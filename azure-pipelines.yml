@@ -9,7 +9,7 @@ trigger:
 variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  ArtifactName: 'Nop.Web.zip'
+  artifactName: 'Nop.Web'
 
 pool:
   vmImage: 'windows-latest'
@@ -46,4 +46,4 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    ArtifactName: '$(Parameters.ArtifactName)'
+    ArtifactName: '$(artifactName)'
