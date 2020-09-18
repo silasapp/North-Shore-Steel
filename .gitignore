@@ -1,5 +1,5 @@
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
-[Bb]in/
+[Bb]in/*
 [Oo]bj/
 
 # mstest test results
@@ -120,10 +120,9 @@ Presentation/Nop.Web/wwwroot/images/thumbs/*
 
 # NOPCOMMERCE Ignore setting
 *.[Cc]ache
-!Presentation/Nop.Web/Plugins/bin
 /Presentation/Nop.Web/Plugins/bin/*
-!/Presentation/Nop.Web/Plugins/bin/placeholder.txt
+!Presentation/Nop.Web/Plugins/bin/*.txt
 /Presentation/Nop.Web/Plugins/*
-!.gitkeep
+!*.gitkeep
 /Presentation/Nop.Web/App_Data/plugins.json
 /Presentation/Nop.Web/App_Data/dataSettings.json
