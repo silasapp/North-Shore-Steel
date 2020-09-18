@@ -120,8 +120,10 @@ Presentation/Nop.Web/wwwroot/images/thumbs/*
 
 # NOPCOMMERCE Ignore setting
 *.[Cc]ache
-/Presentation/Nop.Web/Plugins/*
+!/Presentation/Nop.Web/Plugins/bin
+/Presentation/Nop.Web/Plugins/bin/*
 !/Presentation/Nop.Web/Plugins/bin/placeholder.txt
+/Presentation/Nop.Web/Plugins/*
 !.gitkeep
 /Presentation/Nop.Web/App_Data/plugins.json
 /Presentation/Nop.Web/App_Data/dataSettings.json
