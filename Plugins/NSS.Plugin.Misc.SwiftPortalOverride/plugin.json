@@ -1,11 +1,11 @@
 ﻿{
-  "Group": "",
-  "FriendlyName": "",
-  "SystemName": "",
+  "Group": "Misc",
+  "FriendlyName": "SwiftPortalOverride",
+  "SystemName": "Misc.SwiftPortalOverride",
   "Version": "1.00",
   "SupportedVersions": [ "4.30" ],
-  "Author": "Author Name",
+  "Author": "NSS Team",
   "DisplayOrder": 1,
   "FileName": "NSS.Plugin.Misc.SwiftPortalOverride.dll",
-  "Description": ""
+  "Description": "This plugin allows to override existing features for the Swift Portal project."
 }
