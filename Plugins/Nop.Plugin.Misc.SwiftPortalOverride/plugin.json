@@ -4,8 +4,8 @@
   "SystemName": "Misc.SwiftPortalOverride",
   "Version": "1.00",
   "SupportedVersions": [ "4.30" ],
-  "Author": "NSS Team",
+  "Author": "Chaione team",
   "DisplayOrder": 1,
-  "FileName": "NSS.Plugin.Misc.SwiftPortalOverride.dll",
-  "Description": "This plugin allows to override existing features for the Swift Portal project."
+  "FileName": "Nop.Plugin.Misc.SwiftPortalOverride.dll",
+  "Description": ""
 }
