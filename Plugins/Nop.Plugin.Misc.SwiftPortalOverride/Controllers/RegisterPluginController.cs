@@ -555,7 +555,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/Register.cshtml", model);
         }
 
-
+        [HttpsRequirement]
+        public virtual IActionResult Homepage()
+        {
+            return RedirectToRoute("Homepage");
+        }
 
     }
 }

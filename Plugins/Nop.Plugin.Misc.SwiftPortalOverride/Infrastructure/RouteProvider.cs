@@ -39,6 +39,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "Nop.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Homepage", "homepage/",
+               new { controller = "RegisterPlugin", action = "Homepage" },
+               new { },
+               new[] { "Nop.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
             //endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.PostRegisterCustomer", "register/",
             //  new { controller = "RegisterPlugin", action = "PostRegisterCustomer" },
             //  new { },
