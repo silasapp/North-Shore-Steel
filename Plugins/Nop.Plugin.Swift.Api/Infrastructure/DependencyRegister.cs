@@ -15,6 +15,7 @@ using Nop.Plugin.Api.Maps;
 using Nop.Plugin.Api.ModelBinders;
 using Nop.Plugin.Api.Services;
 using Nop.Plugin.Api.Validators;
+using Nop.Plugin.Swift.Api.Services;
 
 namespace Nop.Plugin.Api.Infrastructure
 {
@@ -41,6 +42,8 @@ namespace Nop.Plugin.Api.Infrastructure
             //builder.RegisterType<ClientService>().As<IClientService>().InstancePerLifetimeScope();
             //builder.RegisterType<CustomerApiService>().As<ICustomerApiService>().InstancePerLifetimeScope();
             builder.RegisterType<SpecificationAttributesApiService>().As<ISpecificationAttributeApiService>().InstancePerLifetimeScope();
+            builder.RegisterType<CompanyService>().As<ICompanyService>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
 
             builder.RegisterType<MappingHelper>().As<IMappingHelper>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerRolesHelper>().As<ICustomerRolesHelper>().InstancePerLifetimeScope();
