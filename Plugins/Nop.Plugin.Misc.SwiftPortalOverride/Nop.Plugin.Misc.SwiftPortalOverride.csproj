@@ -11,18 +11,35 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Content\Images\**" />
+    <EmbeddedResource Remove="Content\Images\**" />
+    <None Remove="Content\Images\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Content\customstyle.css" />
     <None Remove="logo.jpg" />
 	<None Remove="plugin.json" />
     <None Remove="Areas\Admin\Views\_ViewImports.cshtml" />
     <None Remove="Views\Configure.cshtml" />
     <None Remove="Views\_ViewImports.cshtml" />
+    <None Remove="Views\Confirmation.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\customstyle.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="logo.jpg">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="plugin.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Confirmation.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Register.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configure.cshtml">
@@ -49,10 +66,12 @@
     <Folder Include="Areas\Admin\Controllers\" />
     <Folder Include="Areas\Admin\Extensions\" />
     <Folder Include="Areas\Admin\Factories\" />
+    <Folder Include="Areas\Admin\Factories\" />
     <Folder Include="Areas\Admin\Models\" />
-    <Folder Include="Extensions\" />
+<Folder Include="Controllers\" />    <Folder Include="Extensions\" />
     <Folder Include="Factories\" />
-  </ItemGroup>
+<Folder Include="Models\" />
+    <Folder Include="Services\" />  </ItemGroup>
 
   <!-- This target execute after "Build" target -->
   <Target Name="NopTarget" AfterTargets="Build">
