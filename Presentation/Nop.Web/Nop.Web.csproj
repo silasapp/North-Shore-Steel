@@ -36,14 +36,44 @@
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <None Remove="Plugins\**;Themes\**" />
 
-    <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest"/>
-    <None Include="Plugins\**"  CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <None Include="Plugins\**" CopyToPublishDirectory="PreserveNewest" />
 
     <Content Include="Themes\**" CopyToPublishDirectory="PreserveNewest" Exclude="Themes\**\*.config;Themes\**\*.cshtml;Themes\**\*.json" />
-    <None Include="Themes\**"  CopyToPublishDirectory="PreserveNewest" />
+    <None Include="Themes\**" CopyToPublishDirectory="PreserveNewest" />
 
     <!-- We copy the \Logs directory -->
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css.map" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css.map" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
 
     <None Update="Areas\Admin\sitemap.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -57,10 +87,6 @@
     in order to avoid the "Duplicate dll" error during publication. 
     We can also use “ExcludeConfigFilesFromBuildOutput” according to https://github.com/aspnet/AspNetCore/issues/14017 -->
     <Content Update="**\*.config;**\*.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Plugins\" />
   </ItemGroup>
 
   <!-- This target execute after "Build" target.

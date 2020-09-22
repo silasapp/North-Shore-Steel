@@ -4,3 +4,9 @@
     /* margin-right: 40em; */
     display: inline-block !important;
 }
+
+
+.center-1 .page-title, .center-1 .title {
+    margin: unset !important;
+    border-bottom: none !important;
+}
