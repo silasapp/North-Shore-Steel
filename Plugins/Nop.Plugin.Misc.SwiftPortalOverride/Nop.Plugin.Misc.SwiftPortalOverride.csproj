@@ -11,17 +11,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Content\customstyle.css" />
+    <None Remove="Content\Images\facebook_logo.png" />
     <None Remove="logo.jpg" />
 	<None Remove="plugin.json" />
-    <None Remove="Views\_ViewImports.cshtml" />
     <None Remove="Areas\Admin\Views\_ViewImports.cshtml" />
+    <None Remove="Views\Confirmation.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\customstyle.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Images\facebook_logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="logo.jpg">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="plugin.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Confirmation.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Register.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
