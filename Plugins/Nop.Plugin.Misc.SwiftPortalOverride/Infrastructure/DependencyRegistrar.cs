@@ -2,6 +2,8 @@
 using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
 using Nop.Core.Infrastructure.DependencyManagement;
+using Nop.Plugin.Misc.SwiftPortalOverride.Services;
+using Nop.Services.Messages;
 
 namespace Nop.Plugin.Misc.SwiftPortalOverride.Infrastructure
 {
@@ -9,11 +11,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Infrastructure
     {
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
-            //builder.RegisterType<CustomService>().As<ICustomAttributeService>().InstancePerLifetimeScope();
-
-            //builder.RegisterType<CustomModelFactory>().As<ICustomModelFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
         }
 
-        public int Order => 1;
+        public int Order => 10;
     }
 }
