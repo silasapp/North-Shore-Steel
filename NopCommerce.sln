@@ -65,7 +65,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Widgets.Facebook
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Swift.Api", "Plugins\Nop.Plugin.Swift.Api\Nop.Plugin.Swift.Api.csproj", "{EF344199-AF63-4DC1-912D-A344A1DD9309}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nop.Plugin.Misc.SwiftPortalOverride", "Plugins\Nop.Plugin.Misc.SwiftPortalOverride\Nop.Plugin.Misc.SwiftPortalOverride.csproj", "{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Misc.SwiftPortalOverride", "Plugins\Nop.Plugin.Misc.SwiftPortalOverride\Nop.Plugin.Misc.SwiftPortalOverride.csproj", "{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Swift.Api.Tests", "Tests\Nop.Plugin.Swift.Api.Test\Nop.Plugin.Swift.Api.Tests.csproj", "{698533B2-5700-4CD9-9A37-6107DCBF1BEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -381,6 +383,18 @@ Global
 		{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9}.Release|x86.ActiveCfg = Release|Any CPU
 		{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9}.Release|x86.Build.0 = Release|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Debug|x86.Build.0 = Debug|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Release|x86.ActiveCfg = Release|Any CPU
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -414,6 +428,7 @@ Global
 		{87013DC8-D032-465B-A950-753E4EB15502} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{EF344199-AF63-4DC1-912D-A344A1DD9309} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
+		{698533B2-5700-4CD9-9A37-6107DCBF1BEB} = {A340B280-C12B-47E7-90B7-89C650F8AAFC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE72A8B2-332A-4175-9319-6726D36E9D25}
