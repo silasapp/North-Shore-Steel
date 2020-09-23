@@ -96,5 +96,28 @@ namespace Nop.Plugin.Api.Controllers
             return Ok();
         }
 
+        [HttpDelete]
+        [Route("/api/users/{id}/companies/{companyId}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorsRootObject), 400)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
+        [GetRequestsErrorInterceptorActionFilter]
+        public IActionResult DeleteCustomerCompany(
+            int id,
+            int companyId
+            )
+        {
+            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(id, companyId);
+
+            if (customerCompany == null)
+            {
+                return NotFound();
+            }
+
+            _customerCompanyService.DeleteCustomerCompany(customerCompany);
+
+            return Ok();
+        }
+
     }
 }
