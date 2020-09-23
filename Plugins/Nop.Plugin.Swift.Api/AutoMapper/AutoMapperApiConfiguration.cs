@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration;
+using System.Collections.Generic;
 
 namespace Nop.Plugin.Api.AutoMapper
 {
@@ -42,6 +43,11 @@ namespace Nop.Plugin.Api.AutoMapper
         public static TDestination MapTo<TSource, TDestination>(this TSource source, TDestination destination)
         {
             return Mapper.Map(source, destination);
+        }
+
+        public static IList<TDestination> MapTo<TSource, TDestination>(this IList<TSource> source)
+        {
+            return Mapper.Map<IList<TSource>, IList<TDestination>>(source);
         }
     }
 }

@@ -39,11 +39,10 @@ namespace Nop.Plugin.Api.Infrastructure
 
         private void RegisterPluginServices(ContainerBuilder builder)
         {
-            //builder.RegisterType<ClientService>().As<IClientService>().InstancePerLifetimeScope();
-            //builder.RegisterType<CustomerApiService>().As<ICustomerApiService>().InstancePerLifetimeScope();
             builder.RegisterType<SpecificationAttributesApiService>().As<ISpecificationAttributeApiService>().InstancePerLifetimeScope();
             builder.RegisterType<CompanyService>().As<ICompanyService>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
+            builder.RegisterType<ShapeService>().As<IShapeService>().InstancePerLifetimeScope();
 
             builder.RegisterType<MappingHelper>().As<IMappingHelper>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerRolesHelper>().As<ICustomerRolesHelper>().InstancePerLifetimeScope();
