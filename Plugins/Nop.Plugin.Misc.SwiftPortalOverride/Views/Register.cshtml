@@ -3,7 +3,8 @@
 @{
     Layout = "";
     Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/customstyle.css");
-    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/bootstrap.css");
+
+    //Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/bootstrap.css");
 }
 @{
     Layout = "_ColumnsOne";
@@ -14,7 +15,13 @@
     Html.AppendPageCssClassParts("html-registration-page");
 }
 
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 
 <div class="page registration-page">
@@ -238,10 +245,13 @@
                                             <script asp-location="Footer">
                                                 $(document).ready(function() {
                                                     $('#read-privacyinfo').on('click',
-                                                        function(e) {
-                                                            displayPopupContentFromUrl(
-                                                                '@Url.RouteUrl("Terms", new {SystemName = ""})',
-                                                                'Terms of Service');
+                                                        function (e) {
+                                                            e.preventDefault();
+                                                            jQuery.noConflict();
+                                                            $('#myModal').modal('show');
+                                                            @*displayPopupContentFromUrl(
+                                                                '@Url.RouteUrl("term/", new {SystemName = ""})',
+                                                                'Terms of Service');*@
                                                         });
                                                 });
                                             </script>
@@ -264,4 +274,106 @@
             </div>
         </form>
     </div>
+
+    <div class="container">
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Terms of Service</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p style="text-align: center;font-weight: bold;">TERMS AND CONDITIONS (last modified October 15, 2014)</p>
+                        Each order by Buyer, including shipments to Buyer in response to any telephone orders, shall be deemed an acknowledgement and acceptance by Buyer of Seller’s terms and conditions
+                        as then in effect. The terms and conditions set forth herein, as may be subsequently modified by Seller from time to time, are incorporated by reference into all sales order forms and
+                        invoices issued by Seller, and the terms and conditions herein shall constitute the complete and final agreement between Buyer and Seller, superseding prior written and oral
+                        communications.
+                        NO MODIFICATIONS. Seller’s provision of credit, acceptance of any purchase order and/or sale of any goods are expressly conditioned upon the terms and conditions contained or
+                        referred herein. NO TERMS OR CONDITIONS THAT ALTER OR MODIFY IN ANY WAY ANY PROVISION HEREOF SHALL BE BINDING UNLESS EXPRESSLY AGREED
+                        TO IN A WRITTEN INSTRUMENT SIGNED BY SELLER’S AUTHORIZED REPRESENTATIVE. SELLER OBJECTS TO ANY DIFFERENT OR ADDITIONAL TERMS OR
+                        CONDITIONS AND HEREBY REJECTS ANY AND ALL SUCH TERMS, WHETHER CONTAINED IN PREVIOUS OR SUBSEQUENT PROPOSALS OR COMMUNICATIONS
+                        FROM BUYER. Authorization by Buyer to furnish goods hereunder constitutes acceptance of these terms and conditions. BUYER AND SELLER AGREE THAT THE TERMS AND
+                        CONDITIONS PRINTED HEREIN ARE ACCEPTED IN GOOD FAITH BY BOTH PARTIES AS THE CONTROLLING AND FINAL TERMS AND CONDITIONS, AND
+                        FURTHER AGREE THAT THERE SHALL BE NO BATTLE OF THE FORMS AS DESCRIBED IN SECTION 2-207 OF THE UNIFORM COMMERCIAL CODE.
+                        PRICE. The purchase price of any goods sold hereunder shall be as stated on the applicable Seller order acknowledgment or accepted purchase order; provided, however, that any
+                        increase in Seller’s cost of the subject materials after the date of the applicable Seller order acknowledgment or accepted purchase order, including, but not limited to, any price increase
+                        or surcharge may result in an increase in such price effective for any goods scheduled for shipment beginning immediately on the date such increase in Seller’s cost of the subject material is
+                        imposed on Seller. Such price changes may be made effective by Seller without prior notice to Buyer and may be adjusted by Seller periodically to reflect a change is such costs.
+                        Seller shall be bound as to purchase price only upon shipment and acceptance of all or any part of the goods ordered.
+                        DELIVERY; FORCE MAJEURE; INSTALLMENTS. Unless otherwise agreed to in writing, Seller does not guarantee any certain date of delivery, and any delay in or failure of
+                        performance of the Seller shall not constitute default hereunder if such delays and/or failure to perform is caused by an occurrence beyond the control of Seller, including, but not limited to,
+                        acts of God, acts of war, fires, strikes, severe weather conditions, labor shortages, inability to secure material, and thefts. If Seller’s delay in or failure of performance is covered by this
+                        provision, then the time for performance by Seller shall be extended by a period of time equal to time lost by reason of such delay. Unless otherwise expressly stated, Seller shall
+                        have the right to make delivery in installments. All installments shall be separately invoiced and paid as billed without regard to subsequent deliveries. Failure of Buyer to pay for any
+                        installment when due shall excuse Seller from making further deliveries. Delay in delivery on any installment shall not relieve Buyer of its obligations to accept and pay for
+                        remaining installments.
+                        WARRANTY; DISCLAIMER. Seller will furnish goods of the quality specified on the applicable Seller sales order. If goods purchased hereunder are defective or are not in
+                        substantial conformity with the specifications, subject to the tolerances and variations consistent with usual trade practices, Seller will replace such materials with conforming materials at
+                        the point of initial delivery or will, at Seller’s election, issue Buyer a credit or refund for the purchase price, provided that (1) Buyer has notified Seller of the defect or nonconformity
+                        within ten (10) days after the delivery of the material (failure to give such notice constitutes acceptance and an irrevocable waiver of all claims); (2) the material has been properly worked or
+                        used by Buyer; and (3) Seller has been given a reasonable opportunity to inspect the material. After inspection or waiver of inspection by Seller, Seller will arrange for the disposition of
+                        defective or nonconforming materials. This warranty is expressly in lieu of all other warranties, expressed or implied, and of all other obligations or liabilities on Seller’s part.
+                        SELLER EXPRESSLY EXCLUDES AND DISCLAIMS ALL OTHER WARRANTIES, EXPRESSED OR IMPLIED, INCLUDING, WITHOUT LIMITATION, THE
+                        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR USE FOR A PARTICULAR PURPOSE. SELLER SHALL NOT HAVE ANY LIABILITY FOR (A)
+                        DAMAGES IN AN AMOUNT EXCEEDING THE PURCHASE PRICE OF THE GOODS SOLD HEREUNDER, (B) LOSS OF TIME OR COST OF LABOR EXPENDED,
+                        OR (C) ANY SEPARATE SPECIAL, INDIRECT, CONSEQUENTIAL, OR INCIDENTAL DAMAGES, INCLUDING, WITHOUT LIMITATION, CONSEQUENTIAL
+                        DAMAGES RESULTING FROM REJECTION OF FINISHED PARTS BY BUYER OR BUYER'S CUSTOMERS.
+                        SECURING AND OFFLOADING. Buyer is responsible for the securing of all loads of material transported from Seller’s facility in Buyers vehicle, as well as for flagging or
+                        otherwise marking such material for transport. If a third party freight carrier transports material from Seller’s facility, the freight carrier shall be responsible for securing the load,
+                        flagging, or otherwise marking the material for transport. Seller shall not have any liability to Buyer or any third party for any (1) damage to, or loss of, any vehicle used to carry material
+                        purchased by Buyer from Seller, whether such vehicle belongs to Buyer or a third party, or to any other vehicle belonging to a third party, (2) damage to, or loss of, the material
+                        purchased by Buyer from Seller or to a third party’s property (real or personal), (3) injury to any person (whether the driver of the vehicle carrying the material or an unassociated third
+                        person), or (4) any other loss of any kind, resulting from a failure by Buyer or a freight carrier to properly secure a load of material purchased from Seller and transported from Seller’s
+                        facility in Buyers vehicle or on a vehicle belong to a freight carrier. Buyer is expressly prohibited from manually offloading material from Seller’s trucks. Buyer is expected to have the
+                        proper equipment and manpower to offload material without assistance from Seller’s driver. If Buyer does not have a safe, conventional means of offloading the material, Seller’s
+                        driver will be forced to return to Seller’s facility with the material and the customer may be charged for the expense of the trip.
+                        GOVERNING LAW; LITIGATION AND COLLECTION. This contract is deemed made in Texas and shall be governed by and construed in accordance with the laws of
+                        Texas. Any controversy or claim arising out of or relating to this sale shall be mediated by a mutually agreed upon mediator in Harris County, Texas. The cost of the mediation shall be
+                        shared equally. In the event the dispute is not resolved through mediation, any litigation shall be brought in Harris County, Texas, which courts shall have the exclusive venue for and
+                        have exclusive jurisdiction over any such litigation. Buyer and Seller hereby expressly consent to the jurisdiction and venue of said courts. If any default is made in payment of
+                        amounts due for the sale of goods and materials hereunder or upon any other breach of the terms and conditions set forth herein, Buyer agrees to pay Seller’s reasonable cost of collection
+                        and/or compliance, including reasonable attorney fees and costs, not to exceed an amount allowed by law. Buyer and Seller agree that any action, regardless of form, arising out of
+                        this sale must be brought within one (1) year after the goods are delivered to Buyer.
+                        TAXES AND OTHER CHARGES. In addition to the price quoted for goods sold, Buyer shall pay any tax imposed by any present or future law on the sale of goods covered by this
+                        order, and all other reasonable charges for ancillary services and costs such as forming, galvanizing, and other services. If Buyer fails to make payment to Seller of any amounts due
+                        and owing (including any applicable surcharge or freight charge) by the net due date, Seller may charge interest on the outstanding balance at an annual rate of 18% or the highest rate
+                        allowed by law (whichever is less). Payments after accrual of such interest charges shall be applied first against such interest charges and secondly against past due invoices.
+                        FINANCIAL RESPONSIBILITY. Reasonable doubt on the part of Seller concerning the financial responsibility of Buyer (including, but not limited to, Buyers failure to pay on the
+                        net due date for goods shipped) shall entitle Seller to stop operation, decline shipment, or stop any material in transit without liability, until the material has been paid for or until Seller is
+                        furnished reasonably satisfactory proof of Buyers financial responsibility. If Seller suspends performance and later proceeds with such order, Seller shall be entitled to such extension of
+                        time for performance as is necessitated by the suspension. Seller may, in its discretion, require any order placed by Buyer to be paid on a C.O.D. basis.
+                        RETURNS. No goods may be returned for credit and no order may be cancelled, in whole or in part, without the prior written consent of Seller. If Seller consents to a return, Seller may
+                        assess a restocking fee of $20 or 15%, whichever is greater.
+                        SECURITY INTEREST. Buyer grants to Seller a security interest in the goods sold hereunder and in any goods made or fabricated therefrom and the proceeds thereof, said security
+                        interest securing all obligations of Buyer at any time owing to the Seller, whether now existing or hereinafter incurred. Buyer agrees, until such time as Seller has been paid in full for the
+                        goods purchased hereunder, that it will keep the goods free from any adverse security interest. Seller may file a copy of the applicable invoice as a financing statement at any time.
+                        WAIVER. Neither any failure nor any delay on the part of Seller in exercising any rights hereunder shall operate as a waiver of any of Seller’s rights hereunder. All rights and remedies
+                        granted herein are in addition to all remedies available at law or in equity.
+                        INDEMNIFICATION. Buyer shall defend, indemnify and hold harmless Seller and Seller’s affiliates, successors and assigns against any and all claims or damages of any kind, including
+                        reasonable attorney and professional fees and costs, and the cost of enforcing any right to indemnification hereunder arising out of or occurring in connection with Buyer’s use or resale of
+                        any goods purchased hereunder, or Buyer’s negligence, willful misconduct or breach of these terms.
+                        CONFIDENTIALITY. Buyer agrees never to disclose or copy, without written consent from Seller, any non-public, confidential or proprietary information of Seller, including any
+                        specifications, samples, patterns, designs, plans, drawings, documents, data, business operations, pricing, discounts or rebates, disclosed by Seller to Buyer, whether disclosed orally or
+                        disclosed or accessed in written, electronic or other form or media, and whether or not marked, designated or otherwise identified as “confidential.”
+                        SEVERABILITY. If any section or portion of a section of these terms and conditions are deemed unlawful or unenforceable, that section or portion of a section shall be stricken, and the
+                        remaining terms and conditions shall continue in full force and effect.
+                        EXPORT COMPLIANCE. Buyer agrees and certifies that neither the goods purchased from Seller, nor the direct product thereof, will be exported outside the United States (1) into any
+                        country (or to a national or resident of any such country) as to which the U.S. has embargoed goods, (2) to anyone on the U.S. Treasury Departments list of Specially Designated
+                        Nationals or the U.S. Commerce Departments Table of Deny Orders, or (3) otherwise in violation of or as prohibited by the laws, rules, regulations or administrative order of the United
+                        States, or any unit, agency or department thereof. Buyer further agrees and certifies that it is not located in, under the control of, or a national or resident of any such country, on any such list
+                        or order, or subject to any such prohibition.
+                        MSDS CAUTION. When the goods sold hereunder are subject to welding, cutting, grinding, or other processing and/or fabrication, hazardous substances and/or fumes may be released.
+                        Please contact Seller for material safety data sheets on the goods sold hereunder.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
 </div>
