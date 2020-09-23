@@ -56,6 +56,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
+            // log request
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user request -> ", JsonSerializer.Serialize(request));
+
             //initialize
             var retVal = new SwiftCreateUserResponse();
 
@@ -125,6 +128,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             {
                 _logger.Error("Swift Api provider - Create user", ex);
             }
+
+            // log request
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user response -> wintrixId==>", retVal.WintrixId?.ToString() ?? "empty");
 
             return retVal;
         }

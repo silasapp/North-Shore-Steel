@@ -13,6 +13,9 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
+using Nop.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
+using Nop.Plugin.Misc.SwiftPortalOverride.Requests;
+using Nop.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Authentication;
 using Nop.Services.Authentication.External;
 using Nop.Services.Catalog;
@@ -39,7 +42,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
+namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
 {
 
     public partial class RegisterPluginController : CustomerController
@@ -71,30 +74,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly LocalizationSettings _localizationSettings;
         private readonly TaxSettings _taxSettings;
-        //private readonly IAddressAttributeParser _addressAttributeParser;
-        //private readonly ICountryService _countryService;
-        //private readonly ICurrencyService _currencyService;
-        //private readonly ICustomerActivityService _customerActivityService;
-        //private readonly IExportManager _exportManager;
-        //private readonly IExternalAuthenticationService _externalAuthenticationService;
-        //private readonly IGiftCardService _giftCardService;
-        //private readonly ILogger _logger;
-        //private readonly IOrderService _orderService;
-        //private readonly IPictureService _pictureService;
-        //private readonly IPriceFormatter _priceFormatter;
-        //private readonly IProductService _productService;
-        //private readonly IShoppingCartService _shoppingCartService;
-        //private readonly IStateProvinceService _stateProvinceService;
-        //private readonly MediaSettings _mediaSettings;
-        //private readonly StoreInformationSettings _storeInformationSettings;
-        //private readonly IDownloadService _downloadService;
-        //private readonly ForumSettings _forumSettings;
+        private readonly NSSApiProvider _nSSApiProvider;
 
         #endregion
 
 
         #region Constructor
-        public RegisterPluginController(AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
+        public RegisterPluginController(AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, NSSApiProvider nSSApiProvider) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
         {
             _customerSettings = customerSettings;
             _customerModelFactory = customerModelFactory;
@@ -122,24 +108,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workflowMessageService = workflowMessageService;
             _localizationSettings = localizationSettings;
             _taxSettings = taxSettings;
-            //_downloadService = downloadService;
-            //_addressAttributeParser = addressAttributeParser;
-            //_forumSettings = forumSettings;
-            //_countryService = countryService;
-            //_currencyService = currencyService;
-            //_customerActivityService = customerActivityService;
-            //_exportManager = exportManager;
-            //_externalAuthenticationService = externalAuthenticationService;
-            //_giftCardService = giftCardService;
-            //_logger = logger;
-            //_orderService = orderService;
-            //_pictureService = pictureService;
-            //_priceFormatter = priceFormatter;
-            //_productService = productService;
-            //_shoppingCartService = shoppingCartService;
-            //_stateProvinceService = stateProvinceService;
-            //_mediaSettings = mediaSettings;
-            //_storeInformationSettings = storeInformationSettings;
+            _nSSApiProvider = nSSApiProvider;
         }
 
         #endregion
@@ -505,6 +474,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         _workflowMessageService.SendCustomerRegisteredNotificationMessage(customer,
                             _localizationSettings.DefaultAdminLanguageId);
 
+                    //NSS User Registeration
+                    //RegisterNSSUser(model, form, customer);
+
                     //raise event       
                     _eventPublisher.Publish(new CustomerRegisteredEvent(customer));
 
@@ -559,6 +531,102 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public virtual IActionResult Homepage()
         {
             return RedirectToRoute("Homepage");
+        }
+
+        void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
+        {
+            // save customer as no NSSApproved by default
+            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
+
+            // preapre request for create api call
+
+            var request = new SwiftCreateUserRequest
+            {
+                Firstname = model.FirstName,
+                LastName = model.LastName,
+                WorkEmail = model.Email,
+                Phone = model.Phone,
+                CompanyName = model.Company
+            };
+
+            #region BuildCustomAttributes
+
+            foreach (var attribute in model.CustomerAttributes)
+            {
+                var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                switch (attribute.AttributeControlType)
+                {
+                    case AttributeControlType.DropdownList:
+                    case AttributeControlType.RadioList:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var selectedAttributeId = int.Parse(ctrlAttributes);
+                                if (selectedAttributeId > 0)
+                                {
+                                    var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                    if (val != null)
+                                    {
+                                        if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
+                                            request.HearAboutUs = val.Name;
+                                        if (attribute.Name == SwiftPortalOverrideDefaults.PreferredLocationIdAttribute)
+                                            request.PreferredLocationid = val.Id.ToString();
+
+                                    }
+                                }
+                            }
+
+                        }
+                        break;
+                    case AttributeControlType.Checkboxes:
+                        {
+                            var cblAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(cblAttributes))
+                            {
+                                var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                if (items.Length > 0)
+                                {
+                                    if (attribute.Name == SwiftPortalOverrideDefaults.IsExistingCustomerAttribute)
+                                        request.IsExistingCustomer = "1";
+                                }
+                                else
+                                {
+                                    request.IsExistingCustomer = "0";
+                                }
+                            }
+                        }
+                        break;
+                    case AttributeControlType.TextBox:
+                    case AttributeControlType.MultilineTextbox:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var enteredText = ctrlAttributes.ToString().Trim();
+
+                                if (attribute.Name == SwiftPortalOverrideDefaults.ItemsForNextProjectAttribute)
+                                    request.ItemsForNextProject = enteredText;
+
+                                if (attribute.Name == SwiftPortalOverrideDefaults.OtherAttribute)
+                                    request.Other = enteredText;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            #endregion
+
+            var response = _nSSApiProvider.CreateSwiftUser(request);
+
+            if(response != null && response.WintrixId != null)
+            {
+                // save wintrix id
+                _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.WintrixKeyAttribute, response.WintrixId);
+            }
         }
 
 

@@ -12,8 +12,17 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
         public static string SystemName => "Misc.SwiftPortalOverride";
 
         /// <summary>
-        /// Gets a plugin system name
+        /// Gets NSS Wintrix key name
         /// </summary>
-        public static string WintrixId => "WintrixId";        
+        public static string WintrixKeyAttribute => "WintrixId";
+
+        #region NSSCustomerAttributes           
+        public static string IsExistingCustomerAttribute => "IsExistingCustomer";        
+        public static string PreferredLocationIdAttribute => "PreferredLocationId";        
+        public static string HearAboutUsAttribute => "HearAboutUs";        
+        public static string OtherAttribute => "Other";        
+        public static string ItemsForNextProjectAttribute => "ItemsForNextProject"; 
+        public static string NSSApprovedAttribute => "NSSApproved"; 
+        #endregion
     }
 }

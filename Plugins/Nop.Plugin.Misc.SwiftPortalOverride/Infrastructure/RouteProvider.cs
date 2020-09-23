@@ -7,7 +7,7 @@ using Nop.Services.Localization;
 using Nop.Web.Framework.Mvc.Routing;
 using System.Linq;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
+namespace Nop.Plugin.Misc.SwiftPortalOverride.Infrastructure
 {
     /// <summary>
     /// Represents plugin route provider

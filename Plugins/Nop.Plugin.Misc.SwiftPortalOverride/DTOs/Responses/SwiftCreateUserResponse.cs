@@ -6,6 +6,6 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
 {
     public class SwiftCreateUserResponse
     {
-        public int WintrixId { get; set; }
+        public int? WintrixId { get; set; }
     }
 }
