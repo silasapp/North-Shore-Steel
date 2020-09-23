@@ -11,12 +11,21 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Models
         public int ActiveStoreScopeConfiguration {get;set;}
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.UseSandBox")]
         public bool UseSandBox { get; set; }
-        public bool UseSandBox__OverrideForStore { get; set; }
+        public bool UseSandBox_OverrideForStore { get; set; }
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.TestEmailAddress")]
         public string TestEmailAddress { get; set; }
-        public bool TestEmailAddress__OverrideForStore { get; set; }
+        public bool TestEmailAddress_OverrideForStore { get; set; }
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.ApproverMailBox")]
         public string ApproverMailBox { get; set; }
-        public bool ApproverEmailBox__OverrideForStore { get; set; }
+        public bool ApproverMailBox_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.NSSApiBaseUrl")]
+        public string NSSApiBaseUrl { get; set; }
+        public bool NSSApiBaseUrl_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.NSSApiAuthUsername")]
+        public string NSSApiAuthUsername { get; set; }
+        public bool NSSApiAuthUsername_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.NSSApiAuthPassword")]
+        public string NSSApiAuthPassword { get; set; }
+        public bool NSSApiAuthPassword_OverrideForStore { get; set; }
     }
 }

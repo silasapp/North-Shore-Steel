@@ -95,8 +95,7 @@
     <Folder Include="Areas\Admin\Models\" />
 <Folder Include="Controllers\" />    <Folder Include="Extensions\" />
     <Folder Include="Factories\" />
-<Folder Include="Models\" />
-    <Folder Include="Services\" />  </ItemGroup>
+<Folder Include="Models\" />  </ItemGroup>
 
   <!-- This target execute after "Build" target -->
   <Target Name="NopTarget" AfterTargets="Build">

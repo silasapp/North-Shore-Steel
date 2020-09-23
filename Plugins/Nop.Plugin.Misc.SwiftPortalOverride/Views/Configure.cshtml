@@ -12,7 +12,7 @@
                 @*<p>@T("Plugins.Payments.Manual.Instructions")</p>*@
                 <div class="form-group">
                     <div class="col-md-3">
-                        <nop-override-store-checkbox asp-for="UseSandBox__OverrideForStore" asp-input="UseSandBox" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-override-store-checkbox asp-for="UseSandBox_OverrideForStore" asp-input="UseSandBox" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
                         <nop-label asp-for="UseSandBox" />
                     </div>
                     <div class="col-md-9">
@@ -22,7 +22,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-3">
-                        <nop-override-store-checkbox asp-for="TestEmailAddress__OverrideForStore" asp-input="TestEmailAddress" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-override-store-checkbox asp-for="TestEmailAddress_OverrideForStore" asp-input="TestEmailAddress" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
                         <nop-label asp-for="TestEmailAddress" />
                     </div>
                     <div class="col-md-9">
@@ -32,12 +32,42 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-3">
-                        <nop-override-store-checkbox asp-for="ApproverEmailBox__OverrideForStore" asp-input="ApproverMailBox" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-override-store-checkbox asp-for="ApproverMailBox_OverrideForStore" asp-input="ApproverMailBox" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
                         <nop-label asp-for="ApproverMailBox" />
                     </div>
                     <div class="col-md-9">
                         <nop-editor asp-for="ApproverMailBox" />
                         <span asp-validation-for="ApproverMailBox"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="NSSApiBaseUrl_OverrideForStore" asp-input="NSSApiBaseUrl" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="NSSApiBaseUrl" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="NSSApiBaseUrl" />
+                        <span asp-validation-for="NSSApiBaseUrl"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="NSSApiAuthUsername_OverrideForStore" asp-input="NSSApiAuthUsername" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="NSSApiAuthUsername" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="NSSApiAuthUsername" />
+                        <span asp-validation-for="NSSApiAuthUsername"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="NSSApiAuthPassword_OverrideForStore" asp-input="NSSApiAuthPassword" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="NSSApiAuthPassword" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="NSSApiAuthPassword" />
+                        <span asp-validation-for="NSSApiAuthPassword"></span>
                     </div>
                 </div>
 

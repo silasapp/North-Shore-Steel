@@ -62,13 +62,19 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
                 UseSandBox = swiftPortalOverrideSettings.UseSandBox,
                 TestEmailAddress = swiftPortalOverrideSettings.TestEmailAddress,
                 ApproverMailBox = swiftPortalOverrideSettings.ApproverMailBox,
+                NSSApiBaseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl,
+                NSSApiAuthUsername = swiftPortalOverrideSettings.NSSApiAuthUsername,
+                NSSApiAuthPassword = swiftPortalOverrideSettings.NSSApiAuthPassword,
                 ActiveStoreScopeConfiguration = storeScope
             };
             if (storeScope > 0)
             {
-                model.UseSandBox__OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.UseSandBox, storeScope);
-                model.TestEmailAddress__OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.TestEmailAddress, storeScope);
-                model.ApproverEmailBox__OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.ApproverMailBox, storeScope);
+                model.UseSandBox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.UseSandBox, storeScope);
+                model.TestEmailAddress_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.TestEmailAddress, storeScope);
+                model.ApproverMailBox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.ApproverMailBox, storeScope);
+                model.NSSApiBaseUrl_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, storeScope);
+                model.NSSApiAuthUsername_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, storeScope);
+                model.NSSApiAuthPassword_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, storeScope);
             }
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/Configure.cshtml", model);
@@ -91,14 +97,20 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
             swiftPortalOverrideSettings.UseSandBox = model.UseSandBox;
             swiftPortalOverrideSettings.TestEmailAddress = model.TestEmailAddress;
             swiftPortalOverrideSettings.ApproverMailBox = model.ApproverMailBox;
+            swiftPortalOverrideSettings.NSSApiBaseUrl = model.NSSApiBaseUrl;
+            swiftPortalOverrideSettings.NSSApiAuthUsername = model.NSSApiAuthUsername;
+            swiftPortalOverrideSettings.NSSApiAuthPassword = model.NSSApiAuthPassword;
 
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
              * and loaded from database after each update */
 
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.UseSandBox, model.UseSandBox__OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.TestEmailAddress, model.TestEmailAddress__OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.ApproverMailBox, model.ApproverEmailBox__OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.UseSandBox, model.UseSandBox_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.TestEmailAddress, model.TestEmailAddress_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.ApproverMailBox, model.ApproverMailBox_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, model.NSSApiBaseUrl_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, model.NSSApiAuthUsername_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, model.NSSApiAuthPassword_OverrideForStore, storeScope, false);
 
             //now clear settings cache
             _settingService.ClearCache();

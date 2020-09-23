@@ -10,5 +10,10 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
         /// Gets a plugin system name
         /// </summary>
         public static string SystemName => "Misc.SwiftPortalOverride";
+
+        /// <summary>
+        /// Gets a plugin system name
+        /// </summary>
+        public static string WintrixId => "WintrixId";        
     }
 }
