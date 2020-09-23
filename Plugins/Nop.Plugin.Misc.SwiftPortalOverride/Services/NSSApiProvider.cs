@@ -51,10 +51,28 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         /// </summary>
         /// <param name="request">User request object</param>
         /// <returns>Exchange rates</returns>
-        public SwiftCreateUserResponse CreateSwiftUser(SwiftCreateUserRequest request)
+        public SwiftCreateUserResponse CreateSwiftUser(SwiftCreateUserRequest request, bool useMock = false)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
+
+            if (useMock)
+            {
+                request = new SwiftCreateUserRequest
+                {
+                    CompanyName = "ACME",
+                    Firstname = "Jessica",
+                    LastName = "Jones",
+                    HearAboutUs = "WebSite",
+                    IsExistingCustomer = "0",
+                    ItemsForNextProject = "Test Something",
+                    Other = "",
+                    Phone = "+12463775637",
+                    PreferredLocationid = "1",
+                    SwiftUserId = "3",
+                    WorkEmail = "jessicajones@test.com",
+                };
+            }
 
             // log request
             _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user request -> ", JsonSerializer.Serialize(request));

@@ -475,7 +475,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
                             _localizationSettings.DefaultAdminLanguageId);
 
                     //NSS User Registeration
-                    //RegisterNSSUser(model, form, customer);
+                    RegisterNSSUser(model, form, customer);
 
                     //raise event       
                     _eventPublisher.Publish(new CustomerRegisteredEvent(customer));
@@ -535,98 +535,108 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
 
         void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
         {
-            // save customer as no NSSApproved by default
-            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
-
-            // preapre request for create api call
-
-            var request = new SwiftCreateUserRequest
+            try
             {
-                Firstname = model.FirstName,
-                LastName = model.LastName,
-                WorkEmail = model.Email,
-                Phone = model.Phone,
-                CompanyName = model.Company
-            };
+                // save customer as no NSSApproved by default
+                _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
 
-            #region BuildCustomAttributes
+                // preapre request for create api call
 
-            foreach (var attribute in model.CustomerAttributes)
-            {
-                var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                switch (attribute.AttributeControlType)
+                var request = new SwiftCreateUserRequest
                 {
-                    case AttributeControlType.DropdownList:
-                    case AttributeControlType.RadioList:
-                        {
-                            var ctrlAttributes = form[controlId];
-                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
-                            {
-                                var selectedAttributeId = int.Parse(ctrlAttributes);
-                                if (selectedAttributeId > 0)
-                                {
-                                    var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
-                                    if (val != null)
-                                    {
-                                        if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
-                                            request.HearAboutUs = val.Name;
-                                        if (attribute.Name == SwiftPortalOverrideDefaults.PreferredLocationIdAttribute)
-                                            request.PreferredLocationid = val.Id.ToString();
+                    SwiftUserId = customer.Id.ToString(),
+                    Firstname = model.FirstName,
+                    LastName = model.LastName,
+                    WorkEmail = model.Email,
+                    Phone = model.Phone,
+                    CompanyName = model.Company
+                };
 
+                #region BuildCustomAttributes
+
+                foreach (var attribute in model.CustomerAttributes)
+                {
+                    var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                    switch (attribute.AttributeControlType)
+                    {
+                        case AttributeControlType.DropdownList:
+                        case AttributeControlType.RadioList:
+                            {
+                                var ctrlAttributes = form[controlId];
+                                if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                                {
+                                    var selectedAttributeId = int.Parse(ctrlAttributes);
+                                    if (selectedAttributeId > 0)
+                                    {
+                                        var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                        if (val != null)
+                                        {
+                                            if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
+                                                request.HearAboutUs = val.Name;
+                                            if (attribute.Name == SwiftPortalOverrideDefaults.PreferredLocationIdAttribute)
+                                                request.PreferredLocationid = val.Id.ToString();
+
+                                        }
+                                    }
+                                }
+
+                            }
+                            break;
+                        case AttributeControlType.Checkboxes:
+                            {
+                                var cblAttributes = form[controlId];
+                                if (!StringValues.IsNullOrEmpty(cblAttributes))
+                                {
+                                    var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                    if (items.Length > 0)
+                                    {
+                                        if (attribute.Name == SwiftPortalOverrideDefaults.IsExistingCustomerAttribute)
+                                            request.IsExistingCustomer = "1";
+                                    }
+                                    else
+                                    {
+                                        request.IsExistingCustomer = "0";
                                     }
                                 }
                             }
-
-                        }
-                        break;
-                    case AttributeControlType.Checkboxes:
-                        {
-                            var cblAttributes = form[controlId];
-                            if (!StringValues.IsNullOrEmpty(cblAttributes))
+                            break;
+                        case AttributeControlType.TextBox:
+                        case AttributeControlType.MultilineTextbox:
                             {
-                                var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                if (items.Length > 0)
+                                var ctrlAttributes = form[controlId];
+                                if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                                 {
-                                    if (attribute.Name == SwiftPortalOverrideDefaults.IsExistingCustomerAttribute)
-                                        request.IsExistingCustomer = "1";
-                                }
-                                else
-                                {
-                                    request.IsExistingCustomer = "0";
+                                    var enteredText = ctrlAttributes.ToString().Trim();
+
+                                    if (attribute.Name == SwiftPortalOverrideDefaults.ItemsForNextProjectAttribute)
+                                        request.ItemsForNextProject = enteredText;
+
+                                    if (attribute.Name == SwiftPortalOverrideDefaults.OtherAttribute)
+                                        request.Other = enteredText;
                                 }
                             }
-                        }
-                        break;
-                    case AttributeControlType.TextBox:
-                    case AttributeControlType.MultilineTextbox:
-                        {
-                            var ctrlAttributes = form[controlId];
-                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
-                            {
-                                var enteredText = ctrlAttributes.ToString().Trim();
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
-                                if (attribute.Name == SwiftPortalOverrideDefaults.ItemsForNextProjectAttribute)
-                                    request.ItemsForNextProject = enteredText;
+                #endregion
 
-                                if (attribute.Name == SwiftPortalOverrideDefaults.OtherAttribute)
-                                    request.Other = enteredText;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
+                var response = _nSSApiProvider.CreateSwiftUser(request, useMock: true);
+
+                if (response != null && response.WintrixId != null)
+                {
+                    // save wintrix id
+                    _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.WintrixKeyAttribute, response.WintrixId);
                 }
             }
-
-            #endregion
-
-            var response = _nSSApiProvider.CreateSwiftUser(request);
-
-            if(response != null && response.WintrixId != null)
+            catch (Exception)
             {
-                // save wintrix id
-                _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.WintrixKeyAttribute, response.WintrixId);
+
+                // silent NSS error
             }
+
         }
 
 
