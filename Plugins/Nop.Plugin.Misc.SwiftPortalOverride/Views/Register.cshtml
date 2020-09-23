@@ -234,14 +234,14 @@
                                         <label for="accept-consent"></label>
                                         @if (Model.AcceptPrivacyPolicyPopup)
                                         {
-                                            <span class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</span>
+                                            <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
                                             <script asp-location="Footer">
                                                 $(document).ready(function() {
                                                     $('#read-privacyinfo').on('click',
                                                         function(e) {
                                                             displayPopupContentFromUrl(
-                                                                '@Url.RouteUrl("TermsOfService", new {SystemName = "confirmation"})',
-                                                                'Terms of Service', 10, 1000, true);
+                                                                '@Url.RouteUrl("Terms", new {SystemName = ""})',
+                                                                'Terms of Service');
                                                         });
                                                 });
                                             </script>

@@ -10,3 +10,13 @@
     margin: unset !important;
     border-bottom: none !important;
 }
+
+.ui-widget.ui-widget-content {
+    width: auto !important;
+    top: 2em !important;
+    left: 16em !important;
+}
+
+.ui-draggable .ui-dialog-titlebar {
+    text-align: center !important;
+}
