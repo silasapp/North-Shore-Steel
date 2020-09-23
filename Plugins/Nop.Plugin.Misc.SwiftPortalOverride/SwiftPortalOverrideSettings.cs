@@ -21,5 +21,20 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
         /// Gets or sets the email address to be used in sandbox mode
         /// </summary>
         public string TestEmailAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the NSS API base url
+        /// </summary>
+        public string NSSApiBaseUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the NSS API authentication username
+        /// </summary>
+        public string NSSApiAuthUsername { get; set; }
+
+        /// <summary>
+        /// Gets or sets the NSS API authentication password
+        /// </summary>
+        public string NSSApiAuthPassword { get; set; }
     }
 }
