@@ -562,8 +562,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
 
+        // terms of service
         [HttpsRequirement]
-        public virtual IActionResult TermsOfService()
+        public virtual IActionResult Terms()
         {
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/TermsOfService.cshtml");
         }

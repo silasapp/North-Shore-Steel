@@ -46,8 +46,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "Nop.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.TermsOfService", "terms/",
-              new { controller = "RegisterPlugin", action = "TermsOfService" },
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Terms", "terms/",
+              new { controller = "RegisterPlugin", action = "Terms" },
               new { },
               new[] { "Nop.Plugin.Misc.SwiftPortalOverride.Controllers" }
               );
