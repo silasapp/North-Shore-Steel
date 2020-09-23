@@ -20,3 +20,17 @@
 .ui-draggable .ui-dialog-titlebar {
     text-align: center !important;
 }
+
+.modal-backdrop {
+    position: unset !important;
+}
+
+.modal-title {
+    text-align: center;
+    font-size: 3em;
+}
+
+.modal-dialog {
+    top: 9em;
+    width: 67em !important;
+}
