@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Nop.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
 {
-    public class SwiftCreateUserResponse
+    public class NSSCreateUserResponse
     {
-        public int? WintrixId { get; set; }
+        public int? WitnrixId { get; set; }
     }
 }
