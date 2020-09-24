@@ -624,7 +624,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 #endregion
 
-                var response = _nSSApiProvider.CreateSwiftUser(request, useMock: true);
+                var response = _nSSApiProvider.CreateSwiftUser(request, useMock: false);
 
                 if (response != null && response.WitnrixId != null)
                 {
