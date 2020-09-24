@@ -166,7 +166,7 @@
                                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                         var textPrompt = attribute.Name;
 
-                                        @if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
+                                        @if (attribute.Name == "HearAboutUs")
                                         {
                                             <div class="col-sm-6">
 
@@ -185,7 +185,7 @@
                                         }
 
 
-                                        @if (attribute.Name == SwiftPortalOverrideDefaults.PreferredLocationIdAttribute)
+                                        @if (attribute.Name == "PreferredLocation")
                                         {
                                             <div class="col-sm-6">
                                                 <label>Preferred pickup location</label>
@@ -202,7 +202,7 @@
                                             </div>
                                         }
 
-                                        @if (attribute.Name == SwiftPortalOverrideDefaults.OtherAttribute)
+                                        @if (attribute.Name == "Other")
                                         {
                                             <div class="col-sm-6">
                                                 <label>Let us know how you found us</label>
@@ -211,7 +211,7 @@
                                         }
 
 
-                                        @if (attribute.Name == SwiftPortalOverrideDefaults.ItemsForNextProjectAttribute)
+                                        @if (attribute.Name == "ItemsForNextProject")
                                         {
                                             <div class="col-sm-6">
                                                 <label>How can we help?</label>
