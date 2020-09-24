@@ -70,7 +70,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                     Phone = "+12463775637",
                     PreferredLocationid = "1",
                     SwiftUserId = "3",
-                    WorkEmail = "jessicajones@test.com",
+                    WorkEmail = "jessicajones@test8.com",
                 };
             }
 
@@ -79,6 +79,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 
             //initialize
             var retVal = new SwiftCreateUserResponse();
+            var content = string.Empty;
 
             //load settings for a chosen store scope
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
@@ -140,6 +141,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                 // throw error if not successful
                 response.EnsureSuccessStatusCode();
 
+                content = response.Content.ReadAsStringAsync().Result;
                 using var responseStream = response.Content.ReadAsStreamAsync().Result;
                 retVal = JsonSerializer.DeserializeAsync<SwiftCreateUserResponse>(responseStream).Result;
             }
@@ -149,7 +151,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user response -> wintrixId==>", retVal.WintrixId?.ToString() ?? "empty");
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Create NSS user response -> wintrixId==>{retVal.WintrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
 
             return retVal;
         }
