@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using Newtonsoft.Json;
+using Nop.Core;
 using Nop.Core.Http;
 using Nop.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using Nop.Plugin.Misc.SwiftPortalOverride.Models;
@@ -70,12 +71,12 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                     Phone = "+12463775637",
                     PreferredLocationid = "1",
                     SwiftUserId = "3",
-                    WorkEmail = "jessicajones@test9.com",
+                    WorkEmail = "jessicajones@test10.com",
                 };
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user request -> ", JsonSerializer.Serialize(request));
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user request -> ", JsonConvert.SerializeObject(request));
 
             //initialize
             var retVal = new NSSCreateUserResponse();
@@ -142,8 +143,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                 response.EnsureSuccessStatusCode();
 
                 content = response.Content.ReadAsStringAsync().Result;
-                using var responseStream = response.Content.ReadAsStreamAsync().Result;
-                retVal = JsonSerializer.DeserializeAsync<NSSCreateUserResponse>(responseStream).Result;
+                retVal = JsonConvert.DeserializeObject<NSSCreateUserResponse>(content);
             }
             catch (Exception ex)
             {
