@@ -104,6 +104,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 
                 //get token
                 var token = GetSwiftToken(httpClient, baseUrl, user, pword);
+                _logger.Error("Swift Api provider - Create user", new Exception($"NSS token => {token}"));
 
                 if (string.IsNullOrEmpty(token))
                 {
@@ -183,10 +184,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                 // throw error if not successful
                 response.EnsureSuccessStatusCode();
 
-                using var responseStream = response.Content.ReadAsStreamAsync().Result;
-                var token = JsonSerializer.DeserializeAsync<object>(responseStream).Result;
+                var token = response.Content.ReadAsStringAsync().Result;
                 if (token != null)
-                    retVal = token.ToString();
+                    retVal = token;
             }
             catch (Exception ex)
             {
