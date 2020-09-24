@@ -561,12 +561,5 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return RedirectToRoute("Homepage");
         }
 
-
-        //// terms of service
-        //[HttpsRequirement]
-        //public virtual IActionResult Term()
-        //{
-        //    return View("~/Plugins/Misc.SwiftPortalOverride/Views/TermsOfService.cshtml");
-        //}
     }
 }
