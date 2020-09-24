@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride.Services.Customer
+namespace Nop.Plugin.Misc.SwiftPortalOverride.Services.Customer
 {
     public class RegisterCustomerService : CustomerRegistrationService
     {
