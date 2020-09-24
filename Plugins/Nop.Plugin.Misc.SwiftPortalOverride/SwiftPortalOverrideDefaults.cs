@@ -18,7 +18,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
 
         #region NSSCustomerAttributes           
         public static string IsExistingCustomerAttribute => "IsExistingCustomer";        
-        public static string PreferredLocationIdAttribute => "PreferredLocationId";        
+        public static string PreferredLocationIdAttribute => "PreferredLocation";        
         public static string HearAboutUsAttribute => "HearAboutUs";        
         public static string OtherAttribute => "Other";        
         public static string ItemsForNextProjectAttribute => "ItemsForNextProject"; 

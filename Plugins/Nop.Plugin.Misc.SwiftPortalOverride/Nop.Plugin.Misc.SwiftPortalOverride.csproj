@@ -17,11 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Content\bootstrap.css" />
-    <None Remove="Content\bootstrap.css.map" />
-    <None Remove="Content\bootstrap.min.css" />
-    <None Remove="Content\bootstrap.min.css.map" />
-    <None Remove="Content\bootstrap.rtl.css" />
     <None Remove="Content\customstyle.css" />
     <None Remove="logo.jpg" />
 	<None Remove="plugin.json" />
@@ -34,26 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Content\bootstrap.css">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Content\bootstrap.css.map">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Content\bootstrap.min.css">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Content\bootstrap.min.css.map">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Content\bootstrap.rtl.css">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="Content\customstyle.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -166,11 +166,11 @@
                                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                         var textPrompt = attribute.Name;
 
-                                        @if (attribute.Name == "HearAboutUs")
+                                        @if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
                                         {
                                             <div class="col-sm-6">
 
-                                                <label>@textPrompt</label>
+                                                <label>How did you hear about us?</label>
                                                 <select name="@(controlId)" id="@(controlId)" class="form-control">
                                                     @if (!attribute.IsRequired)
                                                     {
@@ -185,10 +185,10 @@
                                         }
 
 
-                                        @if (attribute.Name == "PickupLocation")
+                                        @if (attribute.Name == SwiftPortalOverrideDefaults.PreferredLocationIdAttribute)
                                         {
                                             <div class="col-sm-6">
-                                                <label>@textPrompt</label>
+                                                <label>Preferred pickup location</label>
                                                 <select name="@(controlId)" id="@(controlId)" class="form-control">
                                                     @if (!attribute.IsRequired)
                                                     {
@@ -202,20 +202,20 @@
                                             </div>
                                         }
 
-                                        @if (attribute.Name == "FoundUs")
+                                        @if (attribute.Name == SwiftPortalOverrideDefaults.OtherAttribute)
                                         {
                                             <div class="col-sm-6">
-                                                <label>@textPrompt</label>
+                                                <label>Let us know how you found us</label>
                                                 <input name="@(controlId)" type="text" class="textbox form-control" id="@(controlId)" value="@(attribute.DefaultValue)" />
                                             </div>
                                         }
 
 
-                                        @if (attribute.Name == "Help")
+                                        @if (attribute.Name == SwiftPortalOverrideDefaults.ItemsForNextProjectAttribute)
                                         {
                                             <div class="col-sm-6">
-                                                <label>@textPrompt</label>
-                                                <textarea id="@(controlId)" class="form-control" name="@(controlId)">@(attribute.DefaultValue)</textarea>
+                                                <label>How can we help?</label>
+                                                <textarea id="@(controlId)" placeholder="What items are you considering for your next project?" class="form-control" name="@(controlId)">@(attribute.DefaultValue)</textarea>
                                             </div>
                                         }
                                     }
