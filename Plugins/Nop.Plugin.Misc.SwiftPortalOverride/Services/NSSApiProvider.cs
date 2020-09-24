@@ -184,7 +184,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                 response.EnsureSuccessStatusCode();
 
                 using var responseStream = response.Content.ReadAsStreamAsync().Result;
-                retVal = JsonSerializer.DeserializeAsync<string>(responseStream).Result;
+                var token = JsonSerializer.DeserializeAsync<object>(responseStream).Result;
+                if (token != null)
+                    retVal = token.ToString();
             }
             catch (Exception ex)
             {
