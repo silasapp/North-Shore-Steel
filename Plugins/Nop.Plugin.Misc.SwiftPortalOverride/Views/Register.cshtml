@@ -126,8 +126,24 @@
                                                     <nop-required />
                                                 }*@
                                             <span asp-validation-for="Company" style="display:flex;"></span>
-                                            <input type="checkbox" id="company-customer" name="company-customer" />
-                                            <label asp-for="Company">I am a current customer</label>
+
+                                            @{
+                                                var isExistingCustomerCtrl = Model.CustomerAttributes.Where(x => x.Name == "IsExistingCustomer").FirstOrDefault();
+                                            }
+                                            @if (isExistingCustomerCtrl != null)
+                                            {
+                                                var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{isExistingCustomerCtrl.Id}";
+                                                <ul class="option-list">
+                                                    @foreach (var attributeValue in isExistingCustomerCtrl.Values)
+                                                    {
+                                                        <li>
+                                                            <input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
+                                                            <label for="@(controlId)_@(attributeValue.Id)">I am a current customer</label>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            }
+
                                         </div>
                                     }
 

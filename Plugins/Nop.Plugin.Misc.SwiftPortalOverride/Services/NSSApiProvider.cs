@@ -71,7 +71,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                     Phone = "+12463775637",
                     PreferredLocationid = "1",
                     SwiftUserId = "3",
-                    WorkEmail = "jessicajones@test10.com",
+                    WorkEmail = "jessicajones@test11.com",
                 };
             }
 
@@ -92,7 +92,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pword))
             {
-                _logger.Error("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+                _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
                 return retVal;
             }
 
@@ -106,11 +106,10 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 
                 //get token
                 var token = GetSwiftToken(httpClient, baseUrl, user, pword);
-                _logger.Error("Swift Api provider - Create user", new Exception($"NSS token => {token}"));
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    _logger.Error("Swift Api provider - Create user", new Exception("NSS token returned empty")); 
+                    _logger.Warning("Swift Api provider - Create user", new Exception("NSS token returned empty")); 
                     return retVal;
                 }
 
