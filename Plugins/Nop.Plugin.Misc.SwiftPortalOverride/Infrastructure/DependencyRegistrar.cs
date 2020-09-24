@@ -11,6 +11,8 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Infrastructure
     {
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
+            builder.RegisterType<NSSApiProvider>().AsSelf().InstancePerLifetimeScope();
+
             builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
         }
 
