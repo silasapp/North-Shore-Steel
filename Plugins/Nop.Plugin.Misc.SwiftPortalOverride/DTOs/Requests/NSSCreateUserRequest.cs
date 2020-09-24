@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Nop.Plugin.Misc.SwiftPortalOverride.Requests
 {
-    public class SwiftCreateUserRequest
+    public class NSSCreateUserRequest
     {
         public string SwiftUserId { get; set; }
         public string Firstname { get; set; }

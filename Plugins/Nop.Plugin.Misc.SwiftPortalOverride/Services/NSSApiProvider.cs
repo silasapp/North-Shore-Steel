@@ -51,14 +51,14 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         /// </summary>
         /// <param name="request">User request object</param>
         /// <returns>Exchange rates</returns>
-        public SwiftCreateUserResponse CreateSwiftUser(SwiftCreateUserRequest request, bool useMock = false)
+        public NSSCreateUserResponse CreateSwiftUser(NSSCreateUserRequest request, bool useMock = false)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
             if (useMock)
             {
-                request = new SwiftCreateUserRequest
+                request = new NSSCreateUserRequest
                 {
                     CompanyName = "ACME",
                     Firstname = "Jessica",
@@ -70,7 +70,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                     Phone = "+12463775637",
                     PreferredLocationid = "1",
                     SwiftUserId = "3",
-                    WorkEmail = "jessicajones@test8.com",
+                    WorkEmail = "jessicajones@test9.com",
                 };
             }
 
@@ -78,7 +78,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user request -> ", JsonSerializer.Serialize(request));
 
             //initialize
-            var retVal = new SwiftCreateUserResponse();
+            var retVal = new NSSCreateUserResponse();
             var content = string.Empty;
 
             //load settings for a chosen store scope
@@ -143,7 +143,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 
                 content = response.Content.ReadAsStringAsync().Result;
                 using var responseStream = response.Content.ReadAsStreamAsync().Result;
-                retVal = JsonSerializer.DeserializeAsync<SwiftCreateUserResponse>(responseStream).Result;
+                retVal = JsonSerializer.DeserializeAsync<NSSCreateUserResponse>(responseStream).Result;
             }
             catch (Exception ex)
             {
@@ -151,7 +151,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Create NSS user response -> wintrixId==>{retVal.WintrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Create NSS user response -> wintrixId==>{retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
 
             return retVal;
         }

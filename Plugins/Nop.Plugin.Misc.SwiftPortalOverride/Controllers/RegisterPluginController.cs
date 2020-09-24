@@ -543,7 +543,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 // preapre request for create api call
 
-                var request = new SwiftCreateUserRequest
+                var request = new NSSCreateUserRequest
                 {
                     SwiftUserId = customer.Id.ToString(),
                     Firstname = model.FirstName,
@@ -626,10 +626,10 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 var response = _nSSApiProvider.CreateSwiftUser(request, useMock: true);
 
-                if (response != null && response.WintrixId != null)
+                if (response != null && response.WitnrixId != null)
                 {
                     // save wintrix id
-                    _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.WintrixKeyAttribute, response.WintrixId);
+                    _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.WintrixKeyAttribute, response.WitnrixId);
                 }
             }
             catch (Exception)
