@@ -1,36 +1,13 @@
-﻿.custom-inputs {
-    margin-right: 18% !important;
-    width: 150px !important;
-    /* margin-right: 40em; */
-    display: inline-block !important;
-}
-
-
-.center-1 .page-title, .center-1 .title {
-    margin: unset !important;
-    border-bottom: none !important;
-}
-
-.ui-widget.ui-widget-content {
-    width: auto !important;
-    top: 2em !important;
-    left: 16em !important;
-}
-
-.ui-draggable .ui-dialog-titlebar {
-    text-align: center !important;
-}
-
+﻿
 .modal-backdrop {
     position: unset !important;
 }
 
 .modal-title {
-    text-align: center;
-    font-size: 3em;
+    text-align: center !important;
+    font-size: 3em !important;
 }
 
 .modal-dialog {
-    top: 9em;
     width: 67em !important;
 }

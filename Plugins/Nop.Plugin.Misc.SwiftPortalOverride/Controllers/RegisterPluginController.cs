@@ -533,6 +533,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
             return RedirectToRoute("Homepage");
         }
 
+
         void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
         {
             try
@@ -638,13 +639,5 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
         }
-
-
-        //// terms of service
-        //[HttpsRequirement]
-        //public virtual IActionResult Term()
-        //{
-        //    return View("~/Plugins/Misc.SwiftPortalOverride/Views/TermsOfService.cshtml");
-        //}
     }
 }
