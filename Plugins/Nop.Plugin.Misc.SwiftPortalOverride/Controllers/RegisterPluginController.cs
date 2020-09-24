@@ -550,12 +550,13 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
                     LastName = model.LastName,
                     WorkEmail = model.Email,
                     Phone = model.Phone,
-                    CompanyName = model.Company
+                    CompanyName = model.Company,
+                    IsExistingCustomer = "0"
                 };
 
                 #region BuildCustomAttributes
-
-                foreach (var attribute in model.CustomerAttributes)
+                var attributes = _customerAttributeService.GetAllCustomerAttributes();
+                foreach (var attribute in attributes)
                 {
                     var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                     switch (attribute.AttributeControlType)
@@ -569,7 +570,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
                                     var selectedAttributeId = int.Parse(ctrlAttributes);
                                     if (selectedAttributeId > 0)
                                     {
-                                        var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                        //var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                        var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
+                                        var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
                                         if (val != null)
                                         {
                                             if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
