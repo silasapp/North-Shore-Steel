@@ -5,9 +5,11 @@ using Nop.Plugin.Api.Delta;
 using Nop.Plugin.Api.DTO.Errors;
 using Nop.Plugin.Api.JSON.Serializers;
 using Nop.Plugin.Api.ModelBinders;
+using Nop.Plugin.Misc.SwiftPortalOverride;
 using Nop.Plugin.Swift.Api.Domain.Customers;
 using Nop.Plugin.Swift.Api.DTOs.CustomerCompanies;
 using Nop.Plugin.Swift.Api.Services;
+using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Discounts;
 using Nop.Services.Localization;
@@ -23,6 +25,7 @@ namespace Nop.Plugin.Api.Controllers
         private readonly ICompanyService _companyService;
         private readonly ICustomerService _customerService;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly IGenericAttributeService _genericAttributeService;
 
         public CustomerCompaniesController(
             IJsonFieldsSerializer jsonFieldsSerializer,
@@ -35,13 +38,15 @@ namespace Nop.Plugin.Api.Controllers
             ILocalizationService localizationService,
             IPictureService pictureService, 
             ICompanyService companyService,
-            ICustomerCompanyService customerCompanyService) :
+            ICustomerCompanyService customerCompanyService,
+            IGenericAttributeService genericAttributeService) :
             base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService,
                  localizationService, pictureService)
         {
             _customerService = customerService;
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
+            _genericAttributeService = genericAttributeService;
         }
 
         [HttpPost]
@@ -93,6 +98,8 @@ namespace Nop.Plugin.Api.Controllers
 
             _customerCompanyService.InsertCustomerCompany(customerCompany);
 
+            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, true);
+
             return Ok();
         }
 
@@ -115,6 +122,10 @@ namespace Nop.Plugin.Api.Controllers
             }
 
             _customerCompanyService.DeleteCustomerCompany(customerCompany);
+
+            Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
+
+            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
 
             return Ok();
         }
