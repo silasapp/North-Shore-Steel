@@ -15,9 +15,9 @@ namespace Nop.Plugin.Swift.Api.Services
             _companyRepository = companyRepository;
         }
 
-        public Company GetCompanyEntityById(int id)
+        public Company GetCompanyEntityByErpEntityId(int id)
         {
-            var company = _companyRepository.Table.FirstOrDefault(c => c.Id == id);
+            var company = _companyRepository.Table.FirstOrDefault(c => c.ErpCompanyId == id);
 
             return company;
         }

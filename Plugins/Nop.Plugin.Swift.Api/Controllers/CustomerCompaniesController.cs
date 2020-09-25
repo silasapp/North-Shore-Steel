@@ -73,13 +73,13 @@ namespace Nop.Plugin.Api.Controllers
                 return NotFound();
             }
 
-            Company company = _companyService.GetCompanyEntityById(input.Dto.CompanyId);
+            Company company = _companyService.GetCompanyEntityByErpEntityId(input.Dto.CompanyId);
 
             if (company == null)
             {
                 company = new Company
                 {
-                    Id = input.Dto.CompanyId,
+                    ErpCompanyId = input.Dto.CompanyId,
                     Name = input.Dto.CompanyName,
                     SalesContactEmail = input.Dto.SalesContact.Email,
                     SalesContactLiveChatId = input.Dto.SalesContact.LiveChatId,
@@ -114,7 +114,9 @@ namespace Nop.Plugin.Api.Controllers
             int companyId
             )
         {
-            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(id, companyId);
+            Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
+
+            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(id, company.Id);
 
             if (customerCompany == null)
             {
