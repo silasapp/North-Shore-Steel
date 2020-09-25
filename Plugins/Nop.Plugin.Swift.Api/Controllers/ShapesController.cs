@@ -61,6 +61,15 @@ namespace Nop.Plugin.Swift.Api.Controllers
 
             List<Shape> shapes = ShapeDtoMappings.ToEntity(shapesDto.Shapes);
 
+            foreach (Shape shape in shapes)
+            {
+                List<Shape> shapeSubCategoriees = (List<Shape>)shape.SubCategories;
+                if (shapeSubCategoriees != null)
+                {
+                    shapeSubCategoriees.ForEach(sc => sc.ParentId = shape.Id);
+                }
+            }
+
             _shapeService.InsertShapes(shapes);
 
             IList<Shape> createdShapes = _shapeService.GetShapes();
