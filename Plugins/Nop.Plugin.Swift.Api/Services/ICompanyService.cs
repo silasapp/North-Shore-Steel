@@ -7,7 +7,7 @@ namespace Nop.Plugin.Swift.Api.Services
 {
     public interface ICompanyService
     {
-        Company GetCompanyEntityById(int id);
+        Company GetCompanyEntityByErpEntityId(int id);
 
         void InsertCompany(Company company);
     }

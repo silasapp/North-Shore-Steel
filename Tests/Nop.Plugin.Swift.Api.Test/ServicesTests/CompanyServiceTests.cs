@@ -22,6 +22,7 @@ namespace Nop.Plugin.Api.Tests.ServicesTests.Companies
                         new Company()
                         {
                             Id = 1,
+                            ErpCompanyId = 100,
                             Name = "Test 1",
                             SalesContactEmail = "Contact@teest.com",
                             SalesContactLiveChatId = "ChatId1",
@@ -31,6 +32,7 @@ namespace Nop.Plugin.Api.Tests.ServicesTests.Companies
                         new Company()
                         {
                             Id = 2,
+                            ErpCompanyId = 2,
                             Name = "Test 2",
                             SalesContactEmail = "Contact2@teest.com",
                             SalesContactLiveChatId = "ChatId2",
@@ -46,7 +48,7 @@ namespace Nop.Plugin.Api.Tests.ServicesTests.Companies
         [Test]
         public void GetCompanyById()
         {
-            var companyResult = _companyApiService.GetCompanyEntityById(1);
+            var companyResult = _companyApiService.GetCompanyEntityByErpEntityId(100);
 
             Assert.IsNotNull(companyResult);
             Assert.AreEqual(1, companyResult.Id);
@@ -60,7 +62,7 @@ namespace Nop.Plugin.Api.Tests.ServicesTests.Companies
         [Test]
         public void GetCompanyById_NonExistantId()
         {
-            var companyResult = _companyApiService.GetCompanyEntityById(10);
+            var companyResult = _companyApiService.GetCompanyEntityByErpEntityId(10);
 
             Assert.IsNull(companyResult);
         }
