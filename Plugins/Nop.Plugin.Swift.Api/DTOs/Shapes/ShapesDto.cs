@@ -44,6 +44,12 @@ namespace Nop.Plugin.Swift.Api.DTOs.Shapes
         /// </summary>
         [JsonProperty("attributes", Required = Required.Always)]
         public List<ShapeAttributeDto> Atttributes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sub categories
+        /// </summary>
+        [JsonProperty("subCategories", Required = Required.Always)]
+        public List<ShapeDto> SubCategories { get; set; }
     }
 
     public class ShapeAttributeDto

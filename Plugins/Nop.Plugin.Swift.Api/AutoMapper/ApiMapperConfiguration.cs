@@ -25,7 +25,8 @@ namespace Nop.Plugin.Api.AutoMapper
 
             AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<ShapeAttributeDto, ShapeAttribute>().IgnoreAllNonExisting();
             AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<ShapeDto, Shape>().IgnoreAllNonExisting()
-                .ForMember(d => d.Atttributes, o => o.MapFrom(s => s.Atttributes.ToArray()));
+                .ForMember(d => d.Atttributes, o => o.MapFrom(s => s.Atttributes.ToArray()))
+                .ForMember(d => d.SubCategories, o => o.MapFrom(s => s.SubCategories.ToArray()));
 
             AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<ShapeAttribute, ShapeAttributeDto>().IgnoreAllNonExisting();
             AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<Shape, ShapeDto>().IgnoreAllNonExisting()

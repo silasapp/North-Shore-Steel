@@ -25,7 +25,9 @@ namespace Nop.Plugin.Swift.Api.Services
         public void InsertShapes(List<Shape> shapes)
         {
             if (shapes.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(shapes));
+            {
+                return;
+            }
 
             _shapeRepository.Insert(shapes);
 
@@ -36,6 +38,10 @@ namespace Nop.Plugin.Swift.Api.Services
                 Shape createdShape = createdShapes.Single(cs => cs.Name == shape.Name);
                 shape.Atttributes.ForEach(sa => sa.ShapeId = createdShape.Id);
                 _shapeAttributeRepository.Insert(shape.Atttributes);
+                if (shape.SubCategories != null && shape.SubCategories.Count > 0)
+                {
+                    InsertShapes((List<Shape>)shape.SubCategories);
+                }
             }
         }
 
