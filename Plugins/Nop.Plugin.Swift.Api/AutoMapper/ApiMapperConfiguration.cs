@@ -8,6 +8,9 @@ using Nop.Plugin.Api.DTO.CustomerRoles;
 using Nop.Plugin.Api.DTO.Customers;
 using Nop.Plugin.Api.DTO.Languages;
 using Nop.Plugin.Api.MappingExtensions;
+using Nop.Plugin.Swift.Api.Domain.Shapes;
+using Nop.Plugin.Swift.Api.DTOs.Shapes;
+using System.Linq;
 
 namespace Nop.Plugin.Api.AutoMapper
 {
@@ -18,6 +21,16 @@ namespace Nop.Plugin.Api.AutoMapper
             CreateMap<Language, LanguageDto>();
 
             CreateMap<CustomerRole, CustomerRoleDto>();
+
+
+            AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<ShapeAttributeDto, ShapeAttribute>().IgnoreAllNonExisting();
+            AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<ShapeDto, Shape>().IgnoreAllNonExisting()
+                .ForMember(d => d.Atttributes, o => o.MapFrom(s => s.Atttributes.ToArray()))
+                .ForMember(d => d.SubCategories, o => o.MapFrom(s => s.SubCategories.ToArray()));
+
+            AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<ShapeAttribute, ShapeAttributeDto>().IgnoreAllNonExisting();
+            AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<Shape, ShapeDto>().IgnoreAllNonExisting()
+                .ForMember(d => d.Atttributes, o => o.MapFrom(s => s.Atttributes.ToArray()));
 
             CreateAddressMap();
             CreateAddressDtoToEntityMap();
@@ -38,10 +51,6 @@ namespace Nop.Plugin.Api.AutoMapper
             AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<Address, AddressDto>()
                                       .IgnoreAllNonExisting()
                                       .ForMember(x => x.Id, y => y.MapFrom(src => src.Id));
-                                      //.ForMember(x => x.CountryName,
-                                      //           y => y.MapFrom(src => src.Country.GetWithDefault(x => x, new Country()).Name))
-                                      //.ForMember(x => x.StateProvinceName,
-                                      //           y => y.MapFrom(src => src.StateProvince.GetWithDefault(x => x, new StateProvince()).Name));
         }
 
         private void CreateAddressDtoToEntityMap()
@@ -56,23 +65,6 @@ namespace Nop.Plugin.Api.AutoMapper
             AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<Customer, CustomerDto>()
                                       .IgnoreAllNonExisting()
                                       .ForMember(x => x.Id, y => y.MapFrom(src => src.Id));
-                                      //.ForMember(x => x.BillingAddress,
-                                      //           y => y.MapFrom(src => src.BillingAddress.GetWithDefault(x => x, new Address()).ToDto()))
-                                      //.ForMember(x => x.ShippingAddress,
-                                      //           y => y.MapFrom(src => src.ShippingAddress.GetWithDefault(x => x, new Address()).ToDto()))
-                                      //.ForMember(x => x.Addresses,
-                                      //           y =>
-                                      //               y.MapFrom(
-                                      //                         src =>
-                                      //                             src.Addresses.GetWithDefault(x => x, new List<Address>())
-                                      //                                .Select(address => address.ToDto())))
-                                      //.ForMember(x => x.ShoppingCartItems,
-                                      //           y =>
-                                      //               y.MapFrom(
-                                      //                         src =>
-                                      //                             src.ShoppingCartItems.GetWithDefault(x => x, new List<ShoppingCartItem>())
-                                      //                                .Select(item => item.ToDto())))
-                                      //.ForMember(x => x.RoleIds, y => y.MapFrom(src => src.CustomerRoles.Select(z => z.Id)));
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -52,7 +53,6 @@ namespace Nop.Plugin.Api.Infrastructure
                     JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
                     AddAuthorizationPipeline(services);
                     //services.AddHostedService<ApplicationPartsLogger>();
-
                 }
             }
            

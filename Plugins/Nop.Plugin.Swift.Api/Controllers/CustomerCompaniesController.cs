@@ -1,13 +1,16 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Nop.Plugin.Api.Attributes;
 using Nop.Plugin.Api.Delta;
 using Nop.Plugin.Api.DTO.Errors;
 using Nop.Plugin.Api.JSON.Serializers;
 using Nop.Plugin.Api.ModelBinders;
+using Nop.Plugin.Misc.SwiftPortalOverride;
 using Nop.Plugin.Swift.Api.Domain.Customers;
 using Nop.Plugin.Swift.Api.DTOs.CustomerCompanies;
 using Nop.Plugin.Swift.Api.Services;
+using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Discounts;
 using Nop.Services.Localization;
@@ -23,6 +26,8 @@ namespace Nop.Plugin.Api.Controllers
         private readonly ICompanyService _companyService;
         private readonly ICustomerService _customerService;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILogger _logger;
 
         public CustomerCompaniesController(
             IJsonFieldsSerializer jsonFieldsSerializer,
@@ -35,13 +40,17 @@ namespace Nop.Plugin.Api.Controllers
             ILocalizationService localizationService,
             IPictureService pictureService, 
             ICompanyService companyService,
-            ICustomerCompanyService customerCompanyService) :
+            ICustomerCompanyService customerCompanyService,
+            IGenericAttributeService genericAttributeService,
+            ILogger logger) :
             base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService,
                  localizationService, pictureService)
         {
             _customerService = customerService;
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
+            _genericAttributeService = genericAttributeService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -61,6 +70,9 @@ namespace Nop.Plugin.Api.Controllers
                 return Error();
             }
 
+            // log request
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Swift.ApproveUser -> Customer Id: {id}", JsonConvert.SerializeObject(input));
+
             Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
 
             if (customer == null)
@@ -68,13 +80,13 @@ namespace Nop.Plugin.Api.Controllers
                 return NotFound();
             }
 
-            Company company = _companyService.GetCompanyEntityById(input.Dto.CompanyId);
+            Company company = _companyService.GetCompanyEntityByErpEntityId(input.Dto.CompanyId);
 
             if (company == null)
             {
                 company = new Company
                 {
-                    Id = input.Dto.CompanyId,
+                    ErpCompanyId = input.Dto.CompanyId,
                     Name = input.Dto.CompanyName,
                     SalesContactEmail = input.Dto.SalesContact.Email,
                     SalesContactLiveChatId = input.Dto.SalesContact.LiveChatId,
@@ -93,6 +105,15 @@ namespace Nop.Plugin.Api.Controllers
 
             _customerCompanyService.InsertCustomerCompany(customerCompany);
 
+            // update customer as NSS Approved
+            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, true);
+
+            #region Log Approved Status
+            var approvedStatus = _genericAttributeService.GetAttribute<bool>(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute);
+            // log nssapproved status
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Swift.ApproveUser -> {customer.Email} approval status = '{approvedStatus}'");
+            #endregion
+
             return Ok();
         }
 
@@ -107,7 +128,9 @@ namespace Nop.Plugin.Api.Controllers
             int companyId
             )
         {
-            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(id, companyId);
+            Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
+
+            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(id, company.Id);
 
             if (customerCompany == null)
             {
@@ -115,6 +138,10 @@ namespace Nop.Plugin.Api.Controllers
             }
 
             _customerCompanyService.DeleteCustomerCompany(customerCompany);
+
+            Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
+
+            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
 
             return Ok();
         }
