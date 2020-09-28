@@ -241,14 +241,6 @@
                                                             }
                                                             @foreach (var attributeValue in attribute.Values)
                                                             {
-                                                                @if (@attributeValue.Name == "HOUSTON")
-                                                                {
-                                                                    @attributeValue.Id = 1;
-         }
-         else if (@attributeValue.Name == "BEAUMONT")
-         {
-            @attributeValue.Id = 2;
-}
                                                                 <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
                                                             }
                                                         </select>
