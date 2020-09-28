@@ -133,7 +133,7 @@
                                             <span asp-validation-for="Company" style="display:flex;"></span>
 
                                             @{
-                                                var isExistingCustomerCtrl = Model.CustomerAttributes.Where(x => x.Name == "IsExistingCustomer").FirstOrDefault();
+                                                var isExistingCustomerCtrl = Model.CustomerAttributes.Where(x => x.Name == "Existing Customer").FirstOrDefault();
                                             }
                                             @if (isExistingCustomerCtrl != null)
                                             {
