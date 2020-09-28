@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Nop.Plugin.Api.Attributes;
 using Nop.Plugin.Api.Delta;
 using Nop.Plugin.Api.DTO.Errors;
@@ -26,6 +27,7 @@ namespace Nop.Plugin.Api.Controllers
         private readonly ICustomerService _customerService;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ILogger _logger;
 
         public CustomerCompaniesController(
             IJsonFieldsSerializer jsonFieldsSerializer,
@@ -39,7 +41,8 @@ namespace Nop.Plugin.Api.Controllers
             IPictureService pictureService, 
             ICompanyService companyService,
             ICustomerCompanyService customerCompanyService,
-            IGenericAttributeService genericAttributeService) :
+            IGenericAttributeService genericAttributeService,
+            ILogger logger) :
             base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService,
                  localizationService, pictureService)
         {
@@ -47,6 +50,7 @@ namespace Nop.Plugin.Api.Controllers
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
             _genericAttributeService = genericAttributeService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -65,6 +69,9 @@ namespace Nop.Plugin.Api.Controllers
             {
                 return Error();
             }
+
+            // log request
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Swift.ApproveUser -> Customer Id: {id}", JsonConvert.SerializeObject(input));
 
             Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
 
@@ -98,7 +105,14 @@ namespace Nop.Plugin.Api.Controllers
 
             _customerCompanyService.InsertCustomerCompany(customerCompany);
 
+            // update customer as NSS Approved
             _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, true);
+
+            #region Log Approved Status
+            var approvedStatus = _genericAttributeService.GetAttribute<bool>(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute);
+            // log nssapproved status
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Swift.ApproveUser -> {customer.Email} approval status = '{approvedStatus}'");
+            #endregion
 
             return Ok();
         }

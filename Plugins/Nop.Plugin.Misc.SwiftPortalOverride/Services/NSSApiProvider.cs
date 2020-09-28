@@ -76,7 +76,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, "Create NSS user request -> ", JsonConvert.SerializeObject(request));
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"NSS.CreateUser -> {request.WorkEmail}", JsonConvert.SerializeObject(request));
 
             //initialize
             var retVal = new NSSCreateUserResponse();
@@ -109,7 +109,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    _logger.Warning("Swift Api provider - Create user", new Exception("NSS token returned empty")); 
+                    _logger.Warning($"NSS.CreateUser -> {request.WorkEmail}", new Exception("NSS token returned empty")); 
                     return retVal;
                 }
 
@@ -146,7 +146,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error("Swift Api provider - Create user", ex);
+                _logger.Error($"NSS.CreateUser -> {request.WorkEmail}", ex);
             }
 
             // log request
