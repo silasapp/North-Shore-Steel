@@ -578,7 +578,17 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
                                             if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
                                                 request.HearAboutUs = val.Name;
                                             if (attribute.Name == SwiftPortalOverrideDefaults.PreferredLocationIdAttribute)
+                                            {
+                                                if (attribute.Name.ToLower() == "houston")
+                                                {
+                                                    val.Id = 1;
+                                                }
+                                                else if (attribute.Name.ToLower() == "beaumont")
+                                                {
+                                                    val.Id = 2;
+                                                }
                                                 request.PreferredLocationid = val.Id.ToString();
+                                            }
 
                                         }
                                     }
