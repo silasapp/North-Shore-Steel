@@ -12,6 +12,11 @@ namespace Nop.Plugin.Swift.Api.Domain.Customers
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets ERP company identifier
+        /// </summary>
+        public int ErpCompanyId { get; set; }
+
+        /// <summary>
         /// Gets or sets a sales contact live chat id
         /// </summary>
         public string SalesContactLiveChatId { get; set; }
