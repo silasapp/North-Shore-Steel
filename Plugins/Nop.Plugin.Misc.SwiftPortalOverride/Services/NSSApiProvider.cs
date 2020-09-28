@@ -150,7 +150,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Create NSS user response -> wintrixId==>{retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
 
             return retVal;
         }
