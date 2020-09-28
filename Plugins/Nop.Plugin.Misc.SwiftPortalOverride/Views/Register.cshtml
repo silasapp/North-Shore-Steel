@@ -27,6 +27,7 @@
     <div class="page-title">
         <h1>REGISTER</h1>
     </div>
+
     <div class="page-body">
         <form asp-route="Register" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
             <div asp-validation-summary="ModelOnly" class="message-error"></div>
@@ -96,25 +97,25 @@
 
 
                                 <div class="form-group row">
-                                    @if (Model.PhoneEnabled)
-                                    {
-                                        <div class="col-sm-6">
-                                            <label asp-for="Phone">Phone Number</label>
-                                            <input asp-for="Phone" class="form-control" />
-                                            @*@if (Model.PhoneRequired)
-                                                {
-                                                    <nop-required />
-                                                }*@
-                                            <span asp-validation-for="Phone" style="display:flex;"></span>
-                                        </div>
-                                    }
 
                                     <div class="col-sm-6">
                                         <label asp-for="Password">Set Password</label>
                                         <input asp-for="Password" class="form-control" />
                                         @*<nop-required />*@
                                         <span asp-validation-for="Password" style="display:flex;"></span>
+
                                     </div>
+
+                                    <div class="col-sm-6">
+                                        <label asp-for="ConfirmPassword">Confirm Password</label>
+                                        <input asp-for="ConfirmPassword" class="form-control" />
+                                        @*<nop-required />*@
+                                        <span asp-validation-for="ConfirmPassword" style="display:flex;"></span>
+                                    </div>
+                                    @if (Model.DisplayCaptcha)
+                                    {
+                                        <nop-captcha />
+                                    }
 
                                 </div>
 
@@ -151,16 +152,19 @@
                                         </div>
                                     }
 
-                                    <div class="col-sm-6">
-                                        <label asp-for="ConfirmPassword">Confirm Password</label>
-                                        <input asp-for="ConfirmPassword" class="form-control" />
-                                        @*<nop-required />*@
-                                        <span asp-validation-for="ConfirmPassword" style="display:flex;"></span>
-                                    </div>
-                                    @if (Model.DisplayCaptcha)
+                                    @if (Model.PhoneEnabled)
                                     {
-                                        <nop-captcha />
+                                        <div class="col-sm-6">
+                                            <label asp-for="Phone">Phone Number</label>
+                                            <input asp-for="Phone" class="form-control" />
+                                            @*@if (Model.PhoneRequired)
+                                                {
+                                                    <nop-required />
+                                                }*@
+                                            <span asp-validation-for="Phone" style="display:flex;"></span>
+                                        </div>
                                     }
+
                                 </div>
 
                             </div>
@@ -181,64 +185,86 @@
                         <div class="container-fluid" style="margin: auto; padding: 0 18em;">
                             <div class="row">
                                 <div class="col-md-12">
-                                    @foreach (var attribute in Model.CustomerAttributes)
-                                    {
-                                        var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                                        var textPrompt = attribute.Name;
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12" style="margin-bottom: 2em">
+                                                @foreach (var attribute in Model.CustomerAttributes)
+                                                {
+                                                    var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                                                    var textPrompt = attribute.Name;
 
-                                        @if (attribute.Name == "HearAboutUs")
-                                        {
-                                            <div class="col-sm-6">
-
-                                                <label>How did you hear about us?</label>
-                                                <select name="@(controlId)" id="@(controlId)" class="form-control">
-                                                    @if (!attribute.IsRequired)
+                                                    @if (attribute.Name == "HearAboutUs")
                                                     {
-                                                        <option value="0">---</option>
+                                                        <label>How did you hear about us?</label>
+                                                        <select name="@(controlId)" id="@(controlId)" class="form-control">
+                                                            @if (!attribute.IsRequired)
+                                                            {
+                                                                <option value="0"> ---</option>
+                                                            }
+                                                            @foreach (var attributeValue in attribute.Values)
+                                                            {
+                                                                <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id"> @attributeValue.Name </option>
+                                                            }
+                                                        </select>
                                                     }
-                                                    @foreach (var attributeValue in attribute.Values)
+                                                }
+                                            </div>
+
+                                            <div class="col-md-12" style="margin-bottom: 2em">
+                                                @foreach (var attribute in Model.CustomerAttributes)
+                                                {
+                                                    var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                                                    var textPrompt = attribute.Name;
+                                                    @if (attribute.Name == "Other")
                                                     {
-                                                        <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
+                                                        <label> Let us know how you found us</label>
+                                                        <input name="@(controlId)" type="text" class="textbox form-control" id="@(controlId)" value="@(attribute.DefaultValue)" />
+
                                                     }
-                                                </select>
+                                                }
                                             </div>
-                                        }
+
+                                            <div class="col-md-12">
+                                                @foreach (var attribute in Model.CustomerAttributes)
+                                                {
+                                                    var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                                                    var textPrompt = attribute.Name;
 
 
-                                        @if (attribute.Name == "PreferredLocation")
-                                        {
-                                            <div class="col-sm-6">
-                                                <label>Preferred pickup location</label>
-                                                <select name="@(controlId)" id="@(controlId)" class="form-control">
-                                                    @if (!attribute.IsRequired)
+                                                    @if (attribute.Name == "PreferredLocation")
                                                     {
-                                                        <option value="0">---</option>
+                                                        <label>Preferred pickup location</label>
+                                                        <select name="@(controlId)" id="@(controlId)" class="form-control">
+                                                            @if (!attribute.IsRequired)
+                                                            {
+                                                                <option value="0">---</option>
+                                                            }
+                                                            @foreach (var attributeValue in attribute.Values)
+                                                            {
+                                                                <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
+                                                            }
+                                                        </select>
                                                     }
-                                                    @foreach (var attributeValue in attribute.Values)
-                                                    {
-                                                        <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                        }
 
-                                        @if (attribute.Name == "Other")
-                                        {
-                                            <div class="col-sm-6">
-                                                <label>Let us know how you found us</label>
-                                                <input name="@(controlId)" type="text" class="textbox form-control" id="@(controlId)" value="@(attribute.DefaultValue)" />
+                                                }
                                             </div>
-                                        }
+                                        </div>
+                                        <div class="col-md-6">
+                                            @foreach (var attribute in Model.CustomerAttributes)
+                                            {
+                                                var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                                                var textPrompt = attribute.Name;
+                                                @if (attribute.Name == "ItemsForNextProject")
+                                                {
+                                                    <div class="" style="margin-bottom: 1em;">
+                                                        <label>How can we help?</label>
+                                                        <textarea id="@(controlId)" placeholder="What items are you considering for your next project?" class="form-control" name="@(controlId)">@(attribute.DefaultValue)</textarea>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
 
-
-                                        @if (attribute.Name == "ItemsForNextProject")
-                                        {
-                                            <div class="col-sm-6">
-                                                <label>How can we help?</label>
-                                                <textarea id="@(controlId)" placeholder="What items are you considering for your next project?" class="form-control" name="@(controlId)">@(attribute.DefaultValue)</textarea>
-                                            </div>
-                                        }
-                                    }
+                                    </div>
                                 </div>
                             </div>
                         </div>
