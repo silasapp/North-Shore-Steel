@@ -55,16 +55,6 @@
                                     }
 
 
-                                    <div class="col-sm-6">
-                                        <label asp-for="Email">Work Email</label>
-                                        <input asp-for="Email" class="form-control" />
-                                        @*<nop-required />*@
-                                        <span asp-validation-for="Email" style="display:flex;"></span>
-                                    </div>
-                                </div>
-
-
-                                <div class="form-group row">
                                     @if (Model.LastNameEnabled)
                                     {
                                         <div class="col-sm-6">
@@ -77,6 +67,20 @@
                                             <span asp-validation-for="LastName" style="display: flex;"></span>
                                         </div>
                                     }
+
+
+
+                                </div>
+
+
+                                <div class="form-group row">
+
+                                    <div class="col-sm-6">
+                                        <label asp-for="Email">Work Email</label>
+                                        <input asp-for="Email" class="form-control" />
+                                        @*<nop-required />*@
+                                        <span asp-validation-for="Email" style="display:flex;"></span>
+                                    </div>
 
                                     @if (Model.EnteringEmailTwice)
                                     {
@@ -138,7 +142,7 @@
                                                     {
                                                         <li>
                                                             <input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
-                                                            <label for="@(controlId)_@(attributeValue.Id)">I am a current customer</label>
+                                                            <label for="@(controlId)_@(attributeValue.Id)" id="current-customer">I am a current customer</label>
                                                         </li>
                                                     }
                                                 </ul>
@@ -251,15 +255,11 @@
                             <div class="title">
                                 <strong>KEEP INFORMED</strong>
                             </div>
-
-                            @if (Model.NewsletterEnabled)
-                            {
-                                <div style="text-align:center">
-                                    <input asp-for="Newsletter" />
-                                    <label asp-for="Newsletter">Sign me up to your newsleter</label>
-                                    <span asp-validation-for="Newsletter"></span>
-                                </div>
-                            }
+                            <div style="text-align:center">
+                                <input asp-for="Newsletter" />
+                                <label asp-for="Newsletter">Sign me up to your newsletter</label>
+                                <span asp-validation-for="Newsletter"></span>
+                            </div>
                         </div>
                     </div>
                 </div>

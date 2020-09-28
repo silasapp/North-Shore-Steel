@@ -11,3 +11,16 @@
 .modal-dialog {
     width: 67em !important;
 }
+
+input#Newsletter {
+    margin-top: -4px !important;
+}
+
+#read-privacyinfo {
+    margin-left: 5px;
+    margin-top: 4px;
+}
+
+#current-customer {
+    margin-top: 9px;
+}
