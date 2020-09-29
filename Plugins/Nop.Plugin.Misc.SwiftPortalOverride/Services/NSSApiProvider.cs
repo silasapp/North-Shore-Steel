@@ -76,7 +76,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"NSS.CreateUser -> {request.WorkEmail}", JsonConvert.SerializeObject(request));
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser -> {request.WorkEmail}", JsonConvert.SerializeObject(request));
 
             //initialize
             var retVal = new NSSCreateUserResponse();
@@ -105,7 +105,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/x-www-form-urlencoded");
 
                 //get token
-                var token = GetSwiftToken(httpClient, baseUrl, user, pword);
+                var token = GetNSSToken(httpClient, baseUrl, user, pword);
 
                 if (string.IsNullOrEmpty(token))
                 {
@@ -150,7 +150,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
 
             return retVal;
         }
@@ -163,7 +163,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         /// <param name="user">NSS API auth username</param>
         /// <param name="pword">NSS API auth password</param>
         /// <returns>Exchange rates</returns>
-        public string GetSwiftToken(HttpClient httpClient, string baseUrl, string user, string pword)
+        public string GetNSSToken(HttpClient httpClient, string baseUrl, string user, string pword)
         {
             var retVal = string.Empty;
             var requestUrl = $"{ baseUrl}authenticate";

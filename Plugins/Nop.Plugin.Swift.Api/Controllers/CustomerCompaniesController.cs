@@ -71,7 +71,7 @@ namespace Nop.Plugin.Api.Controllers
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Swift.ApproveUser -> Customer Id: {id}", JsonConvert.SerializeObject(input));
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> Customer Id: {id}", JsonConvert.SerializeObject(input));
 
             Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
 
@@ -111,7 +111,7 @@ namespace Nop.Plugin.Api.Controllers
             #region Log Approved Status
             var approvedStatus = _genericAttributeService.GetAttribute<bool>(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute);
             // log nssapproved status
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Information, $"Swift.ApproveUser -> {customer.Email} approval status = '{approvedStatus}'");
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> {customer.Email} approval status = '{approvedStatus}'");
             #endregion
 
             return Ok();
