@@ -541,7 +541,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
                 // save customer as no NSSApproved by default
                 _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
 
-                // preapre request for create api call
+                // prepare request for create api call
 
                 var request = new NSSCreateUserRequest
                 {

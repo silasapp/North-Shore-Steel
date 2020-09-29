@@ -196,7 +196,7 @@
                                                     @if (attribute.Name == "HearAboutUs")
                                                     {
                                                         <label>How did you hear about us?</label>
-                                                        <select name="@(controlId)" id="@(controlId)" class="form-control">
+                                                        <select name="@(controlId)" id="@(controlId)" class="form-control" onchange="otherMethodCheck(this);">
                                                             @if (!attribute.IsRequired)
                                                             {
                                                                 <option value="0"> ---</option>
@@ -215,11 +215,13 @@
                                                 {
                                                     var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                                     var textPrompt = attribute.Name;
+
                                                     @if (attribute.Name == "Other")
                                                     {
-                                                        <label> Let us know how you found us</label>
-                                                        <input name="@(controlId)" type="text" class="textbox form-control" id="@(controlId)" value="@(attribute.DefaultValue)" />
-
+                                                        <div id="other-method" style="display:none">
+                                                            <label> Let us know how you found us</label>
+                                                            <input name="@(controlId)" type="text" class="textbox form-control" id="@(controlId)" value="@(attribute.DefaultValue)" />
+                                                        </div>
                                                     }
                                                 }
                                             </div>
@@ -442,3 +444,16 @@
     </div>
 
 </div>
+<script>
+    function otherMethodCheck(option) {
+        console.log(option);
+        console.log(option.value);
+        console.log(option.id);
+        console.log(option.name);
+        if (option.value == 8) {
+            document.getElementById("other-method").style.display = "block";
+        } else {
+            document.getElementById("other-method").style.display = "none";
+        }
+    }
+</script>
