@@ -24,3 +24,8 @@ input#Newsletter {
 #current-customer {
     margin-top: 9px;
 }
+
+.text-format {
+    font-weight: bold;
+    text-decoration: underline;
+}
