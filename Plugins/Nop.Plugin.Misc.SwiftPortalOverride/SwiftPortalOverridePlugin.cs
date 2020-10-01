@@ -1,11 +1,14 @@
 ﻿using Nop.Core;
+using Nop.Core.Domain.Messages;
 using Nop.Services.Common;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
+using Nop.Services.Messages;
 using Nop.Services.Plugins;
 using Nop.Services.Stores;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Nop.Plugin.Misc.SwiftPortalOverride
@@ -19,6 +22,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
         private readonly ISettingService _settingService;
         private readonly IStoreService _storeService;
         private readonly IWebHelper _webHelper;
+        private readonly IMessageTemplateService _messageTemplateService;
 
         #endregion
 
@@ -28,13 +32,15 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
             ILocalizationService localizationService,
             ISettingService settingService,
             IStoreService storeService,
-            IWebHelper webHelper)
+            IWebHelper webHelper,
+            IMessageTemplateService messageTemplateService)
         {
             _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
             _settingService = settingService;
             _storeService = storeService;
             _webHelper = webHelper;
+            _messageTemplateService = messageTemplateService;
         }
 
         #endregion
@@ -74,6 +80,10 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.NSSApiAuthPassword.Hint"] = "Enter NSS API authentication password.",
             });
 
+            // email template
+            ConfigureMessageTemplates();
+
+
             base.Install();
         }
 
@@ -88,7 +98,28 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
             //locales
             _localizationService.DeletePluginLocaleResources("Plugins.Misc.SwiftPortalOverride");
 
+            // email template
+            var approvalMail = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
+            if (approvalMail != null)
+                _messageTemplateService.DeleteMessageTemplate(approvalMail);
+
             base.Uninstall();
+        }
+
+        void ConfigureMessageTemplates()
+        {
+            // approval email
+            var approvalMail = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
+            if (approvalMail == null)
+            {
+                var newCustomerMail = _messageTemplateService.GetMessageTemplatesByName("NewCustomer.Notification").FirstOrDefault();
+                approvalMail = _messageTemplateService.CopyMessageTemplate(newCustomerMail);
+            }
+            // change body
+            //approvalMail.Body =
+            approvalMail.Name = SwiftPortalOverrideDefaults.ApprovalMessageTemplateName;
+            approvalMail.Body = $@"<p>  <a href='%Store.URL%'>%Store.Name%</a>  <br />  <br />  A new customer registered with your store. Below are the customer's details:  <br />  Full name: %Customer.FullName%  <br />  Email: %Customer.Email% <br />  Erp Id: %Customer.ErpId%  </p>  ";
+            _messageTemplateService.UpdateMessageTemplate(approvalMail);
         }
 
         #endregion

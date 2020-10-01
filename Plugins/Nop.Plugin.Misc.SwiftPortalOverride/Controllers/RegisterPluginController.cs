@@ -75,12 +75,13 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly LocalizationSettings _localizationSettings;
         private readonly TaxSettings _taxSettings;
         private readonly NSSApiProvider _nSSApiProvider;
+        private readonly WorkFlowMessageServiceOverride _workFlowMessageServiceOverride;
 
         #endregion
 
 
         #region Constructor
-        public RegisterPluginController(AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, NSSApiProvider nSSApiProvider) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
+        public RegisterPluginController(AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, NSSApiProvider nSSApiProvider, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
         {
             _customerSettings = customerSettings;
             _customerModelFactory = customerModelFactory;
@@ -109,6 +110,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
             _localizationSettings = localizationSettings;
             _taxSettings = taxSettings;
             _nSSApiProvider = nSSApiProvider;
+            _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
         }
 
         #endregion
@@ -644,6 +646,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
                     // save wintrix id
                     _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.WintrixKeyAttribute, response.WitnrixId);
                 }
+
+                // send nss an email
+                _workFlowMessageServiceOverride.SendNSSCustomerRegisteredNotificationMessage(customer, _workContext.WorkingLanguage.Id, response?.WitnrixId);
             }
             catch (Exception)
             {

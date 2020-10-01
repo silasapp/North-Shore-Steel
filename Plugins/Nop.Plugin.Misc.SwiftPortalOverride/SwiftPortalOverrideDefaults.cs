@@ -14,7 +14,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
         /// <summary>
         /// Gets NSS Wintrix key name
         /// </summary>
-        public static string WintrixKeyAttribute => "WintrixId";
+        public static string WintrixKeyAttribute => "ErpId";
 
         #region NSSCustomerAttributes           
         public static string IsExistingCustomerAttribute => "Existing Customer";        
@@ -22,7 +22,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
         public static string HearAboutUsAttribute => "HearAboutUs";        
         public static string OtherAttribute => "Other";        
         public static string ItemsForNextProjectAttribute => "ItemsForNextProject"; 
-        public static string NSSApprovedAttribute => "NSSApproved"; 
+        public static string NSSApprovedAttribute => "NSSApproved";
         #endregion
+
+        public static string ApprovalMessageTemplateName => "NewCustomer.ApprovalNotication";
     }
 }

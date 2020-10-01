@@ -14,6 +14,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Infrastructure
             builder.RegisterType<NSSApiProvider>().AsSelf().InstancePerLifetimeScope();
 
             builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
+            builder.RegisterType<WorkFlowMessageServiceOverride>().As<IWorkflowMessageService>().InstancePerLifetimeScope();
         }
 
         public int Order => 10;
