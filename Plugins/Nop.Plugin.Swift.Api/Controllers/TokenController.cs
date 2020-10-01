@@ -42,7 +42,7 @@ namespace Nop.Plugin.Api.Controllers
             _apiConfiguration = apiConfiguration;
         }
 
-        [Route("/api/token")]
+        [Route("/token")]
         [HttpGet]
         public IActionResult Create(TokenRequest model)
         {
