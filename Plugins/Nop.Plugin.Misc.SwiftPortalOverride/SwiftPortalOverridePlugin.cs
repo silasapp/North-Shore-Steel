@@ -109,17 +109,17 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride
         void ConfigureMessageTemplates()
         {
             // approval email
-            var approvalMail = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
-            if (approvalMail == null)
+            var approvalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
+            if (approvalTemplate == null)
             {
                 var newCustomerMail = _messageTemplateService.GetMessageTemplatesByName("NewCustomer.Notification").FirstOrDefault();
-                approvalMail = _messageTemplateService.CopyMessageTemplate(newCustomerMail);
+                approvalTemplate = _messageTemplateService.CopyMessageTemplate(newCustomerMail);
             }
             // change body
             //approvalMail.Body =
-            approvalMail.Name = SwiftPortalOverrideDefaults.ApprovalMessageTemplateName;
-            approvalMail.Body = $@"<p>  <a href='%Store.URL%'>%Store.Name%</a>  <br />  <br />  A new customer registered with your store. Below are the customer's details:  <br />  Full name: %Customer.FullName%  <br />  Email: %Customer.Email% <br />  Erp Id: %Customer.ErpId%  </p>  ";
-            _messageTemplateService.UpdateMessageTemplate(approvalMail);
+            approvalTemplate.Name = SwiftPortalOverrideDefaults.ApprovalMessageTemplateName;
+            approvalTemplate.Body = $@"<p>  <a href='%Store.URL%'>%Store.Name%</a>  <br />  <br />  A new customer registered with your store. Below are the customer's details:  <br />  Full name: %Customer.FullName%  <br />  Email: %Customer.Email% <br />  Erp Id: %Customer.ErpId%  </p>  ";
+            _messageTemplateService.UpdateMessageTemplate(approvalTemplate);
         }
 
         #endregion
