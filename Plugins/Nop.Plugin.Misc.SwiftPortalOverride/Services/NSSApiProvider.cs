@@ -7,12 +7,14 @@ using Nop.Plugin.Misc.SwiftPortalOverride.Requests;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
+using StackExchange.Profiling.Internal;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 {
@@ -198,6 +200,39 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         }
 
 
+        public async Task<RecentOrderModel> GetRecentOrders(string requestUrl)
+        {
+            try
+            {
+                var retVal = new RecentOrderModel();
+                var responseBody = string.Empty;
+                using (HttpClient client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    var response = await client.GetAsync(requestUrl);
+
+                    // throw error if not successful
+                    
+                    response.EnsureSuccessStatusCode();
+
+                    responseBody = response.Content.ReadAsStringAsync().Result;
+                    dynamic json = JsonConvert.DeserializeObject(responseBody);
+                    retVal = json;
+
+                }
+                return retVal;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        //public GetRecentInvoices()
+        //{
+
+        //}
         #endregion
     }
 }

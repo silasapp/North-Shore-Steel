@@ -14,11 +14,11 @@ using System.Text;
 
 namespace Nop.Plugin.Misc.SwiftPortalOverride.Services.Customer
 {
-    public class RegisterCustomerService : CustomerRegistrationService
+    public class CustomerRegistrationServiceOverride : CustomerRegistrationService
     {
         CustomerSettings _customerSettings;
         #region constructor
-        public RegisterCustomerService(CustomerSettings customerSettings, ICustomerService customerService, IEncryptionService encryptionService, IEventPublisher eventPublisher, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, INewsLetterSubscriptionService newsLetterSubscriptionService, IRewardPointService rewardPointService, IStoreService storeService, IWorkContext workContext, IWorkflowMessageService workflowMessageService, RewardPointsSettings rewardPointsSettings) : base(customerSettings, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, newsLetterSubscriptionService, rewardPointService, storeService, workContext, workflowMessageService, rewardPointsSettings)
+        public CustomerRegistrationServiceOverride(CustomerSettings customerSettings, ICustomerService customerService, IEncryptionService encryptionService, IEventPublisher eventPublisher, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, INewsLetterSubscriptionService newsLetterSubscriptionService, IRewardPointService rewardPointService, IStoreService storeService, IWorkContext workContext, IWorkflowMessageService workflowMessageService, RewardPointsSettings rewardPointsSettings) : base(customerSettings, customerService, encryptionService, eventPublisher, genericAttributeService, localizationService, newsLetterSubscriptionService, rewardPointService, storeService, workContext, workflowMessageService, rewardPointsSettings)
         {
             _customerSettings = customerSettings;
         }

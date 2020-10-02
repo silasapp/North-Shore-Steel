@@ -34,13 +34,13 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Infrastructure
         {
             // register
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Register", "register/",
-               new { controller = "CustomerCustom", action = "Register" },
+               new { controller = "CustomerOverride", action = "Register" },
                new { },
                new[] { "Nop.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/",
-               new { controller = "HomeCustom", action = "Index" },
+               new { controller = "HomeOverride", action = "Index" },
                new { },
                new[] { "Nop.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
