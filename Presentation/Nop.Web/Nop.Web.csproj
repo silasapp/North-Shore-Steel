@@ -29,12 +29,17 @@
     <!-- We copy the entire \App_Data directory. But we ignore JSON files and data protection keys  -->
     <Content Include="App_Data\**" CopyToPublishDirectory="PreserveNewest" Exclude="App_Data\*.json" />
     <Content Remove="App_Data\*.json" />
+    <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
 
     <Compile Remove="Plugins\**;Themes\**" />
+
+    <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
+    <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <None Remove="Plugins\**;Themes\**" />
+    <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
 
     <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
 
@@ -63,7 +68,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
 
-    <Content Include="Themes\DefaultClean\Views\RegisterPlugin\_CustomerAttributes.cshtml" />
+    <Content Include="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
     <None Include="Plugins\**" CopyToPublishDirectory="PreserveNewest" />
 
     <Content Include="Themes\**" CopyToPublishDirectory="PreserveNewest" Exclude="Themes\**\*.config;Themes\**\*.cshtml;Themes\**\*.json" />
@@ -76,7 +81,7 @@
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css.map" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
-    <None Remove="Themes\DefaultClean\Views\RegisterPlugin\_CustomerAttributes.cshtml" />
+    <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
 
     <None Update="Areas\Admin\sitemap.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -93,11 +98,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Themes\DefaultClean\Views\NewFolder\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="Themes\DefaultClean\Views\RegisterPlugin\_CustomerAttributes.cshtml">
+    <Content Update="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

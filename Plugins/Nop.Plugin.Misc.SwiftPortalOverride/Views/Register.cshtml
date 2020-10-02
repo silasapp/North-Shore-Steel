@@ -18,9 +18,11 @@
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <!-- Latest compiled JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
 <div class="page registration-page">
@@ -44,7 +46,7 @@
                                 <div class="form-group row">
                                     @if (Model.FirstNameEnabled)
                                     {
-                                        <div class="col-sm-6">
+                                        <div class="col-md-6 col-xs-12">
                                             <label asp-for="FirstName">First Name</label>
                                             <input asp-for="FirstName" class="form-control" />
                                             @*@if (Model.FirstNameRequired)
@@ -58,7 +60,7 @@
 
                                     @if (Model.LastNameEnabled)
                                     {
-                                        <div class="col-sm-6">
+                                        <div class="col-md-6 col-xs-12">
                                             <label asp-for="LastName">Last Name</label>
                                             <input asp-for="LastName" class="form-control" />
                                             @*@if (Model.LastNameRequired)
@@ -76,7 +78,7 @@
 
                                 <div class="form-group row">
 
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6 col-xs-12">
                                         <label asp-for="Email">Work Email</label>
                                         <input asp-for="Email" class="form-control" />
                                         @*<nop-required />*@
@@ -85,7 +87,7 @@
 
                                     @if (Model.EnteringEmailTwice)
                                     {
-                                        <div class="col-sm-6">
+                                        <div class="col-md-6 col-xs-12">
                                             <label asp-for="ConfirmEmail">Confirm Email</label>
                                             <input asp-for="ConfirmEmail" class="form-control" />
                                             @*<nop-required />*@
@@ -98,7 +100,7 @@
 
                                 <div class="form-group row">
 
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6 col-xs-12">
                                         <label asp-for="Password">Set Password</label>
                                         <input asp-for="Password" class="form-control" />
                                         @*<nop-required />*@
@@ -106,7 +108,7 @@
 
                                     </div>
 
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6 col-xs-12">
                                         <label asp-for="ConfirmPassword">Confirm Password</label>
                                         <input asp-for="ConfirmPassword" class="form-control" />
                                         @*<nop-required />*@
@@ -123,7 +125,7 @@
                                 <div class="form-group row">
                                     @if (Model.CompanyEnabled)
                                     {
-                                        <div class="col-sm-6">
+                                        <div class="col-md-6 col-xs-12">
                                             <label asp-for="Company">Company Name</label>
                                             <input asp-for="Company" class="form-control" />
                                             @*@if (Model.CompanyRequired)
@@ -154,7 +156,7 @@
 
                                     @if (Model.PhoneEnabled)
                                     {
-                                        <div class="col-sm-6">
+                                        <div class="col-md-6 col-xs-12">
                                             <label asp-for="Phone">Phone Number</label>
                                             <input asp-for="Phone" class="form-control" />
                                             @*@if (Model.PhoneRequired)
@@ -186,7 +188,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 col-xs-12">
                                             <div class="col-md-12" style="margin-bottom: 2em">
                                                 var
                                                 @foreach (var attribute in Model.CustomerAttributes)
@@ -252,7 +254,7 @@
                                                 }
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 col-xs-12">
                                             @foreach (var attribute in Model.CustomerAttributes)
                                             {
                                                 var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
