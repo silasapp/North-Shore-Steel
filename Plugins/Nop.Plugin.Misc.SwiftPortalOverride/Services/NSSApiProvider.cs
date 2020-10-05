@@ -111,7 +111,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    _logger.Warning($"NSS.CreateUser -> {request.WorkEmail}", new Exception("NSS token returned empty")); 
+                    _logger.Warning($"NSS.CreateUser -> {request.WorkEmail}", new Exception("NSS token returned empty"));
                     return retVal;
                 }
 
@@ -152,7 +152,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request
-            _logger.InsertLog(Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}" );
+            _logger.InsertLog(Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}");
 
             return retVal;
         }
@@ -200,24 +200,23 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         }
 
 
-        public async Task<RecentOrderModel> GetRecentOrders(string requestUrl)
+        public List<RecentOrderModel> GetRecentOrders(string requestUrl)
         {
             try
             {
-                var retVal = new RecentOrderModel();
+                var retVal = new List<RecentOrderModel>();
                 var responseBody = string.Empty;
                 using (HttpClient client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Accept.Clear();
-                    var response = await client.GetAsync(requestUrl);
+                    var response = client.GetAsync(requestUrl).Result;
 
                     // throw error if not successful
-                    
+
                     response.EnsureSuccessStatusCode();
 
                     responseBody = response.Content.ReadAsStringAsync().Result;
-                    dynamic json = JsonConvert.DeserializeObject(responseBody);
-                    retVal = json;
+                    retVal = JsonConvert.DeserializeObject<List<RecentOrderModel>>(responseBody);
 
                 }
                 return retVal;

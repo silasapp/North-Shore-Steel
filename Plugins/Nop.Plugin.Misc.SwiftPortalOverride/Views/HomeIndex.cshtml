@@ -1,93 +1,15 @@
-﻿@{
+﻿@using Nop.Plugin.Misc.SwiftPortalOverride.Models
+@model IEnumerable<RecentOrderModel>
+
+@{
     Layout = "_ColumnsOne";
 
     //page class
     Html.AppendPageCssClassParts("html-home-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/homepageStyle.css");
 }
 
 <style>
-
-    #profile-default {
-        background: url(Themes/DefaultClean/Content/images/profile.png) no-repeat 50% 50%;
-    }
-
-    .avatar {
-        /*border: 1.9rem solid rgba(255, 255, 255, 0.3);*/
-        max-width: 6rem;
-    }
-
-    .contact-btn {
-        height: 35px;
-        width: 35px;
-        border-radius: 50% !important;
-        padding: 2px 1px 15px 1px !important;
-        color: #585858 !important;
-        background-color: #DEDEDE !important;
-        border-color: transparent !important;
-        margin: 0 1.2em;
-    }
-
-    .rounded-circle {
-        height: 5.6em;
-        width: 5.6em;
-    }
-
-    .card-body {
-        padding-top: 4em !important;
-        background-color: #F6F6F6;
-    }
-
-    .tab-content {
-        background-color: #F6F6F6;
-        height: auto;
-        padding: 1em;
-    }
-
-    .contact-container {
-        margin-top: 2em;
-    }
-
-    .nav-item:hover {
-        background-color: #585858 !important;
-    }
-
-    .nav-item {
-        background-color: #DEDEDE;
-    }
-
-    .nav-link:hover {
-        color: #FFF;
-    }
-
-    .nav-link {
-        color: #646464;
-    }
-
-    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-        background-color: #585858 !important;
-    }
-
-    .underline {
-        text-decoration: underline;
-    }
-
-    .table-striped > thead > tr {
-        background-color: #DEDEDE;
-    }
-
-    .table-bordered {
-        border: 2px solid transparent !important;
-    }
-
-    .table-striped > tbody > tr:nth-child(odd) > td,
-    .table-striped > tbody > tr:nth-child(odd) > th {
-        background-color: #F6F6F6;
-    }
-
-    .table-striped > tbody > tr:nth-child(even) > td,
-    .table-striped > tbody > tr:nth-child(even) > th {
-        background-color: #FFFFFF;
-    }
 </style>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -124,39 +46,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <th class="underline" scope="row">12345678</th>
-                                        <td>114.00</td>
-                                        <td>$135.33</td>
-                                        <td>P-12345</td>
-                                        <td>09/20/2020</td>
-                                        <td>Processing</td>
-                                    </tr>
+                                    @if (Model != null)
+                                    {
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <th class="underline" scope="row">@item.OrderId</th>
+                                                <td>@item.Weight</td>
+                                                <td>@item.OrderTotal</td>
+                                                <td>@item.PONo</td>
+                                                <td>@item.EstDeliveryDate</td>
+                                                <td>@item.OrderStatusName</td>
+                                            </tr>
+                                        }
+                                    }
 
-                                    <tr>
-                                        <th class="underline" scope="row">12345676</th>
-                                        <td>114.00</td>
-                                        <td>$135.33</td>
-                                        <td>P-12343</td>
-                                        <td>09/14/2020</td>
-                                        <td>Shipped</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="underline" scope="row">12345675</th>
-                                        <td>128.00</td>
-                                        <td>$135.33</td>
-                                        <td>P-12342</td>
-                                        <td>09/10/2020</td>
-                                        <td>Delivered</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="underline" scope="row">12345674</th>
-                                        <td>114.00</td>
-                                        <td>$135.33</td>
-                                        <td>P-12341</td>
-                                        <td>09/02/2020</td>
-                                        <td>Delivered</td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -181,30 +85,7 @@
                                         <td>09/20/2020</td>
                                         <td>PastDue 3 days</td>
                                     </tr>
-                                    <tr>
-                                        <th class="underline">456787</th>
-                                        <th class="underline" scope="row">12345678</th>
-                                        <td>$135.33</td>
-                                        <td>09/20/2020</td>
-                                        <td>10/01/2020</td>
-                                        <td>Invoiced</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="underline">456786</th>
-                                        <th class="underline" scope="row">12345678</th>
-                                        <td>$135.33</td>
-                                        <td>09/20/2020</td>
-                                        <td>10/01/2020</td>
-                                        <td>Paid</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="underline">456785</th>
-                                        <th class="underline" scope="row">12345678</th>
-                                        <td>$135.33</td>
-                                        <td>09/20/2020</td>
-                                        <td>10/01/2020</td>
-                                        <td>Paid</td>
-                                    </tr>
+
 
 
                                 </tbody>
