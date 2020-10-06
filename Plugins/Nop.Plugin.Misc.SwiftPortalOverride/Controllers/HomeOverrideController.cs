@@ -29,21 +29,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public override IActionResult Index()
         {
-            //var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            //var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
-
-            //string baseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl;
-
-
-
-            //var orderRequestUrl = $"{ baseUrl}companies/3/orders/recent";
-            //var invoiceRequestUrl = $"{ baseUrl}companies/3/invoices/recent";
-            //if (!baseUrl.EndsWith('/'))
-            //{
-            //    orderRequestUrl = $"{ baseUrl}/companies/3/orders/recent";
-            //    invoiceRequestUrl = $"{ baseUrl}/companies/3/invoices/recent";
-            //}
-
+            //return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml");
             var model = new TransactionModel();
             model.RecentOrders = _nSSApiProvider.GetRecentOrders(141713);
             model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(141713);
