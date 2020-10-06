@@ -221,8 +221,8 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                         _logger.Warning($"NSS.GetRecentOrders -> ", new Exception("NSS token returned empty"));
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/${companyId}/orders/recent";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/${companyId}/orders/recent";
+                    var requestUrl = $"{ _baseUrl}companies/{companyId}/orders/recent";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{companyId}/orders/recent";
 
 
                     client.DefaultRequestHeaders.Accept.Clear();
@@ -267,8 +267,8 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                         _logger.Warning($"NSS.GetRecentInvoices -> ", new Exception("NSS token returned empty"));
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/${companyId}/invoices/recent";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/${companyId}/invoices/recent";
+                    var requestUrl = $"{ _baseUrl}companies/{companyId}/invoices/recent";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{companyId}/invoices/recent";
 
 
                     client.DefaultRequestHeaders.Accept.Clear();
