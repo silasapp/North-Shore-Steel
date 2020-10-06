@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
+using Nop.Plugin.Misc.SwiftPortalOverride.Models;
 using Nop.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Configuration;
 using Nop.Web.Controllers;
@@ -28,29 +29,26 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public override IActionResult Index()
         {
-            try
-            {
-                var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-                var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
+            //var storeScope = _storeContext.ActiveStoreScopeConfiguration;
+            //var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
 
-                string baseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl;
-
-                // create recent order 
-
-                baseUrl = "https://private-anon-ab0bddfbec-nssswift.apiary-mock.com/";
-                var requestUrl = $"{ baseUrl}companies/3/orders/recent";
-                if (!baseUrl.EndsWith('/')) requestUrl = $"{ baseUrl}/companies/3/orders/recent";
+            //string baseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl;
 
 
-                var model = _nSSApiProvider.GetRecentOrders(requestUrl);
 
-                return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
-            }
-            catch (Exception ex)
-            {
+            //var orderRequestUrl = $"{ baseUrl}companies/3/orders/recent";
+            //var invoiceRequestUrl = $"{ baseUrl}companies/3/invoices/recent";
+            //if (!baseUrl.EndsWith('/'))
+            //{
+            //    orderRequestUrl = $"{ baseUrl}/companies/3/orders/recent";
+            //    invoiceRequestUrl = $"{ baseUrl}/companies/3/invoices/recent";
+            //}
 
-                throw ex;
-            }
+            var model = new TransactionModel();
+            model.RecentOrders = _nSSApiProvider.GetRecentOrders(141713);
+            model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(141713);
+
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
 
         }
     }

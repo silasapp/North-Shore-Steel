@@ -1,5 +1,5 @@
 ﻿@using Nop.Plugin.Misc.SwiftPortalOverride.Models
-@model IEnumerable<RecentOrderModel>
+@model TransactionModel
 
 @{
     Layout = "_ColumnsOne";
@@ -48,15 +48,15 @@
                                 <tbody>
                                     @if (Model != null)
                                     {
-                                        foreach (var item in Model)
+                                        foreach (Order order in Model.RecentOrders)
                                         {
                                             <tr>
-                                                <th class="underline" scope="row">@item.OrderId</th>
-                                                <td>@item.Weight</td>
-                                                <td>@item.OrderTotal</td>
-                                                <td>@item.PONo</td>
-                                                <td>@item.EstDeliveryDate</td>
-                                                <td>@item.OrderStatusName</td>
+                                                <th class="underline" scope="row">@order.OrderId</th>
+                                                <td>@order.Weight</td>
+                                                <td>@order.OrderTotal</td>
+                                                <td>@order.PONo</td>
+                                                <td>@order.EstDeliveryDate</td>
+                                                <td>@order.OrderStatusName</td>
                                             </tr>
                                         }
                                     }
@@ -77,16 +77,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <th class="underline">456789</th>
-                                        <th class="underline" scope="row">12345678</th>
-                                        <td>$135.33</td>
-                                        <td>09/20/2020</td>
-                                        <td>09/20/2020</td>
-                                        <td>PastDue 3 days</td>
-                                    </tr>
+                                    @if (Model != null)
+                                    {
+                                        foreach (Invoice invoice in Model.RecentInvoices)
+                                        {
+                                            <tr>
+                                                <th class="underline" scope="row">@invoice.InvoiceId</th>
+                                                <td>@invoice.OrderNo</td>
+                                                <td>@invoice.InvoiceAmount</td>
+                                                <td>@invoice.InvoiceDate</td>
+                                                <td>@invoice.InvoiceDueDate</td>
+                                                <td>@invoice.InvoiceStatusName</td>
+                                            </tr>
 
-
+                                        }
+                                    }
 
                                 </tbody>
                             </table>

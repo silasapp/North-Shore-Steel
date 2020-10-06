@@ -27,6 +27,9 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         private readonly ILogger _logger;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
+        private string _baseUrl;
+        private string _user;
+        private string _pword;
 
         #endregion
 
@@ -43,6 +46,10 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             _logger = logger;
             _settingService = settingService;
             _storeContext = storeContext;
+
+            // configure settings
+            ConfigureUserSettings();
+
         }
 
         #endregion
@@ -84,15 +91,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             var retVal = new NSSCreateUserResponse();
             var content = string.Empty;
 
-            //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
-
-            string baseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl;
-            string user = swiftPortalOverrideSettings.NSSApiAuthUsername;
-            string pword = swiftPortalOverrideSettings.NSSApiAuthPassword;
-
-            if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pword))
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
                 _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
                 return retVal;
@@ -107,7 +106,7 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/x-www-form-urlencoded");
 
                 //get token
-                var token = GetNSSToken(httpClient, baseUrl, user, pword);
+                var token = GetNSSToken(httpClient);
 
                 if (string.IsNullOrEmpty(token))
                 {
@@ -116,8 +115,8 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
                 }
 
                 // create user resource
-                var requestUrl = $"{ baseUrl}users";
-                if (!baseUrl.EndsWith('/')) requestUrl = $"{ baseUrl}/users";
+                var requestUrl = $"{ _baseUrl}users";
+                if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/users";
 
                 //body params
                 var param = new Dictionary<string, string>
@@ -165,17 +164,17 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         /// <param name="user">NSS API auth username</param>
         /// <param name="pword">NSS API auth password</param>
         /// <returns>Exchange rates</returns>
-        public string GetNSSToken(HttpClient httpClient, string baseUrl, string user, string pword)
+        public string GetNSSToken(HttpClient httpClient)
         {
             var retVal = string.Empty;
-            var requestUrl = $"{ baseUrl}authenticate";
-            if (!baseUrl.EndsWith('/')) requestUrl = $"{ baseUrl}/authenticate";
+            var requestUrl = $"{ _baseUrl}authenticate";
+            if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/authenticate";
 
             //body params
             var param = new Dictionary<string, string>
             {
-                { "username", user },
-                { "password", pword }
+                { "username", _user },
+                { "password", _pword }
             };
             var content = new FormUrlEncodedContent(param);
 
@@ -200,23 +199,88 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
         }
 
 
-        public List<RecentOrderModel> GetRecentOrders(string requestUrl)
+        public List<Order> GetRecentOrders(int companyId)
         {
+            var retVal = new List<Order>();
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - Get Recent Orders", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            
             try
             {
-                var retVal = new List<RecentOrderModel>();
-                var responseBody = string.Empty;
                 using (HttpClient client = new HttpClient())
                 {
+                    //get token
+                    var token = GetNSSToken(client);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetRecentOrders -> ", new Exception("NSS token returned empty"));
+                    }
+
+                    var requestUrl = $"{ _baseUrl}companies/${companyId}/orders/recent";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/${companyId}/orders/recent";
+
+
                     client.DefaultRequestHeaders.Accept.Clear();
-                    var response = client.GetAsync(requestUrl).Result;
+                    var req = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+                    req.Headers.Add("Authorization", $"Bearer {token}");
+                    var response = client.SendAsync(req).Result;
 
                     // throw error if not successful
-
                     response.EnsureSuccessStatusCode();
 
-                    responseBody = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<List<RecentOrderModel>>(responseBody);
+                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<List<Order>>(responseBody);
+
+                }
+                return retVal;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.GetRecentOrders ->", ex);
+                return retVal;
+            }
+        }
+
+        public List<Invoice> GetRecentInvoices(int companyId)
+        {
+            var retVal = new List<Invoice>();
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - Get Recent Invoices", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    //get token
+                    var token = GetNSSToken(client);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetRecentInvoices -> ", new Exception("NSS token returned empty"));
+                    }
+
+                    var requestUrl = $"{ _baseUrl}companies/${companyId}/invoices/recent";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/${companyId}/invoices/recent";
+
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    var req = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+                    req.Headers.Add("Authorization", $"Bearer {token}");
+                    var response = client.SendAsync(req).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<List<Invoice>>(responseBody);
 
                 }
                 return retVal;
@@ -224,14 +288,26 @@ namespace Nop.Plugin.Misc.SwiftPortalOverride.Services
             catch (Exception ex)
             {
 
-                throw ex;
+                _logger.Error($"NSS.GetRecentInvoices ->", ex);
+                return retVal;
             }
         }
 
-        //public GetRecentInvoices()
-        //{
 
-        //}
+        private void ConfigureUserSettings ()
+        {
+            //load settings for a chosen store scope
+            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
+            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
+
+            _baseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl;
+            _user = swiftPortalOverrideSettings.NSSApiAuthUsername;
+            _pword = swiftPortalOverrideSettings.NSSApiAuthPassword;
+
+
+        }
+
+
         #endregion
     }
 }
