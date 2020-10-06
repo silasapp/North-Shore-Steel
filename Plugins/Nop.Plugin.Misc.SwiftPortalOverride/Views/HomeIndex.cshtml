@@ -87,7 +87,14 @@
                                                 <td>@invoice.InvoiceAmount</td>
                                                 <td>@invoice.InvoiceDate</td>
                                                 <td>@invoice.InvoiceDueDate</td>
-                                                <td>@invoice.InvoiceStatusName</td>
+                                                @if (@invoice.InvoiceStatusName.IndexOf("Past") > -1)
+                                                {
+                                                    <td style="color: red;">@invoice.InvoiceStatusName</td>
+                                                }
+                                                else
+                                                {
+                                                    <td>@invoice.InvoiceStatusName</td>
+                                                }
                                             </tr>
 
                                         }
