@@ -2,6 +2,8 @@
 using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
 using Nop.Core.Infrastructure.DependencyManagement;
+using NSS.Plugin.Misc.SwiftPortalOverride.Services;
+using Nop.Services.Messages;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 {
@@ -9,11 +11,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
     {
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
-            //builder.RegisterType<CustomService>().As<ICustomAttributeService>().InstancePerLifetimeScope();
+            builder.RegisterType<NSSApiProvider>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<WorkFlowMessageServiceOverride>().AsSelf().InstancePerLifetimeScope();
 
-            //builder.RegisterType<CustomModelFactory>().As<ICustomModelFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
+            builder.RegisterType<WorkFlowMessageServiceOverride>().As<IWorkflowMessageService>().InstancePerLifetimeScope();
         }
 
-        public int Order => 1;
+        public int Order => 10;
     }
 }

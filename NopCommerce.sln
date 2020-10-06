@@ -63,11 +63,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Payments.PayPalS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Widgets.FacebookPixel", "Plugins\Nop.Plugin.Widgets.FacebookPixel\Nop.Plugin.Widgets.FacebookPixel.csproj", "{87013DC8-D032-465B-A950-753E4EB15502}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Swift.Api", "Plugins\Nop.Plugin.Swift.Api\Nop.Plugin.Swift.Api.csproj", "{EF344199-AF63-4DC1-912D-A344A1DD9309}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSS.Plugin.Misc.SwiftApi", "Plugins\NSS.Plugin.Misc.SwiftApi\NSS.Plugin.Misc.SwiftApi.csproj", "{EF344199-AF63-4DC1-912D-A344A1DD9309}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Misc.SwiftPortalOverride", "Plugins\Nop.Plugin.Misc.SwiftPortalOverride\Nop.Plugin.Misc.SwiftPortalOverride.csproj", "{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSS.Plugin.Misc.SwiftPortalOverride", "Plugins\NSS.Plugin.Misc.SwiftPortalOverride\NSS.Plugin.Misc.SwiftPortalOverride.csproj", "{BA28F544-69A0-4E67-BCF8-CAAF7C0106D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Swift.Api.Tests", "Tests\Nop.Plugin.Swift.Api.Test\Nop.Plugin.Swift.Api.Tests.csproj", "{698533B2-5700-4CD9-9A37-6107DCBF1BEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nop.Plugin.Swift.Api.Tests", "Tests\NSS.Plugin.Misc.SwiftApi.Test\NSS.Plugin.Misc.SwiftApi.Tests.csproj", "{698533B2-5700-4CD9-9A37-6107DCBF1BEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
