@@ -1,4 +1,5 @@
 ﻿using NSS.Plugin.Misc.SwiftApi.Domain.Customers;
+using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftApi.Services
 {
@@ -9,5 +10,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Services
         void DeleteCustomerCompany(CustomerCompany customerCompany);
 
         CustomerCompany GetCustomerCompany(int customerId, int companyId);
+
+        IEnumerable<CustomerCompany> GetCustomerCompanies(int customerId);
     }
 }

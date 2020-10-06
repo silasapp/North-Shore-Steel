@@ -1,6 +1,8 @@
 ﻿using Nop.Data;
 using NSS.Plugin.Misc.SwiftApi.Domain.Customers;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NSS.Plugin.Misc.SwiftApi.Services
@@ -38,6 +40,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Services
                 return null;
 
             return _customerCompanyRepository.Table.FirstOrDefault(c => c.CustomerId == customerId && c.CompanyId == companyId);
+        }
+
+        public virtual IEnumerable<CustomerCompany> GetCustomerCompanies(int customerId)
+        {
+            if (customerId == 0)
+                return null;
+
+            return _customerCompanyRepository.Table.Where(c => c.CustomerId == customerId).ToList();
         }
     }
 }
