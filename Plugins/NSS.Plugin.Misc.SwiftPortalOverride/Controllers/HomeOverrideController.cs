@@ -12,6 +12,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly NSSApiProvider _nSSApiProvider;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
+        private readonly ICustomerCompanyService _customerCompanyService;
 
         public HomeOverrideController(
             ISettingService settingService,
@@ -26,30 +27,26 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public override IActionResult Index()
         {
-            string ERPId;
-            //var ERPCompanyId = SwiftPortalOverrideDefaults.ERPCompanyId;
-            var ERPCompanyId = "141713";
-            if (Request.Cookies[ERPCompanyId] != null)
+            string ERPCId = "";
+            var ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+
+            if (Request.Cookies[ERPComId] != null && (!string.IsNullOrEmpty(Request.Cookies[ERPComId].ToString())))
             {
-                ERPId = Request.Cookies[ERPCompanyId].ToString();
+                ERPCId = Request.Cookies[ERPComId].ToString();
                 var model = new TransactionModel();
-                model.RecentOrders = _nSSApiProvider.GetRecentOrders(ERPId);
-                model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(ERPId);
-                model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(ERPId);
+                model.RecentOrders = _nSSApiProvider.GetRecentOrders(ERPCId);
+                model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(ERPCId);
+                model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(ERPCId);
 
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }
             else
             {
+                
 
+                // Response.Cookies.Append(ERPComId, ERPCId);
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml");
             }
-
-
-
-
-
-
 
 
 
@@ -59,33 +56,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //    if count > 1 show select account
             //    if coount = 1; setcookie
 
-            //name, phone number and email
 
 
             //show company name on select account
 
             //onclick pass company id :: cookies.insert(redirect to homescreen)
 
-            // return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml");
-            //var model = new TransactionModel();
-            //model.RecentOrders = _nSSApiProvider.GetRecentOrders(141713);
-            //model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(141713);
-
-            //return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
-
+        //    //if no company show no recent order
         }
 
-        //private IActionResult NavigateToHome(TransactionModel model)
-        //{
-        //    // var model = new TransactionModel();
-        //    // 141713 = erpcompanyid
-        //    model.RecentOrders = _nSSApiProvider.GetRecentOrders(141713);
-        //    model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(141713);
-
-        //    //if no company show no recent order
-        //    // 
-
-        //    return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
-        //}
     }
 }

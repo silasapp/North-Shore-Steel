@@ -80,8 +80,8 @@
     background-color: #FFFFFF;
 }
 
-#pills-profile {
-    height: 28rem;
+#pills-profile, #pills-home {
+    height: 16rem;
     overflow-x: auto;
 }
 
