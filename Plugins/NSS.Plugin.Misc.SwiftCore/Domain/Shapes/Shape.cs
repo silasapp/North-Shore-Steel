@@ -1,7 +1,7 @@
 ﻿using Nop.Core;
 using System.Collections.Generic;
 
-namespace NSS.Plugin.Misc.SwiftApi.Domain.Shapes
+namespace NSS.Plugin.Misc.SwiftCore.Domain.Shapes
 {
     public class Shape : BaseEntity
     {

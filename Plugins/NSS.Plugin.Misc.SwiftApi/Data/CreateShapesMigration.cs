@@ -1,7 +1,8 @@
 ﻿using FluentMigrator;
+using FluentMigrator.Builders.Create.Table;
+using Nop.Data.Mapping.Builders;
 using Nop.Data.Migrations;
-using NSS.Plugin.Misc.SwiftApi.Domain.Customers;
-using NSS.Plugin.Misc.SwiftApi.Domain.Shapes;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 
 namespace NSS.Plugin.Misc.SwiftApi.Data
 {
@@ -33,9 +34,23 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
             _migrationManager.BuildTable<ShapeAttribute>(Create);
             _migrationManager.BuildTable<Shape>(Create);
 
+
             Create.ForeignKey("FK_ShapeAttribute_Shape").FromTable("ShapeAttribute").ForeignColumn("ShapeId").ToTable("Shape").PrimaryColumn("Id");
             Create.ForeignKey("FK_Shape_Shape").FromTable("Shape").ForeignColumn("ParentId").ToTable("Shape").PrimaryColumn("Id");
         }
         #endregion
+    }
+
+
+    public class ShapeBuilder : NopEntityBuilder<Shape>
+    {
+        public override void MapEntity(CreateTableExpressionBuilder table)
+        {
+            table
+                .WithColumn(nameof(Shape.Id))
+                .AsInt32()
+                .NotNullable()
+                .PrimaryKey();
+        }
     }
 }

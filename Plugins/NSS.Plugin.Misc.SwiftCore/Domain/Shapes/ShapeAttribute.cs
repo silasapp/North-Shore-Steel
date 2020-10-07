@@ -1,6 +1,6 @@
 ﻿using Nop.Core;
 
-namespace NSS.Plugin.Misc.SwiftApi.Domain.Shapes
+namespace NSS.Plugin.Misc.SwiftCore.Domain.Shapes
 {
     public class ShapeAttribute : BaseEntity
     {

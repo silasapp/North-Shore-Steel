@@ -2,12 +2,12 @@
 using System.Linq;
 using LinqToDB.Common;
 using Nop.Data;
-using NSS.Plugin.Misc.SwiftApi.Domain.Shapes;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using NUglify.Helpers;
 using System;
 using System.Collections.Generic;
 
-namespace NSS.Plugin.Misc.SwiftApi.Services
+namespace NSS.Plugin.Misc.SwiftCore.Services
 {
     public class ShapeService : IShapeService
     {
@@ -31,13 +31,17 @@ namespace NSS.Plugin.Misc.SwiftApi.Services
 
             _shapeRepository.Insert(shapes);
 
-            IList<Shape> createdShapes = _shapeRepository.Table.ToList();
+            //IList<Shape> createdShapes = _shapeRepository.Table.ToList();
 
             foreach (Shape shape in shapes)
             {
-                Shape createdShape = createdShapes.Single(cs => cs.Name == shape.Name);
-                shape.Atttributes.ForEach(sa => sa.ShapeId = createdShape.Id);
-                _shapeAttributeRepository.Insert(shape.Atttributes);
+                //Shape createdShape = createdShapes.Single(cs => cs.Name == shape.Name);
+                if (shape.Atttributes != null && shape.Atttributes.Count > 0)
+                {
+                    shape.Atttributes.ForEach(sa => sa.ShapeId = shape.Id);
+                    _shapeAttributeRepository.Insert(shape.Atttributes);
+                }
+
                 if (shape.SubCategories != null && shape.SubCategories.Count > 0)
                 {
                     InsertShapes((List<Shape>)shape.SubCategories);

@@ -6,7 +6,7 @@ using NSS.Plugin.Misc.SwiftApi.Delta;
 using NSS.Plugin.Misc.SwiftApi.DTO.Errors;
 using NSS.Plugin.Misc.SwiftApi.JSON.Serializers;
 using NSS.Plugin.Misc.SwiftApi.ModelBinders;
-using NSS.Plugin.Misc.SwiftApi.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies;
 using NSS.Plugin.Misc.SwiftApi.Services;
 using Nop.Services.Common;
@@ -17,7 +17,8 @@ using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Security;
 using Nop.Services.Stores;
-using NSS.Plugin.Misc.SwiftPortalOverride;
+using NSS.Plugin.Misc.SwiftCore.Services;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
 {
@@ -106,10 +107,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _customerCompanyService.InsertCustomerCompany(customerCompany);
 
             // update customer as NSS Approved
-            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, true);
+            _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, true);
 
             #region Log Approved Status
-            var approvedStatus = _genericAttributeService.GetAttribute<bool>(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute);
+            var approvedStatus = _genericAttributeService.GetAttribute<bool>(customer, Constants.NSSApprovedAttribute);
             // log nssapproved status
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> {customer.Email} approval status = '{approvedStatus}'");
             #endregion
@@ -141,7 +142,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             Nop.Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
 
-            _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
+            _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, false);
 
             return Ok();
         }

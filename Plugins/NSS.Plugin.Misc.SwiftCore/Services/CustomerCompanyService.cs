@@ -1,11 +1,11 @@
 ﻿using Nop.Data;
-using NSS.Plugin.Misc.SwiftApi.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NSS.Plugin.Misc.SwiftApi.Services
+namespace NSS.Plugin.Misc.SwiftCore.Services
 {
     public class CustomerCompanyService : ICustomerCompanyService
     {

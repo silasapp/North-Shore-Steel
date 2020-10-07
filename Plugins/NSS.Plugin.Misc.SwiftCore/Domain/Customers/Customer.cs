@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NSS.Plugin.Misc.SwiftApi.Domain.Customers
+namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
 {
     public class Customer : Nop.Core.Domain.Customers.Customer
     {

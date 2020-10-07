@@ -5,7 +5,6 @@ using NSS.Plugin.Misc.SwiftApi.Controllers;
 using NSS.Plugin.Misc.SwiftApi.DTO.Errors;
 using NSS.Plugin.Misc.SwiftApi.JSON.ActionResults;
 using NSS.Plugin.Misc.SwiftApi.JSON.Serializers;
-using NSS.Plugin.Misc.SwiftApi.Domain.Shapes;
 using NSS.Plugin.Misc.SwiftApi.DTOs.Shapes;
 using NSS.Plugin.Misc.SwiftApi.MappingExtensions;
 using NSS.Plugin.Misc.SwiftApi.Services;
@@ -18,6 +17,8 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using System.Collections.Generic;
 using System.Net;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
+using NSS.Plugin.Misc.SwiftCore.Services;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
 {
@@ -48,6 +49,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
+        [DisableRequestSizeLimit]
         public IActionResult CreateShapes(
             ShapesDto shapesDto
             )
@@ -61,14 +63,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             List<Shape> shapes = ShapeDtoMappings.ToEntity(shapesDto.Shapes);
 
-            foreach (Shape shape in shapes)
-            {
-                List<Shape> shapeSubCategoriees = (List<Shape>)shape.SubCategories;
-                if (shapeSubCategoriees != null)
-                {
-                    shapeSubCategoriees.ForEach(sc => { sc.ParentId = shape.Id; sc.SawOption = shape.SawOption; sc.Atttributes = shape.Atttributes; });
-                }
-            }
+            //foreach (Shape shape in shapes)
+            //{
+            //    List<Shape> shapeSubCategoriees = (List<Shape>)shape.SubCategories;
+            //    if (shapeSubCategoriees != null)
+            //    {
+            //        shapeSubCategoriees.ForEach(sc => { sc.ParentId = shape.Id; sc.SawOption = shape.SawOption; });
+            //    }
+            //}
 
             _shapeService.InsertShapes(shapes);
 

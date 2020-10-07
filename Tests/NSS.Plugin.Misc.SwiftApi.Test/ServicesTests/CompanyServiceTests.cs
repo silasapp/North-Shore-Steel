@@ -2,8 +2,9 @@
 using System.Linq;
 using Moq;
 using Nop.Data;
-using NSS.Plugin.Misc.SwiftApi.Domain.Customers;
 using NSS.Plugin.Misc.SwiftApi.Services;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Services;
 using NUnit.Framework;
 
 namespace NSS.Plugin.Misc.SwiftApi.Tests.ServicesTests.Companies

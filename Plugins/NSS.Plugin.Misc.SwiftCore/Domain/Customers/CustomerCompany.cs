@@ -1,6 +1,6 @@
 ﻿using Nop.Core;
 
-namespace NSS.Plugin.Misc.SwiftApi.Domain.Customers
+namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
 {
     public class CustomerCompany : BaseEntity
     {

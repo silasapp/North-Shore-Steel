@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace NSS.Plugin.Misc.SwiftApi.Domain.Customers
+namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
 {
     public class Company : BaseEntity
     {

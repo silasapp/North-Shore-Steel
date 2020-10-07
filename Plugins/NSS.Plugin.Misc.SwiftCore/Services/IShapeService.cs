@@ -1,7 +1,7 @@
-﻿using NSS.Plugin.Misc.SwiftApi.Domain.Shapes;
+﻿using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using System.Collections.Generic;
 
-namespace NSS.Plugin.Misc.SwiftApi.Services
+namespace NSS.Plugin.Misc.SwiftCore.Services
 {
     public interface IShapeService
     {
