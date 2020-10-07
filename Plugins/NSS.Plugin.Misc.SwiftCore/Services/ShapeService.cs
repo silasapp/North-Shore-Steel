@@ -44,6 +44,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
                 if (shape.SubCategories != null && shape.SubCategories.Count > 0)
                 {
+                    shape.SubCategories.ForEach(sc => { sc.ParentId = shape.Id; sc.SawOption = shape.SawOption; });
                     InsertShapes((List<Shape>)shape.SubCategories);
                 }
             }
@@ -51,10 +52,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         public IList<Shape> GetShapes()
         {
-            var shapes = _shapeRepository.Table.ToList();
+            var shapes = _shapeRepository.Table.Where(s => s.ParentId == null || s.ParentId == 0).ToList();
 
             foreach (Shape shape in shapes) {
                 shape.Atttributes = _shapeAttributeRepository.Table.Where(s => s.ShapeId == shape.Id).ToList();
+                shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
             }
 
             return shapes;
