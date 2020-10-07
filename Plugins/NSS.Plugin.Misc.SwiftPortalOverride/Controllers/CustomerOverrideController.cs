@@ -634,7 +634,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 #endregion
 
-                var response = _nSSApiProvider.CreateSwiftUser(request, useMock: false);
+                var response = _nSSApiProvider.CreateNSSUser(request);
 
                 if (response != null && response.WitnrixId != null)
                 {

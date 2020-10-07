@@ -61,28 +61,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// </summary>
         /// <param name="request">User request object</param>
         /// <returns>Exchange rates</returns>
-        public NSSCreateUserResponse CreateSwiftUser(NSSCreateUserRequest request, bool useMock = false)
+        public NSSCreateUserResponse CreateNSSUser(NSSCreateUserRequest request)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-
-            if (useMock)
-            {
-                request = new NSSCreateUserRequest
-                {
-                    CompanyName = "ACME",
-                    Firstname = "Jessica",
-                    LastName = "Jones",
-                    HearAboutUs = "WebSite",
-                    IsExistingCustomer = "0",
-                    ItemsForNextProject = "Test Something",
-                    Other = "",
-                    Phone = "+12463775637",
-                    PreferredLocationid = "1",
-                    SwiftUserId = "3",
-                    WorkEmail = "jessicajones@test11.com",
-                };
-            }
 
             // log request
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser -> {request.WorkEmail}", JsonConvert.SerializeObject(request));
@@ -160,10 +142,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// Get Request Token
         /// </summary>
         /// <param name="httpClient">Http client instance</param>
-        /// <param name="baseUrl">NSS API base url</param>
-        /// <param name="user">NSS API auth username</param>
-        /// <param name="pword">NSS API auth password</param>
-        /// <returns>Exchange rates</returns>
+        /// <returns>token</returns>
         public string GetNSSToken(HttpClient httpClient)
         {
             var retVal = string.Empty;
@@ -272,8 +251,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
 
                     client.DefaultRequestHeaders.Accept.Clear();
+
                     var req = new HttpRequestMessage(HttpMethod.Get, requestUrl);
                     req.Headers.Add("Authorization", $"Bearer {token}");
+
                     var response = client.SendAsync(req).Result;
 
                     // throw error if not successful
