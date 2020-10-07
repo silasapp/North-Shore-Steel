@@ -15,7 +15,7 @@ using NSS.Plugin.Misc.SwiftApi.Maps;
 using NSS.Plugin.Misc.SwiftApi.ModelBinders;
 using NSS.Plugin.Misc.SwiftApi.Services;
 using NSS.Plugin.Misc.SwiftApi.Validators;
-using NSS.Plugin.Misc.SwiftApi.Services;
+using NSS.Plugin.Misc.SwiftCore.Services;
 
 namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
 {

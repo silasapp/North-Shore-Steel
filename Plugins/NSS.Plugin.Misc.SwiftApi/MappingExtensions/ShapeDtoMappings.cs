@@ -1,6 +1,6 @@
 ﻿using NSS.Plugin.Misc.SwiftApi.AutoMapper;
-using NSS.Plugin.Misc.SwiftApi.Domain.Shapes;
 using NSS.Plugin.Misc.SwiftApi.DTOs.Shapes;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftApi.MappingExtensions

@@ -8,9 +8,9 @@ using NSS.Plugin.Misc.SwiftApi.DTO.CustomerRoles;
 using NSS.Plugin.Misc.SwiftApi.DTO.Customers;
 using NSS.Plugin.Misc.SwiftApi.DTO.Languages;
 using NSS.Plugin.Misc.SwiftApi.MappingExtensions;
-using NSS.Plugin.Misc.SwiftApi.Domain.Shapes;
 using NSS.Plugin.Misc.SwiftApi.DTOs.Shapes;
 using System.Linq;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 
 namespace NSS.Plugin.Misc.SwiftApi.AutoMapper
 {

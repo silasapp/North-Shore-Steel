@@ -13,7 +13,6 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Requests;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Authentication;
@@ -40,8 +39,7 @@ using Nop.Web.Models.Customer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
 
@@ -536,7 +534,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             try
             {
                 // save customer as no NSSApproved by default
-                _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.NSSApprovedAttribute, false);
+                _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, false);
 
                 // prepare request for create api call
 
@@ -572,9 +570,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                         var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
                                         if (val != null)
                                         {
-                                            if (attribute.Name == SwiftPortalOverrideDefaults.HearAboutUsAttribute)
+                                            if (attribute.Name == Constants.HearAboutUsAttribute)
                                                 request.HearAboutUs = val.Name;
-                                            if (attribute.Name == SwiftPortalOverrideDefaults.PreferredLocationIdAttribute)
+                                            if (attribute.Name == Constants.PreferredLocationIdAttribute)
                                             {
                                                 if (attribute.Name.ToLower() == "houston")
                                                 {
@@ -601,7 +599,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                     var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                                     if (items.Length > 0)
                                     {
-                                        if (attribute.Name == SwiftPortalOverrideDefaults.IsExistingCustomerAttribute)
+                                        if (attribute.Name == Constants.IsExistingCustomerAttribute)
                                             request.IsExistingCustomer = "1";
                                     }
                                     else
@@ -619,10 +617,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                 {
                                     var enteredText = ctrlAttributes.ToString().Trim();
 
-                                    if (attribute.Name == SwiftPortalOverrideDefaults.ItemsForNextProjectAttribute)
+                                    if (attribute.Name == Constants.ItemsForNextProjectAttribute)
                                         request.ItemsForNextProject = enteredText;
 
-                                    if (attribute.Name == SwiftPortalOverrideDefaults.OtherAttribute)
+                                    if (attribute.Name == Constants.OtherAttribute)
                                         request.Other = enteredText;
                                 }
                             }
@@ -639,7 +637,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (response != null && response.WitnrixId != null)
                 {
                     // save wintrix id
-                    _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.WintrixKeyAttribute, response.WitnrixId);
+                    _genericAttributeService.SaveAttribute(customer, Constants.WintrixKeyAttribute, response.WitnrixId);
                 }
 
                 // send nss an email

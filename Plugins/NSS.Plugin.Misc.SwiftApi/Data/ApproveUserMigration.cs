@@ -1,6 +1,6 @@
 ﻿using FluentMigrator;
 using Nop.Data.Migrations;
-using NSS.Plugin.Misc.SwiftApi.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftApi.Data
 {
