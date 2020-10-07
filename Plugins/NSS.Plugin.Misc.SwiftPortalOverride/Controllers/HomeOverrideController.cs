@@ -4,6 +4,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Configuration;
 using Nop.Web.Controllers;
+using NSS.Plugin.Misc.SwiftApi.Services;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -12,17 +13,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly NSSApiProvider _nSSApiProvider;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
-        private readonly ICustomerCompanyService _customerCompanyService;
+        // private readonly ICustomerCompanyService _customerCompanyService;
 
         public HomeOverrideController(
             ISettingService settingService,
             IStoreContext storeContext,
             NSSApiProvider nSSApiProvider
+            // ICustomerCompanyService customerCompanyService
+
             )
         {
             _settingService = settingService;
             _storeContext = storeContext;
             _nSSApiProvider = nSSApiProvider;
+            // _customerCompanyService = customerCompanyService;
         }
 
         public override IActionResult Index()
@@ -42,9 +46,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
             else
             {
-                
+                // var customerCompanies = _customerCompanyService.GetCustomerCompanies(1);
+                //if (customerCompanies.Count() == 1)
+                //{
+                //    Response.Cookies.Append(ERPComId, ERPCId);
 
-                // Response.Cookies.Append(ERPComId, ERPCId);
+                //}
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml");
             }
 
