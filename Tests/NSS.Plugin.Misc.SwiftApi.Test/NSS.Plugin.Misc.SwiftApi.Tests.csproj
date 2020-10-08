@@ -21,13 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\Nop.Core\Nop.Core.csproj" />
     <ProjectReference Include="..\..\Libraries\Nop.Services\Nop.Services.csproj" />
+    <ProjectReference Include="..\..\Plugins\NSS.Plugin.Misc.SwiftApi\NSS.Plugin.Misc.SwiftApi.csproj" />
     <ProjectReference Include="..\..\Plugins\NSS.Plugin.Misc.SwiftCore\NSS.Plugin.Misc.SwiftCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="NSS.Plugin.Misc.SwiftApi">
-      <HintPath>..\..\Presentation\Nop.Web\Plugins\Misc.SwiftApi\NSS.Plugin.Misc.SwiftApi.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
