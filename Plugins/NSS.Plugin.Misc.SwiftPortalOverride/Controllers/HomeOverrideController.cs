@@ -39,35 +39,48 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public override IActionResult Index()
         {
             string ERPCId;
+            int customerId = _workContext.CurrentCustomer.Id;
             string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-            var model = new TransactionModel();
+            ERPComId += customerId;
+            TransactionModel model = new TransactionModel();
+
+            // get all companies assigned to customer
+            IEnumerable<CustomerCompany> customerCompanies = _customerCompanyService.GetCustomerCompanies(customerId);
+
             if (Request.Cookies[ERPComId] != null && (!string.IsNullOrEmpty(Request.Cookies[ERPComId].ToString())))
             {
                 ERPCId = Request.Cookies[ERPComId].ToString();
-                model = GetTransactions(ERPCId);
 
-                return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
-            }
-            else
-            {
-                int customerId = _workContext.CurrentCustomer.Id;
-                IEnumerable<CustomerCompany> customerCompanies = _customerCompanyService.GetCustomerCompanies(customerId);
-                if (customerCompanies.Count() == 1)
+                // check if customer still has access to previously selected company
+                IEnumerable<CustomerCompany> cc = customerCompanies.Where(x => x.Company.ErpCompanyId.ToString() == ERPCId);
+                if (cc.Count() > 0)
                 {
-                    ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
-                    Response.Cookies.Append(ERPComId, ERPCId);
                     model = GetTransactions(ERPCId);
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
                 }
-                else if (customerCompanies.Count() > 1)
-                {
-                    CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
-                    selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
-                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml", selectAccountModel);
-                }
 
+                // remove cookie
+                Response.Cookies.Delete(ERPComId);
+
+            }
+
+            if (customerCompanies.Count() == 1)
+            {
+                ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
+                Response.Cookies.Append(ERPComId, ERPCId);
+                model = GetTransactions(ERPCId);
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }
+            else if (customerCompanies.Count() > 1)
+            {
+                CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
+                selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
+                return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml", selectAccountModel);
+            }
+
+            // has access to no company
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
+
         }
 
         private TransactionModel GetTransactions(string ERPCId)
