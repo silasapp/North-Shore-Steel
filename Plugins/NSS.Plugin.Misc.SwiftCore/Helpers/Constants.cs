@@ -13,10 +13,10 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 
         #region NSSCustomerAttributes           
         public static string IsExistingCustomerAttribute => "Existing Customer";
-        public static string PreferredLocationIdAttribute => "PreferredLocation";
-        public static string HearAboutUsAttribute => "HearAboutUs";
+        public static string PreferredLocationIdAttribute => "Preferred Location";
+        public static string HearAboutUsAttribute => "Hear About Us";
         public static string OtherAttribute => "Other";
-        public static string ItemsForNextProjectAttribute => "ItemsForNextProject";
+        public static string ItemsForNextProjectAttribute => "Items For Next Project";
         public static string NSSApprovedAttribute => "NSSApproved";
         #endregion
     }
