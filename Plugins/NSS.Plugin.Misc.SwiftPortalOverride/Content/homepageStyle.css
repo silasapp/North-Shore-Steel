@@ -98,9 +98,9 @@
     box-shadow: 0 0 6px 0 #999;
 }
 
-    .account-name-container:hover {
-        color: inherit;
-    }
+.account-name-container:hover {
+    color: inherit;
+}
 
 .account-name {
     font-weight: 700;
