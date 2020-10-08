@@ -195,7 +195,7 @@
                                                     var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                                     var textPrompt = attribute.Name;
 
-                                                    @if (attribute.Name == "HearAboutUs")
+                                                    @if (attribute.Name == "Hear About Us")
                                                     {
                                                         <label>How did you hear about us?</label>
                                                         <select name="@(controlId)" id="@(controlId)" class="form-control" onchange="otherMethodCheck(this);">
@@ -235,7 +235,7 @@
                                                     var textPrompt = attribute.Name;
 
 
-                                                    @if (attribute.Name == "PreferredLocation")
+                                                    @if (attribute.Name == "Preferred Location")
                                                     {
                                                         <label>Preferred pickup location</label>
                                                         <select name="@(controlId)" id="@(controlId)" class="form-control">
@@ -258,7 +258,7 @@
                                             {
                                                 var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                                 var textPrompt = attribute.Name;
-                                                @if (attribute.Name == "ItemsForNextProject")
+                                                @if (attribute.Name == "Items For Next Project")
                                                 {
                                                     <div class="" style="margin-bottom: 1em;">
                                                         <label>How can we help?</label>
