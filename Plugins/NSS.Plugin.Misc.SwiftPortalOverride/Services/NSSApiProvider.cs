@@ -178,7 +178,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         }
 
 
-        public List<Order> GetRecentOrders(int companyId)
+        public List<Order> GetRecentOrders(string ERPCompanyId)
         {
             var retVal = new List<Order>();
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -200,8 +200,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         _logger.Warning($"NSS.GetRecentOrders -> ", new Exception("NSS token returned empty"));
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/{companyId}/orders/recent";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{companyId}/orders/recent";
+                    var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}/orders/recent";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{ERPCompanyId}/orders/recent";
 
 
                     client.DefaultRequestHeaders.Accept.Clear();
@@ -225,7 +225,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
         }
 
-        public List<Invoice> GetRecentInvoices(int companyId)
+        public List<Invoice> GetRecentInvoices(string ERPCompanyId)
         {
             var retVal = new List<Invoice>();
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -246,8 +246,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         _logger.Warning($"NSS.GetRecentInvoices -> ", new Exception("NSS token returned empty"));
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/{companyId}/invoices/recent";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{companyId}/invoices/recent";
+                    var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}/invoices/recent";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{ERPCompanyId}/invoices/recent";
 
 
                     client.DefaultRequestHeaders.Accept.Clear();
@@ -274,6 +274,53 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
         }
 
+
+        public CompanyInfo GetCompanyInfo(string ERPCompanyId)
+        {
+            var retVal = new CompanyInfo();
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - Get Recent Invoices", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    //get token
+                    var token = GetNSSToken(client);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetCompanyInfo -> ", new Exception("NSS token returned empty"));
+                    }
+
+                    var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{ERPCompanyId}";
+
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    var req = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+                    req.Headers.Add("Authorization", $"Bearer {token}");
+                    var response = client.SendAsync(req).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<CompanyInfo>(responseBody);
+
+                }
+                return retVal;
+            }
+            catch (Exception ex)
+            {
+
+                _logger.Error($"NSS.GetCompanyInfo ->", ex);
+                return retVal;
+            }
+        }
 
         private void ConfigureUserSettings ()
         {

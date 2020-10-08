@@ -9,6 +9,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     {
         public List<Order> RecentOrders { get; set; }
         public List<Invoice> RecentInvoices { get; set; }
+        public CompanyInfo CompanyInfo { get; set; }
+    }
+
+    public class CompanyInfo
+    {
+        public int CompanyId { get; set; }
+        public string CompanyName { get; set; }
+        public SalesContact SalesContact { get; set; }
+    }
+
+    public class SalesContact
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
     }
 
     public class Order

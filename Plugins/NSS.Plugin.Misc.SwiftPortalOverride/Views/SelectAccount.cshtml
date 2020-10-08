@@ -1,5 +1,5 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
-@model TransactionModel
+@model CustomerSelectAccountModel
 
 @{
     Layout = "_ColumnsOne";
@@ -10,7 +10,6 @@
 }
 
 <style>
-    
 </style>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -29,19 +28,27 @@
             <div class="form-fields">
                 <div class="container-fluid" style="margin: auto; padding: 0 18em;">
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group account-name-container">
-                                <div class="account-name">ACME INC</div>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group account-name-container">
-                                <div class="account-name">ACME CORP</div>
-                            </div>
-                        </div>
+                        @if (Model.Companies != null)
+                        {
+                            foreach (var company in Model.Companies)
+                            {
+                                <div class="col-md-12">
+                                    <a class="form-group account-name-container" onclick=SelectCompany(@company.ErpCompanyId);>
+                                        <div class="account-name">@company.Name</div>
+                                    </a>
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script type='text/javascript'>
+    function SelectCompany(ErpId) {
+        document.cookie = "ERPCompanyId=" + ErpId;
+        location.href = "@Url.Action("Index")"
+    }
+</script>

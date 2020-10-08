@@ -29,15 +29,23 @@
     <!-- We copy the entire \App_Data directory. But we ignore JSON files and data protection keys  -->
     <Content Include="App_Data\**" CopyToPublishDirectory="PreserveNewest" Exclude="App_Data\*.json" />
     <Content Remove="App_Data\*.json" />
+    <Content Remove="bin\**" />
+    <Content Remove="obj\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
+    <Compile Remove="bin\**" />
+    <Compile Remove="obj\**" />
 
     <Compile Remove="Plugins\**;Themes\**" />
 
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Remove="Plugins\**;Themes\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="obj\**" />
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
+    <None Remove="bin\**" />
+    <None Remove="obj\**" />
     <None Remove="Plugins\**;Themes\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
 
@@ -102,6 +110,10 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Plugins\Misc.SwiftApi\" />
   </ItemGroup>
 
   <!-- This target execute after "Build" target.

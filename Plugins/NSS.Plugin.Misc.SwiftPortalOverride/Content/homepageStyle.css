@@ -80,20 +80,26 @@
     background-color: #FFFFFF;
 }
 
-#pills-profile {
-    height: 28rem;
+#pills-profile, #pills-home {
+    height: 16rem;
     overflow-x: auto;
 }
 
+/*select account screen*/
 .account-name-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    color: inherit;
     height: 3rem;
     background-color: #fff;
     -moz-box-shadow: 0 0 6px 0 #999;
     -webkit-box-shadow: 0 0 6px 0 #999;
     box-shadow: 0 0 6px 0 #999;
+}
+
+.account-name-container:hover {
+    color: inherit;
 }
 
 .account-name {
