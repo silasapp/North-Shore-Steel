@@ -31,11 +31,9 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
             _shapeRepository.Insert(shapes);
 
-            //IList<Shape> createdShapes = _shapeRepository.Table.ToList();
-
+            // insert attributes and subcategory
             foreach (Shape shape in shapes)
             {
-                //Shape createdShape = createdShapes.Single(cs => cs.Name == shape.Name);
                 if (shape.Atttributes != null && shape.Atttributes.Count > 0)
                 {
                     shape.Atttributes.ForEach(sa => sa.ShapeId = shape.Id);
@@ -55,11 +53,33 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             var shapes = _shapeRepository.Table.Where(s => s.ParentId == null || s.ParentId == 0).ToList();
 
             foreach (Shape shape in shapes) {
-                shape.Atttributes = _shapeAttributeRepository.Table.Where(s => s.ShapeId == shape.Id).ToList();
                 shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
+                shape.Atttributes = _shapeAttributeRepository.Table.Where(s => s.ShapeId == shape.Id).ToList();
             }
 
             return shapes;
+        }
+
+        public Shape GetShapeById(int id)
+        {
+            var shape = _shapeRepository.Table.FirstOrDefault(s => s.Id == id);
+
+            if (shape != null && (shape.ParentId == 0 || shape.ParentId == null))
+            {
+                shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
+                shape.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Id).ToList();
+            }
+            else
+            {
+                shape.Parent = _shapeRepository.Table.FirstOrDefault(s => s.Id == shape.ParentId);
+                if(shape.Parent != null)
+                {
+                    shape.Parent.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Parent.Id).ToList();
+                }
+            }
+
+            
+            return shape;
         }
 
         public void DeleteShapes()

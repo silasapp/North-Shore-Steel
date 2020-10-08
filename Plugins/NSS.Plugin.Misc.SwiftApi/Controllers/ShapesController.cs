@@ -49,7 +49,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
-        [DisableRequestSizeLimit]
         public IActionResult CreateShapes(
             ShapesDto shapesDto
             )
@@ -62,15 +61,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _shapeService.DeleteShapes();
 
             List<Shape> shapes = ShapeDtoMappings.ToEntity(shapesDto.Shapes);
-
-            //foreach (Shape shape in shapes)
-            //{
-            //    List<Shape> shapeSubCategoriees = (List<Shape>)shape.SubCategories;
-            //    if (shapeSubCategoriees != null)
-            //    {
-            //        shapeSubCategoriees.ForEach(sc => { sc.ParentId = shape.Id; sc.SawOption = shape.SawOption; });
-            //    }
-            //}
 
             _shapeService.InsertShapes(shapes);
 

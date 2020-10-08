@@ -3,6 +3,7 @@ using Autofac;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Nop.Core.Configuration;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Infrastructure;
@@ -15,6 +16,7 @@ using NSS.Plugin.Misc.SwiftApi.Maps;
 using NSS.Plugin.Misc.SwiftApi.ModelBinders;
 using NSS.Plugin.Misc.SwiftApi.Services;
 using NSS.Plugin.Misc.SwiftApi.Validators;
+using NSS.Plugin.Misc.SwiftApiApi.Services;
 using NSS.Plugin.Misc.SwiftCore.Services;
 
 namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
@@ -43,6 +45,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
             builder.RegisterType<CompanyService>().As<ICompanyService>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
             builder.RegisterType<ShapeService>().As<IShapeService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductApiService>().As<IProductApiService>().InstancePerLifetimeScope();
 
             builder.RegisterType<MappingHelper>().As<IMappingHelper>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerRolesHelper>().As<ICustomerRolesHelper>().InstancePerLifetimeScope();
@@ -58,6 +61,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
 
             builder.RegisterType<CustomerFactory>().As<IFactory<Customer>>().InstancePerLifetimeScope();
             builder.RegisterType<AddressFactory>().As<IFactory<Address>>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductFactory>().As<IFactory<Product>>().InstancePerLifetimeScope();
 
             builder.RegisterType<JsonPropertyMapper>().As<IJsonPropertyMapper>().InstancePerLifetimeScope();
 
