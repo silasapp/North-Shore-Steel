@@ -64,21 +64,24 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         {
             var shape = _shapeRepository.Table.FirstOrDefault(s => s.Id == id);
 
-            if (shape != null && (shape.ParentId == 0 || shape.ParentId == null))
+            if(shape != null)
             {
-                shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
-                shape.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Id).ToList();
-            }
-            else
-            {
-                shape.Parent = _shapeRepository.Table.FirstOrDefault(s => s.Id == shape.ParentId);
-                if(shape.Parent != null)
+                if (shape.ParentId == 0 || shape.ParentId == null)
                 {
-                    shape.Parent.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Parent.Id).ToList();
+                    shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
+                    shape.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Id).ToList();
                 }
+                else
+                {
+                    shape.Parent = _shapeRepository.Table.FirstOrDefault(s => s.Id == shape.ParentId);
+                    if (shape.Parent != null)
+                    {
+                        shape.Parent.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Parent.Id).ToList();
+                    }
+                }
+
             }
 
-            
             return shape;
         }
 
