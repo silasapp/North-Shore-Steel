@@ -51,6 +51,31 @@
 
     <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
 
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+
     <Content Include="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
     <None Include="Plugins\**" CopyToPublishDirectory="PreserveNewest" />
 
@@ -59,6 +84,11 @@
 
     <!-- We copy the \Logs directory -->
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css.map" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css.map" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
 
     <None Update="Areas\Admin\sitemap.config">
@@ -140,11 +170,6 @@
       
       More details here: https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals#concurrent-garbage-collection-->
     <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
 </Project>
