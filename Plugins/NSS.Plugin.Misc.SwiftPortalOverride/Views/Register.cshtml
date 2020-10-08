@@ -1,9 +1,10 @@
 ﻿@using Nop.Web.Models.Customer
 @using Nop.Services.Customers
+@using NSS.Plugin.Misc.SwiftCore.Helpers;
 @model RegisterModel
 @{
     Layout = "";
-    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/customstyle.css");
+ Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/customstyle.css");
 
 }
 @{
@@ -195,7 +196,7 @@
                                                     var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                                     var textPrompt = attribute.Name;
 
-                                                    @if (attribute.Name == "Hear About Us")
+                                                    @if (attribute.Name == Constants.HearAboutUsAttribute)
                                                     {
                                                         <label>How did you hear about us?</label>
                                                         <select name="@(controlId)" id="@(controlId)" class="form-control" onchange="otherMethodCheck(this);">
@@ -218,7 +219,7 @@
                                                     var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                                     var textPrompt = attribute.Name;
 
-                                                    @if (attribute.Name == "Other")
+                                                    @if (attribute.Name == Constants.OtherAttribute)
                                                     {
                                                         <div id="other-method" style="display:none">
                                                             <label> Let us know how you found us</label>
@@ -235,7 +236,7 @@
                                                     var textPrompt = attribute.Name;
 
 
-                                                    @if (attribute.Name == "Preferred Location")
+                                                    @if (attribute.Name == Constants.PreferredLocationIdAttribute)
                                                     {
                                                         <label>Preferred pickup location</label>
                                                         <select name="@(controlId)" id="@(controlId)" class="form-control">
@@ -258,7 +259,7 @@
                                             {
                                                 var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                                 var textPrompt = attribute.Name;
-                                                @if (attribute.Name == "Items For Next Project")
+                                                @if (attribute.Name == Constants.ItemsForNextProjectAttribute)
                                                 {
                                                     <div class="" style="margin-bottom: 1em;">
                                                         <label>How can we help?</label>
