@@ -5,6 +5,10 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Configuration;
 using Nop.Web.Controllers;
 using NSS.Plugin.Misc.SwiftCore.Services;
+using System;
+using System.Linq;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -34,53 +38,36 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public override IActionResult Index()
         {
-            string ERPCId = "";
-            var ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-
+            string ERPCId;
+            string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+            var model = new TransactionModel();
             if (Request.Cookies[ERPComId] != null && (!string.IsNullOrEmpty(Request.Cookies[ERPComId].ToString())))
             {
                 ERPCId = Request.Cookies[ERPComId].ToString();
-                TransactionModel model = GetTransactions(ERPCId);
+                model = GetTransactions(ERPCId);
 
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }
             else
             {
                 int customerId = _workContext.CurrentCustomer.Id;
-                var customerCompanies = _customerCompanyService.GetCustomerCompanies(customerId);
-                //check if no company is returned
-                if (customerCompanies == null)
-                {
-                    var model = new TransactionModel();
-                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model = null);
-                }
-
-
+                IEnumerable<CustomerCompany> customerCompanies = _customerCompanyService.GetCustomerCompanies(customerId);
                 if (customerCompanies.Count() == 1)
                 {
-                    // get erpid from customer company
-                    // var ERPCId = 
+                    ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
                     Response.Cookies.Append(ERPComId, ERPCId);
-                    TransactionModel model = GetTransactions(ERPCId);
+                    model = GetTransactions(ERPCId);
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
-
                 }
                 else if (customerCompanies.Count() > 1)
                 {
-                    var accountModel = new SelectAccountModel();
-
-                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml", accountModel);
-
+                    SelectAccountModel selectAccountModel = new SelectAccountModel();
+                    selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
+                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml", selectAccountModel);
                 }
+
+                return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }
-
-
-            //show company name on select account
-
-            //onclick pass company id :: cookies.insert(redirect to homescreen)
-
-            //    //if no company show no recent order
-            return 
         }
 
         private TransactionModel GetTransactions(string ERPCId)

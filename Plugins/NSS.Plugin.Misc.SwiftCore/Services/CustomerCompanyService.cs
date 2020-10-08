@@ -10,11 +10,14 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
     public class CustomerCompanyService : ICustomerCompanyService
     {
         private readonly IRepository<CustomerCompany> _customerCompanyRepository;
+        private readonly IRepository<Company> _companyRepository;
 
         public CustomerCompanyService(
-            IRepository<CustomerCompany> customerCompanyRepository)
+            IRepository<CustomerCompany> customerCompanyRepository,
+            IRepository<Company> companyRepository)
         {
             _customerCompanyRepository = customerCompanyRepository;
+            _companyRepository = companyRepository;
         }
 
         public void DeleteCustomerCompany(CustomerCompany customerCompany)
@@ -27,7 +30,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         public void InsertCustomerCompany(CustomerCompany customerCompany)
         {
-            
+
             if (customerCompany == null)
                 throw new ArgumentNullException(nameof(customerCompany));
 
@@ -47,7 +50,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             if (customerId == 0)
                 return null;
 
-            return _customerCompanyRepository.Table.Where(c => c.CustomerId == customerId).ToList();
+            var customerCompanies = _customerCompanyRepository.Table.Where(c => c.CustomerId == customerId).ToList();
+
+            foreach (CustomerCompany customerCompany in customerCompanies)
+            {
+                customerCompany.Company = _companyRepository.Table.FirstOrDefault(c => c.Id == customerCompany.CompanyId);
+            }
+            return customerCompanies;
         }
     }
 }
