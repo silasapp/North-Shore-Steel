@@ -8,6 +8,7 @@ using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Infrastructure;
 using Nop.Core.Infrastructure.DependencyManagement;
+using Nop.Services.Common;
 using NSS.Plugin.Misc.SwiftApi.Converters;
 using NSS.Plugin.Misc.SwiftApi.Factories;
 using NSS.Plugin.Misc.SwiftApi.Helpers;
@@ -41,11 +42,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
 
         private void RegisterPluginServices(ContainerBuilder builder)
         {
+            builder.RegisterType<CustomGenericAttributeService>().AsSelf().InstancePerLifetimeScope();
+
             builder.RegisterType<SpecificationAttributesApiService>().As<ISpecificationAttributeApiService>().InstancePerLifetimeScope();
             builder.RegisterType<CompanyService>().As<ICompanyService>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
             builder.RegisterType<ShapeService>().As<IShapeService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductApiService>().As<IProductApiService>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomGenericAttributeService>().As<IGenericAttributeService>().InstancePerLifetimeScope();
 
             builder.RegisterType<MappingHelper>().As<IMappingHelper>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerRolesHelper>().As<ICustomerRolesHelper>().InstancePerLifetimeScope();

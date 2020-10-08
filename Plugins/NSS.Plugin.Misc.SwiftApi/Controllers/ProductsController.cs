@@ -46,9 +46,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly IDTOHelper _dtoHelper;
         private readonly ILogger _logger;
         private readonly IShapeService _shapeService;
-        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly CustomGenericAttributeService _genericAttributeService;
 
-        public ProductsController(IGenericAttributeService genericAttributeService, IShapeService shapeService, IProductService productService, IProductApiService productApiService, IFactory<Product> factory,
+        public ProductsController(CustomGenericAttributeService genericAttributeService, IShapeService shapeService, IProductService productService, IProductApiService productApiService, IFactory<Product> factory,
             IManufacturerService manufacturerService, IProductTagService productTagService, IUrlRecordService urlRecordService,
             IProductAttributeService productAttributeService, ILogger logger, IDTOHelper dtoHelper,
             IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService,
@@ -82,11 +82,20 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
+            var attr = _genericAttributeService.GetAttributeByKeyValue("itemId", erpProductDelta.Dto.itemId.ToString(), nameof(Product));
+            if (attr != null)
+            {
+                var existingProduct = _productApiService.GetProductById(attr.EntityId);
+
+                if(existingProduct != null)
+                    return Error(HttpStatusCode.BadRequest, "product", "duplicate product");
+            }
+                
             // check if shapes exist and if required attributes have value
             var shape = _shapeService.GetShapeById(erpProductDelta.Dto.shapeId);
 
             if (shape == null)
-                throw new Exception("No shape found for the Shape Id specified.");
+                return Error(HttpStatusCode.NotFound, "error", "No shape found for the Shape Id specified.");
 
             var request = erpProductDelta.ObjectPropertyNameValuePairs.FirstOrDefault();
             var requestData = (Dictionary<string,object>)request.Value;
@@ -174,7 +183,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
             CustomerActivityService.InsertActivity("APIService", "Starting Product Update", null);
 
-            var product = _productApiService.GetProductById(erpProductDelta.Dto.Id);
+            var product = new Product();
+
+            var attr = _genericAttributeService.GetAttributeByKeyValue("itemId", erpProductDelta.Dto.Id.ToString(), nameof(Product));
+            if (attr == null)
+                product = null;
+            else
+                product = _productApiService.GetProductById(attr.EntityId);
+
 
             if (product == null)
             {
@@ -182,6 +198,15 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
 
             var request = (Dictionary<string, object>)erpProductDelta.ObjectPropertyNameValuePairs.FirstOrDefault().Value;
+
+            if (request.ContainsKey("shapeId"))
+            {
+                // check if shapes exist and if required attributes have value
+                var shape = _shapeService.GetShapeById(erpProductDelta.Dto.shapeId);
+
+                if (shape == null)
+                    return Error(HttpStatusCode.NotFound, "shape", "not found");
+            }
 
             product.Name = request.ContainsKey("itemName") ? erpProductDelta.Dto.itemName : product.Name;
             product.Height = request.ContainsKey("height") ? erpProductDelta.Dto.height : product.Height;
@@ -208,7 +233,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             foreach (var attribute in request)
             {
-                if (attribute.Key == "Id")
+                if (attribute.Key == "Id" || attribute.Key == "itemId")
                     continue;
                 // save generic data
                 if (attribute.Value != null)

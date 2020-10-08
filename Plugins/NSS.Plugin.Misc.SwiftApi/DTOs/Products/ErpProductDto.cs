@@ -41,7 +41,7 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Products
         public int shapeId { get; set; }
 
         [JsonProperty("itemNo")]
-        public long itemNo { get; set; }
+        public string itemNo { get; set; }
 
         [JsonProperty("itemTagNo")]
         public string itemTagNo { get; set; }
