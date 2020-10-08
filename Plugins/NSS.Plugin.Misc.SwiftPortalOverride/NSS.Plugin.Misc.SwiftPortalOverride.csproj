@@ -85,6 +85,12 @@
     <Folder Include="Areas\Admin\Models\" />    <Folder Include="Extensions\" />
     <Folder Include="Factories\" />  </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Models\CustomerSelectAccountModel.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
   <!-- This target execute after "Build" target -->
   <Target Name="NopTarget" AfterTargets="Build">
     <!-- Delete unnecessary libraries from plugins path -->

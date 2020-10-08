@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class SelectAccountModel : BaseNopModel
+    public class CustomerSelectAccountModel : BaseNopModel
     {
         public IEnumerable<Company> Companies { get; set; }
     }

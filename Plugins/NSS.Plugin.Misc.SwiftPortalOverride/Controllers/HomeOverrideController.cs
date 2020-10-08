@@ -61,7 +61,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
                 else if (customerCompanies.Count() > 1)
                 {
-                    SelectAccountModel selectAccountModel = new SelectAccountModel();
+                    CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
                     selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml", selectAccountModel);
                 }
