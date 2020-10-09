@@ -75,6 +75,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
                 selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
+                selectAccountModel.loggedInCustomerId = customerId;
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml", selectAccountModel);
             }
 
