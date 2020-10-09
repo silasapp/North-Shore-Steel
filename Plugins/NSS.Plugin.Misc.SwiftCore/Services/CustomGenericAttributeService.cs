@@ -35,16 +35,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
             var attribute = query.FirstOrDefault();
 
-            if(attribute != null)
-            {
-                //we cannot inject ICacheKeyService into constructor because it'll cause circular references.
-                //that's why we resolve it here this way
-                var cacheKey = EngineContext.Current.Resolve<ICacheKeyService>()
-                    .PrepareKeyForShortTermCache(NopCommonDefaults.GenericAttributeCacheKey, attribute.EntityId, keyGroup);
-
-                attribute = query.ToCachedFirstOrDefault(cacheKey);
-            }
-
             return attribute;
         }
     }
