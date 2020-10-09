@@ -81,7 +81,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             });
 
             // email template
-            ConfigureMessageTemplates();
+            //ConfigureMessageTemplates();
 
 
             base.Install();
@@ -106,21 +106,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             base.Uninstall();
         }
 
-        void ConfigureMessageTemplates()
-        {
-            // approval email
-            var approvalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
-            if (approvalTemplate == null)
-            {
-                var newCustomerMail = _messageTemplateService.GetMessageTemplatesByName("NewCustomer.Notification").FirstOrDefault();
-                approvalTemplate = _messageTemplateService.CopyMessageTemplate(newCustomerMail);
-            }
-            // change body
-            //approvalMail.Body =
-            approvalTemplate.Name = SwiftPortalOverrideDefaults.ApprovalMessageTemplateName;
-            approvalTemplate.Body = $@"<p>  <a href='%Store.URL%'>%Store.Name%</a>  <br />  <br />  A new customer registered with your store. Below are the customer's details:  <br />  Full name: %Customer.FullName%  <br />  Email: %Customer.Email% <br />  Erp Id: %Customer.ErpId%  </p>  ";
-            _messageTemplateService.UpdateMessageTemplate(approvalTemplate);
-        }
+        //void ConfigureMessageTemplates()
+        //{
+        //    // approval email
+        //    var approvalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
+        //    if (approvalTemplate == null)
+        //    {
+        //        var newCustomerMail = _messageTemplateService.GetMessageTemplatesByName("NewCustomer.Notification").FirstOrDefault();
+        //        approvalTemplate = _messageTemplateService.CopyMessageTemplate(newCustomerMail);
+        //    }
+        //    // change body
+        //    //approvalMail.Body =
+        //    approvalTemplate.Name = SwiftPortalOverrideDefaults.ApprovalMessageTemplateName;
+        //    approvalTemplate.Body = $@"<p>  <a href='%Store.URL%'>%Store.Name%</a>  <br />  <br />  A new customer registered with your store. Below are the customer's details:  <br />  Full name: %Customer.FullName%  <br />  Email: %Customer.Email% <br />  Erp Id: %Customer.ErpId%  </p>  ";
+        //    _messageTemplateService.UpdateMessageTemplate(approvalTemplate);
+        //}
 
         #endregion
     }

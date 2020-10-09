@@ -11,7 +11,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         /// </summary>
         public static string SystemName => "Misc.SwiftPortalOverride";
 
-        public static string ApprovalMessageTemplateName => "NewCustomer.ApprovalNotication";
+        public static string ApprovalMessageTemplateName => "NewCustomer.Notification";
 
         public static string ERPCompanyId => "ERPCompanyId";
     }
