@@ -48,7 +48,8 @@
 
 <script type='text/javascript'>
     function SelectCompany(ErpId) {
-        document.cookie = "ERPCompanyId=" + ErpId;
+        let cookieKey = `ERPCompanyId${@{@Model.loggedInCustomerId}}=`
+        document.cookie = cookieKey + ErpId;
         location.href = "@Url.Action("Index")"
     }
 </script>

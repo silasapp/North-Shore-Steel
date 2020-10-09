@@ -9,5 +9,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     public class CustomerSelectAccountModel : BaseNopModel
     {
         public IEnumerable<Company> Companies { get; set; }
+
+        public int loggedInCustomerId { get; set; }
     }
 }
