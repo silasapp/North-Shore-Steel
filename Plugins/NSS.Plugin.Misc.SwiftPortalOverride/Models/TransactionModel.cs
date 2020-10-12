@@ -9,6 +9,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     {
         public List<Order> RecentOrders { get; set; }
         public List<Invoice> RecentInvoices { get; set; }
+
         public CompanyInfo CompanyInfo { get; set; }
     }
 
@@ -30,9 +31,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     {
         public int OrderId { get; set; }
         public double Weight { get; set; }
-        public string OrderTotal { get; set; }
+        public double OrderTotal { get; set; }
         public string PONo { get; set; }
-        public string EstDeliveryDate { get; set; }
+        public DateTime EstDeliveryDate { get; set; }
         public string OrderStatusName { get; set; }
     }
 
@@ -41,8 +42,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public int InvoiceId { get; set; }
         public int OrderNo { get; set; }
         public double InvoiceAmount { get; set; }
-        public string InvoiceDate { get; set; }
-        public string InvoiceDueDate { get; set; }
+        public DateTime InvoiceDate { get; set; }
+        public DateTime InvoiceDueDate { get; set; }
         public string InvoiceStatusName { get; set; }
     }
 }

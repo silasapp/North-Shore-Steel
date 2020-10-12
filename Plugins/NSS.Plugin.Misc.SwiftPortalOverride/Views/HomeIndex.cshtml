@@ -52,10 +52,10 @@
                                         {
                                             <tr>
                                                 <th class="underline" scope="row">@order.OrderId</th>
-                                                <td>@order.Weight</td>
-                                                <td>@order.OrderTotal</td>
+                                                <td>@(string.Format("{0:N2}", order.Weight))</td>
+                                                <td>$@(string.Format("{0:N2}", order.OrderTotal))</td>
                                                 <td>@order.PONo</td>
-                                                <td>@order.EstDeliveryDate</td>
+                                                <td>@order.EstDeliveryDate.ToString("MM/dd/yyyy")</td>
                                                 <td>@order.OrderStatusName</td>
                                             </tr>
                                         }
@@ -90,9 +90,9 @@
                                             <tr>
                                                 <th class="underline" scope="row">@invoice.InvoiceId</th>
                                                 <td>@invoice.OrderNo</td>
-                                                <td>@invoice.InvoiceAmount</td>
-                                                <td>@invoice.InvoiceDate</td>
-                                                <td>@invoice.InvoiceDueDate</td>
+                                                <td>$@(string.Format("{0:N2}", invoice.InvoiceAmount))</td>
+                                                <td>@invoice.InvoiceDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</td>
                                                 @if (@invoice.InvoiceStatusName.IndexOf("Past") > -1)
                                                 {
                                                     <td style="color: red;">@invoice.InvoiceStatusName</td>

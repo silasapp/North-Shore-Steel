@@ -8,8 +8,12 @@
     font-size: 3em !important;
 }
 
-.modal-dialog {
+.modal-dialog, .modal-content {
     width: 67em !important;
+}
+
+#modal-container {
+    padding-right: 36rem !important;
 }
 
 input#Newsletter {
