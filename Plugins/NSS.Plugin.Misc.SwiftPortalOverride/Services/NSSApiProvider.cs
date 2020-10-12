@@ -48,7 +48,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             _storeContext = storeContext;
 
             // configure settings
-            ConfigureUserSettings();
+            ConfigureNSSApiSettings();
 
         }
 
@@ -65,9 +65,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-
-            // log request
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser -> {request.WorkEmail}", JsonConvert.SerializeObject(request));
 
             //initialize
             var retVal = new NSSCreateUserResponse();
@@ -132,8 +129,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 _logger.Error($"NSS.CreateUser -> {request.WorkEmail}", ex);
             }
 
-            // log request
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==>{content ?? "empty"}");
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==> {content ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }
@@ -198,6 +195,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (string.IsNullOrEmpty(token))
                     {
                         _logger.Warning($"NSS.GetRecentOrders -> ", new Exception("NSS token returned empty"));
+                        return retVal;
                     }
 
                     var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}/orders/recent";
@@ -216,13 +214,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     retVal = JsonConvert.DeserializeObject<List<Order>>(responseBody);
 
                 }
-                return retVal;
             }
             catch (Exception ex)
             {
                 _logger.Error($"NSS.GetRecentOrders ->", ex);
-                return retVal;
             }
+
+            return retVal;
         }
 
         public List<Invoice> GetRecentInvoices(string ERPCompanyId)
@@ -244,6 +242,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (string.IsNullOrEmpty(token))
                     {
                         _logger.Warning($"NSS.GetRecentInvoices -> ", new Exception("NSS token returned empty"));
+                        return retVal;
                     }
 
                     var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}/invoices/recent";
@@ -264,18 +263,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     retVal = JsonConvert.DeserializeObject<List<Invoice>>(responseBody);
 
                 }
-                return retVal;
             }
             catch (Exception ex)
             {
-
                 _logger.Error($"NSS.GetRecentInvoices ->", ex);
-                return retVal;
             }
+
+            return retVal;
         }
 
 
-        public CompanyInfo GetCompanyInfo(string ERPCompanyId)
+        public CompanyInfo GetCompanyInfo(string erpCompanyId)
         {
             var retVal = new CompanyInfo();
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -294,10 +292,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (string.IsNullOrEmpty(token))
                     {
                         _logger.Warning($"NSS.GetCompanyInfo -> ", new Exception("NSS token returned empty"));
+                        return retVal;
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{ERPCompanyId}";
+                    var requestUrl = $"{ _baseUrl}companies/{erpCompanyId}";
+                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{erpCompanyId}";
 
 
                     client.DefaultRequestHeaders.Accept.Clear();
@@ -312,17 +311,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     retVal = JsonConvert.DeserializeObject<CompanyInfo>(responseBody);
 
                 }
-                return retVal;
             }
             catch (Exception ex)
             {
-
                 _logger.Error($"NSS.GetCompanyInfo ->", ex);
-                return retVal;
             }
+
+            return retVal;
         }
 
-        private void ConfigureUserSettings ()
+        private void ConfigureNSSApiSettings()
         {
             //load settings for a chosen store scope
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
@@ -331,10 +329,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             _baseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl;
             _user = swiftPortalOverrideSettings.NSSApiAuthUsername;
             _pword = swiftPortalOverrideSettings.NSSApiAuthPassword;
-
-
         }
-
 
         #endregion
     }
