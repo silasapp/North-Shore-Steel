@@ -239,8 +239,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error(HttpStatusCode.NotFound, "product", "not found");
             }
 
-            var genericAttr = _genericAttributeService.GetAttribute<bool>(product, "serialized", defaultValue: false);
-
             var request = (Dictionary<string, object>)erpProductDelta.ObjectPropertyNameValuePairs.FirstOrDefault().Value;
 
             if (request.ContainsKey("shapeId"))
@@ -267,7 +265,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
             else
             {
-                product.Sku = request.ContainsKey("itemNo") ? erpProductDelta.Dto.itemNo.ToString() : product.Sku;
+                product.Sku = request.ContainsKey("itemNo") ? erpProductDelta.Dto.itemNo : product.Sku;
                 product.ManageInventoryMethod = ManageInventoryMethod.DontManageStock;
                 product.OrderMaximumQuantity = request.ContainsKey("quantity") ? erpProductDelta.Dto.quantity ?? 0 : product.OrderMaximumQuantity;
             }
