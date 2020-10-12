@@ -5,6 +5,7 @@
 
 trigger:
 - dev
+- 0*
 
 variables:
   buildPlatform: 'Any CPU'
