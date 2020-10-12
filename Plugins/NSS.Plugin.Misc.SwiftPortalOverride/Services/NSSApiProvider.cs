@@ -68,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             //initialize
             var retVal = new NSSCreateUserResponse();
-            var content = string.Empty;
+            var respContent = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
@@ -113,16 +113,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     { "itemsForNextProject", request.ItemsForNextProject },
                 };
 
-                var req = new HttpRequestMessage(HttpMethod.Post, requestUrl) { Content = new FormUrlEncodedContent(param) };
-                req.Headers.Add("Authorization", $"Bearer {token}");
+                var json = JsonConvert.SerializeObject(param);
 
-                var response = httpClient.SendAsync(req).Result;
+                var content = new StringContent(json, Encoding.UTF8, "application/x-www-form-urlencoded");
+                content.Headers.Add("Authorization", $"Bearer {token}");
+                content.Headers.ContentLength = Encoding.UTF8.GetByteCount(json);
+                
+                var response = httpClient.PostAsync(requestUrl, content).Result;
 
                 // throw error if not successful
                 response.EnsureSuccessStatusCode();
 
-                content = response.Content.ReadAsStringAsync().Result;
-                retVal = JsonConvert.DeserializeObject<NSSCreateUserResponse>(content);
+                respContent = response.Content.ReadAsStringAsync().Result;
+                retVal = JsonConvert.DeserializeObject<NSSCreateUserResponse>(respContent);
             }
             catch (Exception ex)
             {
@@ -130,7 +133,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==> {content ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.WorkEmail}, wintrixId: {retVal.WitnrixId?.ToString() ?? "empty"}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }
