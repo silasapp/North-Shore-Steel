@@ -116,7 +116,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 var json = JsonConvert.SerializeObject(param);
 
                 var content = new StringContent(json, Encoding.UTF8, "application/x-www-form-urlencoded");
-                content.Headers.ContentLength = Encoding.UTF8.GetByteCount(json);
 
                 var req = new HttpRequestMessage(HttpMethod.Post, requestUrl) { Content = content};
                 req.Headers.Add("Authorization", $"Bearer {token}");
