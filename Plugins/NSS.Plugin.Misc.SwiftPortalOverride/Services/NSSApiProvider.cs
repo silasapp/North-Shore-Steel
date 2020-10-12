@@ -120,6 +120,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                 var req = new HttpRequestMessage(HttpMethod.Post, requestUrl) { Content = content};
                 req.Headers.Add("Authorization", $"Bearer {token}");
+                req.Headers.Add("Content-Length", $"{Encoding.UTF8.GetByteCount(json)}");
 
                 var response = httpClient.SendAsync(req).Result;
 
