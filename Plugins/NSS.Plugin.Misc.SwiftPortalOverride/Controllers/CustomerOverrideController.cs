@@ -574,11 +574,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                                 request.HearAboutUs = val.Name;
                                             if (attribute.Name == Constants.PreferredLocationIdAttribute)
                                             {
-                                                if (attribute.Name.ToLower() == "houston")
+                                                if (val.Name.ToLower() == "houston")
                                                 {
                                                     val.Id = 1;
                                                 }
-                                                else if (attribute.Name.ToLower() == "beaumont")
+                                                else if (val.Name.ToLower() == "beaumont")
                                                 {
                                                     val.Id = 2;
                                                 }
