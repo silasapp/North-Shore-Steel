@@ -87,10 +87,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 var existingProduct = _productApiService.GetProductById(attr.EntityId);
 
-                if(existingProduct != null)
+                if (existingProduct != null)
                     return Error(HttpStatusCode.BadRequest, "product", "duplicate product");
             }
-                
+
             // check if shapes exist and if required attributes have value
             var shape = _shapeService.GetShapeById(erpProductDelta.Dto.shapeId);
 
@@ -98,7 +98,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error(HttpStatusCode.NotFound, "error", "No shape found for the Shape Id specified.");
 
             var request = erpProductDelta.ObjectPropertyNameValuePairs.FirstOrDefault();
-            var requestData = (Dictionary<string,object>)request.Value;
+            var requestData = (Dictionary<string, object>)request.Value;
 
             foreach (var attribute in (shape.Parent == null ? shape.Atttributes : shape.Parent.Atttributes))
             {
@@ -106,12 +106,16 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
                 else
                     if (string.IsNullOrWhiteSpace(value?.ToString()))
-                        ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
+                    ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
             }
 
             // serialized product field check
             if (erpProductDelta.Dto.serialized && string.IsNullOrWhiteSpace(erpProductDelta.Dto.itemTagNo))
-                ModelState.AddModelError("ItemTagNo", $"ItemTagNo field requires a value");
+                ModelState.AddModelError("itemTagNo", $"itemTagNo field requires a value for serialized products");
+
+            // price check
+            if(erpProductDelta.Dto.pricePerCWT == null && erpProductDelta.Dto.pricePerFt == null && erpProductDelta.Dto.pricePerPiece == null)
+                ModelState.AddModelError("price", $"at least one price item must not be null");
 
 
             if (ModelState.ErrorCount > 0)
@@ -125,21 +129,22 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             var product = _factory.Initialize();
 
             product.Name = erpProductDelta.Dto.itemName;
-            product.Length = erpProductDelta.Dto.width;
-            product.Height = erpProductDelta.Dto.height;
-            product.Width = erpProductDelta.Dto.width;
-            product.Weight = erpProductDelta.Dto.weight;
+            product.Length = erpProductDelta.Dto.length ?? (decimal)0.00;
+            product.Height = erpProductDelta.Dto.height ?? (decimal)0.00;
+            product.Width = erpProductDelta.Dto.width ?? (decimal)0.00;
+            product.Weight = erpProductDelta.Dto.weight ?? (decimal)0.00;
+            // serialized product
             if (erpProductDelta.Dto.serialized)
             {
                 product.Sku = erpProductDelta.Dto.itemTagNo;
                 product.ManageInventoryMethod = ManageInventoryMethod.ManageStock;
-                product.StockQuantity = erpProductDelta.Dto.quantity;
+                product.StockQuantity = erpProductDelta.Dto.quantity ?? 0;
             }
             else
             {
-                product.Sku = erpProductDelta.Dto.itemNo.ToString();
+                product.Sku = erpProductDelta.Dto.itemNo;
                 product.ManageInventoryMethod = ManageInventoryMethod.DontManageStock;
-                product.OrderMaximumQuantity = erpProductDelta.Dto.quantity;
+                product.OrderMaximumQuantity = erpProductDelta.Dto.quantity ?? 0;
             }
 
             _productService.InsertProduct(product);
@@ -147,8 +152,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             foreach (var attribute in requestData)
             {
                 // save generic data
-                if (attribute.Value != null)
-                    _genericAttributeService.SaveAttribute(product, attribute.Key.ToString(), attribute.Value);
+                _genericAttributeService.SaveAttribute(product, attribute.Key.ToString(), attribute.Value);
             }
 
             //search engine name
@@ -161,6 +165,45 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             // Preparing the result dto of the new product
             var response = GetErpProduct(product);
+
+            var json = JsonFieldsSerializer.Serialize(response, string.Empty);
+
+            return new RawJsonActionResult(json);
+        }
+
+        [HttpGet]
+        [Route("/api/products/{id}")]
+        [ProducesResponseType(typeof(ErpProductDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorsRootObject), 422)]
+        [ProducesResponseType(typeof(ErrorsRootObject), (int)HttpStatusCode.BadRequest)]
+        public IActionResult GetProductById(int id)
+        {
+            // Here we display the errors if the validation has failed at some point.
+            if (!ModelState.IsValid)
+            {
+                return Error();
+            }
+
+            CustomerActivityService.InsertActivity("APIService", "Starting Product get By Id", null);
+
+            var product = new Product();
+
+            var attr = _genericAttributeService.GetAttributeByKeyValue("itemId", id.ToString(), nameof(Product));
+            if (attr == null)
+                product = null;
+            else
+                product = _productApiService.GetProductById(attr.EntityId);
+
+            if (product == null)
+            {
+                return Error(HttpStatusCode.NotFound, "product", "not found");
+            }
+
+            var response = GetErpProduct(product);
+
+            CustomerActivityService.InsertActivity("APIService", "Finished Get Product by Id", product);
 
             var json = JsonFieldsSerializer.Serialize(response, string.Empty);
 
@@ -191,11 +234,12 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             else
                 product = _productApiService.GetProductById(attr.EntityId);
 
-
             if (product == null)
             {
                 return Error(HttpStatusCode.NotFound, "product", "not found");
             }
+
+            var genericAttr = _genericAttributeService.GetAttribute<bool>(product, "serialized", defaultValue: false);
 
             var request = (Dictionary<string, object>)erpProductDelta.ObjectPropertyNameValuePairs.FirstOrDefault().Value;
 
@@ -209,23 +253,23 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
 
             product.Name = request.ContainsKey("itemName") ? erpProductDelta.Dto.itemName : product.Name;
-            product.Height = request.ContainsKey("height") ? erpProductDelta.Dto.height : product.Height;
-            product.Width = request.ContainsKey("width") ? erpProductDelta.Dto.width : product.Width;
-            product.Weight = request.ContainsKey("weight") ? erpProductDelta.Dto.weight : product.Weight;
-            if (request.ContainsKey("serialized"))
+            product.Height = request.ContainsKey("height") ? erpProductDelta.Dto.height ?? (decimal)0.00 : product.Height;
+            product.Width = request.ContainsKey("width") ? erpProductDelta.Dto.width ?? (decimal)0.00 : product.Width;
+            product.Weight = request.ContainsKey("weight") ? erpProductDelta.Dto.weight ?? (decimal)0.00 : product.Weight;
+
+            var isSerialized = _genericAttributeService.GetAttribute<bool>(product, "serialized", defaultValue: false);
+            isSerialized = request.ContainsKey("serialized") ? erpProductDelta.Dto.serialized : isSerialized;
+            if (isSerialized)
             {
-                if (erpProductDelta.Dto.serialized)
-                {
-                    product.Sku = request.ContainsKey("itemTagNo") ? erpProductDelta.Dto.itemTagNo : product.Sku;
-                    product.ManageInventoryMethod = ManageInventoryMethod.ManageStock;
-                    product.StockQuantity = request.ContainsKey("quantity") ? erpProductDelta.Dto.quantity : product.StockQuantity;
-                }
-                else
-                {
-                    product.Sku = request.ContainsKey("itemNo") ? erpProductDelta.Dto.itemNo.ToString() : product.Sku;
-                    product.ManageInventoryMethod = ManageInventoryMethod.DontManageStock;
-                    product.OrderMaximumQuantity = request.ContainsKey("quantity") ? erpProductDelta.Dto.quantity : product.OrderMaximumQuantity;
-                }
+                product.Sku = request.ContainsKey("itemTagNo") ? erpProductDelta.Dto.itemTagNo : product.Sku;
+                product.ManageInventoryMethod = ManageInventoryMethod.ManageStock;
+                product.StockQuantity = request.ContainsKey("quantity") ? erpProductDelta.Dto.quantity ?? 0 : product.StockQuantity;
+            }
+            else
+            {
+                product.Sku = request.ContainsKey("itemNo") ? erpProductDelta.Dto.itemNo.ToString() : product.Sku;
+                product.ManageInventoryMethod = ManageInventoryMethod.DontManageStock;
+                product.OrderMaximumQuantity = request.ContainsKey("quantity") ? erpProductDelta.Dto.quantity ?? 0 : product.OrderMaximumQuantity;
             }
 
             product.UpdatedOnUtc = DateTime.UtcNow;
@@ -236,8 +280,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 if (attribute.Key == "Id" || attribute.Key == "itemId")
                     continue;
                 // save generic data
-                if (attribute.Value != null)
-                    _genericAttributeService.SaveAttribute(product, attribute.Key.ToString(), attribute.Value);
+                _genericAttributeService.SaveAttribute(product, attribute.Key.ToString(), attribute.Value);
             }
 
             CustomerActivityService.InsertActivity("APIService", LocalizationService.GetResource("ActivityLog.UpdateProduct"), product);
@@ -261,6 +304,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
 
             var response = new Delta<ErpProductDto>(keyValuePair);
+            // add product id
+            response.Dto.Id = product.Id;
             return response.Dto;
         }
 
