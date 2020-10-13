@@ -19,6 +19,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             else
             {
                 viewLocations = new[] { $"/Plugins/NSS.Plugin.Misc.SwiftPortalOverride/Views/{context.ControllerName}/{context.ViewName}.cshtml" }.Concat(viewLocations);
+
+                if (context.Values.TryGetValue("SwiftPortal", out string theme))
+                {
+                    if (context.ViewName == "Components/TopMenu/Default")
+                    {
+                        viewLocations = new[] {
+                            $"~/Plugins/Misc.PluginName/Themes/{theme}/Views/Shared/Components/CustomTopMenu/Default.cshtml",
+                        }
+                        .Concat(viewLocations);
+                    }
+                }
             }
 
             return viewLocations;

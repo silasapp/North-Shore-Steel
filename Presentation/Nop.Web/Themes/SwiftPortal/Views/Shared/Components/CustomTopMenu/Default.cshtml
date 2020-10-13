@@ -1,0 +1,58 @@
+﻿@model TopMenuModel
+
+<ul class="top-menu notmobile">
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
+
+    @* custom swift menu *@
+    <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
+    <li><a href="@Url.RouteUrl("Catalog")">SHOP</a></li>
+    <li><a href="@Url.RouteUrl("Orders")">ORDERS</a></li>
+    <li><a href="@Url.RouteUrl("Invoices")">INVOICES</a></li>
+    <li><a href="@Url.RouteUrl("Resources")">RESOURCES</a></li>
+</ul>
+
+@{
+    <div class="menu-toggle">Menu</div>
+    <ul class="top-menu mobile">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
+
+        <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
+        <li><a href="@Url.RouteUrl("Catalog")">SHOP</a></li>
+        <li><a href="@Url.RouteUrl("Orders")">ORDERS</a></li>
+        <li><a href="@Url.RouteUrl("Invoices")">INVOICES</a></li>
+        <li><a href="@Url.RouteUrl("Resources")">RESOURCES</a></li>
+    </ul>
+
+    @if (Model.UseAjaxMenu)
+    {
+        <script asp-location="Footer">
+                $(document).ready(function () {
+                    $('.menu-toggle').on('click', function () {
+                        $(this).siblings('.top-menu.mobile').slideToggle('slow');
+                    });
+                    var localized_data = {
+                        AjaxFailure: "@T("MainMenu.AjaxFailure")"
+                    };
+                    mainMenu.init('@Url.RouteUrl("GetCatalogRoot")', '@Url.RouteUrl("GetCatalogSubCategories")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
+                    });
+        </script>
+
+        Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.menu.js");
+
+    }
+    else
+    {
+        <script asp-location="Footer">
+            $(document).ready(function () {
+                $('.menu-toggle').on('click', function () {
+                    $(this).siblings('.top-menu.mobile').slideToggle('slow');
+                });
+                $('.top-menu.mobile .sublist-toggle').on('click', function () {
+                    $(this).siblings('.sublist').slideToggle('slow');
+                });
+            });
+        </script>
+
+    }
+
+}

@@ -77,6 +77,10 @@
     </Content>
 
     <Content Include="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\_Header.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\_Root.cshtml" />
     <None Include="Plugins\**" CopyToPublishDirectory="PreserveNewest" />
 
     <Content Include="Themes\**" CopyToPublishDirectory="PreserveNewest" Exclude="Themes\**\*.config;Themes\**\*.cshtml;Themes\**\*.json" />
@@ -90,6 +94,8 @@
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css.map" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\_Header.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\_Root.cshtml" />
 
     <None Update="Areas\Admin\sitemap.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -107,6 +113,14 @@
 
   <ItemGroup>
     <Content Update="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\_Header.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\_Root.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
