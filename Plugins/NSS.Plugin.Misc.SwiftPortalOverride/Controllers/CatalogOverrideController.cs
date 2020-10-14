@@ -26,11 +26,43 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
         #endregion
 
-
         public IActionResult Index()
         {
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml");
+            List<object> treedata = new List<object>();
+            treedata.Add(new
+            {
+                id = 1,
+                name = "Australia",
+                hasChild = true
+            });
+            treedata.Add(new
+            {
+                id = 2,
+                pid = 1,
+                name = "New South Wales",
 
+            });
+            treedata.Add(new
+            {
+                id = 3,
+                pid = 1,
+                name = "Victoria"
+            });
+            treedata.Add(new
+            {
+                id = 4,
+                name = "Brazil",
+                hasChild = true
+            });
+            treedata.Add(new
+            {
+                id = 5,
+                pid = 4,
+                name = "Paraná"
+            });
+            
+            ViewBag.dataSource = treedata;
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml");
         }
     }
 }

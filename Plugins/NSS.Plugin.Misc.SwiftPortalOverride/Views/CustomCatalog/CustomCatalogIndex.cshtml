@@ -1,4 +1,4 @@
-﻿
+﻿@using Syncfusion.EJ2
 @{
     Layout = "_ColumnsOne";
 
@@ -7,17 +7,91 @@
     Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
 }
 
-@*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>*@
 
+<style>
+    .card-body {
+        padding: 0.5rem 0 0.5rem 1.25rem;
+    }
 
+    .e-treeview .e-ul {
+        padding: 0 0 0 12px !important;
+    }
+</style>
 <div class="page home-page">
     <div class="page-body">
-        <div class="container">
-            <div class="row">
+        <div class="row">
+            <div class="col-sm-3">
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="card-link" data-toggle="collapse" href="#collapseOne">
+                                SHAPES
+                            </a>
+                        </div>
+                        <div id="collapseOne" class="collapse">
+                            <div class="">
+                                <ejs-treeview id="treedata" showCheckBox="true" nodeClicked="nodeCheck" keyPress="nodeCheck">
+                                    <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded" selected="is_selected"></e-treeview-fields>
+                                </ejs-treeview>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
+                                METALS
+                            </a>
+                        </div>
+                        <div id="collapseTwo" class="collapse">
+                            <div class="card-body">
+                                <ejs-radiobutton id="radioAlloy" label="Alloy (8)" name="metals"></ejs-radiobutton>
+                            </div>
+                            <div class="card-body">
+                                <ejs-radiobutton id="radioAluminuim" label="Aluminuim (109)" name="metals"></ejs-radiobutton>
+                            </div>
+                            <div class="card-body">
+                                <ejs-radiobutton id="radioHotRoll" label="Hot Roll (849)" name="metals"></ejs-radiobutton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <a class="collapsed card-link" data-toggle="collapse" href="#collapseThree">
+                                GRADES
+                            </a>
+                        </div>
+                        <div id="collapseThree" class="collapse">
+                            <div class="card-body">
+                                <ejs-radiobutton id="radioA36" label="A36 (38)" name="grades"></ejs-radiobutton>
+                            </div>
+                            <div class="card-body">
+                                <ejs-radiobutton id="radioA514" label="A514 (33)" name="grades"></ejs-radiobutton>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <ejs-treeview id="treedata" showCheckBox="true" nodeClicked="nodeCheck" keyPress="nodeCheck">
+                    <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded" selected="is_selected"></e-treeview-fields>
+                </ejs-treeview>
             </div>
         </div>
     </div>
 </div>
+<script>
+    function nodeCheck(args) {
+        var checkedNode = [args.node];
+        var treeObj = document.getElementById('treedata').ej2_instances[0];
+        if (args.event.target.classList.contains('e-fullrow') || args.event.key == "Enter") {
+            var getNodeDetails = treeObj.getNodeData(args.node);
+            if (getNodeDetails.isChecked == 'true') {
+                treeObj.uncheckAll(checkedNode);
+            } else {
+                treeObj.checkAll(checkedNode);
+            }
+        }
+    }
+</script>
+<ejs-scripts></ejs-scripts>

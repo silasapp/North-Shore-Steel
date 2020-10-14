@@ -7,7 +7,7 @@
     <!--Set this parameter to true to get the dlls copied from the NuGet cache to the output of your project.
     You need to set this parameter to true if your plugin has a nuget package 
     to ensure that the dlls copied from the NuGet cache to the output of your project-->
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Content\catalog.css" />
     <None Remove="Content\customstyle.css" />
     <None Remove="Content\homepageStyle.css" />
     <None Remove="logo.jpg" />
@@ -34,6 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\catalog.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\homepageStyle.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -92,6 +96,10 @@
     <Folder Include="Areas\Admin\Factories\" />
     <Folder Include="Areas\Admin\Models\" />    <Folder Include="Extensions\" />
     <Folder Include="Factories\" />  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.3.0.40" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Models\CustomerSelectAccountModel.cs">
