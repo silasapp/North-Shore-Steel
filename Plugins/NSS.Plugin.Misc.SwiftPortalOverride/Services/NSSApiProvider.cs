@@ -81,8 +81,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             {
                 var httpClient = _httpClientFactory.CreateClient();
                 httpClient.DefaultRequestHeaders.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/x-www-form-urlencoded");
+
+                httpClient.BaseAddress = new Uri(_baseUrl);
 
                 //get token
                 var token = GetNSSToken(httpClient);
@@ -93,33 +93,29 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     return retVal;
                 }
 
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
+
                 // create user resource
-                var requestUrl = $"{ _baseUrl}users";
-                if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/users";
+                var resource = "/users";
 
                 //body params
-                var param = new Dictionary<string, string>
+                var param = new KeyValuePair<string, string>[]
                 {
-                    { "swiftUserId", request.SwiftUserId },
-                    { "firstName", request.Firstname },
-                    { "lastName", request.LastName },
-                    { "workEmail", request.WorkEmail },
-                    { "phone", request.Phone },
-                    { "companyName", request.CompanyName },
-                    { "isExistingCustomer", request.IsExistingCustomer },
-                    { "preferredLocationId", request.PreferredLocationid },
-                    { "hearAboutUs", request.HearAboutUs },
-                    { "other", request.Other },
-                    { "itemsForNextProject", request.ItemsForNextProject },
+                    new KeyValuePair<string, string>("swiftUserId", request.SwiftUserId),
+                    new KeyValuePair<string, string>("firstName", request.Firstname),
+                    new KeyValuePair<string, string>("lastName", request.LastName),
+                    new KeyValuePair<string, string>("workEmail", request.WorkEmail),
+                    new KeyValuePair<string, string>("phone", request.Phone),
+                    new KeyValuePair<string, string>("companyName", request.CompanyName),
+                    new KeyValuePair<string, string>("isExistingCustomer", request.IsExistingCustomer),
+                    new KeyValuePair<string, string>("preferredLocationId", request.PreferredLocationid),
+                    new KeyValuePair<string, string>("hearAboutUs", request.HearAboutUs),
+                    new KeyValuePair<string, string>("other", request.Other),
+                    new KeyValuePair<string, string>("itemsForNextProject", request.ItemsForNextProject)
                 };
 
-                var json = JsonConvert.SerializeObject(param);
-
-                var req = new HttpRequestMessage(HttpMethod.Post, requestUrl) { Content = new FormUrlEncodedContent(param)};
-                req.Headers.Add("Authorization", $"Bearer {token}");
-                req.Headers.Add("Content-Length", $"{Encoding.UTF8.GetByteCount(json)}");
-
-                var response = httpClient.SendAsync(req).Result;
+                var response = httpClient.PostAsync(resource, new FormUrlEncodedContent(param)).Result;
 
                 // throw error if not successful
                 response.EnsureSuccessStatusCode();
@@ -146,8 +142,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         public string GetNSSToken(HttpClient httpClient)
         {
             var retVal = string.Empty;
-            var requestUrl = $"{ _baseUrl}authenticate";
-            if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/authenticate";
+            var resource = "/authenticate";
 
             //body params
             var param = new Dictionary<string, string>
@@ -160,7 +155,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             //get token
             try
             {
-                var response = httpClient.PostAsync(requestUrl, content).Result;
+                var response = httpClient.PostAsync(resource, content).Result;
 
                 // throw error if not successful
                 response.EnsureSuccessStatusCode();
@@ -192,6 +187,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             {
                 using (HttpClient client = new HttpClient())
                 {
+                    client.BaseAddress = new Uri(_baseUrl);
                     //get token
                     var token = GetNSSToken(client);
 
@@ -201,14 +197,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}/orders/recent";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{ERPCompanyId}/orders/recent";
+                    client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
+                    var resource = $"/companies/{ERPCompanyId}/orders/recent";
 
                     client.DefaultRequestHeaders.Accept.Clear();
-                    var req = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-                    req.Headers.Add("Authorization", $"Bearer {token}");
-                    var response = client.SendAsync(req).Result;
+
+                    var response = client.GetAsync(resource).Result;
 
                     // throw error if not successful
                     response.EnsureSuccessStatusCode();
@@ -239,6 +235,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             {
                 using (HttpClient client = new HttpClient())
                 {
+                    client.BaseAddress = new Uri(_baseUrl);
                     //get token
                     var token = GetNSSToken(client);
 
@@ -248,16 +245,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/{ERPCompanyId}/invoices/recent";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{ERPCompanyId}/invoices/recent";
-
+                    var resource = $"/companies/{ERPCompanyId}/invoices/recent";
 
                     client.DefaultRequestHeaders.Accept.Clear();
 
-                    var req = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-                    req.Headers.Add("Authorization", $"Bearer {token}");
-
-                    var response = client.SendAsync(req).Result;
+                    var response = client.GetAsync(resource).Result;
 
                     // throw error if not successful
                     response.EnsureSuccessStatusCode();
@@ -289,6 +281,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             {
                 using (HttpClient client = new HttpClient())
                 {
+                    client.BaseAddress = new Uri(_baseUrl);
                     //get token
                     var token = GetNSSToken(client);
 
@@ -298,14 +291,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    var requestUrl = $"{ _baseUrl}companies/{erpCompanyId}";
-                    if (!_baseUrl.EndsWith('/')) requestUrl = $"{ _baseUrl}/companies/{erpCompanyId}";
-
+                    var resource = $"/companies/{erpCompanyId}";
 
                     client.DefaultRequestHeaders.Accept.Clear();
-                    var req = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-                    req.Headers.Add("Authorization", $"Bearer {token}");
-                    var response = client.SendAsync(req).Result;
+
+                    var response = client.GetAsync(resource).Result;
 
                     // throw error if not successful
                     response.EnsureSuccessStatusCode();

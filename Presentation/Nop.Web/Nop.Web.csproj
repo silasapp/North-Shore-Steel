@@ -32,6 +32,7 @@
     <Content Remove="bin\**" />
     <Content Remove="obj\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
+    <Content Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
     <Compile Remove="bin\**" />
     <Compile Remove="obj\**" />
@@ -39,15 +40,19 @@
     <Compile Remove="Plugins\**;Themes\**" />
 
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
+
+    <Compile Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
     <Content Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="obj\**" />
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
+    <EmbeddedResource Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
     <None Remove="bin\**" />
     <None Remove="obj\**" />
     <None Remove="Plugins\**;Themes\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
 
     <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
 

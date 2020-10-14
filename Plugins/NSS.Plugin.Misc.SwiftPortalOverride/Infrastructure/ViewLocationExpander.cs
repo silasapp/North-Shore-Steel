@@ -18,7 +18,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             }
             else
             {
-                viewLocations = new[] { $"/Plugins/NSS.Plugin.Misc.SwiftPortalOverride/Views/{context.ControllerName}/{context.ViewName}.cshtml" }.Concat(viewLocations);   
+                viewLocations = new[] { $"/Plugins/NSS.Plugin.Misc.SwiftPortalOverride/Views/{context.ControllerName}/{context.ViewName}.cshtml" }.Concat(viewLocations);
             }
 
             return viewLocations;
