@@ -6,10 +6,10 @@
 
     @* custom swift menu *@
     <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
-    <li><a href="@Url.RouteUrl("Catalog")">SHOP</a></li>
-    <li><a href="@Url.RouteUrl("Orders")">ORDERS</a></li>
-    <li><a href="@Url.RouteUrl("Invoices")">INVOICES</a></li>
-    <li><a href="@Url.RouteUrl("Resources")">RESOURCES</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")">SHOP</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">INVOICES</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")">RESOURCES</a></li>
 </ul>
 
 @{
@@ -18,10 +18,10 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
 
         <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
-        <li><a href="@Url.RouteUrl("Catalog")">SHOP</a></li>
-        <li><a href="@Url.RouteUrl("Orders")">ORDERS</a></li>
-        <li><a href="@Url.RouteUrl("Invoices")">INVOICES</a></li>
-        <li><a href="@Url.RouteUrl("Resources")">RESOURCES</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")">SHOP</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">INVOICES</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")">RESOURCES</a></li>
     </ul>
 
     @if (Model.UseAjaxMenu)
@@ -34,7 +34,7 @@
                     var localized_data = {
                         AjaxFailure: "@T("MainMenu.AjaxFailure")"
                     };
-                    mainMenu.init('@Url.RouteUrl("GetCatalogRoot")', '@Url.RouteUrl("GetCatalogSubCategories")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
+                    mainMenu.init('@Url.RouteUrl("")', '@Url.RouteUrl("")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
                     });
         </script>
 
