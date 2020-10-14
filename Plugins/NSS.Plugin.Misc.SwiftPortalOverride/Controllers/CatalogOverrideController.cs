@@ -29,7 +29,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public IActionResult Index()
         {
-            return Ok();
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml");
 
         }
     }

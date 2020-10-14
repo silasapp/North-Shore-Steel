@@ -19,7 +19,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 
             if (context.AreaName == null && context.ViewName == "Components/TopMenu/Default")
             {
-                viewLocations = new string[] { "~/Plugins/Misc.SwiftPortalOverride/Views/CustomTopMenu.cshtml"
+                viewLocations = new string[] { "~/Plugins/Misc.SwiftPortalOverride/Views/CustomTopMenu/CustomTopMenu.cshtml"
                 }.Concat(viewLocations);
 
             }
