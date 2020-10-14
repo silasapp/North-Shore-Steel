@@ -14,12 +14,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
     public class HomeOverrideController : HomeController
     {
+        #region Fields
         private readonly NSSApiProvider _nSSApiProvider;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
         private readonly ICustomerCompanyService _customerCompanyService;
 
+        #endregion
+
+        #region Constructor
         public HomeOverrideController(
             ISettingService settingService,
             IStoreContext storeContext,
@@ -35,7 +39,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workContext = workContext;
             _customerCompanyService = customerCompanyService;
         }
+        #endregion
 
+       
         public override IActionResult Index()
         {
             string ERPCId;
@@ -83,6 +89,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
 
         }
+
+
 
         private TransactionModel GetTransactions(string ERPCId)
         {

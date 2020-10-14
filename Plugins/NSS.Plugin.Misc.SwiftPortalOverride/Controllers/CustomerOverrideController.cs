@@ -209,7 +209,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #endregion
 
-        #region Register
+        #region Methods
         [HttpsRequirement]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
