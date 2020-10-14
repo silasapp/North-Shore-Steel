@@ -79,49 +79,54 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             //create swift user
             try
             {
-                var httpClient = _httpClientFactory.CreateClient();
-                httpClient.DefaultRequestHeaders.Clear();
-
-                httpClient.BaseAddress = new Uri(_baseUrl);
-
-                //get token
-                var token = GetNSSToken(httpClient);
-
-                if (string.IsNullOrEmpty(token))
+                using var httpClient = _httpClientFactory.CreateClient();
                 {
-                    _logger.Warning($"NSS.CreateUser -> {request.WorkEmail}", new Exception("NSS token returned empty"));
-                    return retVal;
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.CreateUser -> {request.WorkEmail}", new Exception("NSS token returned empty"));
+                        return retVal;
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+                    // create user resource
+                    var resource = "/users";
+
+                    //body params
+                    var param = new KeyValuePair<string, string>[]
+                    {
+                        new KeyValuePair<string, string>("swiftUserId", request.SwiftUserId),
+                        new KeyValuePair<string, string>("firstName", request.Firstname),
+                        new KeyValuePair<string, string>("lastName", request.LastName),
+                        new KeyValuePair<string, string>("workEmail", request.WorkEmail),
+                        new KeyValuePair<string, string>("phone", request.Phone),
+                        new KeyValuePair<string, string>("companyName", request.CompanyName),
+                        new KeyValuePair<string, string>("isExistingCustomer", request.IsExistingCustomer),
+                        new KeyValuePair<string, string>("preferredLocationId", request.PreferredLocationid),
+                        new KeyValuePair<string, string>("hearAboutUs", request.HearAboutUs),
+                        new KeyValuePair<string, string>("other", request.Other),
+                        new KeyValuePair<string, string>("itemsForNextProject", request.ItemsForNextProject)
+                    };
+
+                    var content = new FormUrlEncodedContent(param);
+
+                    var response = httpClient.PostAsync(resource, content).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<NSSCreateUserResponse>(respContent);
                 }
 
-                httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-
-                // create user resource
-                var resource = "/users";
-
-                //body params
-                var param = new KeyValuePair<string, string>[]
-                {
-                    new KeyValuePair<string, string>("swiftUserId", request.SwiftUserId),
-                    new KeyValuePair<string, string>("firstName", request.Firstname),
-                    new KeyValuePair<string, string>("lastName", request.LastName),
-                    new KeyValuePair<string, string>("workEmail", request.WorkEmail),
-                    new KeyValuePair<string, string>("phone", request.Phone),
-                    new KeyValuePair<string, string>("companyName", request.CompanyName),
-                    new KeyValuePair<string, string>("isExistingCustomer", request.IsExistingCustomer),
-                    new KeyValuePair<string, string>("preferredLocationId", request.PreferredLocationid),
-                    new KeyValuePair<string, string>("hearAboutUs", request.HearAboutUs),
-                    new KeyValuePair<string, string>("other", request.Other),
-                    new KeyValuePair<string, string>("itemsForNextProject", request.ItemsForNextProject)
-                };
-
-                var response = httpClient.PostAsync(resource, new FormUrlEncodedContent(param)).Result;
-
-                // throw error if not successful
-                response.EnsureSuccessStatusCode();
-
-                respContent = response.Content.ReadAsStringAsync().Result;
-                retVal = JsonConvert.DeserializeObject<NSSCreateUserResponse>(respContent);
             }
             catch (Exception ex)
             {
