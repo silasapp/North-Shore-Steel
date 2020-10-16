@@ -20,6 +20,16 @@
         padding: 0 0 0 12px !important;
     }
 
+    .chip {
+        display: inline-block;
+        padding: 0 1rem;
+        height: 1.5rem;
+        font-size: 12px;
+        line-height: 1.6rem;
+        border-radius: 25px;
+        background-color: #f1f1f1
+    }
+
     .spinner {
         height: 60px;
         width: 60px;
@@ -87,10 +97,28 @@
         /*background-color: rgba(0,0,0,0.5);*/
         z-index: 2;
     }
+
+    .chip-closebtn:hover {
+        color: #666666;
+    }
 </style>
 
 <div class="page home-page">
     <div class="page-body">
+        <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-9">
+                <div id="cc">
+
+                </div>
+                @*<ejs-chiplist id="chip-avatar" enableDelete="true">
+                        <e-chips>
+                            <e-chip text="Sent a text" enabled="true"></e-chip>
+                            <e-chip text="Set a remainder" enabled="true"></e-chip>
+                        </e-chips>
+                    </ejs-chiplist>*@
+            </div>
+        </div>
         <div class="row">
             <div class="col-sm-3">
                 <div id="accordion">
@@ -158,16 +186,28 @@
     }
 
    $(function () {
-        var specIDs = [];
+       var specIDs = [];
+       var specNames = [];
         $(document).on("change", "[name=Specs]", function (e) {
             e.preventDefault();
             $("#overlay").css("display", "flex");
             var specId = event.target.id.split('-')[1]
+            var checkedValue = event.target.defaultValue;
             specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
-            console.log('post-data', { SpecIds: specIDs });
-            console.log('event.target.value', event.target.defaultValue);
+            specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
+            console.log('eventCheckedValue', specNames);
+            var arrayValue = "";
+
+            for (i = 0; i < specNames.length; i++) {
+                arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" onclick=\"\">×</span></div>";
+            }
+
+            document.getElementById("cc").innerHTML = arrayValue;
+
+
             $("#overlay").css("display", "flex");
             var postData = { SpecIds: specIDs };
+            console.log('post-data', postData);
 
             $.ajax({
                 url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
@@ -179,9 +219,8 @@
                     console.log('datadata-success',data);
                     if(data != null)
                     {
-                    $("#overlay").css("display", "none");
-                     $('#prtialview').html(data)
-                    //$('#PalmsDiv').hide();
+                        $("#overlay").css("display", "none");
+                        $('#prtialview').html(data)
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
