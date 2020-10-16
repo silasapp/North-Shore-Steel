@@ -5,6 +5,7 @@ using Nop.Core.Infrastructure.DependencyManagement;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Messages;
 using NSS.Plugin.Misc.SwiftCore.Services;
+using Nop.Services.Catalog;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 {
@@ -19,6 +20,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 
             builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
             builder.RegisterType<WorkFlowMessageServiceOverride>().As<IWorkflowMessageService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ProductServiceOverride>().As<IProductService>().InstancePerLifetimeScope();
+
         }
 
         public int Order => 10;

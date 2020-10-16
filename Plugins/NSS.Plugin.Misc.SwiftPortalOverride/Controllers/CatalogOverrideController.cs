@@ -20,10 +20,10 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
-    public partial class CatalogOverrideController : CatalogController
+    public partial class CatalogOverrideController:Controller
     {
         #region Constructor
-        public CatalogOverrideController(CatalogSettings catalogSettings, IAclService aclService, ICatalogModelFactory catalogModelFactory, ICategoryService categoryService, ICustomerActivityService customerActivityService, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, IManufacturerService manufacturerService, IPermissionService permissionService, IProductModelFactory productModelFactory, IProductService productService, IProductTagService productTagService, IStoreContext storeContext, IStoreMappingService storeMappingService, IVendorService vendorService, IWebHelper webHelper, IWorkContext workContext, MediaSettings mediaSettings, VendorSettings vendorSettings) : base(catalogSettings, aclService, catalogModelFactory, categoryService, customerActivityService, genericAttributeService, localizationService, manufacturerService, permissionService, productModelFactory, productService, productTagService, storeContext, storeMappingService, vendorService, webHelper, workContext, mediaSettings, vendorSettings)
+        public CatalogOverrideController(CatalogSettings catalogSettings, IAclService aclService, ICatalogModelFactory catalogModelFactory, ICategoryService categoryService, ICustomerActivityService customerActivityService, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, IManufacturerService manufacturerService, IPermissionService permissionService, IProductModelFactory productModelFactory, IProductService productService, IProductTagService productTagService, IStoreContext storeContext, IStoreMappingService storeMappingService, IVendorService vendorService, IWebHelper webHelper, IWorkContext workContext, MediaSettings mediaSettings, VendorSettings vendorSettings)
         {
         }
         #endregion

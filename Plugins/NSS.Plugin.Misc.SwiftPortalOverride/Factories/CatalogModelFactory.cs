@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Nop.Core;
+using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
+using Nop.Services.Caching;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Directory;
@@ -9,6 +11,7 @@ using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Events;
 using Nop.Web.Models.Catalog;
+using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
@@ -21,69 +24,55 @@ namespace Nop.Web.Factories
     {
 
         private readonly CatalogSettings _catalogSettings;
-        private readonly DisplayDefaultMenuItemSettings _displayDefaultMenuItemSettings;
-        private readonly ICategoryService _categoryService;
-        private readonly ICurrencyService _currencyService;
         private readonly IEventPublisher _eventPublisher;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IPriceFormatter _priceFormatter;
         private readonly IProductModelFactory _productModelFactory;
         private readonly IProductService _productService;
-        private readonly IProductTagService _productTagService;
         private readonly ISearchTermService _searchTermService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly IStoreContext _storeContext;
         private readonly IWebHelper _webHelper;
         private readonly IWorkContext _workContext;
+        private readonly IStaticCacheManager _staticCacheManager;
+        private readonly ICacheKeyService _cacheKeyService;
+        private readonly IShapeService _shapeService;
+
         public CatalogModelFactory(
             CatalogSettings catalogSettings,
-            DisplayDefaultMenuItemSettings displayDefaultMenuItemSettings,
-            //ForumSettings forumSettings,
-            //IActionContextAccessor actionContextAccessor,
-            //ICacheKeyService cacheKeyService,
-            ICategoryService categoryService,
-            ICategoryTemplateService categoryTemplateService,
-            ICurrencyService currencyService,
-            //ICustomerService customerService,
             IEventPublisher eventPublisher,
             IHttpContextAccessor httpContextAccessor,
             ILocalizationService localizationService,
-            IManufacturerService manufacturerService,
-            IManufacturerTemplateService manufacturerTemplateService,
-            //IPictureService pictureService,
             IPriceFormatter priceFormatter,
             IProductModelFactory productModelFactory,
             IProductService productService,
             IProductTagService productTagService,
             ISearchTermService searchTermService,
             ISpecificationAttributeService specificationAttributeService,
-            //IStaticCacheManager staticCacheManager,
             IStoreContext storeContext,
-            //ITopicService topicService,
-            //IUrlHelperFactory urlHelperFactory,
-            //IUrlRecordService urlRecordService,
-            //IVendorService vendorService,
             IWebHelper webHelper,
-            IWorkContext workContext
+            IWorkContext workContext,
+            IStaticCacheManager staticCacheManager,
+            ICacheKeyService cacheKeyService,
+            IShapeService shapeService
             )
         {
             _catalogSettings = catalogSettings;
-            _displayDefaultMenuItemSettings = displayDefaultMenuItemSettings;
-            _categoryService = categoryService;
-            _currencyService = currencyService;
             _eventPublisher = eventPublisher;
             _httpContextAccessor = httpContextAccessor;
             _localizationService = localizationService;
             _priceFormatter = priceFormatter;
             _productModelFactory = productModelFactory;
             _productService = productService;
-            _productTagService = productTagService;
             _searchTermService = searchTermService;
             _specificationAttributeService = specificationAttributeService;
             _storeContext = storeContext;
             _webHelper = webHelper;
             _workContext = workContext;
+            _staticCacheManager = staticCacheManager;
+            _cacheKeyService = cacheKeyService;
+            _shapeService = shapeService;
         }
         public void PrepareSwiftCatalogModel(IList<int> shapeIds, IList<int> specIds)
         {
@@ -112,7 +101,8 @@ namespace Nop.Web.Factories
             if (_httpContextAccessor.HttpContext.Request.Query.TryGetValue("q", out var query))
                 searchTerms = query.FirstOrDefault();
 
-            var shapeIds = new List<int>();
+            var shapeIds = command.ShapeIds;
+            var specids = command.SpecIds;
             decimal? minPriceConverted = null;
             decimal? maxPriceConverted = null;
             var searchInDescriptions = false;
@@ -121,21 +111,20 @@ namespace Nop.Web.Factories
             //var searchInProductTags = searchInDescriptions;
 
             //products
-            products = _productService.SearchProducts(
+            products = _productService.SearchProducts(out var filterableSpecificationAttributeOptionIds,
+                true,
                 categoryIds: shapeIds,
-                //manufacturerId: manufacturerId,
-                //storeId: _storeContext.CurrentStore.Id,
-                //visibleIndividuallyOnly: false,
+                storeId: _storeContext.CurrentStore.Id,
+                visibleIndividuallyOnly: true,
+                featuredProducts: _catalogSettings.IncludeFeaturedProductsInNormalLists ? null : (bool?)false,
                 priceMin: minPriceConverted,
                 priceMax: maxPriceConverted,
                 keywords: searchTerms,
-                //searchDescriptions: searchInDescriptions,
-                //searchProductTags: searchInProductTags,
-                languageId: _workContext.WorkingLanguage.Id,
-                orderBy: (ProductSortingEnum)command.OrderBy
-                //pageIndex: command.PageNumber - 1,
-                //pageSize: command.PageSize
-                );
+                filteredSpecs: specids,
+                orderBy: (ProductSortingEnum)command.OrderBy,
+                pageIndex: command.PageNumber - 1,
+                pageSize: command.PageSize);
+
             model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).ToList();
 
             model.NoResults = !model.Products.Any();
@@ -174,6 +163,14 @@ namespace Nop.Web.Factories
             });
 
             model.PagingFilteringContext.LoadPagedList(products);
+
+            //specs
+            model.PagingFilteringContext.SpecificationFilter.PrepareSpecsFilters(specids,
+                filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
+                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager);
+
+            model.Shapes = _shapeService.GetShapes();
+
             return model;
         }
     }

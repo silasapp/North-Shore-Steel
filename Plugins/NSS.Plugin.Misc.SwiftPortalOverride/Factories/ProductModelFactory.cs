@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Services.Catalog;
+using Nop.Services.Common;
 using Nop.Services.Localization;
 using Nop.Services.Seo;
 using Nop.Web.Models.Catalog;
@@ -14,19 +15,22 @@ namespace Nop.Web.Factories
 {
     public partial class ProductModelFactory : IProductModelFactory
     {
-        public ILocalizationService _localizationService;
-        public IUrlRecordService _urlRecordService;
-        public ISpecificationAttributeService _specificationAttributeService;
-        public IShapeService _shapeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IUrlRecordService _urlRecordService;
+        private readonly ISpecificationAttributeService _specificationAttributeService;
+        private readonly IShapeService _shapeService;
+        private readonly IGenericAttributeService _genericAttributeService;
 
         public ProductModelFactory(
             ILocalizationService localizationService,
-            ISpecificationAttributeService specificationAttributeService
+            ISpecificationAttributeService specificationAttributeService,
+            IShapeService shapeService,
+            IGenericAttributeService genericAttributeService
             )
         {
             _localizationService = localizationService;
             _specificationAttributeService = specificationAttributeService;
-
+            _shapeService = shapeService;
         }
 
         public IEnumerable<ProductOverviewModel> PrepareSwiftProductOverviewmodel(IEnumerable<Product> products)
@@ -69,6 +73,14 @@ namespace Nop.Web.Factories
 
                 //reviews
                 //model.ReviewOverviewModel = PrepareProductReviewOverviewModel(product);
+
+                // erp
+                var attr = _genericAttributeService.GetAttributesForEntity(model.Id, nameof(Product));
+                if(int.TryParse(attr.FirstOrDefault(x => x.Key == "ShapeId")?.Value, out int shapeId))
+                    model.Shape = _shapeService.GetShapeById(shapeId);
+
+                model.ProductCustomAttributes = attr;
+
 
                 models.Add(model);
             }
