@@ -52,9 +52,45 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         {
             var shapes = _shapeRepository.Table.Where(s => s.ParentId == null || s.ParentId == 0).ToList();
 
-            foreach (Shape shape in shapes) {
-                shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
-                shape.Atttributes = _shapeAttributeRepository.Table.Where(s => s.ShapeId == shape.Id).ToList();
+            foreach (Shape shape in shapes)
+            {
+                if (shape.ParentId == 0 || shape.ParentId == null)
+                {
+                    shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
+                    shape.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Id).ToList();
+                }
+                else
+                {
+                    shape.Parent = _shapeRepository.Table.FirstOrDefault(s => s.Id == shape.ParentId);
+                    if (shape.Parent != null)
+                    {
+                        shape.Parent.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Parent.Id).ToList();
+                    }
+                }
+            }
+
+            return shapes;
+        }
+
+        public IList<Shape> GetPublishedShapes()
+        {
+            var shapes = _shapeRepository.Table.Where(s => s.ParentId == null || s.ParentId == 0).ToList();
+
+            foreach (Shape shape in shapes)
+            {
+                if (shape.ParentId == 0 || shape.ParentId == null)
+                {
+                    shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
+                    shape.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Id).ToList();
+                }
+                else
+                {
+                    shape.Parent = _shapeRepository.Table.FirstOrDefault(s => s.Id == shape.ParentId);
+                    if (shape.Parent != null)
+                    {
+                        shape.Parent.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Parent.Id).ToList();
+                    }
+                }
             }
 
             return shapes;
@@ -64,7 +100,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         {
             var shape = _shapeRepository.Table.FirstOrDefault(s => s.Id == id);
 
-            if(shape != null)
+            if (shape != null)
             {
                 if (shape.ParentId == 0 || shape.ParentId == null)
                 {

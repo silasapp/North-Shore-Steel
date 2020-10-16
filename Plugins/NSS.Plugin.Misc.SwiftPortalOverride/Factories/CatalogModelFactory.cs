@@ -115,15 +115,16 @@ namespace Nop.Web.Factories
                 true,
                 categoryIds: shapeIds,
                 storeId: _storeContext.CurrentStore.Id,
-                visibleIndividuallyOnly: true,
+                //visibleIndividuallyOnly: false,
                 featuredProducts: _catalogSettings.IncludeFeaturedProductsInNormalLists ? null : (bool?)false,
                 priceMin: minPriceConverted,
                 priceMax: maxPriceConverted,
                 keywords: searchTerms,
-                filteredSpecs: specids,
-                orderBy: (ProductSortingEnum)command.OrderBy,
-                pageIndex: command.PageNumber - 1,
-                pageSize: command.PageSize);
+                filteredSpecs: specids
+                //orderBy: (ProductSortingEnum)command.OrderBy,
+                //pageIndex: command.PageNumber - 1,
+                //pageSize: command.PageSize
+                );
 
             model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).ToList();
 
