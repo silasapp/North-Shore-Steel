@@ -12,8 +12,10 @@ using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
 using Nop.Web.Factories;
+using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
@@ -28,10 +30,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public IActionResult Index()
         {
+            #region dataSource
             List<object> treedata = new List<object>();
             treedata.Add(new
             {
                 id = 1,
+                pid = 0,
                 name = "Australia",
                 hasChild = true
             });
@@ -52,6 +56,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 id = 4,
                 name = "Brazil",
+                pid = 0,
                 hasChild = true
             });
             treedata.Add(new
@@ -60,9 +65,50 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 pid = 4,
                 name = "Paraná"
             });
-            
-            ViewBag.dataSource = treedata;
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml");
+            #endregion
+
+            FilterableProductsModel model = new FilterableProductsModel();
+            model.SpecificationFilters = new List<SpecificationFilter>();
+            #region specData
+            model.SpecificationFilters.Add(new SpecificationFilter
+            {
+                Id = 1,
+                SpecTitle = "METALS",
+                Name = "Alloy",
+                ProductCount = 8
+            });
+            model.SpecificationFilters.Add(new SpecificationFilter
+            {
+                Id = 2,
+                SpecTitle = "METALS",
+                Name = "Aluminium",
+                ProductCount = 109
+            });
+            model.SpecificationFilters.Add(new SpecificationFilter
+            {
+                Id = 3,
+                SpecTitle = "METALS",
+                Name = "Stainless Steel",
+                ProductCount = 138
+            });
+            model.SpecificationFilters.Add(new SpecificationFilter
+            {
+                Id = 4,
+                SpecTitle = "GRADES",
+                Name = "A36",
+                ProductCount = 38
+            });
+            model.SpecificationFilters.Add(new SpecificationFilter
+            {
+                Id = 5,
+                SpecTitle = "GRADES",
+                Name = "A514",
+                ProductCount = 33
+            });
+            #endregion
+            IEnumerable<string> uniqueSpecTitles = model.SpecificationFilters.Select(x => x.SpecTitle).Distinct();
+            model.UniqueSpecTitles = uniqueSpecTitles;
+            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
         }
     }
 }
