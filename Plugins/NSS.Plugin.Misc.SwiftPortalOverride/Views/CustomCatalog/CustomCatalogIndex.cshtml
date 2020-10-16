@@ -108,33 +108,32 @@
                             </div>
                         </div>
                     </div>
-
-                    @foreach (var (title, index) in Model.UniqueSpecTitles.Select((value, i) => (value, i)))
+                    @if (Model.ProductsGroupedBySpecTitle != null)
                     {
-                        <div class="card">
-                            <div class="card-header">
-                                <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                    @title
-                                </a>
-                            </div>
-                            @foreach (SpecificationFilter item in Model.SpecificationFilters)
-                            {
-                                @if (@title == item.SpecTitle)
+                        @foreach (var (group, index) in Model.ProductsGroupedBySpecTitle.Select((value, i) => (value, i)))
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                        @group.Key
+                                    </a>
+                                </div>
+                                @foreach (var item in group)
                                 {
                                     <div id="collapse-@index" class="collapse">
                                         <div class="card-body">
-                                            <ejs-checkbox id="checkbox-@item.Id" name="Specs" label="@item.Name (@item.ProductCount)" checked="false"></ejs-checkbox>
+                                            <ejs-checkbox id="checkbox-@item.Id" name="Specs" value="@item.Name" label="@item.Name (@item.ProductCount)" checked="false"></ejs-checkbox>
                                         </div>
                                     </div>
                                 }
-                            }
-                        </div>
+                            </div>
+                        }
                     }
 
                 </div>
             </div>
             <div class="col-sm-9">
-                @**@
+                <div id="prtialview"></div>
             </div>
         </div>
     </div>
@@ -159,28 +158,35 @@
     }
 
    $(function () {
+        var specIDs = [];
         $(document).on("change", "[name=Specs]", function (e) {
             e.preventDefault();
-            console.log('event.target', event.target)
-            var specId = event.target.id.split('-')[1]
-            var SpecID = specId;
-            console.log('SpecID', SpecID)
             $("#overlay").css("display", "flex");
+            var specId = event.target.id.split('-')[1]
+            specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
+            console.log('post-data', { SpecIds: specIDs });
+            console.log('event.target.value', event.target.defaultValue);
+            $("#overlay").css("display", "flex");
+            var postData = { SpecIds: specIDs };
+
             $.ajax({
-                url: "@Url.Action()",
+                url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
                 type: 'POST',
                 cache: false,
                 dataType: 'html',
-                data: { SpecID: specId },
+                data: postData,
                 success: function (data, textStatus, XMLHttpRequest) {
+                    console.log('datadata-success',data);
                     if(data != null)
                     {
                     $("#overlay").css("display", "none");
-                    //$('#prtialview').html(data)
+                     $('#prtialview').html(data)
                     //$('#PalmsDiv').hide();
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError, 'datadata-error', xhr);
+                    $('#prtialview').html('an error has occured here')
                     $("#overlay").css("display", "none");
                 },
 

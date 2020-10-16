@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -106,9 +107,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 ProductCount = 33
             });
             #endregion
-            IEnumerable<string> uniqueSpecTitles = model.SpecificationFilters.Select(x => x.SpecTitle).Distinct();
-            model.UniqueSpecTitles = uniqueSpecTitles;
-            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
+
+            model.ProductsGroupedBySpecTitle = model.SpecificationFilters.GroupBy(sf => sf.SpecTitle);
+
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
+        }
+
+        [HttpPost]
+        public async Task<PartialViewResult> FilteredProductsResult(List<string> SpecIds)
+        {
+            FilterableProductsModel model = new FilterableProductsModel();
+
+            model.rr = "Success Data";
+            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", model);
+
         }
     }
 }

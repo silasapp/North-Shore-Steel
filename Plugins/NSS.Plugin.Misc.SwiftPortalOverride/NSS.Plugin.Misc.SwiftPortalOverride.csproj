@@ -26,6 +26,7 @@
     <None Remove="Views\Configure.cshtml" />
     <None Remove="Views\Confirmation - Copy.cshtml" />
     <None Remove="Views\CustomCatalog\CustomCatalogIndex.cshtml" />
+    <None Remove="Views\CustomCatalog\_FilteredPartialView.cshtml" />
     <None Remove="Views\CustomTopMenu.cshtml" />
     <None Remove="Views\HomeIndex.cshtml" />
     <None Remove="Views\SelectAccount.cshtml" />
@@ -51,6 +52,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Confirmation.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomCatalog\_FilteredPartialView.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\CustomCatalog\CustomCatalogIndex.cshtml">
