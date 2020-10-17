@@ -98,8 +98,7 @@
     <Folder Include="Areas\Admin\Extensions\" />
     <Folder Include="Areas\Admin\Factories\" />
     <Folder Include="Areas\Admin\Factories\" />
-    <Folder Include="Areas\Admin\Models\" />    <Folder Include="Extensions\" />
-    <Folder Include="Factories\" />  </ItemGroup>
+    <Folder Include="Areas\Admin\Models\" />    <Folder Include="Extensions\" />  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.3.0.40" />

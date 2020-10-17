@@ -8,6 +8,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         void InsertShapes(List<Shape> shapes);
 
         IList<Shape> GetShapes();
+
         Shape GetShapeById(int id);
 
         void DeleteShapes();
