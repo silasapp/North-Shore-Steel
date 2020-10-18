@@ -25,12 +25,15 @@ namespace Nop.Web.Factories
             ILocalizationService localizationService,
             ISpecificationAttributeService specificationAttributeService,
             IShapeService shapeService,
-            IGenericAttributeService genericAttributeService
+            IGenericAttributeService genericAttributeService,
+            IUrlRecordService urlRecordService
             )
         {
             _localizationService = localizationService;
             _specificationAttributeService = specificationAttributeService;
             _shapeService = shapeService;
+            _genericAttributeService = genericAttributeService;
+            _urlRecordService = urlRecordService;
         }
 
         public IEnumerable<ProductOverviewModel> PrepareSwiftProductOverviewmodel(IEnumerable<Product> products)
@@ -76,7 +79,7 @@ namespace Nop.Web.Factories
 
                 // erp
                 var attr = _genericAttributeService.GetAttributesForEntity(model.Id, nameof(Product));
-                if(int.TryParse(attr.FirstOrDefault(x => x.Key == "ShapeId")?.Value, out int shapeId))
+                if(int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
                     model.Shape = _shapeService.GetShapeById(shapeId);
 
                 model.ProductCustomAttributes = attr;

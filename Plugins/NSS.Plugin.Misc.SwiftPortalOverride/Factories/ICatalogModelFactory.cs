@@ -8,7 +8,6 @@ namespace Nop.Web.Factories
 {
     public partial interface ICatalogModelFactory
     {
-        public void PrepareSwiftCatalogModel(IList<int> categoryIds, IList<int> specIds);
-        public CatalogModel PrepareSwiftCatalogModel(CatalogPagingFilteringModel command);
+        public CatalogModel PrepareSwiftCatalogModel(IList<int> categoryIds, IList<int> specIds);
     }
 }

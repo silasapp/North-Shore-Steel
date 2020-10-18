@@ -8,6 +8,7 @@ using Nop.Services.Localization;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.UI.Paging;
 using Nop.Web.Infrastructure.Cache;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -34,8 +35,7 @@ namespace Nop.Web.Models.Catalog
 
             PriceRangeFilter = new PriceRangeFilterModel();
             SpecificationFilter = new SpecificationFilterModel();
-            ShapeIds = new List<int>();
-            SpecIds = new List<int>();
+            ShapeFilter = new ShapeFilterModel();
         }
 
         #endregion
@@ -51,6 +51,11 @@ namespace Nop.Web.Models.Catalog
         /// Specification filter model
         /// </summary>
         public SpecificationFilterModel SpecificationFilter { get; set; }
+
+        /// <summary>
+        /// Shape filter model
+        /// </summary>
+        public ShapeFilterModel ShapeFilter { get; set; }
 
         /// <summary>
         /// A value indicating whether product sorting is allowed
@@ -89,9 +94,6 @@ namespace Nop.Web.Models.Catalog
         /// Product sorting
         /// </summary>
         public string ViewMode { get; set; }
-
-        public List<int> ShapeIds { get; set; }
-        public IList<int> SpecIds { get; set; }
 
         #endregion
 
@@ -440,6 +442,7 @@ namespace Nop.Web.Models.Catalog
 
                     return new SpecificationFilterItem()
                     {
+                        SpecificationAttributeOptionId = x.SpecificationAttributeOptionId,
                         SpecificationAttributeName = x.SpecificationAttributeName,
                         SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
                         SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb,
@@ -478,6 +481,10 @@ namespace Nop.Web.Models.Catalog
         public partial class SpecificationFilterItem : BaseNopModel
         {
             /// <summary>
+            /// Specification attribute id
+            public int SpecificationAttributeOptionId { get; set; }
+            /// </summary>
+            /// <summary>
             /// Specification attribute name
             /// </summary>
             public string SpecificationAttributeName { get; set; }
@@ -493,6 +500,58 @@ namespace Nop.Web.Models.Catalog
             /// Filter URL
             /// </summary>
             public string FilterUrl { get; set; }
+        }
+
+
+        /// <summary>
+        /// Shape filter model
+        /// </summary>
+        public partial class ShapeFilterModel : BaseNopModel
+        {
+            #region Const
+
+            private const string QUERYSTRINGPARAM = "shape";
+
+            #endregion 
+
+            #region Ctor
+
+            /// <summary>
+            /// Ctor
+            /// </summary>
+            public ShapeFilterModel()
+            {
+                Shapes = new List<Shape>();
+            }
+
+            #endregion
+
+            #region Utilities
+
+
+            #endregion
+
+            #region Methods
+
+           
+            #endregion
+
+            #region Properties
+
+            /// <summary>
+            /// Gets or sets a value indicating whether filtering is enabled
+            /// </summary>
+            public bool Enabled { get; set; }
+            /// <summary>
+            /// Filter items
+            /// </summary>
+            public IList<Shape> Shapes { get; set; }
+            /// <summary>
+            /// URL of "remove filters" button
+            /// </summary>
+            public string RemoveFilterUrl { get; set; }
+
+            #endregion
         }
 
         #endregion
