@@ -476,7 +476,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             /// URL of "remove filters" button
             /// </summary>
             public string RemoveFilterUrl { get; set; }
-            public IEnumerable<IGrouping<string, SpecificationFilterItem>> GroupedSpecificationAttributeName { get; internal set; }
 
             #endregion
         }

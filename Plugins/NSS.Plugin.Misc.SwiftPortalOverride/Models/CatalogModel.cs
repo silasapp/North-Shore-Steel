@@ -4,6 +4,7 @@ using Nop.Web.Models.Catalog;
 using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
@@ -19,6 +20,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public bool NoResults { get; set; }
         public IList<ProductOverviewModel> Products { get; set; }
         public CatalogPagingFilteringModel PagingFilteringContext { get; set; }
+        public IEnumerable<IGrouping<string, CatalogPagingFilteringModel.SpecificationFilterItem>> GroupedSpecificationAttributeName { get; internal set; }
 
         #region Nested Class
 

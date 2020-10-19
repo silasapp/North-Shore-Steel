@@ -1,9 +1,49 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
-@model FilterableProductsModel
+@model CatalogModel
 
 <div id="_prtialview">
-    @if (Model.rr != null)
+    <table class="table table-bordered catalog-table table-striped" id="catalogTable" onload="sortTable(0)">
+        <thead>
+            <tr>
+                <th class="sortable" scope="col" onclick="sortTable(0)">Item #</th>
+                <th class="sortable" scope="col" onclick="sortTable(1)">Description </th>
+                <th class="sortable" scope="col" onclick="sortTable(2)">Height(in)</th>
+                <th class="sortable" scope="col" onclick="sortTable(3)">Length(ft)</th>
+                <th class="sortable" scope="col" onclick="sortTable(4)">Weight(Ib)/ft</th>
+                <th class="sortable" scope="col" onclick="sortTable(5)">Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>213456779-10-1</td>
+                <td>a1 Beam Hot Roll A36 3 x 5.7 x 20</td>
+                <td>3"</td>
+                <td>20'</td>
+                <td>5.7</td>
+                <td>
+                    <input style="width: 60px" type="number" name="quantity" id="">
+                </td>
+                <td style="text-align:center">
+                    <button class="table-action-button">
+                        <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+                    </button>
+                    <button class="table-action-button">
+                        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+                    </button>
+                    <button class="table-action-button">
+                        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+                    </button>
+                    <button class="table-action-button">
+                        <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    @if (Model.Products != null)
     {
-        <p>@Model.rr</p>
+        <p>@Model.Products</p>
     }
 </div>

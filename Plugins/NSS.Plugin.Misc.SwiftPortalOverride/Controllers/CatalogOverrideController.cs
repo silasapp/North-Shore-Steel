@@ -34,45 +34,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public IActionResult Index()
         {
+            CatalogModel model = new CatalogModel();
             var shapeIds = new List<int>();
             var specIds = new List<int>();
-            //var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+            var res = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+            model.Products = res.Products;
+            model.PagingFilteringContext.SpecificationFilter.NotFilteredItems = res.PagingFilteringContext.SpecificationFilter.NotFilteredItems;
 
 
-            CatalogPagingFilteringModel.SpecificationFilterModel model = new CatalogPagingFilteringModel.SpecificationFilterModel();
-            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
-            {
-                SpecificationAttributeOptionId = 1,
-                SpecificationAttributeName = "METALS",
-                SpecificationAttributeOptionName = "Alloy"
-            });
-            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
-            {
-                SpecificationAttributeOptionId = 2,
-                SpecificationAttributeName = "METALS",
-                SpecificationAttributeOptionName = "Aluminium"
-            });
-            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
-            {
-                SpecificationAttributeOptionId = 3,
-                SpecificationAttributeName = "METALS",
-                SpecificationAttributeOptionName = "Stainless Steel"
-            });
-            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
-            {
-                SpecificationAttributeOptionId = 4,
-                SpecificationAttributeName = "GRADES",
-                SpecificationAttributeOptionName = "A36"
-            });
-            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
-            {
-                SpecificationAttributeOptionId = 5,
-                SpecificationAttributeName = "GRADES",
-                SpecificationAttributeOptionName = "A514"
-            });
-
-
-            model.GroupedSpecificationAttributeName = model.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
+            model.GroupedSpecificationAttributeName = model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
         }
