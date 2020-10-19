@@ -10,14 +10,13 @@ using Nop.Services.Directory;
 using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Events;
-using Nop.Web.Models.Catalog;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static Nop.Web.Models.Catalog.CatalogPagingFilteringModel;
+using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogPagingFilteringModel;
 
 namespace Nop.Web.Factories
 {

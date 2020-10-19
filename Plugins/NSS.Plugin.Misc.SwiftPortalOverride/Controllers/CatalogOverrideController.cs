@@ -12,7 +12,6 @@ using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
 using Nop.Web.Factories;
-using Nop.Web.Models.Catalog;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
-    public partial class CatalogOverrideController:Controller
+    public partial class CatalogOverrideController : Controller
     {
         private readonly ICatalogModelFactory _catalogModelFactory;
 
@@ -36,12 +35,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public IActionResult Index()
         {
             var shapeIds = new List<int> { 1 };
-            var specIds = new List<int> ();
+            var specIds = new List<int>();
             //var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
 
             CatalogPagingFilteringModel.SpecificationFilterModel model = new CatalogPagingFilteringModel.SpecificationFilterModel();
             model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
+#pragma warning restore CS0436 // Type conflicts with imported type
             {
                 SpecificationAttributeOptionId = 1,
                 SpecificationAttributeName = "METALS",
@@ -78,7 +78,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
         }
 
-        [HttpPost]
+        // [HttpPost]
         //public async Task<PartialViewResult> FilteredProductsResult(List<int> SpecIds, List<int> ShapeIds)
         //{
         //    //var shapeIds = ShapeIds;

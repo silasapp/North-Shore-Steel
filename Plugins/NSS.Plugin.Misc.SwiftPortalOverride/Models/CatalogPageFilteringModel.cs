@@ -15,7 +15,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace Nop.Web.Models.Catalog
+namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
     /// <summary>
     /// Filtering and paging model for catalog
@@ -61,6 +61,11 @@ namespace Nop.Web.Models.Catalog
         /// A value indicating whether product sorting is allowed
         /// </summary>
         public bool AllowProductSorting { get; set; }
+
+        /// <summary>
+        /// A value indicating whether product sorting is allowed
+        /// </summary>
+        public bool GroupedSpecificationAttributeName { get; set; }
 
         /// <summary>
         /// Available sort options
