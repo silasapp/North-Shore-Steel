@@ -37,99 +37,57 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var shapeIds = new List<int> { 1 };
             var specIds = new List<int> ();
-            var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+            //var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
 
-            #region dataSource
-            List<object> treedata = new List<object>();
-            treedata.Add(new
+            CatalogPagingFilteringModel.SpecificationFilterModel model = new CatalogPagingFilteringModel.SpecificationFilterModel();
+            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
             {
-                id = 1,
-                pid = 0,
-                name = "Australia",
-                hasChild = true
+                SpecificationAttributeOptionId = 1,
+                SpecificationAttributeName = "METALS",
+                SpecificationAttributeOptionName = "Alloy"
             });
-            treedata.Add(new
+            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
             {
-                id = 2,
-                pid = 1,
-                name = "New South Wales",
+                SpecificationAttributeOptionId = 2,
+                SpecificationAttributeName = "METALS",
+                SpecificationAttributeOptionName = "Aluminium"
+            });
+            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
+            {
+                SpecificationAttributeOptionId = 3,
+                SpecificationAttributeName = "METALS",
+                SpecificationAttributeOptionName = "Stainless Steel"
+            });
+            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
+            {
+                SpecificationAttributeOptionId = 4,
+                SpecificationAttributeName = "GRADES",
+                SpecificationAttributeOptionName = "A36"
+            });
+            model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
+            {
+                SpecificationAttributeOptionId = 5,
+                SpecificationAttributeName = "GRADES",
+                SpecificationAttributeOptionName = "A514"
+            });
 
-            });
-            treedata.Add(new
-            {
-                id = 3,
-                pid = 1,
-                name = "Victoria"
-            });
-            treedata.Add(new
-            {
-                id = 4,
-                name = "Brazil",
-                pid = 0,
-                hasChild = true
-            });
-            treedata.Add(new
-            {
-                id = 5,
-                pid = 4,
-                name = "Paraná"
-            });
-            #endregion
 
-            FilterableProductsModel model = new FilterableProductsModel();
-            model.SpecificationFilters = new List<SpecificationFilter>();
-            #region specData
-            model.SpecificationFilters.Add(new SpecificationFilter
-            {
-                Id = 1,
-                SpecTitle = "METALS",
-                Name = "Alloy",
-                ProductCount = 8
-            });
-            model.SpecificationFilters.Add(new SpecificationFilter
-            {
-                Id = 2,
-                SpecTitle = "METALS",
-                Name = "Aluminium",
-                ProductCount = 109
-            });
-            model.SpecificationFilters.Add(new SpecificationFilter
-            {
-                Id = 3,
-                SpecTitle = "METALS",
-                Name = "Stainless Steel",
-                ProductCount = 138
-            });
-            model.SpecificationFilters.Add(new SpecificationFilter
-            {
-                Id = 4,
-                SpecTitle = "GRADES",
-                Name = "A36",
-                ProductCount = 38
-            });
-            model.SpecificationFilters.Add(new SpecificationFilter
-            {
-                Id = 5,
-                SpecTitle = "GRADES",
-                Name = "A514",
-                ProductCount = 33
-            });
-            #endregion
-
-            model.ProductsGroupedBySpecTitle = model.SpecificationFilters.GroupBy(sf => sf.SpecTitle);
+            model.GroupedSpecificationAttributeName = model.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
         }
 
         [HttpPost]
-        public async Task<PartialViewResult> FilteredProductsResult(List<string> SpecIds)
-        {
-            FilterableProductsModel model = new FilterableProductsModel();
+        //public async Task<PartialViewResult> FilteredProductsResult(List<int> SpecIds, List<int> ShapeIds)
+        //{
+        //    //var shapeIds = ShapeIds;
+        //    //var specIds = SpecIds;
+        //    //var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
-            model.rr = "Success Data";
-            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", model);
+        //    //x.Products = "Success Data";
+        //    //return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", model);
 
-        }
+        //}
     }
 }

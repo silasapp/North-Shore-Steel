@@ -471,6 +471,7 @@ namespace Nop.Web.Models.Catalog
             /// URL of "remove filters" button
             /// </summary>
             public string RemoveFilterUrl { get; set; }
+            public IEnumerable<IGrouping<string, SpecificationFilterItem>> GroupedSpecificationAttributeName { get; internal set; }
 
             #endregion
         }
