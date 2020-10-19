@@ -18,7 +18,7 @@ using System.Linq;
 using System.Text;
 using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogPagingFilteringModel;
 
-namespace Nop.Web.Factories
+namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public partial class CatalogModelFactory : ICatalogModelFactory
     {

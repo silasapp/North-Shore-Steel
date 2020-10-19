@@ -1,13 +1,14 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Web.Framework.Models;
+using Nop.Web.Models.Catalog;
 using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using NSS.Plugin.Misc.SwiftCore.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Nop.Web.Models.Catalog
+namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
     public partial class ProductOverviewModel : BaseNopEntityModel
     {

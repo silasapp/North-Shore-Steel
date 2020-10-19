@@ -11,7 +11,7 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
-using Nop.Web.Factories;
+using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;

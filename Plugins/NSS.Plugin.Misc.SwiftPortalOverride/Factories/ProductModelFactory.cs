@@ -3,15 +3,15 @@ using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Localization;
 using Nop.Services.Seo;
-using Nop.Web.Models.Catalog;
 using NSS.Plugin.Misc.SwiftCore.Services;
+using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace Nop.Web.Factories
+namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public partial class ProductModelFactory : IProductModelFactory
     {
@@ -96,7 +96,7 @@ namespace Nop.Web.Factories
         /// </summary>
         /// <param name="product">Product</param>
         /// <returns>List of product specification model</returns>
-        public virtual IList<ProductSpecificationModel> PrepareProductSpecificationModel(Product product)
+        public virtual IList<Nop.Web.Models.Catalog.ProductSpecificationModel> PrepareProductSpecificationModel(Product product)
         {
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
@@ -111,7 +111,7 @@ namespace Nop.Web.Factories
                         _specificationAttributeService.GetSpecificationAttributeById(specAttributeOption
                             .SpecificationAttributeId);
 
-                    var m = new ProductSpecificationModel
+                    var m = new Nop.Web.Models.Catalog.ProductSpecificationModel
                     {
                         SpecificationAttributeId = specAttribute.Id,
                         SpecificationAttributeName = _localizationService.GetLocalized(specAttribute, x => x.Name),

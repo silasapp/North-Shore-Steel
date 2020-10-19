@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Nop.Web.Factories
+namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public partial interface ICatalogModelFactory
     {

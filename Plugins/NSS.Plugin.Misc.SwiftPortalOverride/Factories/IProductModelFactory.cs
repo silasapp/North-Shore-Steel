@@ -1,10 +1,10 @@
 ﻿using Nop.Core.Domain.Catalog;
-using Nop.Web.Models.Catalog;
+using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Nop.Web.Factories
+namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public partial interface IProductModelFactory
     {
