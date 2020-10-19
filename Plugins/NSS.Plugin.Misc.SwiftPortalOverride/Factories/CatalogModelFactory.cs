@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static Nop.Web.Models.Catalog.CatalogPagingFilteringModel;
 
 namespace Nop.Web.Factories
 {
@@ -74,13 +75,6 @@ namespace Nop.Web.Factories
             _cacheKeyService = cacheKeyService;
             _shapeService = shapeService;
         }
-        public void PrepareSwiftCatalogModel(IList<int> shapeIds, IList<int> specIds)
-        {
-            var model = new SearchModel();
-
-            var products = _productService.SearchProducts(out var filterableSpecificationAttributeOptionIds, categoryIds: shapeIds, filteredSpecs: specIds);
-
-        }
 
         /// <summary>
         /// Prepare search model
@@ -88,7 +82,7 @@ namespace Nop.Web.Factories
         /// <param name="model">Search model</param>
         /// <param name="command">Catalog paging filtering command</param>
         /// <returns>Search model</returns>
-        public CatalogModel PrepareSwiftCatalogModel(CatalogPagingFilteringModel command)
+        public CatalogModel PrepareSwiftCatalogModel(IList<int> shapeIds, IList<int> specIds)
         {
             var model = new CatalogModel();
             var searchTerms = string.Empty;
@@ -101,8 +95,7 @@ namespace Nop.Web.Factories
             if (_httpContextAccessor.HttpContext.Request.Query.TryGetValue("q", out var query))
                 searchTerms = query.FirstOrDefault();
 
-            var shapeIds = command.ShapeIds;
-            var specids = command.SpecIds;
+
             decimal? minPriceConverted = null;
             decimal? maxPriceConverted = null;
             var searchInDescriptions = false;
@@ -120,7 +113,7 @@ namespace Nop.Web.Factories
                 priceMin: minPriceConverted,
                 priceMax: maxPriceConverted,
                 keywords: searchTerms,
-                filteredSpecs: specids
+                filteredSpecs: specIds
                 //orderBy: (ProductSortingEnum)command.OrderBy,
                 //pageIndex: command.PageNumber - 1,
                 //pageSize: command.PageSize
@@ -163,14 +156,26 @@ namespace Nop.Web.Factories
                 VendorId = 0
             });
 
-            model.PagingFilteringContext.LoadPagedList(products);
-
             //specs
-            model.PagingFilteringContext.SpecificationFilter.PrepareSpecsFilters(specids,
+            model.PagingFilteringContext.SpecificationFilter.PrepareSpecsFilters(specIds,
                 filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
                 _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager);
 
-            model.Shapes = _shapeService.GetShapes();
+            model.PagingFilteringContext.ShapeFilter = PrepareShapeFilterModel();
+
+            model.PagingFilteringContext.LoadPagedList(products);
+
+            return model;
+        }
+
+        public ShapeFilterModel PrepareShapeFilterModel()
+        {
+            var model = new ShapeFilterModel();
+
+            var shapes = _shapeService.GetShapes();
+
+            if(shapes.Count > 0)
+                model.Shapes = shapes;
 
             return model;
         }

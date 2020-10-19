@@ -12,13 +12,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     {
         public CatalogModel()
         {
-            Shapes = new List<Shape>();
             PagingFilteringContext = new CatalogPagingFilteringModel();
             Products = new List<ProductOverviewModel>();
         }
         public string Warning { get; set; }
         public bool NoResults { get; set; }
-        public IList<Shape> Shapes { get; set; }
         public IList<ProductOverviewModel> Products { get; set; }
         public CatalogPagingFilteringModel PagingFilteringContext { get; set; }
 

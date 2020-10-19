@@ -35,10 +35,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public IActionResult Index()
         {
-            var command = new CatalogPagingFilteringModel();
-            var x = _catalogModelFactory.PrepareSwiftCatalogModel(command);
-
-
+            var shapeIds = new List<int> { 1 };
+            var specIds = new List<int> ();
+            var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
 
             #region dataSource
