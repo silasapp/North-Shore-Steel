@@ -7,7 +7,7 @@ using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Security;
 using Nop.Services.Stores;
-using NSS.Plugin.Misc.SwiftApi.Attributes;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftApi.Delta;
 using NSS.Plugin.Misc.SwiftApi.DTO.Errors;
 using NSS.Plugin.Misc.SwiftApi.DTO.Products;
@@ -46,9 +46,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly IDTOHelper _dtoHelper;
         private readonly ILogger _logger;
         private readonly IShapeService _shapeService;
+        private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly CustomGenericAttributeService _genericAttributeService;
 
-        public ProductsController(CustomGenericAttributeService genericAttributeService, IShapeService shapeService, IProductService productService, IProductApiService productApiService, IFactory<Product> factory,
+        public ProductsController(ISpecificationAttributeService specificationAttributeService, CustomGenericAttributeService genericAttributeService, IShapeService shapeService, IProductService productService, IProductApiService productApiService, IFactory<Product> factory,
             IManufacturerService manufacturerService, IProductTagService productTagService, IUrlRecordService urlRecordService,
             IProductAttributeService productAttributeService, ILogger logger, IDTOHelper dtoHelper,
             IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService,
@@ -67,6 +68,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _dtoHelper = dtoHelper;
             _shapeService = shapeService;
             _genericAttributeService = genericAttributeService;
+            _specificationAttributeService = specificationAttributeService;
         }
 
         [HttpPost]
@@ -114,7 +116,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 ModelState.AddModelError("itemTagNo", $"itemTagNo field requires a value for serialized products");
 
             // price check
-            if(erpProductDelta.Dto.pricePerCWT == null && erpProductDelta.Dto.pricePerFt == null && erpProductDelta.Dto.pricePerPiece == null)
+            if (erpProductDelta.Dto.pricePerCWT == null && erpProductDelta.Dto.pricePerFt == null && erpProductDelta.Dto.pricePerPiece == null)
                 ModelState.AddModelError("price", $"at least one price item must not be null");
 
 
@@ -133,6 +135,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             product.Height = erpProductDelta.Dto.height ?? (decimal)0.00;
             product.Width = erpProductDelta.Dto.width ?? (decimal)0.00;
             product.Weight = erpProductDelta.Dto.weight ?? (decimal)0.00;
+            product.Price = erpProductDelta.Dto.pricePerPiece ?? product.Price;
+            product.Published = erpProductDelta.Dto.visible;
+
             // serialized product
             if (erpProductDelta.Dto.serialized)
             {
@@ -158,6 +163,12 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             //search engine name
             var seName = _urlRecordService.ValidateSeName(product, null, product.Name, true);
             _urlRecordService.SaveSlug(product, seName, 0);
+
+            // create product attr
+            MapProductAttributes(product);
+
+            // create spec option for metals, coating, grades, thickness, condition, country_of_origin, min width 
+            MapProductSpecificationAttributeOption(product, requestData);
 
             _productService.UpdateProduct(product);
 
@@ -254,6 +265,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             product.Height = request.ContainsKey("height") ? erpProductDelta.Dto.height ?? (decimal)0.00 : product.Height;
             product.Width = request.ContainsKey("width") ? erpProductDelta.Dto.width ?? (decimal)0.00 : product.Width;
             product.Weight = request.ContainsKey("weight") ? erpProductDelta.Dto.weight ?? (decimal)0.00 : product.Weight;
+            product.Price = request.ContainsKey("pricePerPiece") ? erpProductDelta.Dto.pricePerPiece ?? product.Price : product.Price;
+            product.Published = request.ContainsKey("visible") ? erpProductDelta.Dto.visible : product.Published;
 
             var isSerialized = _genericAttributeService.GetAttribute<bool>(product, "serialized", defaultValue: false);
             isSerialized = request.ContainsKey("serialized") ? erpProductDelta.Dto.serialized : isSerialized;
@@ -621,6 +634,74 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 newAssociatedProduct.ParentGroupedProductId = product.Id;
                 _productService.UpdateProduct(newAssociatedProduct);
+            }
+        }
+
+        private void MapProductSpecificationAttributeOption(Product entity, Dictionary<string,object> data)
+        {
+            // get value option id for maping
+            var attributes = _specificationAttributeService.GetSpecificationAttributes();
+
+            foreach (var attr in attributes)
+            {
+                var options = _specificationAttributeService.GetSpecificationAttributeOptionsBySpecificationAttribute(attr.Id);
+
+                bool containsValue = data.TryGetValue(attr.Name, out object value);
+
+                if(containsValue && !string.IsNullOrEmpty(value.ToString()))
+                {
+                    var option = options.FirstOrDefault(x => x.Name == value.ToString());
+
+                    if (option == null)
+                    {
+                        //create option
+                        option = new SpecificationAttributeOption { Name = value.ToString(), SpecificationAttributeId = attr.Id };
+                        _specificationAttributeService.InsertSpecificationAttributeOption(option);
+                    }
+
+                    //map
+                    var prodSpec = new ProductSpecificationAttribute
+                    {
+                        AllowFiltering = true,
+                        ProductId = entity.Id,
+                        SpecificationAttributeOptionId = option.Id,
+                        AttributeType = SpecificationAttributeType.Option
+                    };
+                    _specificationAttributeService.InsertProductSpecificationAttribute(prodSpec);
+                }
+                
+            }
+        }
+
+        private void MapProductAttributes(Product product)
+        {
+            var productAttributes = _productAttributeService.GetAllProductAttributes();
+            foreach (var productAttribute in productAttributes)
+            {
+                if (productAttribute.Name == Constants.CutOptionsAttribute)
+                {
+                    var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.RadioList, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
+                    _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+
+                    // cut options
+                    if (productAttribute.Name == Constants.CutOptionsAttribute)
+                    {
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in half", ProductAttributeMappingId = attributeMapping.Id });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in thirds", ProductAttributeMappingId = attributeMapping.Id });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in quarters", ProductAttributeMappingId = attributeMapping.Id });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Other", ProductAttributeMappingId = attributeMapping.Id });
+                    }
+                }
+                else if (productAttribute.Name == Constants.WorkOrderInstructionsAttribute)
+                {
+                    var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.MultilineTextbox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
+                    _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+                }
+                else if (productAttribute.Name == Constants.LengthToleranceCutAttribute)
+                {
+                    var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.TextBox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
+                    _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+                }
             }
         }
     }
