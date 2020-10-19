@@ -220,7 +220,7 @@
         specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
         var arrayValue = "";
-        arrayValue = "<div style =\"display: flex; margin: 20px 0;\">";
+        arrayValue = "<div style =\"display: flex; margin: 0 20px 12px 0;\">";
         for (i = 0; i < specNames.length; i++) {
             var sChip = specNames[i].replace(/ /g, "_");
             arrayValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
