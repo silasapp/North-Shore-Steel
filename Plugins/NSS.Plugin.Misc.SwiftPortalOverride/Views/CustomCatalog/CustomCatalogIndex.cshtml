@@ -1,6 +1,6 @@
 ﻿@using Syncfusion.EJ2
-@using NSS.Plugin.Misc.SwiftPortalOverride.Models
-@model FilterableProductsModel
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models 
+@model CatalogPagingFilteringModel.SpecificationFilterModel
 
 @{
     Layout = "_ColumnsOne";
@@ -11,112 +11,12 @@
 }
 
 
-<style>
-    .card-body {
-        padding: 0.5rem 0 0.5rem 1.25rem;
-    }
-
-    .e-treeview .e-ul {
-        padding: 0 0 0 12px !important;
-    }
-
-    .chip {
-        display: inline-block;
-        padding: 0 1rem;
-        height: 1.5rem;
-        font-size: 12px;
-        line-height: 1.6rem;
-        border-radius: 25px;
-        background-color: #f1f1f1
-    }
-
-    .spinner {
-        height: 60px;
-        width: 60px;
-        margin: auto;
-        display: flex;
-        position: absolute;
-        -webkit-animation: rotation .6s infinite linear;
-        -moz-animation: rotation .6s infinite linear;
-        -o-animation: rotation .6s infinite linear;
-        animation: rotation .6s infinite linear;
-        border-left: 6px solid rgba(0, 174, 239, .15);
-        border-right: 6px solid rgba(0, 174, 239, .15);
-        border-bottom: 6px solid rgba(0, 174, 239, .15);
-        border-top: 6px solid rgba(0, 174, 239, .8);
-        border-radius: 100%;
-    }
-
-    @@-webkit-keyframes rotation {
-        from {
-            -webkit-transform: rotate(0deg);
-        }
-
-        to {
-            -webkit-transform: rotate(359deg);
-        }
-    }
-
-    @@-moz-keyframes rotation {
-        from {
-            -moz-transform: rotate(0deg);
-        }
-
-        to {
-            -moz-transform: rotate(359deg);
-        }
-    }
-
-    @@-o-keyframes rotation {
-        from {
-            -o-transform: rotate(0deg);
-        }
-
-        to {
-            -o-transform: rotate(359deg);
-        }
-    }
-
-    @@keyframes rotation {
-        from {
-            transform: rotate(0deg);
-        }
-
-        to {
-            transform: rotate(359deg);
-        }
-    }
-
-    #overlay {
-        position: absolute;
-        display: none;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        /*background-color: rgba(0,0,0,0.5);*/
-        z-index: 2;
-    }
-
-    .chip-closebtn:hover {
-        color: #666666;
-    }
-</style>
-
 <div class="page home-page">
     <div class="page-body">
         <div class="row">
             <div class="col-sm-3"></div>
             <div class="col-sm-9">
-                <div id="cc">
-
-                </div>
-                @*<ejs-chiplist id="chip-avatar" enableDelete="true">
-                        <e-chips>
-                            <e-chip text="Sent a text" enabled="true"></e-chip>
-                            <e-chip text="Set a remainder" enabled="true"></e-chip>
-                        </e-chips>
-                    </ejs-chiplist>*@
+                <div id="cc"></div>
             </div>
         </div>
         <div class="row">
@@ -136,9 +36,9 @@
                             </div>
                         </div>
                     </div>
-                    @if (Model.ProductsGroupedBySpecTitle != null)
+                    @if (Model.GroupedSpecificationAttributeName != null)
                     {
-                        @foreach (var (group, index) in Model.ProductsGroupedBySpecTitle.Select((value, i) => (value, i)))
+                        @foreach (var (group, index) in Model.GroupedSpecificationAttributeName.Select((value, i) => (value, i)))
                         {
                             <div class="card">
                                 <div class="card-header">
@@ -150,7 +50,10 @@
                                 {
                                     <div id="collapse-@index" class="collapse">
                                         <div class="card-body">
-                                            <ejs-checkbox id="checkbox-@item.Id" name="Specs" value="@item.Name" label="@item.Name (@item.ProductCount)" checked="false"></ejs-checkbox>
+                                            <label class="pure-material-checkbox">
+                                                <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                <span>@item.SpecificationAttributeOptionName ()</span>
+                                            </label>
                                         </div>
                                     </div>
                                 }
@@ -172,6 +75,8 @@
     </div>
 </div>
 <script>
+    let specNames = [];
+    let specIDs = [];
     function nodeCheck(args) {
         var checkedNode = [args.node];
         var treeObj = document.getElementById('treedata').ej2_instances[0];
@@ -186,54 +91,90 @@
     }
 
    $(function () {
-       var specIDs = [];
-       var specNames = [];
-        $(document).on("change", "[name=Specs]", function (e) {
-            e.preventDefault();
-            $("#overlay").css("display", "flex");
-            var specId = event.target.id.split('-')[1]
-            var checkedValue = event.target.defaultValue;
-            specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
-            specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
-            console.log('eventCheckedValue', specNames);
-            var arrayValue = "";
-
-            for (i = 0; i < specNames.length; i++) {
-                arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" onclick=\"\">×</span></div>";
-            }
-
-            document.getElementById("cc").innerHTML = arrayValue;
-
-
-            $("#overlay").css("display", "flex");
-            var postData = { SpecIds: specIDs };
-            console.log('post-data', postData);
-
-            $.ajax({
-                url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
-                type: 'POST',
-                cache: false,
-                dataType: 'html',
-                data: postData,
-                success: function (data, textStatus, XMLHttpRequest) {
-                    console.log('datadata-success',data);
-                    if(data != null)
-                    {
-                        $("#overlay").css("display", "none");
-                        $('#prtialview').html(data)
-                    }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    console.log(thrownError, 'datadata-error', xhr);
-                    $('#prtialview').html('an error has occured here')
-                    $("#overlay").css("display", "none");
-                },
-
-
-            });
+       $(document).on("change", "[type=checkbox]", function () {
+           populateFilteredProductsTable(specIDs, specNames)
         })
-    })
+   })
 
+    function populateFilteredProductsTable(specIDs, specNames) {
+        $("#overlay").css("display", "flex");
+        var specId = event.target.id.split('-')[1]
+        var checkedValue = event.target.defaultValue;
+        specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
+        specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
+        var arrayValue = "";
+        for (i = 0; i < specNames.length; i++) {
+            var sChip = specNames[i].replace(/ /g, "_");
+            arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
+        }
+        document.getElementById("cc").innerHTML = arrayValue;
+        $("#overlay").css("display", "flex");
+        var postData = { SpecIds: specIDs };
+
+        $.ajax({
+            url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
+            type: 'POST',
+            cache: false,
+            dataType: 'html',
+            data: postData,
+            success: function (data, textStatus, XMLHttpRequest) {
+                if(data != null)
+                {
+                    $("#overlay").css("display", "none");
+                    $('#prtialview').html(data)
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(thrownError, 'datadata-error', xhr);
+                $('#prtialview').html('an error has occured here')
+                $("#overlay").css("display", "none");
+            }
+        });
+    }
+
+    var boxId = 0;
+    function doSomething() {
+        $("#overlay").css("display", "flex");
+        var selectedChip = event.target.getAttribute('name');
+        var inputs = document.querySelectorAll("input[type='checkbox']");
+        selectedChip = selectedChip.replace(/_/g, " ");
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].checked == true && inputs[i].value == selectedChip) {
+                boxId = inputs[i].id;
+                $("#" + inputs[i].id).prop('checked', false);
+                specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
+                var arrayValue = "";
+                for (i = 0; i < specNames.length; i++) {
+                    var sChip = specNames[i].replace(/ /g, "_");
+                    arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
+                }
+                document.getElementById("cc").innerHTML = arrayValue;
+            }
+        }
+
+        var specId = boxId.split('-')[1];
+        specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
+        var postData = { SpecIds: specIDs };
+        $.ajax({
+            url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
+            type: 'POST',
+            cache: false,
+            dataType: 'html',
+            data: postData,
+            success: function (data, textStatus, XMLHttpRequest) {
+                if(data != null)
+                {
+                    $("#overlay").css("display", "none");
+                    $('#prtialview').html(data)
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(thrownError, 'datadata-error', xhr);
+                $('#prtialview').html('an error has occured here')
+                $("#overlay").css("display", "none");
+            }
+        });
+    }
 
 </script>
 <ejs-scripts></ejs-scripts>
