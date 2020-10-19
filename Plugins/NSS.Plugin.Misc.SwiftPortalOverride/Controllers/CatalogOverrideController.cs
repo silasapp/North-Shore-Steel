@@ -41,7 +41,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             CatalogPagingFilteringModel.SpecificationFilterModel model = new CatalogPagingFilteringModel.SpecificationFilterModel();
             model.NotFilteredItems.Add(new CatalogPagingFilteringModel.SpecificationFilterItem
-#pragma warning restore CS0436 // Type conflicts with imported type
             {
                 SpecificationAttributeOptionId = 1,
                 SpecificationAttributeName = "METALS",
@@ -89,5 +88,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         //    //return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", model);
 
         //}
+
+
+        public IActionResult AddToCart()
+        {
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/Cart.cshtml");
+        }
     }
 }

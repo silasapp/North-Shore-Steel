@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Content\cart.css" />
     <None Remove="Content\catalog.css" />
     <None Remove="Content\customstyle.css" />
     <None Remove="Content\homepageStyle.css" />
@@ -25,6 +26,7 @@
     <None Remove="Areas\Admin\Views\_ViewImports.cshtml" />
     <None Remove="Views\Configure.cshtml" />
     <None Remove="Views\Confirmation - Copy.cshtml" />
+    <None Remove="Views\CustomCatalog\Cart.cshtml" />
     <None Remove="Views\CustomCatalog\CustomCatalogIndex.cshtml" />
     <None Remove="Views\CustomCatalog\_FilteredPartialView.cshtml" />
     <None Remove="Views\CustomTopMenu.cshtml" />
@@ -36,6 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\cart.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\catalog.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -52,6 +57,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Confirmation.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomCatalog\Cart.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\CustomCatalog\_FilteredPartialView.cshtml">
