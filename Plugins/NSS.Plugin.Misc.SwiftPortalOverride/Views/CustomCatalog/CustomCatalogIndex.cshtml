@@ -1,5 +1,5 @@
 ﻿@using Syncfusion.EJ2
-@using NSS.Plugin.Misc.SwiftPortalOverride.Models 
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @model CatalogPagingFilteringModel.SpecificationFilterModel
 
 @{
@@ -64,7 +64,120 @@
                 </div>
             </div>
             <div class="col-sm-9">
-                <div id="prtialview"></div>
+
+                <table class="table table-bordered catalog-table table-striped" id="catalogTable" onload="sortTable(0)">
+                    <thead>
+                        <tr>
+                            <th class="sortable" scope="col" onclick="sortTable(0)">Item #</th>
+                            <th class="sortable" scope="col" onclick="sortTable(1)">Description </th>
+                            <th class="sortable" scope="col" onclick="sortTable(2)">Height(in)</th>
+                            <th class="sortable" scope="col" onclick="sortTable(3)">Length(ft)</th>
+                            <th class="sortable" scope="col" onclick="sortTable(4)">Weight(Ib)/ft</th>
+                            <th class="sortable" scope="col" onclick="sortTable(5)">Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>213456779-10-1</td>
+                            <td>a1 Beam Hot Roll A36 3 x 5.7 x 20</td>
+                            <td>3"</td>
+                            <td>20'</td>
+                            <td>5.7</td>
+                            <td>
+                                <input style="width: 60px" type="number" name="quantity" id="">
+                            </td>
+                            <td style="text-align:center">
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>123456779-10-1</td>
+                            <td>1 Beam Hot Roll A36 3 x 5.7 x 20</td>
+                            <td>1"</td>
+                            <td>26'</td>
+                            <td>5.1</td>
+                            <td>
+                                <input style="width: 60px" type="number" name="quantity" id="" value="1">
+                            </td>
+                            <td style="text-align:center">
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3123456779-10-1</td>
+                            <td>1 Beam Hot Roll A36 3 x 5.7 x 20</td>
+                            <td>3"</td>
+                            <td>20'</td>
+                            <td>5.7</td>
+                            <td>
+                                <input style="width: 60px" type="number" name="quantity" id="">
+                            </td>
+                            <td style="text-align:center">
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>123456779-10-1</td>
+                            <td>1 Beam Hot Roll A36 3 x 5.7 x 20</td>
+                            <td>3"</td>
+                            <td>20'</td>
+                            <td>5.7</td>
+                            <td>
+                                <input style="width: 60px" type="number" name="quantity" id="">
+                            </td>
+                            <td style="text-align:center">
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+                                </button>
+                                <button class="table-action-button">
+                                    <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p id="test"></p>
+
+                @*<div id="prtialview"></div>*@
             </div>
         </div>
     </div>
@@ -90,6 +203,10 @@
         }
     }
 
+    $(document).ready(function () {
+        //$('#prtialview').html("hahaha")
+    });
+
    $(function () {
        $(document).on("change", "[type=checkbox]", function () {
            populateFilteredProductsTable(specIDs, specNames)
@@ -103,10 +220,15 @@
         specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
         var arrayValue = "";
+        arrayValue = "<div style =\"display: flex; margin: 20px 0;\">";
         for (i = 0; i < specNames.length; i++) {
             var sChip = specNames[i].replace(/ /g, "_");
-            arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
+            arrayValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
+
+      //arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
         }
+        arrayValue += "</div>";
+
         document.getElementById("cc").innerHTML = arrayValue;
         $("#overlay").css("display", "flex");
         var postData = { SpecIds: specIDs };
@@ -133,9 +255,9 @@
     }
 
     var boxId = 0;
-    function doSomething() {
+    function removeFiltered() {
         $("#overlay").css("display", "flex");
-        var selectedChip = event.target.getAttribute('name');
+        var selectedChip = event.target.alt;
         var inputs = document.querySelectorAll("input[type='checkbox']");
         selectedChip = selectedChip.replace(/_/g, " ");
         for (var i = 0; i < inputs.length; i++) {
@@ -144,10 +266,15 @@
                 $("#" + inputs[i].id).prop('checked', false);
                 specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
                 var arrayValue = "";
+                arrayValue = "<div style =\"display: flex; margin: 20px 0;\">";
                 for (i = 0; i < specNames.length; i++) {
                     var sChip = specNames[i].replace(/ /g, "_");
-                    arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
+                    arrayValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
+
+                    //arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
                 }
+                arrayValue += "</div>";
+
                 document.getElementById("cc").innerHTML = arrayValue;
             }
         }
@@ -175,6 +302,56 @@
             }
         });
     }
+
+
+    var $sortable = $('.sortable');
+
+    $sortable.on('click', function () {
+        var $this = $(this);
+        var asc = $this.hasClass('asc');
+        var desc = $this.hasClass('desc');
+        $sortable.removeClass('asc').removeClass('desc');
+        if (desc || (!asc && !desc)) {
+            $this.addClass('asc');
+        } else {
+            $this.addClass('desc');
+        }
+
+    });
+    $(function () {
+        $('table')
+            .on('click', 'th', function () {
+                var index = $(this).index(),
+                    rows = [],
+                    thClass = $(this).hasClass('asc') ? 'desc' : 'asc';
+
+                $('#catalogTable th').removeClass('asc desc');
+                $(this).addClass(thClass);
+
+                $('#catalogTable tbody tr').each(function (index, row) {
+                    rows.push($(row).detach());
+                });
+
+                rows.sort(function (a, b) {
+                    var aValue = $(a).find('td').eq(index).text(),
+                        bValue = $(b).find('td').eq(index).text();
+
+                    return aValue > bValue
+                        ? 1
+                        : aValue < bValue
+                            ? -1
+                            : 0;
+                });
+
+                if ($(this).hasClass('desc')) {
+                    rows.reverse();
+                }
+
+                $.each(rows, function (index, row) {
+                    $('#catalogTable tbody').append(row);
+                });
+            });
+    });
 
 </script>
 <ejs-scripts></ejs-scripts>
