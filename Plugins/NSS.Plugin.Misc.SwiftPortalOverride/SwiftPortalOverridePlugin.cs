@@ -1,5 +1,8 @@
 ﻿using Nop.Core;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Messages;
+using Nop.Core.Infrastructure;
+using Nop.Data;
 using Nop.Services.Common;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
@@ -8,7 +11,9 @@ using Nop.Services.Plugins;
 using Nop.Services.Stores;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride
@@ -83,6 +88,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             // email template
             //ConfigureMessageTemplates();
 
+            // create proc
+            var settings = DataSettingsManager.LoadSettings();
+            var dataProvider = DataProviderManager.GetDataProvider(settings.DataProvider);
+
+            dataProvider.ExecuteNonQuery(@"IF EXISTS (
+                SELECT type_desc, type
+                FROM sys.procedures WITH(NOLOCK)
+                WHERE NAME = 'ProductLoadAllPagedSwiftPortal'
+                    AND type = 'P'
+              )
+             DROP PROCEDURE dbo.ProductLoadAllPagedSwiftPortal");
+
+            var sql = GetSQL("ProductLoadAllPagedSwiftPortal");
+            dataProvider.ExecuteNonQuery(sql);
 
             base.Install();
         }
@@ -98,10 +117,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             //locales
             _localizationService.DeletePluginLocaleResources("Plugins.Misc.SwiftPortalOverride");
 
-            // email template
-            var approvalMail = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
-            if (approvalMail != null)
-                _messageTemplateService.DeleteMessageTemplate(approvalMail);
+            //// email template
+            //var approvalMail = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
+            //if (approvalMail != null)
+            //    _messageTemplateService.DeleteMessageTemplate(approvalMail);
 
             base.Uninstall();
         }
@@ -121,6 +140,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         //    approvalTemplate.Body = $@"<p>  <a href='%Store.URL%'>%Store.Name%</a>  <br />  <br />  A new customer registered with your store. Below are the customer's details:  <br />  Full name: %Customer.FullName%  <br />  Email: %Customer.Email% <br />  Erp Id: %Customer.ErpId%  </p>  ";
         //    _messageTemplateService.UpdateMessageTemplate(approvalTemplate);
         //}
+
+        static string GetSQL(string file)
+        {
+            string sql = null;
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"NSS.Plugin.Misc.SwiftPortalOverride.Domains.SQL.{file}.sql";
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                sql = reader.ReadToEnd();
+            }
+
+            return sql;
+        }
 
         #endregion
     }

@@ -89,7 +89,16 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Products
 
         [JsonProperty("pipeSize")]
         public decimal? pipeSize { get; set; }
+        [JsonProperty("displaySize")]
+        public string displaySize { get; set; }
 
+        [JsonProperty("size")]
+        public decimal? size { get; set; }
+        [JsonProperty("displayOD")]
+        public string displayOD { get; set; }
+
+        [JsonProperty("OD")]
+        public decimal? OD { get; set; }
         [JsonProperty("wall")]
         public string wall { get; set; }
 
@@ -107,6 +116,8 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Products
 
         [JsonProperty("millName")]
         public string millName { get; set; }
+        [JsonProperty("displayWeightPerFoot")]
+        public string displayWeightPerFoot { get; set; }
 
         [JsonProperty("weightPerFoot")]
         public decimal? weightPerFoot { get; set; }
@@ -119,6 +130,10 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Products
 
         [JsonProperty("grade")]
         public string grade { get; set; }
+        [JsonProperty("metal")]
+        public string metal { get; set; }
+        [JsonProperty("coating")]
+        public string coating { get; set; }
 
         [JsonProperty("mtr")]
         public string mtr { get; set; }
