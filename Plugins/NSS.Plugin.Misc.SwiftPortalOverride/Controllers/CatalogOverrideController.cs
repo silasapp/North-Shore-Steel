@@ -34,7 +34,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public IActionResult Index()
         {
-            var shapeIds = new List<int> { 1 };
+            var shapeIds = new List<int>();
             var specIds = new List<int>();
             //var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
