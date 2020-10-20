@@ -47,17 +47,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
         }
 
-        // [HttpPost]
-        //public async Task<PartialViewResult> FilteredProductsResult(List<int> SpecIds, List<int> ShapeIds)
-        //{
-        //    //var shapeIds = ShapeIds;
-        //    //var specIds = SpecIds;
-        //    //var x = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+        [HttpPost]
+        public async Task<PartialViewResult> FilteredProductsResult(List<int> SpecIds, List<int> ShapeIds)
+        {
 
-        //    //x.Products = "Success Data";
-        //    //return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", model);
+            CatalogModel model = new CatalogModel();
+            var shapeIds = ShapeIds;
+            var specIds = SpecIds;
+            if (shapeIds == null)
+                shapeIds = new List<int>();
+            if (specIds == null)
+                specIds = new List<int>();
 
-        //}
+            var res = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+            model.Products = res.Products;
+
+            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", model);
+
+        }
 
 
         public IActionResult AddToCart()
