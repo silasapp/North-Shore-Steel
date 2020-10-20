@@ -126,15 +126,16 @@
 
         document.getElementById("cc").innerHTML = arrayValue;
         $("#overlay").css("display", "flex");
-        var postData = { SpecIds: specIDs, ShapeIds : [] };
+        var filterParams = { SpecIds: specIDs, ShapeIds : [] };
+
 
         $.ajax({
             url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
             type: 'POST',
-            cache: false,
-            dataType: 'html',
-            data: postData,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(filterParams),
             success: function (data, textStatus, XMLHttpRequest) {
+                console.log(typeof data);
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
@@ -176,13 +177,12 @@
 
         var specId = boxId.split('-')[1];
         specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
-        var postData = { SpecIds: specIDs };
+        var filterParams = { SpecIds: specIDs, ShapeIds: [] };
         $.ajax({
-            url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
+             url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
             type: 'POST',
-            cache: false,
-            dataType: 'html',
-            data: postData,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(filterParams),
             success: function (data, textStatus, XMLHttpRequest) {
                 if(data != null)
                 {

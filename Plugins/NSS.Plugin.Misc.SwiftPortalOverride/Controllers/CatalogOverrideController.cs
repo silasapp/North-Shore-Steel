@@ -48,12 +48,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpPost]
-        public async Task<PartialViewResult> FilteredProductsResult(List<int> SpecIds, List<int> ShapeIds)
+        public async Task<PartialViewResult> FilteredProductsResult([FromBody] FilterParams filterParams)
         {
 
             CatalogModel model = new CatalogModel();
-            var shapeIds = ShapeIds;
-            var specIds = SpecIds;
+            var shapeIds = filterParams.ShapeIds;
+            var specIds = filterParams.SpecIds;
             if (shapeIds == null)
                 shapeIds = new List<int>();
             if (specIds == null)
@@ -66,6 +66,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         }
 
+        public class FilterParams
+        {
+            public List<int> SpecIds { get; set; }
+            public List<int> ShapeIds { get; set; }
+        }
 
         public IActionResult AddToCart()
         {
