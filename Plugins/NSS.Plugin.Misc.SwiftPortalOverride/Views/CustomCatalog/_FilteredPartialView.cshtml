@@ -8,26 +8,36 @@
         <table class="table table-bordered catalog-table table-striped" id="catalogTable" onload="sortTable(0)">
             <thead>
                 <tr>
-                    <th class="sortable" scope="col" onclick="sortTable(0)">Item #</th>
-                    <th class="sortable" scope="col" onclick="sortTable(1)">Description </th>
-                    <th class="sortable" scope="col" onclick="sortTable(2)">Grade </th>
-                    <th class="sortable" scope="col" onclick="sortTable(3)">Thickness</th>
-                    <th class="sortable" scope="col" onclick="sortTable(4)">Dimensions</th>
-                    <th class="sortable" scope="col" onclick="sortTable(5)">Weight(Ib)/ft</th>
-                    <th class="sortable" scope="col" onclick="sortTable(6)">Qty</th>
+                    @foreach (var item in Model.Products)
+                    {
+                        @foreach (var it in item.Shape.Atttributes)
+                        {
+                            <th class="sortable" scope="col" onclick="sortTable(0)">@it.DisplayName</th>
+                            @*<th class="sortable" scope="col" onclick="sortTable(1)">Description </th>
+                                <th class="sortable" scope="col" onclick="sortTable(2)">Grade </th>
+                                <th class="sortable" scope="col" onclick="sortTable(3)">Thickness (in)</th>
+                                <th class="sortable" scope="col" onclick="sortTable(4)">Dimensions (in)</th>
+                                <th class="sortable" scope="col" onclick="sortTable(5)">Weight(Ib)/ft</th>
+                            *@
+                        }
+                        <th class="sortable" scope="col" onclick="sortTable(6)">Quantity</th>
+                        break;
+                    }
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.Products)
                 {
-
                     <tr>
-                        <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "itemNo")?.Value</td>
-                        <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "itemName")?.Value</td>
-                        <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "grade")?.Value</td>
-                        <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "displayThickness")?.Value</td>
-                        <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "dimensions")?.Value</td>
-                        <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "displayWeightPerFoot")?.Value</td>
+                        @foreach (var it in item.Shape.Atttributes)
+                        {
+                            <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == @it.Code)?.Value</td>
+                            @*<td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "itemName")?.Value</td>
+                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "grade")?.Value</td>
+                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "displayThickness")?.Value</td>
+                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "dimensions")?.Value</td>
+                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "displayWeightPerFoot")?.Value</td>*@
+                        }
                         <td>
                             <input style="width: 60px" type="number" name="quantity" id="">
                         </td>
