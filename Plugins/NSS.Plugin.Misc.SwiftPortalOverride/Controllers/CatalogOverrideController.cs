@@ -65,11 +65,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             public List<int> ShapeIds { get; set; }
         }
 
-        public IActionResult AddToCart()
-        {
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/Cart.cshtml");
-        }
-
         public CatalogModel CatalogModel { get; set; }
     }
 }
