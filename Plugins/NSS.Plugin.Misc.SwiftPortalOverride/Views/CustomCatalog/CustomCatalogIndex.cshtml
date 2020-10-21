@@ -10,7 +10,9 @@
     Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
 }
 
-
+@{
+     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
+}
 <div class="page home-page">
     <div class="page-body">
         <div class="row">
@@ -36,9 +38,9 @@
                             </div>
                         </div>
                     </div>
-                    @if (Model.GroupedSpecificationAttributeName != null)
+                    @if (groupedSpecificationAttributes != null)
                     {
-                        @foreach (var (group, index) in Model.GroupedSpecificationAttributeName.Select((value, i) => (value, i)))
+                        @foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
                         {
                             <div class="card">
                                 <div class="card-header">

@@ -20,7 +20,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public bool NoResults { get; set; }
         public IList<ProductOverviewModel> Products { get; set; }
         public CatalogPagingFilteringModel PagingFilteringContext { get; set; }
-        public IEnumerable<IGrouping<string, CatalogPagingFilteringModel.SpecificationFilterItem>> GroupedSpecificationAttributeName { get; internal set; }
 
         #region Nested Class
 

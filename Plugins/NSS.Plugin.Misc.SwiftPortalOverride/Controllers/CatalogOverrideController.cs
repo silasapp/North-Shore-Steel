@@ -34,24 +34,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public IActionResult Index()
         {
-            CatalogModel model = new CatalogModel();
             var shapeIds = new List<int>();
             var specIds = new List<int>();
-            var res = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
-            model.Products = res.Products;
-            model.PagingFilteringContext.SpecificationFilter.NotFilteredItems = res.PagingFilteringContext.SpecificationFilter.NotFilteredItems;
 
+            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
-            model.GroupedSpecificationAttributeName = model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
-
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
         }
 
         [HttpPost]
-        public async Task<PartialViewResult> FilteredProductsResult([FromBody] FilterParams filterParams)
+        public PartialViewResult FilteredProductsResult([FromBody] FilterParams filterParams)
         {
-
-            CatalogModel model = new CatalogModel();
             var shapeIds = filterParams.ShapeIds;
             var specIds = filterParams.SpecIds;
             if (shapeIds == null)
@@ -59,10 +52,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (specIds == null)
                 specIds = new List<int>();
 
-            var res = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
-            model.Products = res.Products;
+            if(shapeIds.Count > 0 || specIds.Count > 0)
+                CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
-            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", model);
+            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
 
         }
 
@@ -76,5 +69,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/Cart.cshtml");
         }
+
+        public CatalogModel CatalogModel { get; set; }
     }
 }
