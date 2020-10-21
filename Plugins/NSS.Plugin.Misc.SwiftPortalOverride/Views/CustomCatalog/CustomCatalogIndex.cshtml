@@ -40,12 +40,40 @@
                     </div>
                     @if (groupedSpecificationAttributes != null)
                     {
-                        @foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
+                        var key = "";
+						@foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
                         {
+                            switch (@group.Key)
+                            {
+                                case "coating":
+                                    key = "COATING";
+                                    break;
+                                case "condition":
+                                    key = "CONDITION";
+                                    break;
+                                case "countryOfOrigin":
+                                    key = "COUNTRY OF ORIGIN";
+                                    break;
+                                case "displayThickness":
+                                    key = "THICKNESS (in)";
+                                    break;
+                                case "displayWidth":
+                                    key = "MINIMUM WIDTH (in)";
+                                    break;
+                                case "grade":
+                                    key = "GRADES";
+                                    break;
+                                case "metal":
+                                    key = "METAL";
+                                    break;
+                                default:
+                                    key = group.Key;
+                                    break;
+                            }
                             <div class="card">
                                 <div class="card-header">
                                     <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                        @group.Key
+                                        @key
                                     </a>
                                 </div>
                                 @foreach (var item in group)
