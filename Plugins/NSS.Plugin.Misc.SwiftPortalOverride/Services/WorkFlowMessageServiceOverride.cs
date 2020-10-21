@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nop.Services.Configuration;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 {
@@ -93,7 +94,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             // config
             //load settings for a chosen store scope
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
+            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
 
             var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName, store.Id);
             if (!messageTemplates.Any())

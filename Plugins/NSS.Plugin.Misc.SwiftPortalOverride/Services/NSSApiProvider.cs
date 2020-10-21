@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 {
@@ -322,7 +323,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         {
             //load settings for a chosen store scope
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
+            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
 
             _baseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl;
             _user = swiftPortalOverrideSettings.NSSApiAuthUsername;

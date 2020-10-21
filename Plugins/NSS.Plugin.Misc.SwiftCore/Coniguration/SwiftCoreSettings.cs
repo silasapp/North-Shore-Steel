@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride
+namespace NSS.Plugin.Misc.SwiftCore.Configuration
 {
-    public class SwiftPortalOverrideSettings : ISettings
+    public class SwiftCoreSettings : ISettings
     {
         /// <summary>
         /// Gets or sets the UseSandbox attribute
@@ -36,5 +36,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         /// Gets or sets the NSS API authentication password
         /// </summary>
         public string NSSApiAuthPassword { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Storage Account Name
+        /// </summary>
+        public string StorageAccountName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Storage Account Key
+        /// </summary>
+        public string StorageAccountKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Storage Container Name
+        /// </summary>
+        public string StorageContainerName { get; set; }
     }
 }

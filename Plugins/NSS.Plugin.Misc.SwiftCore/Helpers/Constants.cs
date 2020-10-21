@@ -27,6 +27,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         #endregion
 
         #region ProductFields
+        public static string MTRFieldAttribute => "mtr";
+        public static string ItemIdFieldAttribute => "itemId";
         public static string MetalFieldAttribute => "metal";
         public static string GradeFieldAttribute => "grade";
         public static string CoatingFieldAttribute => "coating";
@@ -35,5 +37,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string CountryOfOriginFieldAttribute => "countryOfOrigin";
         public static string DisplayWidthFieldAttribute => "displayWidth";
         #endregion
+
+        public static string MTRBlobName => "Product-MTR.{0}.pdf";
     }
 }

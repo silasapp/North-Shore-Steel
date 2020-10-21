@@ -9,6 +9,7 @@ using Nop.Services.Localization;
 using Nop.Services.Messages;
 using Nop.Services.Plugins;
 using Nop.Services.Stores;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +67,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         public override void Install()
         {
             //settings
-            _settingService.SaveSetting(new SwiftPortalOverrideSettings());
+            _settingService.SaveSetting(
+                new SwiftCoreSettings
+                {
+                    StorageContainerName = "swiftportal-container"
+                }
+            );
 
             //locales
             _localizationService.AddPluginLocaleResource(new Dictionary<string, string>
@@ -83,6 +89,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.NSSApiAuthUsername.Hint"] = "Enter NSS API authentication username.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.NSSApiAuthPassword"] = "NSS API Password",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.NSSApiAuthPassword.Hint"] = "Enter NSS API authentication password.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.StorageAccountName"] = "Storage Account Name",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.StorageAccountName.Hint"] = "Enter Storage Account Name.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.StorageAccountKey"] = "Storage Account Key",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.StorageAccountKey.Hint"] = "Enter Storage Account key.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.StorageContainerName"] = "Storage Container Name",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.StorageContainerName.Hint"] = "Enter Storage Container Name.",
             });
 
             // email template
@@ -112,7 +124,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         public override void Uninstall()
         {
             //settings
-            _settingService.DeleteSetting<SwiftPortalOverrideSettings>();
+            _settingService.DeleteSetting<SwiftCoreSettings>();
 
             //locales
             _localizationService.DeletePluginLocaleResources("Plugins.Misc.SwiftPortalOverride");
