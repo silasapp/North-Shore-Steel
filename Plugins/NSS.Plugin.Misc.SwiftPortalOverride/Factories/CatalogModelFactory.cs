@@ -142,18 +142,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     };
                     _searchTermService.InsertSearchTerm(searchTerm);
                 }
-            }
 
-            //event
-            _eventPublisher.Publish(new ProductSearchEvent
-            {
-                SearchTerm = searchTerms,
-                SearchInDescriptions = searchInDescriptions,
-                CategoryIds = shapeIds,
-                ManufacturerId = 0,
-                WorkingLanguageId = _workContext.WorkingLanguage.Id,
-                VendorId = 0
-            });
+                //event
+                _eventPublisher.Publish(new ProductSearchEvent
+                {
+                    SearchTerm = searchTerms,
+                    SearchInDescriptions = searchInDescriptions,
+                    CategoryIds = shapeIds,
+                    ManufacturerId = 0,
+                    WorkingLanguageId = _workContext.WorkingLanguage.Id,
+                    VendorId = 0
+                });
+            }
 
             //specs
             model.PagingFilteringContext.SpecificationFilter.PrepareSpecsFilters(specIds,
