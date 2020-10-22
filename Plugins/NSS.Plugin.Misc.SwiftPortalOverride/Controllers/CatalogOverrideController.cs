@@ -44,12 +44,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             List<ShapeData> shapeData = new List<ShapeData>();
             for (var i = 0; i < shapes.Count; i++)
             {
-                shapeData.Add(new ShapeData
+                var childShapes = shapes[i].SubCategories.ToList();
+                var shape = new ShapeData
                 {
                     id = shapes[i].Id,
                     pid = shapes[i].ParentId,
-                    name = shapes[i].Name
-                });  
+                    name = shapes[i].Name,
+                    haschild = childShapes != null && childShapes.Count > 0
+                };
+                shapeData.Add(shape);
+
+                if(childShapes != null && childShapes.Count > 0)
+                    for (int j = 0; j < childShapes.Count; j++)
+                    {
+                        shape = new ShapeData
+                        {
+                            id = childShapes[j].Id,
+                            pid = childShapes[j].ParentId,
+                            name = childShapes[j].Name,
+                            haschild = false
+                        };
+                        shapeData.Add(shape);
+                    }
             }
 
             ViewBag.dataSource = shapeData;
@@ -61,6 +77,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             public int id { get; set; }
             public int? pid { get; set; }
             public string name { get; set; }
+            public bool haschild { get; set; }
         }
 
         [HttpPost]
