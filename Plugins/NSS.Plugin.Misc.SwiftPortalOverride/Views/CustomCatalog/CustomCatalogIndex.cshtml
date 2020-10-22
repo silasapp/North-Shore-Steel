@@ -114,6 +114,10 @@
     let specIDs = [];
     let shapeIDs = [];
     function nodeCheck(args) {
+        if (event.which === 3 && event.button === 2) {
+            return;
+        }
+
         var checkedNode = [args.node];
         console.log(args, 'checkedNode', checkedNode);
         var treeObj = document.getElementById('treedata').ej2_instances[0];
@@ -123,15 +127,6 @@
         shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
         populateFilteredProductsTable(specIDs, specNames, shapeIDs);
-
-        //if (args.event.target.classList.contains('e-fullrow') || args.event.key == "Enter") {
-        //    var getNodeDetails = treeObj.getNodeData(args.node);
-        //    if (getNodeDetails.isChecked == 'true') {
-        //        treeObj.uncheckAll(checkedNode);
-        //    } else {
-        //        treeObj.checkAll(checkedNode);
-        //    }
-        //}
     }
 
     function catalogProducts(specIDs, specNames, shapeIDs) {
