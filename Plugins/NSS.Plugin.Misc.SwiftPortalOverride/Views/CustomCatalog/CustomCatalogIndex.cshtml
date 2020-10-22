@@ -115,7 +115,9 @@
     let shapeIDs = [];
     function nodeCheck(args) {
         var checkedNode = [args.node];
+
         var treeObj = document.getElementById('treedata').ej2_instances[0];
+        console.log('checkedNode', checkedNode);
         var selectedShape = treeObj.getNodeData(args.node);
         var shapeId = selectedShape.id;
         var checkedValue = selectedShape.text
@@ -123,14 +125,15 @@
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
         populateFilteredProductsTable(specIDs, specNames, shapeIDs);
 
-        if (args.event.target.classList.contains('e-fullrow') || args.event.key == "Enter") {
-            var getNodeDetails = treeObj.getNodeData(args.node);
-            if (getNodeDetails.isChecked == 'true') {
-                treeObj.uncheckAll(checkedNode);
-            } else {
-                treeObj.checkAll(checkedNode);
-            }
-        }
+        //if (args.event.target.classList.contains('e-fullrow') || args.event.key == "Enter") {
+        //    var getNodeDetails = treeObj.getNodeData(args.node);
+        //    console.log(treeObj, 'treeObj', checkedNode, 'checkedNode')
+        //    if (getNodeDetails.isChecked == 'true') {
+        //        treeObj.uncheckAll();
+        //    } else {
+        //        treeObj.checkAll(checkedNode);
+        //    }
+        //}
     }
 
     function catalogProducts(specIDs, specNames, shapeIDs) {
@@ -200,18 +203,19 @@
                     $("#" + inputs[i].id).prop('checked', false);
                     specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
 
-                    specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
-
                     var specId = boxId.split('-')[1];
                     specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
                 }
-        }
+            }
 
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i].childNodes[1].childNodes[0].ariaChecked == "true" && elements[i].childNodes[1].childNodes[1].innerHTML == selectedChip) {
                     boxId = elements[i].dataset.uid;
-                    elements[i].childNodes[1].childNodes[0].ariaChecked = false;
-                    console.log('hahaha', elements[i].childNodes[1].childNodes[0].ariaChecked);
+                    var checkedNode = elements[i];
+                    var treeObj = document.getElementById('treedata').ej2_instances[0];
+                    treeObj.uncheckAll();
+                    console.log('treeObj', checkedNode);
+                    elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
                     specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
                     shapeIDs.indexOf(boxId) === -1 ? shapeIDs.push(boxId) : shapeIDs.splice(shapeIDs.indexOf(boxId), 1);
                 }
