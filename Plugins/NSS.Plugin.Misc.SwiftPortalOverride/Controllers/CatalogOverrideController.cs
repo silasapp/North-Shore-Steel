@@ -39,7 +39,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
+            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.Shapes;
+
+            List<ShapeData> shapeData = new List<ShapeData>();
+            for (var i = 0; i < shapes.Count; i++)
+            {
+                shapeData.Add(new ShapeData
+                {
+                    id = shapes[i].Id,
+                    pid = shapes[i].ParentId,
+                    name = shapes[i].Name
+                });  
+            }
+
+            ViewBag.dataSource = shapeData;
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
+        }
+
+        public class ShapeData
+        {
+            public int id { get; set; }
+            public int? pid { get; set; }
+            public string name { get; set; }
         }
 
         [HttpPost]
@@ -52,7 +73,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (specIds == null)
                 specIds = new List<int>();
 
-            if(shapeIds.Count > 0 || specIds.Count > 0)
+            if (shapeIds.Count > 0 || specIds.Count > 0)
                 CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
             return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
