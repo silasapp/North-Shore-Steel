@@ -106,22 +106,21 @@
 <script>
 
     $(document).ready(function () {
-        catalogProducts([], []);
+        catalogProducts([], [], []);
     });
 
 
     let specNames = [];
     let specIDs = [];
+    let shapeIDs = [];
     function nodeCheck(args) {
         var checkedNode = [args.node];
         var treeObj = document.getElementById('treedata').ej2_instances[0];
-        console.log('treeObj.getNodeData(args.node)', treeObj.getNodeData(args.node));
         var selectedShape = treeObj.getNodeData(args.node);
         var shapeId = selectedShape.id;
         var checkedValue = selectedShape.text
         shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
-
         populateFilteredProductsTable(specIDs, specNames, shapeIDs);
 
         if (args.event.target.classList.contains('e-fullrow') || args.event.key == "Enter") {
@@ -134,18 +133,17 @@
         }
     }
 
-    function catalogProducts(specIDs, specNames) {
-        populateFilteredProductsTable(specIDs, specNames);
+    function catalogProducts(specIDs, specNames, shapeIDs) {
+        populateFilteredProductsTable(specIDs, specNames, shapeIDs);
     };
 
     $(document).on("change", "[type=checkbox]", function () {
 
-        var specId = event.target.id.split('-')[1]
         var shapeIDs = [];
+        var specId = event.target.id.split('-')[1]
         var checkedValue = event.target.defaultValue;
         specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
-        console.log('specIDs', specIDs, 'specNames', specNames, 'shapeIDs', shapeIDs);
         populateFilteredProductsTable(specIDs, specNames, shapeIDs);
     })
 
@@ -174,7 +172,6 @@
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(filterParams),
             success: function (data, textStatus, XMLHttpRequest) {
-                console.log(typeof data);
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
@@ -194,29 +191,46 @@
         $("#overlay").css("display", "flex");
         var selectedChip = event.target.alt;
         var inputs = document.querySelectorAll("input[type='checkbox']");
+        var elements = $('li.e-list-item');
         selectedChip = selectedChip.replace(/_/g, " ");
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].checked == true && inputs[i].value == selectedChip) {
-                boxId = inputs[i].id;
-                $("#" + inputs[i].id).prop('checked', false);
-                specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
-                var arrayValue = "";
-                arrayValue = "<div style =\"display: flex; margin: 0 20px 12px 0;\">";
-                for (i = 0; i < specNames.length; i++) {
-                    var sChip = specNames[i].replace(/ /g, "_");
-                    arrayValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
 
-                    //arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].checked == true && inputs[i].value == selectedChip) {
+                    boxId = inputs[i].id;
+                    $("#" + inputs[i].id).prop('checked', false);
+                    specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
+
+                    specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
+
+                    var specId = boxId.split('-')[1];
+                    specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
                 }
-                arrayValue += "</div>";
-
-                document.getElementById("cc").innerHTML = arrayValue;
-            }
         }
 
-        var specId = boxId.split('-')[1];
-        specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
-        var filterParams = { SpecIds: specIDs, ShapeIds: [] };
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].childNodes[1].childNodes[0].ariaChecked == "true" && elements[i].childNodes[1].childNodes[1].innerHTML == selectedChip) {
+                    boxId = elements[i].dataset.uid;
+                    elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
+                    console.log('hahaha', elements[i].childNodes[1].childNodes[0].ariaChecked);
+                    specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
+                    shapeIDs.indexOf(boxId) === -1 ? shapeIDs.push(boxId) : shapeIDs.splice(shapeIDs.indexOf(boxId), 1);
+                }
+            }
+
+        var arrayValue = "";
+        arrayValue = "<div style =\"display: flex; margin: 0 20px 12px 0;\">";
+        for (i = 0; i < specNames.length; i++) {
+            var sChip = specNames[i].replace(/ /g, "_");
+            arrayValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
+
+            //arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
+        }
+        arrayValue += "</div>";
+        document.getElementById("cc").innerHTML = arrayValue;
+
+
+        var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs };
+        console.log('filterParams', filterParams);
         $.ajax({
              url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
             type: 'POST',
