@@ -113,6 +113,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                     if (shape.Parent != null)
                     {
                         shape.Parent.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Parent.Id).ToList();
+                        shape.Atttributes = shape.Parent.Atttributes;
                     }
                 }
 

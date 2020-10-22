@@ -66,8 +66,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpPost]
         public PartialViewResult FilteredProductsResult([FromBody] FilterParams filterParams)
         {
-            var shapeIds = filterParams.ShapeIds;
-            var specIds = filterParams.SpecIds;
+            var shapeIds = filterParams?.ShapeIds;
+            var specIds = filterParams?.SpecIds;
             if (shapeIds == null)
                 shapeIds = new List<int>();
             if (specIds == null)
