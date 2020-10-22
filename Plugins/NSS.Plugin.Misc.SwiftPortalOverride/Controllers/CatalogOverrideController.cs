@@ -50,7 +50,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     id = shapes[i].Id,
                     pid = shapes[i].ParentId,
                     name = shapes[i].Name,
-                    haschild = childShapes != null && childShapes.Count > 0
+                    hasChild = childShapes != null && childShapes.Count > 0
                 };
                 shapeData.Add(shape);
 
@@ -61,8 +61,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         {
                             id = childShapes[j].Id,
                             pid = childShapes[j].ParentId,
-                            name = childShapes[j].Name,
-                            haschild = false
+                            name = childShapes[j].Name
                         };
                         shapeData.Add(shape);
                     }
@@ -77,7 +76,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             public int id { get; set; }
             public int? pid { get; set; }
             public string name { get; set; }
-            public bool haschild { get; set; }
+            public bool hasChild { get; set; }
         }
 
         [HttpPost]
