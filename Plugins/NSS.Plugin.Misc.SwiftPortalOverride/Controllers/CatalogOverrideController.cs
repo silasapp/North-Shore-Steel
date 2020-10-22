@@ -66,14 +66,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpPost]
         public PartialViewResult FilteredProductsResult([FromBody] FilterParams filterParams)
         {
-            var shapeIds = filterParams.ShapeIds;
-            var specIds = filterParams.SpecIds;
+            var shapeIds = filterParams?.ShapeIds;
+            var specIds = filterParams?.SpecIds;
             if (shapeIds == null)
                 shapeIds = new List<int>();
             if (specIds == null)
                 specIds = new List<int>();
 
-            
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
             return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
