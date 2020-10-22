@@ -11,7 +11,7 @@
 }
 
 @{
-     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
+    var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
 <div class="page home-page">
     <div class="page-body">
@@ -41,7 +41,7 @@
                     @if (groupedSpecificationAttributes != null)
                     {
                         var key = "";
-						@foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
+                        @foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
                         {
                             switch (@group.Key)
                             {
@@ -109,11 +109,21 @@
         catalogProducts([], []);
     });
 
+
     let specNames = [];
     let specIDs = [];
     function nodeCheck(args) {
         var checkedNode = [args.node];
         var treeObj = document.getElementById('treedata').ej2_instances[0];
+        console.log('treeObj.getNodeData(args.node)', treeObj.getNodeData(args.node));
+        var selectedShape = treeObj.getNodeData(args.node);
+        var shapeId = selectedShape.id;
+        var checkedValue = selectedShape.text
+        shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
+        specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
+
+        populateFilteredProductsTable(specIDs, specNames, shapeIDs);
+
         if (args.event.target.classList.contains('e-fullrow') || args.event.key == "Enter") {
             var getNodeDetails = treeObj.getNodeData(args.node);
             if (getNodeDetails.isChecked == 'true') {
@@ -129,14 +139,17 @@
     };
 
     $(document).on("change", "[type=checkbox]", function () {
+
         var specId = event.target.id.split('-')[1]
+        var shapeIDs = [];
         var checkedValue = event.target.defaultValue;
         specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
-        populateFilteredProductsTable(specIDs, specNames, specId, checkedValue)
+        console.log('specIDs', specIDs, 'specNames', specNames, 'shapeIDs', shapeIDs);
+        populateFilteredProductsTable(specIDs, specNames, shapeIDs);
     })
 
-    function populateFilteredProductsTable(specIDs, specNames) {
+    function populateFilteredProductsTable(specIDs, specNames, shapeIDs) {
         $("#overlay").css("display", "flex");
 
 
@@ -152,7 +165,7 @@
 
         document.getElementById("cc").innerHTML = arrayValue;
         $("#overlay").css("display", "flex");
-        var filterParams = { SpecIds: specIDs, ShapeIds : ["16"] };
+        var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs};
 
 
         $.ajax({
