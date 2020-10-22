@@ -30,6 +30,7 @@
     <None Remove="Views\CustomCatalog\Cart.cshtml" />
     <None Remove="Views\CustomCatalog\CustomCatalogIndex.cshtml" />
     <None Remove="Views\CustomCatalog\_FilteredPartialView.cshtml" />
+    <None Remove="Views\CustomShoppingCart\_GiftCardBox.cshtml" />
     <None Remove="Views\CustomTopMenu.cshtml" />
     <None Remove="Views\HomeIndex.cshtml" />
     <None Remove="Views\SelectAccount.cshtml" />
