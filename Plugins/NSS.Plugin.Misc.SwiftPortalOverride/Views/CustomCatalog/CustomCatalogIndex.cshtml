@@ -210,7 +210,7 @@
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i].childNodes[1].childNodes[0].ariaChecked == "true" && elements[i].childNodes[1].childNodes[1].innerHTML == selectedChip) {
                     boxId = elements[i].dataset.uid;
-                    elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
+                    elements[i].childNodes[1].childNodes[0].ariaChecked = false;
                     console.log('hahaha', elements[i].childNodes[1].childNodes[0].ariaChecked);
                     specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
                     shapeIDs.indexOf(boxId) === -1 ? shapeIDs.push(boxId) : shapeIDs.splice(shapeIDs.indexOf(boxId), 1);
