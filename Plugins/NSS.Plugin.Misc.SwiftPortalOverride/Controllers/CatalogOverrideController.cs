@@ -73,8 +73,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (specIds == null)
                 specIds = new List<int>();
 
-            if (shapeIds.Count > 0 || specIds.Count > 0)
-                CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+            
+            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
             return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
 

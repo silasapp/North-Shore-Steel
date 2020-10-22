@@ -7,31 +7,24 @@
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var quantity = 1;
 
-
+    var headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>();
 }
 
 <div id="_prtialview">
-    @if (Model.Products != null)
+    @if (Model.Products != null && Model.Products.Count > 0)
     {
 
         <table class="table table-bordered catalog-table table-striped" id="catalogTable" onload="sortTable(0)">
             <thead>
                 <tr>
-                    @foreach (var item in Model.Products)
+                    @{headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();}
+
+                    @foreach (var it in headerColumns)
                     {
-                        @foreach (var it in item.Shape.Atttributes)
-                        {
-                            <th class="sortable" scope="col" onclick="sortTable(0)">@it.DisplayName</th>
-                            @*<th class="sortable" scope="col" onclick="sortTable(1)">Description </th>
-                                <th class="sortable" scope="col" onclick="sortTable(2)">Grade </th>
-                                <th class="sortable" scope="col" onclick="sortTable(3)">Thickness (in)</th>
-                                <th class="sortable" scope="col" onclick="sortTable(4)">Dimensions (in)</th>
-                                <th class="sortable" scope="col" onclick="sortTable(5)">Weight(Ib)/ft</th>
-                            *@
-                        }
-                        <th class="sortable" scope="col" onclick="sortTable(6)">Quantity</th>
-                        break;
+                        <th class="sortable" scope="col" onclick="sortTable(0)">@it.DisplayName</th>
                     }
+
+                    <th class="sortable" scope="col" onclick="sortTable(6)">Quantity</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,15 +32,11 @@
                 {
                     addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
                     var addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
+
                     <tr>
-                        @foreach (var it in item.Shape.Atttributes)
+                        @foreach (var it in headerColumns)
                         {
                             <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == @it.Code)?.Value</td>
-                            @*<td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "itemName")?.Value</td>
-                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "grade")?.Value</td>
-                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "displayThickness")?.Value</td>
-                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "dimensions")?.Value</td>
-                                <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "displayWeightPerFoot")?.Value</td>*@
                         }
                         <td>
                             <input style="width: 60px" type="number" name="quantity" id="">
@@ -68,10 +57,10 @@
                                     <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
                                 </button>
                             }
-                            <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;" >
+                            <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">
                                 <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
                             </button>
-                            <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;" >
+                            <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">
                                 <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
                             </button>
                         </td>
