@@ -60,7 +60,7 @@
     <Content Include="Views\Confirmation.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\CustomCatalog\Cart.cshtml">
+    <Content Include="Views\CustomShoppingCart\Cart.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\CustomCatalog\_FilteredPartialView.cshtml">
