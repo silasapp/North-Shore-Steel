@@ -114,26 +114,19 @@
     let specIDs = [];
     let shapeIDs = [];
     function nodeCheck(args) {
-        var checkedNode = [args.node];
+        if (event.which === 3 && event.button === 2) {
+            return;
+        }
 
+        var checkedNode = [args.node];
+        console.log(args, 'checkedNode', checkedNode);
         var treeObj = document.getElementById('treedata').ej2_instances[0];
-        console.log('checkedNode', checkedNode);
         var selectedShape = treeObj.getNodeData(args.node);
         var shapeId = selectedShape.id;
         var checkedValue = selectedShape.text
         shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
         specNames.indexOf(checkedValue) === -1 ? specNames.push(checkedValue) : specNames.splice(specNames.indexOf(checkedValue), 1);
         populateFilteredProductsTable(specIDs, specNames, shapeIDs);
-
-        //if (args.event.target.classList.contains('e-fullrow') || args.event.key == "Enter") {
-        //    var getNodeDetails = treeObj.getNodeData(args.node);
-        //    console.log(treeObj, 'treeObj', checkedNode, 'checkedNode')
-        //    if (getNodeDetails.isChecked == 'true') {
-        //        treeObj.uncheckAll();
-        //    } else {
-        //        treeObj.checkAll(checkedNode);
-        //    }
-        //}
     }
 
     function catalogProducts(specIDs, specNames, shapeIDs) {
@@ -159,8 +152,6 @@
         for (i = 0; i < specNames.length; i++) {
             var sChip = specNames[i].replace(/ /g, "_");
             arrayValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
-
-      //arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
         }
         arrayValue += "</div>";
 
@@ -174,14 +165,14 @@
             type: 'POST',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(filterParams),
-            success: function (data, textStatus, XMLHttpRequest) {
+            success: function (data) {
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
                     $('#prtialview').html(data)
                 }
             },
-            error: function (xhr, ajaxOptions, thrownError) {
+            error: function (xhr, thrownError) {
                 console.log(thrownError, 'datadata-error', xhr);
                 $('#prtialview').html('an error has occured here')
                 $("#overlay").css("display", "none");
@@ -213,7 +204,8 @@
                     boxId = elements[i].dataset.uid;
                     var checkedNode = elements[i];
                     var treeObj = document.getElementById('treedata').ej2_instances[0];
-                    treeObj.uncheckAll();
+                    // treeObj.uncheckAll(checkedNode);
+                    treeObj.checkNode();
                     console.log('treeObj', checkedNode);
                     elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
                     specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
