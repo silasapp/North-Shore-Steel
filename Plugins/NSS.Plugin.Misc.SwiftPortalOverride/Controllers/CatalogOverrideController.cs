@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
-    public partial class CatalogOverrideController : Controller
+    public partial class CatalogOverrideController : BasePublicController
     {
         private readonly ICatalogModelFactory _catalogModelFactory;
 
@@ -43,7 +43,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (shapes != null && shapes.Count > 0)
             {
-                var prodShapeIds = CatalogModel.Products.Select(x => Convert.ToInt32(x.ProductCustomAttributes.FirstOrDefault(y => y.Key == "shapeId")?.Value));
+                var prodShapeIds = CatalogModel.Products.Select(x => Convert.ToInt32(x.ProductCustomAttributes.FirstOrDefault(y => y.Key == "shapeId")?.Value)).Distinct();
 
                 shapes = shapes.Where(x => prodShapeIds.Contains(x.Id)).ToList();
             }
