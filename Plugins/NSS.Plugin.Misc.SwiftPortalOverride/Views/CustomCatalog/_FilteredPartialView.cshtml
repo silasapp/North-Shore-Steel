@@ -1,75 +1,98 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.DropDowns
+
 @model CatalogModel
 @using Nop.Core.Domain.Orders
 @{
     //prepare "Add to cart" AJAX link
     var addtocartlink = "";
+    var addtowishlistlink = "";
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var quantity = 1;
+    var mtr = "";
+    var sawOption = false;
 
     var headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>();
 }
 
-<div id="_prtialview" table-responsive style="height: 30rem; overflow-y: scroll;">
-    @if (Model.Products != null && Model.Products.Count > 0)
+
+@{List<object> ObjectData = new List<object>(); }
+
+
+@if (Model.Products != null && Model.Products.Count > 0)
+{
+    headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();
+
+    @foreach (var item in Model.Products)
     {
+        //addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
+        //addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
+        //mtr = item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value;
+        //sawOption = item.Shape.SawOption;
 
-        <table class="table table-bordered catalog-table table-striped" id="catalogTable" onload="sortTable(0)">
-            <thead>
-                <tr>
-                    @{headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();}
+        var productRowData = new Dictionary<string, string>();
 
-                    @foreach (var it in headerColumns)
-                    {
-                        <th class="sortable" scope="col" onclick="sortTable(0)">@it.DisplayName</th>
-                    }
+        @foreach (var it in headerColumns)
+        {
+            productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Code)?.Value);
 
-                    <th class="sortable" scope="col" onclick="sortTable(6)">Quantity</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Products)
-                {
-                    addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
-                    var addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
-
-                    <tr>
-                        @foreach (var it in headerColumns)
-                        {
-                            <td>@item.ProductCustomAttributes.FirstOrDefault(x => x.Key == @it.Code)?.Value</td>
-                        }
-                        <td>
-                            <input style="width: 60px" type="number" name="quantity" id="">
-                        </td>
-                        <td style="text-align:left">
-                            @{
-                                var mtr = item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value;
-                            }
-                            @if (!string.IsNullOrEmpty(mtr))
-                            {
-                                <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
-                                    <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
-                                </a>
-                            }
-                            @if (item.Shape.SawOption)
-                            {
-                                <button class="table-action-button">
-                                    <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
-                                </button>
-                            }
-                            <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">
-                                <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
-                            </button>
-                            <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">
-                                <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
-                            </button>
-                        </td>
-                    </tr>
-
-                }
-            </tbody>
-        </table>
+        }
+        ObjectData.Add(productRowData);
     }
 
 
-</div>
+    <div id="_prtialview">
+        <div class="control-section">
+            @Html.EJS().Grid("Grid").DataSource((IEnumerable<object>)ObjectData).Columns(col =>
+       {
+           foreach (var it in headerColumns)
+           {
+               col.Field(it.DisplayName).Width("150").Add();
+           }
+           col.Field("Quantity").HeaderText("Quantity").Template("#quantity-template").Width("150").AllowFiltering(false).Add();
+           col.Field("Options").Template("#option-template").AllowFiltering(false).Add();
+
+       }).AllowPaging(true).AllowSorting(true).AllowFiltering(true).PageSettings(page => page.PageSize(10)).Render()
+        </div>
+
+    </div>
+}
+
+<script id="quantity-template" type="text/x-template">
+    <input style="width: 60px" type="number" name="quantity" id="">
+</script>
+
+<script id="option-template" type="text/x-template">
+    @{var count = 0; }
+    @foreach (var item in Model.Products)
+    {
+        addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
+        addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
+        mtr = item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value;
+
+        @if (!string.IsNullOrEmpty(mtr))
+        {
+            <a class="table-action-button" style="text-decoration:none" href="" target="_blank">
+                <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+            </a>
+        }
+
+        @if (item.Shape.SawOption)
+        {
+            <button class="table-action-button">
+                <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+            </button>
+        }
+
+        <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">
+            <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+        </button>
+        <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">
+            <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+        </button>
+        count++;
+    }
+</script>
+
+<ejs-scripts></ejs-scripts>
