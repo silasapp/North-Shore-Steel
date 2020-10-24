@@ -21,6 +21,9 @@
 
 @if (Model.Products != null && Model.Products.Count > 0)
 {
+    // check if shape is selceted or not
+    // hsapeid
+    //
     headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();
 
     @foreach (var item in Model.Products)
@@ -37,6 +40,12 @@
             productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Code)?.Value);
 
         }
+
+
+
+        productRowData.Add("_itemId", item.Id.ToString());
+        productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
+
         ObjectData.Add(productRowData);
     }
 
@@ -47,7 +56,11 @@
        {
            foreach (var it in headerColumns)
            {
-               col.Field(it.DisplayName).Width("150").Add();
+               if (!it.DisplayName.StartsWith("_"))
+               {
+
+                col.Field(it.DisplayName).Width("150").Add();
+               }
            }
            col.Field("Quantity").HeaderText("Quantity").Template("#quantity-template").Width("150").AllowFiltering(false).Add();
 
@@ -65,31 +78,30 @@
 </script>
 
 
+
+
 <script id="option-template" type="text/x-template">
-    @{count++; }
-    @{var ite = Model.Products[1]; }
-    @{addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = ite.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }); }
-    @{var addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = ite.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });}
-    @{mtr = ite.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value;}
+    ${if(_mtr)}
+    <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
+        <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+    </a>
+    ${else}
+    No MTR
+    ${/if}
 
-    @if (!string.IsNullOrEmpty(mtr))
-    {
-        <a class="table-action-button" style="text-decoration:none" href="" target="_blank">
+    @*<a class="table-action-button" style="text-decoration:none" href="" target="_blank">
             <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
-        </a>
-    }
+        </a>*@
 
-    @if (ite.Shape.SawOption)
-    {
-        <button class="table-action-button">
-            <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
-        </button>
-    }
+    <button class="table-action-button">
+        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+    </button>
 
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">
+
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog();return false;">
         <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
     </button>
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog();return false;">
         <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
     </button>
 </script>
