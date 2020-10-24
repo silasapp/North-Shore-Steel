@@ -210,6 +210,8 @@
         var selectedChip = event.target.alt;
         var inputs = document.querySelectorAll("input[type='checkbox']");
         var elements = $('li.e-list-item');
+        var shapeButtons = $('.e-frame.e-icons.e-check');
+        shapeButtons.removeClass("e-check");
         selectedChip = selectedChip.replace(/_/g, " ");
 
             for (var i = 0; i < inputs.length; i++) {
@@ -228,25 +230,32 @@
                     boxId = elements[i].dataset.uid;
                     var checkedNode = elements[i];
                     var treeObj = document.getElementById('treedata').ej2_instances[0];
-                    // treeObj.uncheckAll(checkedNode);
-                    treeObj.checkNode();
-                    console.log('treeObj', checkedNode);
                     elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
-                    specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
+                    shapeNames.indexOf(selectedChip) === -1 ? shapeNames.push(selectedChip) : shapeNames.splice(shapeNames.indexOf(selectedChip), 1);
                     shapeIDs.indexOf(boxId) === -1 ? shapeIDs.push(boxId) : shapeIDs.splice(shapeIDs.indexOf(boxId), 1);
                 }
             }
 
-        var arrayValue = "";
-        arrayValue = "<div style =\"display: flex; margin: 0 20px 12px 0;\">";
+        var specValue = "";
+        specValue = "<div style =\"display: flex; margin: 0 0 12px 0;\">";
         for (i = 0; i < specNames.length; i++) {
             var sChip = specNames[i].replace(/ /g, "_");
-            arrayValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
-
-            //arrayValue += "<div class=\"chip\">" + specNames[i] + "<span class=\"chip-closebtn\" style=\"cursor:pointer\" name=" + sChip + " onclick=doSomething()>×</span></div>";
+            specValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
         }
-        arrayValue += "</div>";
-        document.getElementById("cc").innerHTML = arrayValue;
+        specValue += "</div>";
+
+        document.getElementById("specs").innerHTML = specValue;
+
+
+        var shapeValue = "";
+        shapeValue = "<div style =\"display: flex; margin: 0 20px 12px 0;\">";
+        for (i = 0; i < shapeNames.length; i++) {
+            var sChip = shapeNames[i].replace(/ /g, "_");
+            shapeValue += "<span class=\"filter-tag\">" + shapeNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
+        }
+        shapeValue += "</div>";
+
+        document.getElementById("shapes").innerHTML = shapeValue;
 
 
         var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs };
