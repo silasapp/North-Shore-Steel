@@ -19,47 +19,52 @@
 @if (Model.Products != null && Model.Products.Count > 0)
 {
 
-    headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();
+    if (Model.FilterParams.ShapeIds.Count > 0)
+    {
+        headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();
 
-    if (Model.FilterParams.ShapeIds.Count == 0)
+    }
+    else
     {
         headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>()
 {
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "itemNo",
-                DisplayName = "Item #"
+                DisplayName = "Item #",
+                Sort = "itemNo"
             },
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "itemName",
-                DisplayName = "Description"
+                DisplayName = "Description",
+                Sort = "itemName"
             },
-             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "displayHeight",
-                DisplayName = "Height (in)"
+                DisplayName = "Height (in)",
+                Sort = "height"
             },
-              new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "displayLength",
-                DisplayName = "Length (ft)"
+                DisplayName = "Length (ft)",
+                Sort = "length"
             },
-               new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "weightPerFoot",
-                DisplayName = "Weight (lb)/ ft"
+                DisplayName = "Weight (lb)/ ft",
+                Sort = "weight"
             },
-                new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "quantity",
-                DisplayName = "Qty"
+                DisplayName = "Qty",
+                Sort = "qunatity"
             }
         };
-    }
-    else
-    {
-        headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();
 
     }
 
@@ -97,7 +102,7 @@
            }
            col.Field("Quantity").HeaderText("Quantity").Template("#quantity-template").Width("150").AllowFiltering(false).Add();
 
-           col.Field("Options").Template("#options-template").AllowFiltering(false).Add();
+           col.Field("Options").Template("#options-template").Width("150").AllowFiltering(false).Add();
 
        }).AllowPaging(true).AllowSorting(true).AllowFiltering(true).PageSettings(page => page.PageSize(10)).Render()
 
