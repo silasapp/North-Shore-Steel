@@ -27,6 +27,7 @@ using Nop.Services.Tax;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
 using Nop.Web.Factories;
+using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Models.ShoppingCart;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
@@ -121,6 +122,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #endregion
 
+        [HttpsRequirement]
         public override IActionResult Cart()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
@@ -129,7 +131,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
             var model = new ShoppingCartModel();
             model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart);
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomShoppingCart/Cart.cshtml", model);
+            return View(model);
         }
 
 
