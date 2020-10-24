@@ -7,11 +7,10 @@
 @{
     //prepare "Add to cart" AJAX link
     var addtocartlink = "";
-    var addtowishlistlink = "";
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var quantity = 1;
     var mtr = "";
-    var sawOption = false;
+    var count = 0;
 
     var headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>();
 }
@@ -51,9 +50,11 @@
                col.Field(it.DisplayName).Width("150").Add();
            }
            col.Field("Quantity").HeaderText("Quantity").Template("#quantity-template").Width("150").AllowFiltering(false).Add();
+
            col.Field("Options").Template("#option-template").AllowFiltering(false).Add();
 
        }).AllowPaging(true).AllowSorting(true).AllowFiltering(true).PageSettings(page => page.PageSize(10)).Render()
+
         </div>
 
     </div>
@@ -63,36 +64,35 @@
     <input style="width: 60px" type="number" name="quantity" id="">
 </script>
 
+
 <script id="option-template" type="text/x-template">
-    @{var count = 0; }
-    @foreach (var item in Model.Products)
+    @{count++; }
+    @{var ite = Model.Products[1]; }
+    @{addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = ite.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }); }
+    @{var addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = ite.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });}
+    @{mtr = ite.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value;}
+
+    @if (!string.IsNullOrEmpty(mtr))
     {
-        addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
-        addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
-        mtr = item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value;
-
-        @if (!string.IsNullOrEmpty(mtr))
-        {
-            <a class="table-action-button" style="text-decoration:none" href="" target="_blank">
-                <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
-            </a>
-        }
-
-        @if (item.Shape.SawOption)
-        {
-            <button class="table-action-button">
-                <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
-            </button>
-        }
-
-        <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">
-            <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
-        </button>
-        <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">
-            <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
-        </button>
-        count++;
+        <a class="table-action-button" style="text-decoration:none" href="" target="_blank">
+            <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+        </a>
     }
+
+    @if (ite.Shape.SawOption)
+    {
+        <button class="table-action-button">
+            <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+        </button>
+    }
+
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;">
+        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+    </button>
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;">
+        <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+    </button>
 </script>
+@*<script>alert("@count");</script>*@
 
 <ejs-scripts></ejs-scripts>
