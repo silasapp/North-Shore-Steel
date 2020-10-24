@@ -28,11 +28,6 @@
 
     @foreach (var item in Model.Products)
     {
-        //addtocartlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
-        //addtowishlistlink = Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
-        //mtr = item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value;
-        //sawOption = item.Shape.SawOption;
-
         var productRowData = new Dictionary<string, string>();
 
         @foreach (var it in headerColumns)
@@ -41,10 +36,12 @@
 
         }
 
-
-
         productRowData.Add("_itemId", item.Id.ToString());
         productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
+        productRowData.Add("_sawOption", item.Shape.SawOption.ToString());
+        productRowData.Add("_addtocartlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }));
+        productRowData.Add("_addtowishlistlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity }));
+
 
         ObjectData.Add(productRowData);
     }
@@ -58,8 +55,7 @@
            {
                if (!it.DisplayName.StartsWith("_"))
                {
-
-                col.Field(it.DisplayName).Width("150").Add();
+                    col.Field(it.DisplayName).Width("150").Add();
                }
            }
            col.Field("Quantity").HeaderText("Quantity").Template("#quantity-template").Width("150").AllowFiltering(false).Add();
@@ -85,23 +81,18 @@
     <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
         <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
     </a>
-    ${else}
-    No MTR
     ${/if}
 
-    @*<a class="table-action-button" style="text-decoration:none" href="" target="_blank">
-            <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
-        </a>*@
-
+    ${if(_sawOption == "True")}
     <button class="table-action-button">
         <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
     </button>
+    ${/if}
 
-
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog();return false;">
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(" ${_addtocartlink}");return false;">
         <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
     </button>
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog();return false;">
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(" ${_addtowishlistlink}");return false;">
         <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
     </button>
 </script>
