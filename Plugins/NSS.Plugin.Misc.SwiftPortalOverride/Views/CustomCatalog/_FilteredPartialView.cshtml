@@ -1,6 +1,5 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Syncfusion.EJ2
-@using Syncfusion.EJ2.DropDowns
 
 @model CatalogModel
 @using Nop.Core.Domain.Orders
@@ -18,11 +17,9 @@
 
 @if (Model.Products != null && Model.Products.Count > 0)
 {
-
     if (Model.FilterParams.ShapeIds.Count > 0)
     {
         headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();
-
     }
     else
     {
@@ -52,11 +49,6 @@
             {
                 Code = "weightPerFoot",
                 DisplayName = "Weight (lb)/ ft"
-            },
-            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
-            {
-                Code = "quantity",
-                DisplayName = "Qty"
             }
         };
 
@@ -69,7 +61,6 @@
         @foreach (var it in headerColumns)
         {
             productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Code)?.Value);
-
         }
 
         productRowData.Add("_itemId", item.Id.ToString());
@@ -78,39 +69,37 @@
         productRowData.Add("_addtocartlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }));
         productRowData.Add("_addtowishlistlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity }));
 
-
         ObjectData.Add(productRowData);
     }
 
 
-    <div id="_prtialview">
+    <div id="_partialview">
         <div class="control-section">
-            @Html.EJS().Grid("Grid").DataSource((IEnumerable<object>)ObjectData).Columns(col =>
-       {
-           foreach (var it in headerColumns)
-           {
-               if (!it.DisplayName.StartsWith("_"))
-               {
-                    col.Field(it.DisplayName).Width("150").Add();
-               }
-           }
-           col.Field("Quantity").HeaderText("Quantity").Template("#quantity-template").Width("150").AllowFiltering(false).Add();
+            <ejs-grid id="Grid" allowFiltering="true" allowResizing="true" allowSorting="true" dataSource=ObjectData width="auto" height="359">
+                <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+                <e-grid-columns>
+                    @foreach (var it in headerColumns)
+                    {
+                        if (!it.DisplayName.StartsWith("_"))
+                        {
+                            <e-grid-column field=@it.DisplayName filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="120"></e-grid-column>
+                        }
+                    }
+                    <e-grid-column field="Quantity" headerText="Qty" allowFiltering="false" allowSorting="false" template="#quantityTemplate" width="100"></e-grid-column>
+                    <e-grid-column field="Options" headerText="" allowFiltering="false" allowSorting="false" template="#optionsTemplate" width="120"></e-grid-column>
 
-           col.Field("Options").Template("#options-template").Width("150").AllowFiltering(false).Add();
-
-       }).AllowPaging(true).AllowSorting(true).AllowFiltering(true).PageSettings(page => page.PageSize(10)).Render()
-
+                </e-grid-columns>
+            </ejs-grid>
         </div>
-
     </div>
+
 }
 
-<script id="quantity-template" type="text/x-template">
-    <input style="width: 60px" type="number" name="quantity" id="">
+<script id="quantityTemplate" type="text/x-template">
+    <input style="width: 40px" type="number" name="quantity" id="">
 </script>
 
-
-<script id="options-template" type="text/x-template">
+<script id="optionsTemplate" type="text/x-template">
     ${if(_mtr)}
     <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
         <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
@@ -123,12 +112,13 @@
     </button>
     ${/if}
 
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(" ${_addtocartlink}");return false;">
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(`${_addtocartlink}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
     </button>
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(" ${_addtowishlistlink}");return false;">
+    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(`${_addtowishlistlink}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
     </button>
 </script>
+
 
 <ejs-scripts></ejs-scripts>

@@ -31,10 +31,10 @@
                                 SHAPES
                             </a>
                         </div>
-                        <div id="collapseOne" class="collapse">
+                        <div id="collapseOne" class="collapse show">
                             <div class="">
                                 <ejs-treeview id="treedata" showCheckBox="true" nodeClicked="nodeCheck">
-                                    <e-treeview-fields dataSource="@ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded" selected="is_selected"></e-treeview-fields>
+                                    <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
                                 </ejs-treeview>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                                 </div>
                                 @foreach (var item in group)
                                 {
-                                    <div id="collapse-@index" class="collapse">
+                                    <div id="collapse-@index" class="collapse show">
                                         <div class="card-body">
                                             <label class="pure-material-checkbox">
                                                 <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="col-sm-9">
-                <div id="prtialview"></div>
+                <div id="partialview"></div>
             </div>
         </div>
     </div>
@@ -117,27 +117,27 @@
     let specIDs = [];
     let shapeIDs = [];
     function nodeCheck(args) {
-        if (event.which === 3 && event.button === 2) {
-            return;
-        }
-
         var checkedNode = [args.node];
         var treeObj = document.getElementById('treedata').ej2_instances[0];
         var getNodeDetails = treeObj.getNodeData(args.node);
+
         if (getNodeDetails.isChecked == 'true') {
             treeObj.uncheckAll();
             shapeIDs = [];
             shapeNames = [];
             treeObj.checkAll(checkedNode);
-        } else {
+            if (getNodeDetails.hasChildren) {
+                treeObj.uncheckAll();
+                $(args.node.children[1].childNodes[1]).find('span:nth-child(2)').addClass("e-check");
         }
 
-        var selectedShape = treeObj.getNodeData(args.node);
-        var shapeId = selectedShape.id;
-        var checkedValue = selectedShape.text
-        shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
-        shapeNames.indexOf(checkedValue) === -1 ? shapeNames.push(checkedValue) : shapeNames.splice(shapeNames.indexOf(checkedValue), 1);
-        populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
+            var selectedShape = treeObj.getNodeData(args.node);
+            var shapeId = selectedShape.id;
+            var checkedValue = selectedShape.text
+            shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
+            shapeNames.indexOf(checkedValue) === -1 ? shapeNames.push(checkedValue) : shapeNames.splice(shapeNames.indexOf(checkedValue), 1);
+            populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
+        } else {}
     }
 
     function catalogProducts(specIDs, specNames, shapeIDs, shapeNames) {
@@ -193,12 +193,12 @@
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
-                    $('#prtialview').html(data)
+                    $('#partialview').html(data)
                 }
             },
             error: function (xhr, thrownError) {
                 console.log(thrownError, 'datadata-error', xhr);
-                $('#prtialview').html('an error has occured here')
+                $('#partialview').html('an error has occured here')
                 $("#overlay").css("display", "none");
             }
         });
@@ -269,64 +269,16 @@
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
-                    $('#prtialview').html(data)
+                    $('#partialview').html(data)
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 console.log(thrownError, 'datadata-error', xhr);
-                $('#prtialview').html('an error has occured here')
+                $('#partialview').html('an error has occured here')
                 $("#overlay").css("display", "none");
             }
         });
     }
-
-    var $sortable = $('.sortable');
-    $sortable.on('click', function () {
-        var $this = $(this);
-        var asc = $this.hasClass('asc');
-        var desc = $this.hasClass('desc');
-        $sortable.removeClass('asc').removeClass('desc');
-        if (desc || (!asc && !desc)) {
-            $this.addClass('asc');
-        } else {
-            $this.addClass('desc');
-        }
-
-    });
-    $(function () {
-        $('table')
-            .on('click', 'th', function () {
-                var index = $(this).index(),
-                    rows = [],
-                    thClass = $(this).hasClass('asc') ? 'desc' : 'asc';
-
-                $('#catalogTable th').removeClass('asc desc');
-                $(this).addClass(thClass);
-
-                $('#catalogTable tbody tr').each(function (index, row) {
-                    rows.push($(row).detach());
-                });
-
-                rows.sort(function (a, b) {
-                    var aValue = $(a).find('td').eq(index).text(),
-                        bValue = $(b).find('td').eq(index).text();
-
-                    return aValue > bValue
-                        ? 1
-                        : aValue < bValue
-                            ? -1
-                            : 0;
-                });
-
-                if ($(this).hasClass('desc')) {
-                    rows.reverse();
-                }
-
-                $.each(rows, function (index, row) {
-                    $('#catalogTable tbody').append(row);
-                });
-            });
-    });
-
+    
 </script>
 <ejs-scripts></ejs-scripts>
