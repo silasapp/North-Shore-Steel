@@ -31,7 +31,7 @@
                                 SHAPES
                             </a>
                         </div>
-                        <div id="collapseOne" class="collapse">
+                        <div id="collapseOne" class="collapse show">
                             <div class="">
                                 <ejs-treeview id="treedata" showCheckBox="true" nodeClicked="nodeCheck">
                                     <e-treeview-fields dataSource="@ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded" selected="is_selected"></e-treeview-fields>
@@ -79,7 +79,7 @@
                                 </div>
                                 @foreach (var item in group)
                                 {
-                                    <div id="collapse-@index" class="collapse">
+                                    <div id="collapse-@index" class="collapse show">
                                         <div class="card-body">
                                             <label class="pure-material-checkbox">
                                                 <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="col-sm-9">
-                <div id="prtialview"></div>
+                <div id="partialview"></div>
             </div>
         </div>
     </div>
@@ -193,12 +193,12 @@
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
-                    $('#prtialview').html(data)
+                    $('#partialview').html(data)
                 }
             },
             error: function (xhr, thrownError) {
                 console.log(thrownError, 'datadata-error', xhr);
-                $('#prtialview').html('an error has occured here')
+                $('#partialview').html('an error has occured here')
                 $("#overlay").css("display", "none");
             }
         });
@@ -269,12 +269,12 @@
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
-                    $('#prtialview').html(data)
+                    $('#partialview').html(data)
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 console.log(thrownError, 'datadata-error', xhr);
-                $('#prtialview').html('an error has occured here')
+                $('#partialview').html('an error has occured here')
                 $("#overlay").css("display", "none");
             }
         });
