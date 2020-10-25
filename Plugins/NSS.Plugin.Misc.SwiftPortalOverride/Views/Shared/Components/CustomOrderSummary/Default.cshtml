@@ -11,12 +11,6 @@
 @inject OrderSettings orderSettings
 @inject IGenericAttributeService genericAttributeService
 
-@{ static string DoFormat(double myNumber)
-    {
-        var s = string.Format("{0:0.00}", myNumber);
-
-        return s;
-    }}
 
 <div class="order-summary-content">
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
@@ -55,8 +49,8 @@
                             <th scope="col">Customer Part #</th>
                             <th scope="col">Unit Price</th>
                             <th scope="col">Total Price</th>
-                            <th scope="col">Total Weight</th>
-                            <th scope="col">Total Length</th>
+                            <th scope="col">Weight</th>
+                            <th scope="col">Length</th>
                             <th scope="col">Order Qty</th>
                             <th scope="col">Notes</th>
                             <th scope="col">Remove</th>
@@ -66,7 +60,7 @@
                         @foreach (var item in Model.Items)
                         {
                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value ?? attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value ?? attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                             var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
                             var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
                             var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
@@ -75,7 +69,7 @@
 
 
                             <tr>
-                                <td>@(attr.FirstOrDefault(x => x.Key == "itemNo")?.Value ?? attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value)</td>
+                                <td>@(itemNo)</td>
                                 <td>@item.ProductName</td>
                                 <td>
                                     <input style="width: 100px;height: 30px;" type="text" name="customer-part" id="">
@@ -83,11 +77,11 @@
                                 <td>
                                     @{unitPrice = !string.IsNullOrEmpty(pricePerPiece) ? pricePerPiece : !string.IsNullOrEmpty(pricePerCWT) ? pricePerCWT : !string.IsNullOrEmpty(pricePerFt) ? pricePerFt : unitPrice; }
 
-                                    <input style="width: 100px;height: 30px;" disabled type="text" name="unit-price" id="unitprice@(item.Id)" value="$@(DoFormat(Convert.ToDouble(unitPrice)))">
+                                    <input style="width: 100px;height: 30px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="$@(DoFormat(Convert.ToDouble(unitPrice)))">
                                     <select name="itemunit@(item.Id)" id="itemunit@(item.Id)" style="height: 30px;" onchange="toggleUnitPrice(@item.Id, @pricePerCWT, @pricePerPiece, @pricePerFt, )">
                                         @if (!string.IsNullOrEmpty(pricePerPiece))
                                         {
-                                            <option value="CP">CP</option>
+                                            <option value="EA">EA</option>
                                         }
                                         @if (!string.IsNullOrEmpty(pricePerCWT))
                                         {
@@ -95,17 +89,15 @@
                                         }
                                         @if (!string.IsNullOrEmpty(pricePerFt))
                                         {
-                                            <option value="CFT">CFT</option>
+                                            <option value="FT">FT</option>
                                         }
                                     </select>
                                 </td>
+                                <td id="itemsubtotal@(item.Id)"> @item.SubTotal </td>
+                                <td id="itemweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00") </td>
+                                <td id="itemlength@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00") </td>
                                 <td>
-                                    <span class="product-subtotal">@item.SubTotal</span>
-                                </td>
-                                <td id="itemtotalweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight * Convert.ToDouble(item.Quantity)) : "0.00") </td>
-                                <td id="itemtotallengtht@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length * Convert.ToDouble(item.Quantity)) : "0.00") </td>
-                                <td>
-                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" />
+                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice(@item.Id)" />
                                     @*<input style="width: 100px" type="number" name="quantity" id="">*@
                                 </td>
                                 <td style="text-align:center">
@@ -277,31 +269,53 @@
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
 </div>
 
+@functions{
+    string DoFormat(double myNumber)
+    {
+        var s = string.Format("{0:0.00}", myNumber);
+
+        return s;
+    }
+}
+
 <script>
     function calculateItemTotalPrice(itemId) {
         var qty = parseInt(document.getElementById('itemquantity' + itemId).value, 10);
         var itemUnit = document.getElementById('itemunit' + itemId).value;
-        var unitPrice = parseFloat(document.getElementById('unitprice' + itemId).value);
-        var totalLengthCol = document.getElementById('totallength' + itemId);
-        var totalWeightCol = document.getElementById('totalWeight' + itemId);
-        var totalPrice = "0.00"
-        switch (switch_on) {
+        var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).value.replace(/\$/g, ''));
+        var length = parseFloat(document.getElementById('itemlength' + itemId).innerHTML);
+        var weight = parseFloat(document.getElementById('itemweight' + itemId).innerHTML);
+        var subtotal = document.getElementById('itemsubtotal' + itemId);
+        var totalPrice = 0.00;
+
+        switch (itemUnit) {
+            case 'EA':
+                totalPrice = qty * unitPrice;
+                break;
+            case 'FT':
+                totalPrice = qty * unitPrice * length;
+                break;
+            case 'CWT':
+                totalPrice = (weight / 100) * qty * unitPrice;
+                break;
 
             default:
+                break;
         }
 
-        result.innerHTML = myResult;
+        subtotal.innerHTML = `$${totalPrice.toFixed(2)}`;
     }
 
     function toggleUnitPrice(itemId, weightPrice, piecePrice, ftPrice) {
+        debugger;
         var itemUnit = document.getElementById('itemunit' + itemId).value;
-        var unitPriceCtrl = document.getElementById('unitprice' + itemId);
-        var unitPrice = "0.00";
+        var unitPriceCtrl = document.getElementById('itemunitprice' + itemId);
+        var unitPrice = 0.00;
         switch (itemUnit) {
-            case "CP":
+            case "EA":
                 unitPrice = Number(piecePrice).toFixed(2);
                 break;
-            case "CFT":
+            case "FT":
                 unitPrice = Number(weightPrice).toFixed(2);
                 break;
             case "CWT":
@@ -311,9 +325,6 @@
                 break;
         }
 
-        console.log("unitprice", unitPrice);
-        console.log("unit", itemUnit);
-        console.log("itemId", itemId);
-        unitPriceCtrl.value = `$${unitPrice}`;
+        calculateItemTotalPrice(itemId);
     }
 </script>
