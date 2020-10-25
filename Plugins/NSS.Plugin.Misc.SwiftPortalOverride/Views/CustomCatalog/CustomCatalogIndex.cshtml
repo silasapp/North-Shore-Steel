@@ -104,18 +104,20 @@
         <div class="spinner"></div>
     </div>
 </div>
+
 <script>
 
     $(document).ready(function () {
-        catalogProducts([], [], [], []);
+        populateFilteredProductsTable([],[],[],[]);
     });
-
-
 
     let specNames = [];
     let shapeNames = [];
     let specIDs = [];
     let shapeIDs = [];
+
+
+
     function nodeCheck(args) {
         var checkedNode = [args.node];
         var treeObj = document.getElementById('treedata').ej2_instances[0];
@@ -129,20 +131,27 @@
             if (getNodeDetails.hasChildren) {
                 treeObj.uncheckAll();
                 $(args.node.children[1].childNodes[1]).find('span:nth-child(2)').addClass("e-check");
-        }
-
+            }
             var selectedShape = treeObj.getNodeData(args.node);
             var shapeId = selectedShape.id;
             var checkedValue = selectedShape.text
             shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
             shapeNames.indexOf(checkedValue) === -1 ? shapeNames.push(checkedValue) : shapeNames.splice(shapeNames.indexOf(checkedValue), 1);
             populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
-        } else {}
+
+
+        } else {
+            var shapeButtons = $('.e-frame.e-icons.e-check');
+            if (shapeButtons.length == 0) {
+                shapeIDs = [];
+                shapeNames = [];
+                populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
+
+            }
+
+        }
     }
 
-    function catalogProducts(specIDs, specNames, shapeIDs, shapeNames) {
-        populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
-    };
 
     $(document).on("change", "[type=checkbox]", function () {
 
@@ -279,6 +288,6 @@
             }
         });
     }
-    
+
 </script>
 <ejs-scripts></ejs-scripts>
