@@ -11,8 +11,10 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
+using Syncfusion.EJ2.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +41,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
-            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.Shapes;
+            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.Shapes.OrderBy(s => s.Name).ToList();
 
             if (shapes != null && shapes.Count > 0)
             {
