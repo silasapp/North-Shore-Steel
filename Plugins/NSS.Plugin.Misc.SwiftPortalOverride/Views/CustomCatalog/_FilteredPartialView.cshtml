@@ -1,4 +1,5 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using NSS.Plugin.Misc.SwiftPortalOverride
 @using Syncfusion.EJ2
 
 @model CatalogModel
@@ -7,8 +8,9 @@
     //prepare "Add to cart" AJAX link
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var quantity = 1;
-
+    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
     var headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>();
+    var ERPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == ERPComId);
 }
 
 @{List<object> ObjectData = new List<object>(); }
@@ -71,6 +73,7 @@
         productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
         productRowData.Add("_sawOption", item.Shape.SawOption.ToString());
         productRowData.Add("_addtocartlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }));
+        productRowData.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString());
         productRowData.Add("_addtowishlistlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity }));
 
         ObjectData.Add(productRowData);
@@ -115,10 +118,11 @@
         <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
     </button>
     ${/if}
-
+    ${if(_eRPCompanyIdExist == "True")}
     <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(`${_addtocartlink}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
     </button>
+    ${/if}
     <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(`${_addtowishlistlink}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
     </button>
