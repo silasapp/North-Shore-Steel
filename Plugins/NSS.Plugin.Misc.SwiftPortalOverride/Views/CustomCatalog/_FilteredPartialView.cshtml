@@ -9,6 +9,7 @@
 @{
     //prepare "Add to cart" AJAX link
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+    var wishListShoppingCartId = (int)ShoppingCartType.Wishlist;
     var quantity = 1;
     int customerId = workContext.CurrentCustomer.Id;
     string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
@@ -76,9 +77,9 @@
         productRowData.Add("_itemId", item.Id.ToString());
         productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
         productRowData.Add("_sawOption", item.Shape.SawOption.ToString());
-        productRowData.Add("_addtocartlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }));
+        //productRowData.Add("_addtocartlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }));
         productRowData.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString());
-        productRowData.Add("_addtowishlistlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity }));
+        //productRowData.Add("_addtowishlistlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity }));
 
         ObjectData.Add(productRowData);
     }
@@ -86,7 +87,7 @@
 
     <div id="_partialview">
         <div class="control-section">
-            <ejs-grid id="GridOverview" allowFiltering="true" allowSorting="true" allowResizing="true" rowHeight="38" enableHover="false" dataSource=ObjectData enableVirtualization="true" allowSelection="true">
+            <ejs-grid id="GridOverview" allowFiltering="true" allowSorting="true" allowResizing="true" rowHeight="38" enableHover="false" dataSource=ObjectData enableVirtualization="true">
                 <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
                 <e-grid-columns>
                     @foreach (var it in headerColumns)
@@ -107,7 +108,7 @@
 }
 
 <script id="quantityTemplate" type="text/x-template">
-    <input style="width: 40px" type="number" name="quantity" id="">
+    <input style="width: 40px" type="number" name="quantity" min="1" id="qty${_itemId}">
 </script>
 
 <script id="optionsTemplate" type="text/x-template">
@@ -123,14 +124,34 @@
     </button>
     ${/if}
     ${if(_eRPCompanyIdExist == "True")}
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(`${_addtocartlink}`);return false;">
+    <button class="table-action-button" onclick="AddToShoppingCart(`${_itemId}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
     </button>
     ${/if}
-    <button class="table-action-button" onclick="AjaxCart.addproducttocart_catalog(`${_addtowishlistlink}`);return false;">
+    <button class="table-action-button" onclick="AddToWishList(`${_itemId}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
     </button>
 </script>
 
+<script>
+    function AddToWishList(itemId) {
+        event.preventDefault();
+        let qty = $('#qty' + itemId).val();
+        if (!qty)
+            qty = 1;
+        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=2&quantity=${qty}`
+        console.log('link', link);
+        AjaxCart.addproducttocart_catalog(link);
+    }
 
+    function AddToShoppingCart(itemId) {
+        event.preventDefault();
+        let qty = $('#qty' + itemId).val();
+        if (!qty)
+            qty = 1;
+        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=1&quantity=${qty}`
+        console.log('link', link);
+        AjaxCart.addproducttocart_catalog(link);
+    }
+</script>
 <ejs-scripts></ejs-scripts>
