@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Catalog;
@@ -26,16 +27,30 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
     public partial class CatalogOverrideController : BasePublicController
     {
         private readonly ICatalogModelFactory _catalogModelFactory;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IWorkContext _workContext;
+        private readonly IWebHelper _webHelper;
+        private readonly IStoreContext _storeContext;
 
         #region Constructor
-        public CatalogOverrideController(ICatalogModelFactory catalogModelFactory)
+        public CatalogOverrideController(ICatalogModelFactory catalogModelFactory, IGenericAttributeService genericAttributeService, IWorkContext workContext, IWebHelper webHelper, IStoreContext storeContext)
         {
             _catalogModelFactory = catalogModelFactory;
+            _genericAttributeService = genericAttributeService;
+            _workContext = workContext;
+            _webHelper = webHelper;
+            _storeContext = storeContext;
         }
         #endregion
 
         public IActionResult Index()
         {
+            //'Continue shopping' URL
+            _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+                NopCustomerDefaults.LastContinueShoppingPageAttribute,
+                _webHelper.GetThisPageUrl(false),
+                _storeContext.CurrentStore.Id);
+
             var shapeIds = new List<int>();
             var specIds = new List<int>();
 
