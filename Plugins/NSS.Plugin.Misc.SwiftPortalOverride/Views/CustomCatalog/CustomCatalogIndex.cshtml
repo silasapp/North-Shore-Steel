@@ -11,6 +11,7 @@
 }
 
 @{
+    var noSelectedShape = true;
     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
 <div class="page home-page">
@@ -71,24 +72,51 @@
                                     key = group.Key;
                                     break;
                             }
-                            <div class="card">
-                                <div class="card-header">
-                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                        @key
-                                    </a>
-                                </div>
-                                @foreach (var item in group)
+                            if (noSelectedShape)
+                            {
+                                if (@key == "METAL" || @key == "COATING")
                                 {
-                                    <div id="collapse-@index" class="collapse show">
-                                        <div class="card-body">
-                                            <label class="pure-material-checkbox">
-                                                <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                                <span>@item.SpecificationAttributeOptionName</span>
-                                            </label>
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                                @key
+                                            </a>
                                         </div>
+                                        @foreach (var item in group)
+                                        {
+                                            <div id="collapse-@index" class="collapse show">
+                                                <div class="card-body">
+                                                    <label class="pure-material-checkbox">
+                                                        <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                        <span>@item.SpecificationAttributeOptionName</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
                                 }
-                            </div>
+                            }
+                            else
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                            @key
+                                        </a>
+                                    </div>
+                                    @foreach (var item in group)
+                                    {
+                                        <div id="collapse-@index" class="collapse show">
+                                            <div class="card-body">
+                                                <label class="pure-material-checkbox">
+                                                    <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                    <span>@item.SpecificationAttributeOptionName</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         }
                     }
                 </div>
@@ -219,8 +247,14 @@
         var selectedChip = event.target.alt;
         var inputs = document.querySelectorAll("input[type='checkbox']");
         var elements = $('li.e-list-item');
-        var shapeButtons = $('.e-frame.e-icons.e-check');
-        shapeButtons.removeClass("e-check");
+        var checkedButtons = $('.e-frame.e-icons.e-check');
+        var expandableButtons = $("[aria-checked=mixed]")
+        var mixedButtons = $('.e-frame.e-icons.e-stop');
+        if (expandableButtons.length > 0) {
+            expandableButtons[0].setAttribute("aria-checked", "false");
+            mixedButtons.removeClass("e-stop");
+
+        }
         selectedChip = selectedChip.replace(/_/g, " ");
 
             for (var i = 0; i < inputs.length; i++) {
@@ -235,10 +269,10 @@
             }
 
             for (var i = 0; i < elements.length; i++) {
-                if (elements[i].childNodes[1].childNodes[0].ariaChecked == "true" && elements[i].childNodes[1].childNodes[1].innerHTML == selectedChip) {
+                var listElements = $(elements[i].childNodes[1]).find('span.e-list-text');
+                if (listElements[0].innerHTML == selectedChip) {
+                    checkedButtons.removeClass("e-check");
                     boxId = elements[i].dataset.uid;
-                    var checkedNode = elements[i];
-                    var treeObj = document.getElementById('treedata').ej2_instances[0];
                     elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
                     shapeNames.indexOf(selectedChip) === -1 ? shapeNames.push(selectedChip) : shapeNames.splice(shapeNames.indexOf(selectedChip), 1);
                     shapeIDs.indexOf(boxId) === -1 ? shapeIDs.push(boxId) : shapeIDs.splice(shapeIDs.indexOf(boxId), 1);
