@@ -1,0 +1,165 @@
+﻿.filter-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+    .filter-menu > label {
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .filter-menu > input {
+        border: none;
+        background: #F6F6F6;
+        font-size: 14px;
+        font-style: italic;
+        padding: 5px;
+    }
+
+.cart-table {
+    border: 2px solid #ffffff !important;
+    margin-bottom: 50px;
+}
+
+    .cart-table thead > tr > th {
+        background-color: #DEDEDE !important;
+    }
+
+.no-backgroud-button {
+    border: none;
+    background-color: transparent;
+}
+
+    .no-backgroud-button > img {
+        margin-right: 3px;
+        height: 20px;
+        width: 20px;
+    }
+
+.cart-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.detail-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.discount, .cart-summary {
+    background-color: #F6F6F6;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+    .discount > label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+
+.left-detail {
+    min-width: 30%;
+}
+
+.discount > div > input {
+    border: none;
+    font-style: italic;
+    font-size: 14;
+    box-shadow: 0px 0px 3px 1px #e7e5e5;
+    padding: 5px;
+    margin-right: 10px;
+    width: 100%;
+}
+
+.discount > div > button {
+    border: none;
+    background-color: #DEDEDE;
+    font-weight: 500;
+    padding: 0 15px;
+}
+
+.pickup-options > div {
+    display: flex;
+    align-items: center;
+}
+
+    .pickup-options > div > label {
+        font-size: 14px;
+        margin-left: 5px;
+    }
+
+    .pickup-options > div > input {
+        height: 15px;
+        width: 15px;
+    }
+
+.price-summary {
+    display: flex;
+    justify-content: space-between;
+}
+
+    .price-summary > .title {
+        color: #B1B1B1;
+        font-size: 14px;
+        margin: 2px 0;
+    }
+
+    .price-summary > .amount {
+        color: #000000;
+        font-size: 14px;
+        margin: 2px 0;
+        font-weight: 500;
+    }
+
+    .price-summary > .total {
+        color: #000000;
+        font-size: 24px;
+        margin: 5px 0 0 0;
+        font-weight: 500;
+    }
+
+.right-detail {
+    min-width: 50%;
+}
+
+.agree-terms {
+    display: flex;
+    align-items: center;
+}
+
+    .agree-terms > label {
+        font-size: 14px;
+        margin-left: 5px;
+    }
+
+    .agree-terms > a {
+        font-size: 14px;
+        color: #858585;
+    }
+
+    .agree-terms > input {
+        width: 15px;
+        height: 15px;
+    }
+
+.check-out {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 30px;
+}
+
+    .check-out > button {
+        border: none;
+        background-color: #DEDEDE;
+        color: #585858;
+        font-size: 18px;
+        font-weight: 500;
+        padding: 5px 15px;
+    }
+
+        .check-out > button:hover {
+            background-color: #585858;
+            color: #ffffff;
+        }

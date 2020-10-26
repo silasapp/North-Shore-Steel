@@ -14,11 +14,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
         {
             if (context.AreaName == "Admin")
             {
-                viewLocations = new[] { $"/Plugins/NSS.Plugin.Misc.SwiftPortalOverride/Areas/Admin/Views/{context.ControllerName}/{context.ViewName}.cshtml" }.Concat(viewLocations);
+                viewLocations = new[] { $"/Plugins/Misc.SwiftPortalOverride/Areas/Admin/Views/{context.ControllerName}/{context.ViewName}.cshtml" }.Concat(viewLocations);
             }
             else
             {
-                viewLocations = new[] { $"/Plugins/NSS.Plugin.Misc.SwiftPortalOverride/Views/{context.ControllerName}/{context.ViewName}.cshtml" }.Concat(viewLocations);
+                if (context.ViewName == "Components/TopMenu/Default")
+                {
+                    viewLocations = new string[] { 
+                        "~/Plugins/Misc.SwiftPortalOverride/Views/CustomTopMenu/CustomTopMenu.cshtml"
+                    }.Concat(viewLocations);
+
+                }
+                else
+                {
+                    viewLocations = new[] { 
+                        $"/Plugins/Misc.SwiftPortalOverride/Views/{context.ControllerName}/{context.ViewName}.cshtml", 
+                        $"/Plugins/Misc.SwiftPortalOverride/Views/Shared/{context.ViewName}.cshtml", 
+                    }.Concat(viewLocations);
+                }
             }
 
             return viewLocations;

@@ -27,5 +27,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.NSSApiAuthPassword")]
         public string NSSApiAuthPassword { get; set; }
         public bool NSSApiAuthPassword_OverrideForStore { get; set; }
+
+
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.StorageAccountName")]
+        public string StorageAccountName { get; set; }
+        public bool StorageAccountName_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.StorageAccountKey")]
+        public string StorageAccountKey { get; set; }
+        public bool StorageAccountKey_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.StorageContainerName")]
+        public string StorageContainerName { get; set; }
+        public bool StorageContainerName_OverrideForStore { get; set; }
     }
 }

@@ -5,6 +5,9 @@ using Nop.Core.Infrastructure.DependencyManagement;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Messages;
 using NSS.Plugin.Misc.SwiftCore.Services;
+using Nop.Services.Catalog;
+using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
+using Nop.Services.Orders;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 {
@@ -12,13 +15,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
     {
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
+            // self
             builder.RegisterType<NSSApiProvider>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<WorkFlowMessageServiceOverride>().AsSelf().InstancePerLifetimeScope();
 
+            // core
             builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
+            builder.RegisterType<ShapeService>().As<IShapeService>().InstancePerLifetimeScope();
+            builder.RegisterType<AzureStorageService>().As<IStorageService>().InstancePerLifetimeScope();
 
+            // overrides
             builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
             builder.RegisterType<WorkFlowMessageServiceOverride>().As<IWorkflowMessageService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductServiceOverride>().As<IProductService>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomShoppingCartService>().As<IShoppingCartService>().InstancePerLifetimeScope();
+
+            //  custom factories
+            builder.RegisterType<CatalogModelFactory>().As<ICatalogModelFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductModelFactory>().As<IProductModelFactory>().InstancePerLifetimeScope();
+
         }
 
         public int Order => 10;

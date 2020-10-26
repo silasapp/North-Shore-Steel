@@ -11,6 +11,7 @@ using Nop.Web.Framework.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -55,7 +56,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             //load settings for a chosen store scope
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
+            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
 
             var model = new ConfigurationModel
             {
@@ -65,6 +66,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 NSSApiBaseUrl = swiftPortalOverrideSettings.NSSApiBaseUrl,
                 NSSApiAuthUsername = swiftPortalOverrideSettings.NSSApiAuthUsername,
                 NSSApiAuthPassword = swiftPortalOverrideSettings.NSSApiAuthPassword,
+                StorageAccountKey = swiftPortalOverrideSettings.StorageAccountKey,
+                StorageAccountName = swiftPortalOverrideSettings.StorageAccountName,
+                StorageContainerName = swiftPortalOverrideSettings.StorageContainerName,
                 ActiveStoreScopeConfiguration = storeScope
             };
             if (storeScope > 0)
@@ -75,6 +79,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 model.NSSApiBaseUrl_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, storeScope);
                 model.NSSApiAuthUsername_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, storeScope);
                 model.NSSApiAuthPassword_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, storeScope);
+                model.StorageAccountKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountKey, storeScope);
+                model.StorageAccountName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountName, storeScope);
+                model.StorageContainerName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageContainerName, storeScope);
             }
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/Configure.cshtml", model);
@@ -91,7 +98,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             //load settings for a chosen store scope
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftPortalOverrideSettings>(storeScope);
+            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
 
             //save settings
             swiftPortalOverrideSettings.UseSandBox = model.UseSandBox;
@@ -100,6 +107,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             swiftPortalOverrideSettings.NSSApiBaseUrl = model.NSSApiBaseUrl;
             swiftPortalOverrideSettings.NSSApiAuthUsername = model.NSSApiAuthUsername;
             swiftPortalOverrideSettings.NSSApiAuthPassword = model.NSSApiAuthPassword;
+            swiftPortalOverrideSettings.StorageAccountKey = model.StorageAccountKey;
+            swiftPortalOverrideSettings.StorageAccountName = model.StorageAccountName;
+            swiftPortalOverrideSettings.StorageContainerName = model.StorageContainerName;
 
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
@@ -111,6 +121,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, model.NSSApiBaseUrl_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, model.NSSApiAuthUsername_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, model.NSSApiAuthPassword_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountKey, model.StorageAccountKey_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountName, model.StorageAccountName_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageContainerName, model.StorageContainerName_OverrideForStore, storeScope, false);
 
             //now clear settings cache
             _settingService.ClearCache();

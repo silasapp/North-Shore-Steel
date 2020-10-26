@@ -1,0 +1,25 @@
+﻿@using Nop.Web.Models.Checkout
+@using Nop.Web.Models.ShoppingCart
+
+@model ShoppingCartModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.ShoppingCart").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-shopping-cart-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/cart.css");
+}
+@if (!Model.OnePageCheckoutEnabled)
+{
+    @await Component.InvokeAsync("CheckoutProgress", new { step = CheckoutProgressStep.Cart })
+}
+<div class="page shopping-cart-page">
+    <div class="page-title">
+        <h1>@T("ShoppingCart")</h1>
+    </div>
+    <div class="page-body">
+        @await Component.InvokeAsync("CustomOrderSummary", new { overriddenModel = Model })
+    </div>
+</div>
