@@ -77,9 +77,9 @@
         productRowData.Add("_itemId", item.Id.ToString());
         productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
         productRowData.Add("_sawOption", item.Shape.SawOption.ToString());
-        //productRowData.Add("_addtocartlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity }));
+        productRowData.Add("_cartId", shoppingCartTypeId.ToString());
         productRowData.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString());
-        //productRowData.Add("_addtowishlistlink", Url.Action("CustomAddProductToCart_Catalog", "CartOverride", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity }));
+        productRowData.Add("_wishListId", wishListShoppingCartId.ToString());
 
         ObjectData.Add(productRowData);
     }
@@ -124,34 +124,25 @@
     </button>
     ${/if}
     ${if(_eRPCompanyIdExist == "True")}
-    <button class="table-action-button" onclick="AddToShoppingCart(`${_itemId}`);return false;">
+    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
     </button>
     ${/if}
-    <button class="table-action-button" onclick="AddToWishList(`${_itemId}`);return false;">
+    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
         <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
     </button>
 </script>
 
 <script>
-    function AddToWishList(itemId) {
+    function getInputQuantity(itemId, cartId) {
         event.preventDefault();
         let qty = $('#qty' + itemId).val();
         if (!qty)
             qty = 1;
-        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=2&quantity=${qty}`
-        console.log('link', link);
+        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
+        $('#qty' + itemId).val("");
         AjaxCart.addproducttocart_catalog(link);
     }
 
-    function AddToShoppingCart(itemId) {
-        event.preventDefault();
-        let qty = $('#qty' + itemId).val();
-        if (!qty)
-            qty = 1;
-        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=1&quantity=${qty}`
-        console.log('link', link);
-        AjaxCart.addproducttocart_catalog(link);
-    }
 </script>
 <ejs-scripts></ejs-scripts>
