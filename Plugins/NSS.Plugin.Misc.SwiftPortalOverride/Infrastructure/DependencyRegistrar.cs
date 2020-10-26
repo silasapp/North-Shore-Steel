@@ -7,6 +7,7 @@ using Nop.Services.Messages;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using Nop.Services.Catalog;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
+using Nop.Services.Orders;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 {
@@ -27,11 +28,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
             builder.RegisterType<WorkFlowMessageServiceOverride>().As<IWorkflowMessageService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductServiceOverride>().As<IProductService>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomShoppingCartService>().As<IShoppingCartService>().InstancePerLifetimeScope();
 
-            // factories
+            //  custom factories
             builder.RegisterType<CatalogModelFactory>().As<ICatalogModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ProductModelFactory>().As<IProductModelFactory>().InstancePerLifetimeScope();
-
 
         }
 

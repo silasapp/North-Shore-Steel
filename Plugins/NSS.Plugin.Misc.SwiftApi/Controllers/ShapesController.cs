@@ -22,6 +22,8 @@ using NSS.Plugin.Misc.SwiftCore.Services;
 using Nop.Services.Catalog;
 using Nop.Core.Domain.Catalog;
 using System.Linq;
+using Nop.Services.Orders;
+using Nop.Core.Domain.Orders;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
 {
@@ -30,8 +32,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly IShapeService _shapeService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly IProductAttributeService _productAttributeService;
+        private readonly ICheckoutAttributeService _checkoutAttributeService;
 
-        public ShapesController (
+        public ShapesController(
+            ICheckoutAttributeService checkoutAttributeService,
             IJsonFieldsSerializer jsonFieldsSerializer,
             IAclService aclService,
             ICustomerService customerService,
@@ -50,6 +54,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _shapeService = shapeService;
             _productAttributeService = productAttributeService;
             _specificationAttributeService = specificationAttributeService;
+            _checkoutAttributeService = checkoutAttributeService;
         }
 
         [HttpPost]
@@ -74,21 +79,29 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _shapeService.InsertShapes(shapes);
 
             // create product attributes
+
+            // cut options
             if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.CutOptionsAttribute))
-            {
-                // cut options
-                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.CutOptionsAttribute, Description = Constants.CutOptionsAttribute });
-                // work order instructions
-                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.WorkOrderInstructionsAttribute, Description = Constants.WorkOrderInstructionsAttribute });
-                // tolerance cut
-                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.LengthToleranceCutAttribute, Description = Constants.LengthToleranceCutAttribute });
-            }
+                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.CutOptionsAttribute });
+            // work order instructions
+            if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.WorkOrderInstructionsAttribute))
+                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.WorkOrderInstructionsAttribute });
+            // tolerance cut
+            if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.LengthToleranceCutAttribute))
+                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.LengthToleranceCutAttribute });
+            // cust part no
+            if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.CustomerPartNoAttribute))
+                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.CustomerPartNoAttribute });
+            // purchase unit
+            if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.PurchaseUnitAttribute))
+                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.PurchaseUnitAttribute });
+
 
             // create spec attributes
-            if(!_specificationAttributeService.GetSpecificationAttributes().Any(x=> x.Name == Constants.MetalFieldAttribute))
+            if (!_specificationAttributeService.GetSpecificationAttributes().Any(x => x.Name == Constants.MetalFieldAttribute))
             {
                 // metals
-                _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.MetalFieldAttribute});
+                _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.MetalFieldAttribute });
                 // grades
                 _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.GradeFieldAttribute });
                 // coating
@@ -102,7 +115,20 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 // min_width
                 _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.DisplayWidthFieldAttribute });
             }
-            
+
+
+            // create checkout attribute
+            if (!_checkoutAttributeService.GetAllCheckoutAttributes().Any(x => x.Name == "Purchase Order #"))
+            {
+                var checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.TextBox, IsRequired = true, Name = "Purchase Order #" };
+                _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
+
+                checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.RadioList, IsRequired = true, Name = "Delivery Option" };
+                _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
+
+                _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Ship to Customer", DisplayOrder = 1, IsPreSelected = true });
+                _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Pickup from North Shore Steel", DisplayOrder = 2 });
+            }
 
             IList<Shape> createdShapes = _shapeService.GetShapes();
 

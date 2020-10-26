@@ -294,6 +294,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 _genericAttributeService.SaveAttribute(product, attribute.Key.ToString(), attribute.Value);
             }
 
+            MapProductAttributes(product);
+
             CustomerActivityService.InsertActivity("APIService", LocalizationService.GetResource("ActivityLog.UpdateProduct"), product);
 
             var response = GetErpProduct(product);
@@ -302,6 +304,103 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             return new RawJsonActionResult(json);
         }
+
+
+        #region Attribute Methods
+        private void MapProductSpecificationAttributeOption(Product entity, Dictionary<string, object> data)
+        {
+            // get value option id for maping
+            var attributes = _specificationAttributeService.GetSpecificationAttributes();
+
+            foreach (var attr in attributes)
+            {
+                var options = _specificationAttributeService.GetSpecificationAttributeOptionsBySpecificationAttribute(attr.Id);
+
+                bool containsValue = data.TryGetValue(attr.Name, out object value);
+
+                if (containsValue && !string.IsNullOrEmpty(value.ToString()))
+                {
+                    var option = options.FirstOrDefault(x => x.Name == value.ToString());
+
+                    if (option == null)
+                    {
+                        //create option
+                        option = new SpecificationAttributeOption { Name = value.ToString(), SpecificationAttributeId = attr.Id };
+                        _specificationAttributeService.InsertSpecificationAttributeOption(option);
+                    }
+
+                    //map
+                    var prodSpec = new ProductSpecificationAttribute
+                    {
+                        AllowFiltering = true,
+                        ProductId = entity.Id,
+                        SpecificationAttributeOptionId = option.Id,
+                        AttributeType = SpecificationAttributeType.Option
+                    };
+                    _specificationAttributeService.InsertProductSpecificationAttribute(prodSpec);
+                }
+
+            }
+        }
+
+        private void MapProductAttributes(Product product)
+        {
+            var productAttributes = _productAttributeService.GetAllProductAttributes();
+
+            var attributeMappings = _productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+            foreach (var productAttribute in productAttributes)
+            {
+                bool hasMapping = attributeMappings.Any(x => x.ProductAttributeId == productAttribute.Id);
+
+                if (!hasMapping)
+                {
+                    // insert new
+
+                    if (productAttribute.Name == Constants.CutOptionsAttribute)
+                    {
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.RadioList, ProductAttributeId = productAttribute.Id, ProductId = product.Id };
+                        _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+
+                        // options
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in half", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 1, IsPreSelected = true });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in thirds", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 2 });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in quarters", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 3 });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Other", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 4 });
+
+                    }
+                    else if (productAttribute.Name == Constants.WorkOrderInstructionsAttribute)
+                    {
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.MultilineTextbox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
+                        _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+                    }
+                    else if (productAttribute.Name == Constants.LengthToleranceCutAttribute)
+                    {
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.TextBox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
+                        _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+                    }
+                    else if (productAttribute.Name == Constants.CustomerPartNoAttribute)
+                    {
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.TextBox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
+                        _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+                    }
+                    else if (productAttribute.Name == Constants.PurchaseUnitAttribute)
+                    {
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.DropdownList, ProductAttributeId = productAttribute.Id, ProductId = product.Id };
+                        _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+
+                        // options
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = Constants.UnitPerPieceField, ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 1, IsPreSelected = true });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = Constants.UnitPerWeightField, ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 2 });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = Constants.UnitPerFtField, ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 3 });
+                    }
+                }
+
+            }
+        }
+
+        #endregion
+
+        #region API Methods
 
         private ErpProductDto GetErpProduct(Product product)
         {
@@ -636,73 +735,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 _productService.UpdateProduct(newAssociatedProduct);
             }
         }
-
-        private void MapProductSpecificationAttributeOption(Product entity, Dictionary<string,object> data)
-        {
-            // get value option id for maping
-            var attributes = _specificationAttributeService.GetSpecificationAttributes();
-
-            foreach (var attr in attributes)
-            {
-                var options = _specificationAttributeService.GetSpecificationAttributeOptionsBySpecificationAttribute(attr.Id);
-
-                bool containsValue = data.TryGetValue(attr.Name, out object value);
-
-                if(containsValue && !string.IsNullOrEmpty(value.ToString()))
-                {
-                    var option = options.FirstOrDefault(x => x.Name == value.ToString());
-
-                    if (option == null)
-                    {
-                        //create option
-                        option = new SpecificationAttributeOption { Name = value.ToString(), SpecificationAttributeId = attr.Id };
-                        _specificationAttributeService.InsertSpecificationAttributeOption(option);
-                    }
-
-                    //map
-                    var prodSpec = new ProductSpecificationAttribute
-                    {
-                        AllowFiltering = true,
-                        ProductId = entity.Id,
-                        SpecificationAttributeOptionId = option.Id,
-                        AttributeType = SpecificationAttributeType.Option
-                    };
-                    _specificationAttributeService.InsertProductSpecificationAttribute(prodSpec);
-                }
-                
-            }
-        }
-
-        private void MapProductAttributes(Product product)
-        {
-            var productAttributes = _productAttributeService.GetAllProductAttributes();
-            foreach (var productAttribute in productAttributes)
-            {
-                if (productAttribute.Name == Constants.CutOptionsAttribute)
-                {
-                    var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.RadioList, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
-                    _productAttributeService.InsertProductAttributeMapping(attributeMapping);
-
-                    // cut options
-                    if (productAttribute.Name == Constants.CutOptionsAttribute)
-                    {
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in half", ProductAttributeMappingId = attributeMapping.Id });
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in thirds", ProductAttributeMappingId = attributeMapping.Id });
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in quarters", ProductAttributeMappingId = attributeMapping.Id });
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Other", ProductAttributeMappingId = attributeMapping.Id });
-                    }
-                }
-                else if (productAttribute.Name == Constants.WorkOrderInstructionsAttribute)
-                {
-                    var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.MultilineTextbox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
-                    _productAttributeService.InsertProductAttributeMapping(attributeMapping);
-                }
-                else if (productAttribute.Name == Constants.LengthToleranceCutAttribute)
-                {
-                    var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.TextBox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
-                    _productAttributeService.InsertProductAttributeMapping(attributeMapping);
-                }
-            }
-        }
+        #endregion
     }
 }
