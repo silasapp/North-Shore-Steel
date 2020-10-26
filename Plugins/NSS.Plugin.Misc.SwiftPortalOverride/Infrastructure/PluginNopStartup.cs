@@ -18,6 +18,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 
         public void Configure(IApplicationBuilder application)
         {
+            //Register Syncfusion license
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzQxMDAzQDMxMzgyZTMzMmUzMFVQa3R0NWkwN09PSkRKbjJsQ0NadWdFemovWkxxbEU4TGg4cWVYTjhnN2c9");
         }
 
         public int Order => 11;
