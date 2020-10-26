@@ -6,11 +6,31 @@
 @using Nop.Web.Extensions
 @using Nop.Services.Common
 @using Nop.Core.Domain.Catalog
+@using Nop.Web.Factories
+@using Nop.Services.Catalog
+@using Nop.Web.Models.Catalog
+@using Nop.Services.Localization
+@using Nop.Core.Domain
+@using Nop.Services.Orders
 @inject IWebHelper webHelper
 @inject IWorkContext workContext
 @inject OrderSettings orderSettings
 @inject IGenericAttributeService genericAttributeService
+@inject IProductModelFactory productModelFactory
+@inject IProductAttributeParser productAttributeParser
+@inject IProductAttributeService productAttributeService
+@inject ILocalizationService localizationService
+@inject IProductService productService
+@inject IShoppingCartService shoppingCartService
+@inject IWorkContext workContext
 
+@{
+    var customer = workContext.CurrentCustomer;
+    var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
+
+    var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #");
+    var deliverychkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option");
+}
 
 <div class="order-summary-content">
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
@@ -33,7 +53,16 @@
             <div style="display: flex; margin: 20px 0; justify-content: space-between;" class="col-lg-5">
                 <div class="filter-menu">
                     <label for="purchase-order">Purchase Order #</label>
-                    <input type="text" name="purchase-order" id="purchase-order" placeholder="ENTER...">
+                    @if (purchasechkattr != null)
+                    {
+                        var controlId = $"checkout_attribute_{purchasechkattr.Id}";
+                        <input type="text" name="@(controlId)" id="@(controlId)" value="@(purchasechkattr.DefaultValue)" placeholder="ENTER..." />
+                    }
+                    else
+                    {
+                        <input type="text" name="purchase-order" id="purchase-order" placeholder="ENTER...">
+                    }
+
                 </div>
                 <div class="filter-menu">
                     <label for="estimated-date">Delivery Date</label>
@@ -59,45 +88,85 @@
                     <tbody>
                         @foreach (var item in Model.Items)
                         {
+                            var product = productService.GetProductById(item.ProductId);
                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
                             var itemNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value ?? attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                             var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
                             var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
                             var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
 
+                            // get attribute
+
+                            var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
+                            var attributes = PrepareProductAttributeModels(product, cartItem);
+
+                            var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == "Customer Part No");
+                            var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == "Purchase Unit");
+                            string unitControlId = purchaseUnitAttr == null ? null : $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}";
+
                             var unitPrice = "0.00";
+
 
 
                             <tr>
                                 <td>@(itemNo)</td>
                                 <td>@item.ProductName</td>
                                 <td>
-                                    <input style="width: 100px;height: 30px;" type="text" name="customer-part" id="">
+                                    @if (custPartNoAttr != null)
+                                    {
+                                        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";
+                                        <input style="width: 100px;height: 30px;" type="text" name="@(controlId)" id="@(controlId)" value="@(custPartNoAttr.DefaultValue)" />
+                                    }
+                                    else
+                                    {
+                                        <input style="width: 100px;height: 30px;" type="text" name="customer-part" id="">
+                                    }
+
                                 </td>
                                 <td>
                                     @{unitPrice = !string.IsNullOrEmpty(pricePerPiece) ? pricePerPiece : !string.IsNullOrEmpty(pricePerCWT) ? pricePerCWT : !string.IsNullOrEmpty(pricePerFt) ? pricePerFt : unitPrice; }
-
                                     <input style="width: 100px;height: 30px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="$@(DoFormat(Convert.ToDouble(unitPrice)))">
-                                    <select name="itemunit@(item.Id)" id="itemunit@(item.Id)" style="height: 30px;" onchange="toggleUnitPrice(@item.Id, @pricePerCWT, @pricePerPiece, @pricePerFt, )">
-                                        @if (!string.IsNullOrEmpty(pricePerPiece))
-                                        {
-                                            <option value="EA">EA</option>
-                                        }
-                                        @if (!string.IsNullOrEmpty(pricePerCWT))
-                                        {
-                                            <option value="CWT">CWT</option>
-                                        }
-                                        @if (!string.IsNullOrEmpty(pricePerFt))
-                                        {
-                                            <option value="FT">FT</option>
-                                        }
-                                    </select>
+
+                                    @if (purchaseUnitAttr != null)
+                                    {
+                                        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}";
+                                        <select name="@(controlId)" id="@(controlId)" style="height: 30px;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
+                                            @foreach (var attributeValue in purchaseUnitAttr.Values)
+                                            {
+                                                if (attributeValue.Name == "EA" && string.IsNullOrEmpty(pricePerPiece) || attributeValue.Name == "CWT" && string.IsNullOrEmpty(pricePerCWT) || attributeValue.Name == "FT" && string.IsNullOrEmpty(pricePerFt))
+                                                    continue;
+
+
+                                                <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <select name="itemunit@(item.Id)" id="itemunit@(item.Id)" style="height: 30px;" onchange="toggleUnitPrice(this, null, @item.Id, @pricePerCWT, @pricePerPiece, @pricePerFt)">
+                                            @if (!string.IsNullOrEmpty(pricePerPiece))
+                                            {
+                                                <option value="EA">EA</option>
+                                            }
+                                            @if (!string.IsNullOrEmpty(pricePerCWT))
+                                            {
+                                                <option value="CWT">CWT</option>
+                                            }
+                                            @if (!string.IsNullOrEmpty(pricePerFt))
+                                            {
+                                                <option value="FT">FT</option>
+                                            }
+                                        </select>
+                                    }
+
+
                                 </td>
                                 <td id="itemsubtotal@(item.Id)"> @item.SubTotal </td>
                                 <td id="itemweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00") </td>
                                 <td id="itemlength@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00") </td>
                                 <td>
-                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice(@item.Id)" />
+                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
                                     @*<input style="width: 100px" type="number" name="quantity" id="">*@
                                 </td>
                                 <td style="text-align:center">
@@ -134,10 +203,10 @@
                         @*@await Component.InvokeAsync("ShoppingCartEstimateShipping")*@
                     </div>
                 }
-                @if (Model.IsEditable)
-                {
-                    @await Html.PartialAsync("_CheckoutAttributes", Model)
-                }
+                @*@if (Model.IsEditable)
+                    {
+                        @await Html.PartialAsync("_CheckoutAttributes", Model)
+                    }*@
                 @await Component.InvokeAsync("SelectedCheckoutAttributes")
             </div>
             <div class="cart-footer">
@@ -148,19 +217,43 @@
                         <div class="deals">
                             @await Html.PartialAsync("_DiscountBox", Model.DiscountBox)
                             @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
+
+
                             <div class="pickup-options">
-                                <div>
-                                    <label for="customer" class="radio control-label">
-                                        <input type="radio" id="customer" name="ship" value="customer">
-                                        Ship to Customer
-                                    </label>
-                                </div>
-                                <div>
-                                    <label for="pickup" class="radio control-label">
-                                        <input type="radio" id="pickup" name="ship" value="pickup">
-                                        Pickup from North Shore Steel
-                                    </label>
-                                </div>
+                                @if (deliverychkattr != null)
+                                {
+                                    var controlId = $"checkout_attribute_{deliverychkattr.Id}";
+                                    @foreach (var attributeValue in deliverychkattr.Values)
+                                    {
+                                        <div>
+                                            <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label">
+                                                <input id="@(controlId)_@(attributeValue.Id)" type="radio" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected">
+                                                @attributeValue.Name
+                                            </label>
+                                        </div>
+                                    }
+
+                                }
+                                else
+                                {
+                                    <div>
+                                        <label for="pickup" class="radio control-label">
+                                            <input type="radio" id="customer" name="ship" value="customer">
+                                            Ship to Customer
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label for="pickup" class="radio control-label">
+                                            <input type="radio" id="pickup" name="ship" value="pickup">
+                                            Pickup from North Shore Steel
+                                        </label>
+                                    </div>
+                                }
+
+
+
+
+
                             </div>
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
                         </div>
@@ -197,7 +290,7 @@
                                                 function(e) {
                                                     e.preventDefault();
                                                     displayPopupContentFromUrl(
-                                                        '@Url.RouteUrl("TopicPopup", new {SystemName = "conditionsofuse"})',
+                                                        '@Url.RouteUrl("TopicPopup", new { SystemName = "conditionsofuse" })',
                                                         '@T("Checkout.TermsOfService")');
                                                 });
                                         });
@@ -205,7 +298,7 @@
                                 }
                                 else
                                 {
-                                    <a class="read" id="read-terms" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("conditionsofuse") })">@T("Checkout.TermsOfService.Read")</a>
+                                    <a class="read" id="read-terms" href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("conditionsofuse") })">@T("Checkout.TermsOfService.Read")</a>
                                 }
                             </div>
                         }
@@ -276,12 +369,140 @@
 
         return s;
     }
+
+    IList<ProductDetailsModel.ProductAttributeModel> PrepareProductAttributeModels(Product product, ShoppingCartItem updatecartitem)
+    {
+        if (product == null)
+            throw new ArgumentNullException(nameof(product));
+
+        var model = new List<ProductDetailsModel.ProductAttributeModel>();
+
+        var productAttributeMapping = productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+        foreach (var attribute in productAttributeMapping)
+        {
+            var productAttrubute = productAttributeService.GetProductAttributeById(attribute.ProductAttributeId);
+
+            var attributeModel = new ProductDetailsModel.ProductAttributeModel
+            {
+                Id = attribute.Id,
+                ProductId = product.Id,
+                ProductAttributeId = attribute.ProductAttributeId,
+                Name = localizationService.GetLocalized(productAttrubute, x => x.Name),
+                Description = localizationService.GetLocalized(productAttrubute, x => x.Description),
+                TextPrompt = localizationService.GetLocalized(attribute, x => x.TextPrompt),
+                IsRequired = attribute.IsRequired,
+                AttributeControlType = attribute.AttributeControlType,
+                DefaultValue = updatecartitem != null ? null : localizationService.GetLocalized(attribute, x => x.DefaultValue),
+                HasCondition = !string.IsNullOrEmpty(attribute.ConditionAttributeXml)
+            };
+
+
+            if (attribute.ShouldHaveValues())
+            {
+                //values
+                var attributeValues = productAttributeService.GetProductAttributeValues(attribute.Id);
+                foreach (var attributeValue in attributeValues)
+                {
+                    var valueModel = new ProductDetailsModel.ProductAttributeValueModel
+                    {
+                        Id = attributeValue.Id,
+                        Name = localizationService.GetLocalized(attributeValue, x => x.Name),
+                        ColorSquaresRgb = attributeValue.ColorSquaresRgb, //used with "Color squares" attribute type
+                        IsPreSelected = attributeValue.IsPreSelected,
+                        CustomerEntersQty = attributeValue.CustomerEntersQty,
+                        Quantity = attributeValue.Quantity
+                    };
+                    attributeModel.Values.Add(valueModel);
+                }
+            }
+
+            //set already selected attributes (if we're going to update the existing shopping cart item)
+            if (updatecartitem != null)
+            {
+                switch (attribute.AttributeControlType)
+                {
+                    case AttributeControlType.DropdownList:
+                    case AttributeControlType.RadioList:
+                    case AttributeControlType.Checkboxes:
+                    case AttributeControlType.ColorSquares:
+                    case AttributeControlType.ImageSquares:
+                        {
+                            if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
+                            {
+                                //clear default selection
+                                foreach (var item in attributeModel.Values)
+                                    item.IsPreSelected = false;
+
+                                //select new values
+                                var selectedValues = productAttributeParser.ParseProductAttributeValues(updatecartitem.AttributesXml);
+                                foreach (var attributeValue in selectedValues)
+                                    foreach (var item in attributeModel.Values)
+                                        if (attributeValue.Id == item.Id)
+                                        {
+                                            item.IsPreSelected = true;
+
+                                            //set customer entered quantity
+                                            if (attributeValue.CustomerEntersQty)
+                                                item.Quantity = attributeValue.Quantity;
+                                        }
+                            }
+                        }
+
+                        break;
+                    case AttributeControlType.ReadonlyCheckboxes:
+                        {
+                            //values are already pre-set
+
+                            //set customer entered quantity
+                            if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
+                            {
+                                foreach (var attributeValue in productAttributeParser.ParseProductAttributeValues(updatecartitem.AttributesXml)
+                                    .Where(value => value.CustomerEntersQty))
+                                {
+                                    var item = attributeModel.Values.FirstOrDefault(value => value.Id == attributeValue.Id);
+                                    if (item != null)
+                                        item.Quantity = attributeValue.Quantity;
+                                }
+                            }
+                        }
+
+                        break;
+                    case AttributeControlType.TextBox:
+                    case AttributeControlType.MultilineTextbox:
+                        {
+                            if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
+                            {
+                                var enteredText = productAttributeParser.ParseValues(updatecartitem.AttributesXml, attribute.Id);
+                                if (enteredText.Any())
+                                    attributeModel.DefaultValue = enteredText[0];
+                            }
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            model.Add(attributeModel);
+        }
+
+        return model;
+    }
 }
 
 <script>
-    function calculateItemTotalPrice(itemId) {
+    function calculateItemTotalPrice(attrId, itemId) {
         var qty = parseInt(document.getElementById('itemquantity' + itemId).value, 10);
-        var itemUnit = document.getElementById('itemunit' + itemId).value;
+        var itemUnit;
+        if (attrId == null) {
+            itemUnit = document.getElementById('itemunit' + itemId).value;
+        }
+        else {
+            var el = document.getElementById(attrId);
+            itemUnit = el.options[el.selectedIndex].text;
+        }
+
         var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).value.replace(/\$/g, ''));
         var length = parseFloat(document.getElementById('itemlength' + itemId).innerHTML);
         var weight = parseFloat(document.getElementById('itemweight' + itemId).innerHTML);
@@ -306,9 +527,18 @@
         subtotal.innerHTML = `$${totalPrice.toFixed(2)}`;
     }
 
-    function toggleUnitPrice(itemId, weightPrice, piecePrice, ftPrice) {
-        debugger;
-        var itemUnit = document.getElementById('itemunit' + itemId).value;
+    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice) {
+
+        var itemUnit;
+        if (attrId == null) {
+            itemUnit = document.getElementById('itemunit' + itemId).value;
+        }
+        else {
+            var el = document.getElementById(attrId);
+            console.log(el);
+            itemUnit = el.options[el.selectedIndex].text;
+        }
+
         var unitPriceCtrl = document.getElementById('itemunitprice' + itemId);
         var unitPrice = 0.00;
         switch (itemUnit) {
@@ -316,16 +546,17 @@
                 unitPrice = Number(piecePrice).toFixed(2);
                 break;
             case "FT":
-                unitPrice = Number(weightPrice).toFixed(2);
+                unitPrice = Number(ftPrice).toFixed(2);
                 break;
             case "CWT":
-                unitPrice = Number(ftPrice).toFixed(2);
+                unitPrice = Number(weightPrice).toFixed(2);
                 break;
             default:
                 break;
         }
+
         unitPriceCtrl.value = `$${unitPrice}`;
 
-        calculateItemTotalPrice(itemId);
+        calculateItemTotalPrice(attrId, itemId);
     }
 </script>
