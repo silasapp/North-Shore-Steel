@@ -1,5 +1,6 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using NSS.Plugin.Misc.SwiftPortalOverride
+@inject IWorkContext workContext
 @using Syncfusion.EJ2
 
 @model CatalogModel
@@ -8,7 +9,9 @@
     //prepare "Add to cart" AJAX link
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var quantity = 1;
+    int customerId = workContext.CurrentCustomer.Id;
     string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+    ERPComId += customerId;
     var headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>();
     var ERPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == ERPComId);
 }
