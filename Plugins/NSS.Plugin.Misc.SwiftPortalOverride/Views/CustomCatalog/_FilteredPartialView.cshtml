@@ -20,12 +20,6 @@
 
 @{List<object> ObjectData = new List<object>(); }
 
-<style>
-    div.e-content {
-        height: 20rem !important;
-    }
-</style>
-
 @if (Model.Products != null && Model.Products.Count > 0)
 {
     if (Model.FilterParams.ShapeIds.Count > 0)
@@ -87,8 +81,9 @@
 
     <div id="_partialview">
         <div class="control-section">
-            <ejs-grid id="GridOverview" allowFiltering="true" allowSorting="true" allowResizing="true" rowHeight="38" enableHover="false" dataSource=ObjectData enableVirtualization="true">
+            <ejs-grid id="GridOverview" allowFiltering="true" allowSorting="true" allowPaging="true" allowResizing="true" rowHeight="38" enableHover="false" dataSource=ObjectData>
                 <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+                <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
                 <e-grid-columns>
                     @foreach (var it in headerColumns)
                     {
