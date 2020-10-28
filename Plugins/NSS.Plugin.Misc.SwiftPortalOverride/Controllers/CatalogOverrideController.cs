@@ -16,6 +16,7 @@ using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using Syncfusion.EJ2.Linq;
+using Nop.Web.Framework.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
         #endregion
 
+        [HttpsRequirement]
         public IActionResult Index()
         {
             //'Continue shopping' URL
@@ -104,6 +106,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         public PartialViewResult FilteredProductsResult([FromBody] FilterParams filterParams)
         {
             var shapeIds = filterParams?.ShapeIds;

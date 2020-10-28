@@ -48,5 +48,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 
 
         public static string MTRBlobName => "Product-MTR.{0}.pdf";
+
+        public static string ThemeName => "SwiftPortal";
     }
 }

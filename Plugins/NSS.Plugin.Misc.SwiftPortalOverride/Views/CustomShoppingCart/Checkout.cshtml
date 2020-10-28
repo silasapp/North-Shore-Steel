@@ -1,0 +1,176 @@
+﻿@using NSS.Plugin.Misc.SwiftCore.Helpers 
+
+@{
+    Layout = "_ColumnsOne";
+    var themeName = Constants.ThemeName;
+
+    //page class
+    Html.AppendPageCssClassParts("html-home-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/checkout.css");
+}
+
+
+<div class="page home-page">
+    <div class="page-body">
+        <h1 class="heading1" style="text-align: center;margin: 15px 0;">CHECKOUT</h1>
+        <hr style="height: 2px; color: #000; opacity: 0.5;margin-bottom: 30px;">
+        <div class="row" style="justify-content: space-between;">
+            <div class="col-9">
+                <div class="card card-mod">
+                    <h1 class="heading2">ORDER INFORMATION</h1>
+                    <div style="display: flex;justify-content: space-between;">
+                        <div style="display: inline-grid; flex-basis: 30%;">
+                            <label for="purchaseOrder" class="font12">Purchase Order #</label>
+                            <input type="text" class="font12" name="purchase-order" id="purchaseOrder">
+                        </div>
+                        <div style="display: inline-grid; flex-basis: 25%;">
+                            <label for="deliveryDate" class="font12">Estimated Delivery Date</label>
+                            <p id="deliveryDate" class="font12">10/15/2020</p>
+                        </div>
+                        <button class="font14" style=" flex-basis: 30%;">
+                            <img src="Themes/@themeName/Content/assets/close.svg" alt="" style="margin-right: 5px;">
+                            Edit Shopping Cart
+                        </button>
+                    </div>
+                </div>
+                <div class="card card-mod">
+                    <h1 class="heading2">SHIPPING OR PICKUP</h1>
+                    <div style="display: flex; justify-content: center;">
+                        <button class="font14"
+                                style="margin-right:2px;background-color:  rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
+                            Delivery
+                        </button>
+                        <button class="font14"
+                                style="margin-left: 2px; padding: 5px 15px;background-color:  rgb(226, 231, 243);">
+                            Pickup
+                        </button>
+                    </div>
+                    <div style="display: flex;justify-content: space-between;">
+                        <div style="display: inline-grid; flex-basis: 65%;">
+                            <label for="shippingAddress" class="font12">Shipping Address</label>
+                            <select type="text" class="font14" style="color: rgb(7, 7, 107);" name="shipping-address"
+                                    id="shippingAddress">
+                                <option value="">
+                                    ACME Inc. 12345 Main Street, Houston, TX 77056
+                                </option>
+                            </select>
+                        </div>
+                        <a href="" class="font12"
+                           style="display: flex;align-items: flex-end;flex-basis: 30%;margin: 0;">
+                            Enter a new shiping address
+                        </a>
+                    </div>
+                </div>
+                <div class="card card-mod">
+                    <h1 class="heading2">PAYMENT METHOD</h1>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <button class="font20 payment-type-btn active">
+                            <img src="Themes/@themeName/Content/assets/shopping-cart.svg" alt="">
+                            <div style="margin-left: 10px;">
+                                <p style="margin: 0;text-align: left;line-height: 1;">Credit/Debit</p>
+                                <p class="font12" style="margin: 5px 0;text-align: left;">Pay with credit/debit card</p>
+                            </div>
+                        </button>
+                        <button class="font20 payment-type-btn">
+                            <img src="Themes/@themeName/Content/assets/saw-blade.svg" alt="">
+                            <div style="margin-left: 10px;">
+                                <p style="margin: 0;text-align: left;line-height: 1;">Paypal</p>
+                                <p class="font12" style="margin: 5px 0;text-align: left;">Pay with PayPal account</p>
+                            </div>
+                        </button>
+                        <button class="font20 payment-type-btn">
+                            <img src="Themes/@themeName/Content/assets/saw-blade.svg" alt="">
+                            <div style="margin-left: 10px;">
+                                <p style="margin: 0;text-align: left;line-height: 1;">Line of Credit</p>
+                                <p class="font12" style="margin: 5px 0;text-align: left;">Balance: $2,076.25</p>
+                            </div>
+                        </button>
+                    </div>
+                    <div style="display: flex;justify-content: space-between;">
+                        <div style="display: inline-grid; flex-basis: 65%;">
+                            <label for="shippingAddress" class="font12">Saved Credit/Debit Cards</label>
+                            <select type="text" class="font14" style="color: rgb(7, 7, 107);" name="shipping-address"
+                                    id="shippingAddress">
+                                <option value="">
+                                    VISA 4321
+                                </option>
+                            </select>
+                        </div>
+                        <a href="" class="font12"
+                           style="display: flex;align-items: flex-end;flex-basis: 30%;margin: 0;">
+                            Enter a new billing address
+                        </a>
+                    </div>
+                    <div style="display: flex;align-items: center;">
+                        <input type="checkbox" name="" id="">
+                        <label for="" class="font12" style="margin: 10px 5px;">Same as shipping address</label>
+                    </div>
+                </div>
+                <h1 class="heading1" style="text-align: center;margin: 15px 0;">ORDER SUMMARY</h1>
+                <hr style="color: rgb(7, 7, 107); opacity: 0.5; margin-bottom: 20px;">
+                <table class="table table-bordered catalog-table font12" id="catalogTable" onload="sortTable(0)">
+                    <thead>
+                        <tr>
+                            <th scope="col">Item #</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Customer Part #</th>
+                            <th scope="col">Unit Price</th>
+                            <th scope="col">Total Price</th>
+                            <th scope="col">Total Weight</th>
+                            <th scope="col">Qty.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>213456779-10-1</td>
+                            <td>1 Beam Hot Roll A36 3 x 5.7 x 20</td>
+                            <td>12345</td>
+                            <td>$20.77 / CW</td>
+                            <td>$95.87</td>
+                            <td>75.7</td>
+                            <td>2</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-3">
+                <div class="card card-mod">
+                    <h2 class="heading3" style="text-align: center;">ORDER INFORMATION</h2>
+                    <div class="order-summary">
+                        <div class="price-summary">
+                            <p class="title">Sub-Total</p>
+                            <p class="amount">78.33</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="title">Shipping</p>
+                            <p class="amount">TBD</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="title">Discount</p>
+                            <p class="amount">0.00</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="discount-tag font12">10% OFF | 10,000lbs</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="title">Tax</p>
+                            <p class="amount">12.00</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="total">Total</p>
+                            <p class="total">$135.33</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content: center;">
+                    <button class="font14"
+                            style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
+                        PLACE
+                        ORDER
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
