@@ -532,5 +532,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     }
             }
         }
+
+
+        [HttpsRequirement]
+        public IActionResult Checkout()
+        {
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomShoppingCart/Checkout.cshtml");
+        }
     }
 }
