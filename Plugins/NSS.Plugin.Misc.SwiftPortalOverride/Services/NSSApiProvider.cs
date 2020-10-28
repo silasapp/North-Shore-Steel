@@ -16,6 +16,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
+using Newtonsoft.Json.Linq;
+using NSS.Plugin.Misc.SwiftPortalOverride.Extensions;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 {
@@ -317,6 +320,214 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             return retVal;
+        }
+
+        public NSSCalculateShippingResponse GetShippingRate(NSSCalculateShippingRequest request, bool useMock = false)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            if (useMock)
+            {
+                var resp = new NSSCalculateShippingResponse
+                {
+                    Allowed = true,
+                    DeliveryDate = "2020-10-20",
+                    DistanceMiles = 100,
+                    PickupTime = "4pm"
+                };
+
+                return resp;
+            }
+
+
+            //initialize
+            var retVal = new NSSCalculateShippingResponse();
+            var respContent = string.Empty;
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.CalculateShipping -> {request.DestinationAddressLine1}", new Exception("NSS token returned empty"));
+                        return retVal;
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+                    // create user resource
+                    var resource = "/shipping-charges";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var content = new FormUrlEncodedContent(param);
+
+                    var response = httpClient.PostAsync(resource, content).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<NSSCalculateShippingResponse>(respContent);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.CalculateShipping -> {request.DestinationAddressLine1}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.DestinationAddressLine1}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+
+            return retVal;
+        }
+
+        public NSSGetCompanyCreditBalance GetCompanyCreditBalance(int companyId, bool useMock = false)
+        {
+            //initialize
+            var retVal = new NSSGetCompanyCreditBalance();
+            var respContent = string.Empty;
+
+            if (useMock)
+            {
+                var resp = new NSSGetCompanyCreditBalance
+                {
+                    CreditAmount = (decimal)200.00
+                };
+
+                return resp;
+            }
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetCompanyAccountCreditBal -> {companyId}", new Exception("NSS token returned empty"));
+                        return retVal;
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+                    // acc credit bal resource
+                    var resource = $"/{companyId}/credit";
+
+                    var response = httpClient.GetAsync(resource).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<NSSGetCompanyCreditBalance>(respContent);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.GetCompanyAccountCredBal -> {companyId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetAccountCreditBal details => companyid: {companyId}", $"resp content ==> {respContent ?? "empty"}");
+
+            return retVal;
+        }
+
+        public void CreateNSSOrder(int companyId, NSSCreateOrderRequest request, bool useMock = false)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            if (useMock)
+            { 
+                return;
+            }
+
+            //initialize
+            var respContent = string.Empty;
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.CreateOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+                    // create user resource
+                    var resource = $"/{companyId}/orders";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var content = new FormUrlEncodedContent(param);
+
+                    var response = httpClient.PostAsync(resource, content).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.CreateOrder -> {request.OrderId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateOrder details => orderid: {request.OrderId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
         }
 
         private void ConfigureNSSApiSettings()
