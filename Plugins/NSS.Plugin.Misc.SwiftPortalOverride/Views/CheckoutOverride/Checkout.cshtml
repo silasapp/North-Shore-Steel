@@ -1,5 +1,6 @@
-﻿@using NSS.Plugin.Misc.SwiftCore.Helpers 
-
+﻿@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@model CheckoutCompleteOverrideModel
 @{
     Layout = "_ColumnsOne";
     var themeName = Constants.ThemeName;
@@ -130,6 +131,15 @@
                             <td>75.7</td>
                             <td>2</td>
                         </tr>
+                        <tr>
+                            <td>213456779-10-1</td>
+                            <td>1 Beam Hot Roll A36 3 x 5.7 x 20</td>
+                            <td>12345</td>
+                            <td>$20.77 / CW</td>
+                            <td>$95.87</td>
+                            <td>75.7</td>
+                            <td>2</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -163,10 +173,8 @@
                     </div>
                 </div>
                 <div style="display:flex;justify-content: center;">
-                    <button class="font14"
-                            style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
-                        PLACE
-                        ORDER
+                    <button class="font14" onclick="setLocation('@Url.Action("Completed")')" style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
+                        PLACE ORDER
                     </button>
                 </div>
             </div>
