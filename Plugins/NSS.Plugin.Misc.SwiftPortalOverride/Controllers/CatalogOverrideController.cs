@@ -60,13 +60,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.Shapes.OrderBy(s => s.Order ).ToList();
 
-            if (shapes != null && shapes.Count > 0)
-            {
-                var prodShapeIds = CatalogModel.Products.Select(x => Convert.ToInt32(x.ProductCustomAttributes.FirstOrDefault(y => y.Key == "shapeId")?.Value)).Distinct();
-
-                shapes = shapes.Where(x => prodShapeIds.Contains(x.Id)).ToList();
-            }
-
             List<ShapeData> shapeData = new List<ShapeData>();
             for (var i = 0; i < shapes.Count; i++)
             {
