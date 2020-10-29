@@ -16,6 +16,13 @@
     Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/checkout.css");
 }
 
+@{
+    var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
+    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
+    var shippingMethodsSelected = checkoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option")?.Values;
+    var isDelivery = shippingMethodsSelected.FirstOrDefault(x => x.Name == "Ship to Customer")?.IsPreSelected;
+    var isPickup = shippingMethodsSelected.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
+}
 
 <div class="page home-page">
     <div class="page-body">
@@ -28,7 +35,7 @@
                     <div style="display: flex;justify-content: space-between;">
                         <div style="display: inline-grid; flex-basis: 30%;">
                             <label for="purchaseOrder" class="font12">Purchase Order #</label>
-                            <p id="purchaseOrder" class="font12">3333</p>
+                            <p id="" class="font12">3333</p>
                         </div>
                         <div style="display: inline-grid; flex-basis: 25%;">
                             <label for="deliveryDate" class="font12">Estimated Delivery Date</label>
@@ -158,31 +165,33 @@
             <div class="col-3">
                 <div class="card card-mod">
                     <h2 class="heading3" style="text-align: center;">ORDER INFORMATION</h2>
-                    <div class="order-summary">
-                        <div class="price-summary">
-                            <p class="title">Sub-Total</p>
-                            <p class="amount">78.33</p>
-                        </div>
-                        <div class="price-summary">
-                            <p class="title">Shipping</p>
-                            <p class="amount">TBD</p>
-                        </div>
-                        <div class="price-summary">
-                            <p class="title">Discount</p>
-                            <p class="amount">0.00</p>
-                        </div>
-                        <div class="price-summary">
-                            <p class="discount-tag font12">10% OFF | 10,000lbs</p>
-                        </div>
-                        <div class="price-summary">
-                            <p class="title">Tax</p>
-                            <p class="amount">12.00</p>
-                        </div>
-                        <div class="price-summary">
-                            <p class="total">Total</p>
-                            <p class="total">$135.33</p>
-                        </div>
-                    </div>
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
+                    @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.ShoppingCartModel.IsEditable })
+                    @*<div class="order-summary">
+                            <div class="price-summary">
+                                <p class="title">Sub-Total</p>
+                                <p class="amount">78.33</p>
+                            </div>
+                            <div class="price-summary">
+                                <p class="title">Shipping</p>
+                                <p class="amount">TBD</p>
+                            </div>
+                            <div class="price-summary">
+                                <p class="title">Discount</p>
+                                <p class="amount">0.00</p>
+                            </div>
+                            <div class="price-summary">
+                                <p class="discount-tag font12">10% OFF | 10,000lbs</p>
+                            </div>
+                            <div class="price-summary">
+                                <p class="title">Tax</p>
+                                <p class="amount">12.00</p>
+                            </div>
+                            <div class="price-summary">
+                                <p class="total">Total</p>
+                                <p class="total">$135.33</p>
+                            </div>
+                        </div>*@
                 </div>
                 <div style="display:flex;justify-content: center;">
                     <button class="font14" onclick="setLocation('@Url.Action("Completed")')" style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
