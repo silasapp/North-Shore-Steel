@@ -246,7 +246,7 @@ BEGIN
 			SELECT ga.EntityId
 			FROM GenericAttribute ga with (NOLOCK) JOIN Shape sh with (NOLOCK) ON sh.Id = CAST(ga.Value AS INT) AND ga.KeyGroup = N''Product'' AND ga.[Key] = N''shapeId''
 			LEFT JOIN Shape psh with (NOLOCK) ON sh.ParentId = psh.Id
-			WHERE sh.[Name] = @keyword OR psh.[Name] = @OriginalKeywords '
+			WHERE sh.[Name] = @OriginalKeywords OR psh.[Name] = @OriginalKeywords '
 
 		--PRINT (@sql)
 		EXEC sp_executesql @sql, N'@Keywords nvarchar(4000), @OriginalKeywords nvarchar(4000)', @Keywords, @OriginalKeywords
