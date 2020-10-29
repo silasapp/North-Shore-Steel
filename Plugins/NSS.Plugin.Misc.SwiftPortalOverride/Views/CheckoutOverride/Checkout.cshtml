@@ -52,7 +52,7 @@
                             <select type="text" class="font14" style="color: rgb(7, 7, 107);" name="shipping-address" id="shippingAddress">
                                 @foreach (var item in Model.ShippingAddressModel.ExistingAddresses)
                                 {
-                                    <option value="">@item.Company @item.Address1, @item.City, @item.StateProvinceName @item.ZipPostalCode</option>
+                                    <option value="">@item.Company, @item.Address1, @item.City, @item.StateProvinceName @item.ZipPostalCode</option>
                                 }
                             </select>
                         </div>

@@ -157,7 +157,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return RedirectToRoute("CheckoutBillingAddress");
         }
 
-        public virtual IActionResult PageCheckout()
+        public virtual IActionResult OnePageCheckout()
         {
             var shoppingCartModel = new ShoppingCartModel();
             //validation
@@ -174,6 +174,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.ShippingMethodModel = _checkoutModelFactory.PrepareShippingMethodModel(cart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer));
             model.ConfirmModel = _checkoutModelFactory.PrepareConfirmOrderModel(cart);
             model.ShoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, cart);
+            //filter by country
+            var filterByCountryId = 0;
+            if (_addressSettings.CountryEnabled)
+            {
+                filterByCountryId = _customerService.GetCustomerBillingAddress(_workContext.CurrentCustomer)?.CountryId ?? 0;
+            }
+
+            //model
+            model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);
         }
 
