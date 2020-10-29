@@ -157,7 +157,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return RedirectToRoute("CheckoutBillingAddress");
         }
 
-        public virtual IActionResult OnePageCheckout()
+        public override IActionResult OnePageCheckout()
         {
             var shoppingCartModel = new ShoppingCartModel();
             //validation
