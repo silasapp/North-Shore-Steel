@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
@@ -17,7 +18,11 @@ using Nop.Services.Shipping;
 using Nop.Web.Controllers;
 using Nop.Web.Factories;
 using Nop.Web.Models.ShoppingCart;
+using NSS.Plugin.Misc.SwiftCore.Services;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
+using NSS.Plugin.Misc.SwiftPortalOverride.Services;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
@@ -51,11 +56,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
         private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
+        private readonly NSSApiProvider _nSSApiProvider;
+        private readonly IShapeService _shapeService;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(AddressSettings addressSettings, IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings, IAddressAttributeParser addressAttributeParser, IAddressService addressService, ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger, IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager, IPaymentService paymentService, IProductService productService, IShippingService shippingService, IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper, IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings, RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings) : base(addressSettings, customerSettings, addressAttributeParser, addressService, checkoutModelFactory, countryService, customerService, genericAttributeService, localizationService, logger, orderProcessingService, orderService, paymentPluginManager, paymentService, productService, shippingService, shoppingCartService, storeContext, webHelper, workContext, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings)
+        public CheckoutOverrideController(IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings, IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings, IAddressAttributeParser addressAttributeParser, IAddressService addressService, ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger, IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager, IPaymentService paymentService, IProductService productService, IShippingService shippingService, IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper, IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings, RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings) : base(addressSettings, customerSettings, addressAttributeParser, addressService, checkoutModelFactory, countryService, customerService, genericAttributeService, localizationService, logger, orderProcessingService, orderService, paymentPluginManager, paymentService, productService, shippingService, shoppingCartService, storeContext, webHelper, workContext, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings)
         {
             _addressSettings = addressSettings;
             _customerSettings = customerSettings;
@@ -82,6 +89,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
             _shoppingCartModelFactory = shoppingCartModelFactory;
+            _nSSApiProvider = nSSApiProvider;
+            _shapeService = shapeService;
         }
         #endregion
 
@@ -185,6 +194,54 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);
         }
+
+        //[HttpPost]
+        //[IgnoreAntiforgeryToken]
+        //public IActionResult GetShippingRate(NSSCalculateShippingRequest requestParam)
+        //{
+        //    var request = new NSSCalculateShippingRequest();
+        //    var orderItems = new List<Item>();
+        //    request.OrderWeight = decimal.Zero;
+
+        //    var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
+        //    if (_workContext.CurrentCustomer.ShippingAddressId != null)
+        //    {
+        //        var address = _addressService.GetAddressById(_workContext.CurrentCustomer.ShippingAddressId.Value);
+        //        _workContext.CurrentCustomer.
+
+        //        foreach (var item in cart)
+        //            {
+        //                var attr = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+        //                bool isNum = decimal.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out decimal weight);
+        //                isNum = int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId);
+        //                isNum = int.TryParse(attr.FirstOrDefault(x => x.Key == "itemId")?.Value, out int itemId);
+        //                isNum = decimal.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out decimal length);
+
+        //                request.OrderWeight += (weight * item.Quantity);
+
+        //                if (length > request.MaxLength)
+        //                    request.MaxLength = length;
+
+        //                var shape = _shapeService.GetShapeById(shapeId);
+
+        //                orderItems.Add(new Item
+        //                {
+        //                    ItemId = itemId,
+        //                    ShapeId = shapeId,
+        //                    ShapeName = shape?.Name
+        //                });
+        //            }
+
+        //        request.Items = orderItems.ToArray();
+
+        //        var response = _nSSApiProvider.GetShippingRate(requestParam, true);
+
+        //        return Json(response);
+        //    }
+
+        //}
 
         #endregion
     }
