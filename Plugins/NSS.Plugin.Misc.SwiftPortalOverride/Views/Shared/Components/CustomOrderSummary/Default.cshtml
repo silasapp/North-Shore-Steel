@@ -91,7 +91,10 @@
                             var product = productService.GetProductById(item.ProductId);
                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
 
-                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value ?? attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                            string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                            var iNo = serialized == "True" ? itemTagNo : itemNo;
                             var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
                             var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
                             var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
@@ -110,7 +113,7 @@
 
 
                             <tr>
-                                <td>@(itemNo)</td>
+                                <td>@(iNo)</td>
                                 <td>@item.ProductName</td>
                                 <td>
                                     @if (custPartNoAttr != null)

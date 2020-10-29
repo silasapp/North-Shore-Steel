@@ -1,5 +1,11 @@
 ﻿@using NSS.Plugin.Misc.SwiftCore.Helpers
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using Nop.Core.Domain.Catalog
+@using Nop.Services.Common
+@using Nop.Services.Catalog
+@inject IGenericAttributeService genericAttributeService
+@inject IProductService productService
+
 @model CheckoutCompleteOverrideModel
 @{
     Layout = "_ColumnsOne";
@@ -22,13 +28,13 @@
                     <div style="display: flex;justify-content: space-between;">
                         <div style="display: inline-grid; flex-basis: 30%;">
                             <label for="purchaseOrder" class="font12">Purchase Order #</label>
-                            <input type="text" class="font12" name="purchase-order" id="purchaseOrder">
+                            <p id="purchaseOrder" class="font12">3333</p>
                         </div>
                         <div style="display: inline-grid; flex-basis: 25%;">
                             <label for="deliveryDate" class="font12">Estimated Delivery Date</label>
                             <p id="deliveryDate" class="font12">10/15/2020</p>
                         </div>
-                        <button class="font14" style=" flex-basis: 30%;">
+                        <button class="font14" style=" flex-basis: 30%;" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
                             <img src="Themes/@themeName/Content/assets/close.svg" alt="" style="margin-right: 5px;">
                             Edit Shopping Cart
                         </button>
@@ -124,13 +130,24 @@
                     <tbody>
                         @foreach (var item in Model.ShoppingCartModel.Items)
                         {
+                            var product = productService.GetProductById(item.ProductId);
+                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                            string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                            var iNo = serialized == "True" ? itemTagNo : itemNo;
+                            var itemWeight = product.Weight;
+                            var weight = Decimal.ToDouble(itemWeight);
+                            var totalWeight = (weight * item.Quantity);
+
                             <tr>
-                                <td>333</td>
+                                <td>@iNo</td>
                                 <td>@item.ProductName</td>
-                                <td>12345</td>
+                                <td>P-12345</td>
                                 <td>@item.UnitPrice / CW</td>
                                 <td>@item.SubTotal</td>
-                                <td>75.7</td>
+                                <td>@totalWeight</td>
                                 <td>@item.Quantity</td>
                             </tr>
                         }
@@ -177,3 +194,11 @@
 
     </div>
 </div>
+@functions{
+    string DoFormat(double myNumber)
+    {
+        var s = string.Format("{0:0.00}", myNumber);
+
+        return s;
+    }
+}
