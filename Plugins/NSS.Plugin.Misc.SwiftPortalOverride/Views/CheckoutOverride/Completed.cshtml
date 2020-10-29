@@ -1,0 +1,45 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@model CheckoutCompleteOverrideModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-checkout-page");
+    Html.AppendPageCssClassParts("html-order-completed-page");
+}
+
+<style>
+    .success-text {
+        text-align: center;
+    }
+</style>
+
+<div class="page checkout-page order-completed-page">
+    <div class="page-title">
+        <h1>THANK YOU</h1>
+    </div>
+    <div class="page-body checkout-data">
+        <div class="section order-completed fieldset">
+            <div class="title">
+                <strong>YOUR ORDER HAS BEEN SUCCESSFULLY PROCESSED</strong>
+            </div>
+            <div class="success-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                culpa qui officia deserunt mollit anim id est laborum.
+            </div>
+        </div>
+    </div>
+    <div class="details" style="text-align: center">
+        <div class="order-number">
+            <b>ORDER NUMBER: 45678946</b>
+        </div>
+        <div class="details-link">
+            <a href="@Url.RouteUrl("OrderDetails")">CLICK HERE TO VIEW ORDER DETAILS </a>
+            @*<a href="@Url.RouteUrl("OrderDetails", new { orderID = Model.OrderId })">CLICK HERE TO VIEW ORDER DETAILS </a>*@
+        </div>
+    </div>
+</div>
