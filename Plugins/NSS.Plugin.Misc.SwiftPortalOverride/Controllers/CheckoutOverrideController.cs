@@ -16,7 +16,7 @@ using Nop.Services.Payments;
 using Nop.Services.Shipping;
 using Nop.Web.Controllers;
 using Nop.Web.Factories;
-using Nop.Web.Models.Checkout;
+using Nop.Web.Models.ShoppingCart;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System.Linq;
 
@@ -50,11 +50,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly PaymentSettings _paymentSettings;
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
+        private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(AddressSettings addressSettings, CustomerSettings customerSettings, IAddressAttributeParser addressAttributeParser, IAddressService addressService, ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger, IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager, IPaymentService paymentService, IProductService productService, IShippingService shippingService, IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper, IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings, RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings) : base(addressSettings, customerSettings, addressAttributeParser, addressService, checkoutModelFactory, countryService, customerService, genericAttributeService, localizationService, logger, orderProcessingService, orderService, paymentPluginManager, paymentService, productService, shippingService, shoppingCartService, storeContext, webHelper, workContext, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings)
+        public CheckoutOverrideController(AddressSettings addressSettings, IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings, IAddressAttributeParser addressAttributeParser, IAddressService addressService, ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger, IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager, IPaymentService paymentService, IProductService productService, IShippingService shippingService, IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper, IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings, RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings) : base(addressSettings, customerSettings, addressAttributeParser, addressService, checkoutModelFactory, countryService, customerService, genericAttributeService, localizationService, logger, orderProcessingService, orderService, paymentPluginManager, paymentService, productService, shippingService, shoppingCartService, storeContext, webHelper, workContext, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings)
         {
             _addressSettings = addressSettings;
             _customerSettings = customerSettings;
@@ -80,6 +81,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _paymentSettings = paymentSettings;
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
+            _shoppingCartModelFactory = shoppingCartModelFactory;
         }
         #endregion
 
@@ -155,8 +157,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return RedirectToRoute("CheckoutBillingAddress");
         }
 
-        public override IActionResult OnePageCheckout()
+        public virtual IActionResult PageCheckout()
         {
+            var shoppingCartModel = new ShoppingCartModel();
             //validation
             if (_orderSettings.CheckoutDisabled)
                 return RedirectToRoute("ShoppingCart");
@@ -170,109 +173,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.ShippingAddressModel = _checkoutModelFactory.PrepareShippingAddressModel(cart, prePopulateNewAddressWithCustomerFields: true);
             model.ShippingMethodModel = _checkoutModelFactory.PrepareShippingMethodModel(cart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer));
             model.ConfirmModel = _checkoutModelFactory.PrepareConfirmOrderModel(cart);
-
+            model.ShoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, cart);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);
-        }
-
-        public override IActionResult ShippingAddress()
-        {
-            //validation
-            if (_orderSettings.CheckoutDisabled)
-                return RedirectToRoute("ShoppingCart");
-
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
-
-            if (!cart.Any())
-                return RedirectToRoute("ShoppingCart");
-
-            if (_orderSettings.OnePageCheckoutEnabled)
-                return RedirectToRoute("CheckoutOnePage");
-
-            if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
-                return Challenge();
-
-            if (!_shoppingCartService.ShoppingCartRequiresShipping(cart))
-                return RedirectToRoute("CheckoutShippingMethod");
-
-            //model
-            var model = _checkoutModelFactory.PrepareShippingAddressModel(cart, prePopulateNewAddressWithCustomerFields: true);
-            return (IActionResult)model;
-        }
-
-        [IgnoreAntiforgeryToken]
-        public override IActionResult Completed(int? orderId)
-        {
-            //validation
-            //if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
-            //    return Challenge();
-
-            //Order order = null;
-            //if (orderId.HasValue)
-            //{
-            //    //load order by identifier (if provided)
-            //    order = _orderService.GetOrderById(orderId.Value);
-            //}
-            //if (order == null)
-            //{
-            //    order = _orderService.SearchOrders(storeId: _storeContext.CurrentStore.Id,
-            //    customerId: _workContext.CurrentCustomer.Id, pageSize: 1)
-            //        .FirstOrDefault();
-            //}
-            //if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
-            //{
-            //    return RedirectToRoute("Homepage");
-            //}
-
-            ////disable "order completed" page?
-            //if (_orderSettings.DisableOrderCompletedPage)
-            //{
-            //    return RedirectToRoute("OrderDetails", new { orderId = order.Id });
-            //}
-
-            ////model
-            //var model = _checkoutModelFactory.PrepareCheckoutCompletedModel(order);
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Completed.cshtml");
-        }
-
-        public override IActionResult ShippingMethod()
-        {
-            //validation
-            if (_orderSettings.CheckoutDisabled)
-                return RedirectToRoute("ShoppingCart");
-
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
-
-            if (!cart.Any())
-                return RedirectToRoute("ShoppingCart");
-
-            if (_orderSettings.OnePageCheckoutEnabled)
-                return RedirectToRoute("CheckoutOnePage");
-
-            if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
-                return Challenge();
-
-            if (!_shoppingCartService.ShoppingCartRequiresShipping(cart))
-            {
-                _genericAttributeService.SaveAttribute<ShippingOption>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedShippingOptionAttribute, null, _storeContext.CurrentStore.Id);
-                return RedirectToRoute("CheckoutPaymentMethod");
-            }
-
-            //model
-            var model = _checkoutModelFactory.PrepareShippingMethodModel(cart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer));
-
-            if (_shippingSettings.BypassShippingMethodSelectionIfOnlyOne &&
-                model.ShippingMethods.Count == 1)
-            {
-                //if we have only one shipping method, then a customer doesn't have to choose a shipping method
-                _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
-                    NopCustomerDefaults.SelectedShippingOptionAttribute,
-                    model.ShippingMethods.First().ShippingOption,
-                    _storeContext.CurrentStore.Id);
-
-                return RedirectToRoute("CheckoutPaymentMethod");
-            }
-
-            return (IActionResult)model;
         }
 
         #endregion

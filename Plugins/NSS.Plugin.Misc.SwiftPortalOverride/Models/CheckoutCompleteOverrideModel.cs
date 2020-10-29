@@ -2,6 +2,7 @@
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Checkout;
+using Nop.Web.Models.ShoppingCart;
 using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Controllers;
 using System;
@@ -17,6 +18,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public CheckoutShippingAddressModel ShippingAddressModel { get; set; }
         public CheckoutShippingMethodModel ShippingMethodModel { get; set; }
         public CheckoutConfirmModel ConfirmModel { get; set; }
+        public ShoppingCartModel ShoppingCartModel { get; set; }
 
 
 

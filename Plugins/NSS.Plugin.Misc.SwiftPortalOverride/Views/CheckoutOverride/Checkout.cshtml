@@ -49,11 +49,11 @@
                     <div style="display: flex;justify-content: space-between;">
                         <div style="display: inline-grid; flex-basis: 65%;">
                             <label for="shippingAddress" class="font12">Shipping Address</label>
-                            <select type="text" class="font14" style="color: rgb(7, 7, 107);" name="shipping-address"
-                                    id="shippingAddress">
-                                <option value="">
-                                    ACME Inc. 12345 Main Street, Houston, TX 77056
-                                </option>
+                            <select type="text" class="font14" style="color: rgb(7, 7, 107);" name="shipping-address" id="shippingAddress">
+                                @foreach (var item in Model.ShippingAddressModel.ExistingAddresses)
+                                {
+                                    <option value="">@item.Company @item.Address1, @item.City, @item.StateProvinceName @item.ZipPostalCode</option>
+                                }
                             </select>
                         </div>
                         <a href="" class="font12"
@@ -117,29 +117,24 @@
                             <th scope="col">Customer Part #</th>
                             <th scope="col">Unit Price</th>
                             <th scope="col">Total Price</th>
-                            <th scope="col">Total Weight</th>
+                            <th scope="col">Total Weight (lbs)</th>
                             <th scope="col">Qty.</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>213456779-10-1</td>
-                            <td>1 Beam Hot Roll A36 3 x 5.7 x 20</td>
-                            <td>12345</td>
-                            <td>$20.77 / CW</td>
-                            <td>$95.87</td>
-                            <td>75.7</td>
-                            <td>2</td>
-                        </tr>
-                        <tr>
-                            <td>213456779-10-1</td>
-                            <td>1 Beam Hot Roll A36 3 x 5.7 x 20</td>
-                            <td>12345</td>
-                            <td>$20.77 / CW</td>
-                            <td>$95.87</td>
-                            <td>75.7</td>
-                            <td>2</td>
-                        </tr>
+                        @foreach (var item in Model.ShoppingCartModel.Items)
+                        {
+                            <tr>
+                                <td>333</td>
+                                <td>@item.ProductName</td>
+                                <td>12345</td>
+                                <td>@item.UnitPrice / CW</td>
+                                <td>@item.SubTotal</td>
+                                <td>75.7</td>
+                                <td>@item.Quantity</td>
+                            </tr>
+                        }
+
                     </tbody>
                 </table>
             </div>
