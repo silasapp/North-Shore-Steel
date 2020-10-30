@@ -74,6 +74,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
              new { },
              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
              );
+
+            //endpointRouteBuilder.MapControllerRoute("ProductSearch", $"{pattern}search/",
+            //    new { controller = "Catalog", action = "Search" });
         }
     }
 }
