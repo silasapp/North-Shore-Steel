@@ -303,8 +303,9 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 
 }
 
+
 <script id="quantityTemplate" type="text/x-template">
-    <input style="width: 40px" type="number" name="quantity" min="1" id="qty${_itemId}">
+    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null">
 </script>
 
 <script id="optionsTemplate" type="text/x-template">
