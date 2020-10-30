@@ -212,7 +212,7 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 {
     if (Model.FilterParams.ShapeIds.Count > 0)
     {
-        headerColumns = Model.Products.FirstOrDefault().Shape.Atttributes.ToList();
+        headerColumns = Model.Products.FirstOrDefault().Shape?.Atttributes.ToList();
     }
     else
     {
@@ -258,7 +258,7 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 
         productRowData.Add("_itemId", item.Id.ToString());
         productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
-        productRowData.Add("_sawOption", item.Shape.SawOption.ToString());
+        productRowData.Add("_sawOption", item.Shape?.SawOption.ToString());
         productRowData.Add("_cartId", shoppingCartTypeId.ToString());
         productRowData.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString());
         productRowData.Add("_wishListId", wishListShoppingCartId.ToString());

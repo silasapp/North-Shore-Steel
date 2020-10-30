@@ -35,7 +35,7 @@
                     <div style="display: flex;justify-content: space-between;">
                         <div style="display: inline-grid; flex-basis: 30%;">
                             <label for="purchaseOrder" class="font12">Purchase Order #</label>
-                            <p id="" class="font12">3333</p>
+                            <p id="" class="font12">@purchaseOrder</p>
                         </div>
                         <div style="display: inline-grid; flex-basis: 25%;">
                             <label for="deliveryDate" class="font12">Estimated Delivery Date</label>
@@ -144,9 +144,9 @@
                             var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                             string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
                             var iNo = serialized == "True" ? itemTagNo : itemNo;
-                            var itemWeight = product.Weight;
-                            var weight = Decimal.ToDouble(itemWeight);
-                            var totalWeight = (weight * item.Quantity);
+                            var weight = Decimal.ToDouble(product.Weight);
+                            weight = (weight * item.Quantity);
+                            var totalWeight = DoFormat(weight);
 
                             <tr>
                                 <td>@iNo</td>
