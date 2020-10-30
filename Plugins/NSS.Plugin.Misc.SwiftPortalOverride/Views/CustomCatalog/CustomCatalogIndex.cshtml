@@ -10,7 +10,7 @@
     Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
 }
 
-@{    
+@{
     var noSelectedShape = true;
     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
@@ -32,7 +32,7 @@
                                 SHAPES
                             </a>
                         </div>
-                        <div id="collapseOne" class="collapse show">
+                        <div id="collapseOne" class="collapse show" style="max-height: 36rem; overflow-x: auto;">
                             <div class="">
                                 <ejs-treeview id="treedata" showCheckBox="true" nodeClicked="nodeCheck">
                                     <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
