@@ -17,62 +17,89 @@
 }
 
 @{
-    var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
-    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
-    var shippingMethodsSelected = checkoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option")?.Values;
-    var isDelivery = shippingMethodsSelected.FirstOrDefault(x => x.Name == "Ship to Customer")?.IsPreSelected;
-    var isPickup = shippingMethodsSelected.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+    var shippingAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.ExistingAddresses, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
 }
 
-<div class="page home-page">
+<div id="checkout" class="page home-page">
     <div class="page-body">
         <h1 class="heading1" style="text-align: center;margin: 15px 0;">CHECKOUT</h1>
         <hr style="height: 2px; color: #000; opacity: 0.5;margin-bottom: 30px;">
-        <div class="row" style="justify-content: space-between;">
+        <div class="row px-5" style="justify-content: space-between;">
             <div class="col-9">
                 <div class="card card-mod">
-                    <h1 class="heading2">ORDER INFORMATION</h1>
-                    <div style="display: flex;justify-content: space-between;">
-                        <div style="display: inline-grid; flex-basis: 30%;">
-                            <label for="purchaseOrder" class="font12">Purchase Order #</label>
-                            <p id="" class="font12">@purchaseOrder</p>
+                    <label class="h5 text-primary font-weight-bold mb-4">ORDER INFORMATION</label>
+                    <div class="d-flex flex-row justify-content-between mt-2">
+                        <div class="d-flex flex-column">
+                            <label for="purchaseOrder" class="fs-13 text-black">Purchase Order #</label>
+                            <label id="purchaseOrder" class="p-2 text-black">@purchaseOrder</label>
                         </div>
-                        <div style="display: inline-grid; flex-basis: 25%;">
-                            <label for="deliveryDate" class="font12">Estimated Delivery Date</label>
-                            <p id="deliveryDate" class="font12">10/15/2020</p>
+                        <div class="d-flex flex-column ml-5">
+                            <label for="deliveryDate" class="fs-13 text-black">Estimated Delivery Date</label>
+                            <label id="deliveryDate" class="p-2 text-black">TBD</label>
                         </div>
-                        <button class="font14" style=" flex-basis: 30%;" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
+                        <button class="h6 text-primary mr-5" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
                             <img src="Themes/@themeName/Content/assets/close.svg" alt="" style="margin-right: 5px;">
                             Edit Shopping Cart
                         </button>
                     </div>
                 </div>
                 <div class="card card-mod">
-                    <h1 class="heading2">SHIPPING OR PICKUP</h1>
-                    <div style="display: flex; justify-content: center;">
-                        <button class="font14"
-                                style="margin-right:2px;background-color:  rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
+                    <h1 class="h5 text-primary font-weight-bold mb-4">SHIPPING OR PICKUP</h1>
+                    <div class="d-flex flex-row justify-content-center mb-3">
+                        <button class="fs-14 shipping-tab mr-2" :class="{'active': isDelivery}" v-on:click="isDelivery = true;">
                             Delivery
                         </button>
-                        <button class="font14"
-                                style="margin-left: 2px; padding: 5px 15px;background-color:  rgb(226, 231, 243);">
+                        <button class="font14 shipping-tab" :class="{'active': !isDelivery}" v-on:click="isDelivery = false;">
                             Pickup
                         </button>
                     </div>
-                    <div style="display: flex;justify-content: space-between;">
-                        <div style="display: inline-grid; flex-basis: 65%;">
-                            <label for="shippingAddress" class="font12">Shipping Address</label>
-                            <select type="text" class="font14" style="color: rgb(7, 7, 107);" name="shipping-address" id="shippingAddress">
+
+                    <div class="d-flex flex-column mb-3" v-if="isDelivery">
+                        <label for="shippingAddress" class="fs-14 text-black mb-1">Shipping Address</label>
+                        <div class="d-flex flex-row">
+                            <select type="text" class="bg-accent text-black w-75 px-2 py-2"
+                                    name="shipping-address" id="shippingAddress">
+                                <option value="" v-for="address in shippingAddresses">
+                                    {{ address.company }}, {{ address.address1 }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                </option>
+                            </select>
+                            <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline">
+                                Enter a new shiping address
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column mb-3" v-if="!isDelivery">
+                        <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
+                        <div class="d-flex flex-row">
+                            <select type="text" class="bg-accent text-black w-100 px-2 py-2" name="shipping-address" id="shippingAddress">
                                 @foreach (var item in Model.ShippingAddressModel.ExistingAddresses)
                                 {
                                     <option value="">@item.Company, @item.Address1, @item.City, @item.StateProvinceName @item.ZipPostalCode</option>
                                 }
                             </select>
                         </div>
-                        <a href="" class="font12"
-                           style="display: flex;align-items: flex-end;flex-basis: 30%;margin: 0;">
-                            Enter a new shiping address
-                        </a>
+                    </div>
+
+                    <div class="d-flex flex-column">
+                        <h1 class="h5 text-primary font-weight-bold mb-2">NEW ADDRESS</h1>
+                        <div class="d-flex flex-row mt-3">
+                            <div class="d-flex flex-column w-50 mr-2">
+                                <label class="fs-14 text-black mb-1">Address Line 1</label>
+                                <input type="text" class="" v-model="addressLine1" placeholder="Ex: 1234 Main St." />
+                            </div>
+                            <div class="d-flex flex-column w-50 ml-2">
+                                <label class="fs-14 text-black mb-1">Address Line 2</label>
+                                <input type="text" class="" v-model="addressLine2" placeholder="Ex: Ste. 800" />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card card-mod">
@@ -165,33 +192,31 @@
             <div class="col-3">
                 <div class="card card-mod">
                     <h2 class="heading3" style="text-align: center;">ORDER INFORMATION</h2>
-                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
-                    @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.ShoppingCartModel.IsEditable })
-                    @*<div class="order-summary">
-                            <div class="price-summary">
-                                <p class="title">Sub-Total</p>
-                                <p class="amount">78.33</p>
-                            </div>
-                            <div class="price-summary">
-                                <p class="title">Shipping</p>
-                                <p class="amount">TBD</p>
-                            </div>
-                            <div class="price-summary">
-                                <p class="title">Discount</p>
-                                <p class="amount">0.00</p>
-                            </div>
-                            <div class="price-summary">
-                                <p class="discount-tag font12">10% OFF | 10,000lbs</p>
-                            </div>
-                            <div class="price-summary">
-                                <p class="title">Tax</p>
-                                <p class="amount">12.00</p>
-                            </div>
-                            <div class="price-summary">
-                                <p class="total">Total</p>
-                                <p class="total">$135.33</p>
-                            </div>
-                        </div>*@
+                    <div class="order-summary">
+                        <div class="price-summary">
+                            <p class="title">Sub-Total</p>
+                            <p class="amount">78.33</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="title">Shipping</p>
+                            <p class="amount">TBD</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="title">Discount</p>
+                            <p class="amount">0.00</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="discount-tag font12">10% OFF | 10,000lbs</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="title">Tax</p>
+                            <p class="amount">12.00</p>
+                        </div>
+                        <div class="price-summary">
+                            <p class="total">Total</p>
+                            <p class="total">$135.33</p>
+                        </div>
+                    </div>
                 </div>
                 <div style="display:flex;justify-content: center;">
                     <button class="font14" onclick="setLocation('@Url.Action("Completed")')" style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
@@ -211,3 +236,20 @@
         return s;
     }
 }
+<script>
+    var shippingAddresses = @Html.Raw(shippingAddresses);
+    console.log("addresses: ", shippingAddresses);
+    new Vue({
+        el: '#checkout',
+        data: {
+            isDelivery: true,
+            shippingAddresses,
+            addressLine1: null,
+            addressLine2: null,
+        },
+        mounted: function () {
+        },
+        methods: {
+        },
+    });
+</script>

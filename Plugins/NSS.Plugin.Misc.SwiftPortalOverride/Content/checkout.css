@@ -14,6 +14,37 @@
     font-weight: 600;
 }
 
+.fs-12 {
+    font-size: 12px;
+}
+
+.fs-13 {
+    font-size: 13px;
+}
+
+.fs-14 {
+    font-size: 14px;
+}
+
+.fs-20 {
+    font-size: 20px;
+}
+
+#purchaseOrder {
+    background: #F6F6F6;
+}
+
+.shipping-tab {
+    background-color: #F6F6F6;
+    color: #000;
+    padding: 7px 16px;
+}
+
+    .shipping-tab.active {
+        background-color: #0076B4;
+        color: #FFF;
+    }
+
 button, button:focus {
     background: none;
     border: none;
@@ -34,9 +65,9 @@ button, button:focus {
 }
 
 .active, .active:focus {
-    background-color: rgb(7, 7, 107);
+    /* background-color: rgb(7, 7, 107);
     border: none;
-    color: #ffffff;
+    color: #ffffff;*/
 }
 
 .heading1 {
@@ -60,15 +91,12 @@ button, button:focus {
     font-size: 16px;
 }
 
-#purchaseOrder, #shippingAddress {
-    background-color: rgb(226, 231, 243);
+#shippingAddress {
     border: none;
-    height: 30px;
-    margin-top: 10px;
-    padding: 2px 10px;
+    height: 38px;
 }
 
-    #purchaseOrder:focus, #shippingAddress:focus {
+    #shippingAddress:focus {
         outline: none;
     }
 
@@ -80,9 +108,44 @@ button, button:focus {
     box-shadow: 0px 0px 8px -5px #000;
 }
 
+#checkout input {
+    background: #F6F6F6;
+    border: none;
+    color: #000;
+    padding: 6px 4px;
+}
+
+    #checkout input::placeholder {
+        font-style: italic;
+        color: #777;
+    }
+
+    #checkout input::-webkit-input-placeholder {
+        font-style: italic;
+        color: #C3C3C3;
+    }
+
+    #checkout input:-moz-placeholder { /* Firefox 18- */
+        font-style: italic;
+        color: #C3C3C3;
+    }
+
+    #checkout input::-moz-placeholder { /* Firefox 19+ */
+        font-style: italic;
+        color: #C3C3C3;
+    }
+
+    #checkout input:-ms-input-placeholder {
+        font-style: italic;
+        color: #C3C3C3;
+    }
+
+    #checkout input::placeholder {
+        font-style: italic;
+        color: #C3C3C3;
+    }
 
 /* Table sort indicators */
-
 .catalog-table {
     border: 2px solid #ffffff !important;
     margin-bottom: 50px;
@@ -258,3 +321,19 @@ td {
             background-color: #585858;
             color: #ffffff;
         }
+
+.text-primary {
+    color: #03175B !important;
+}
+
+.text-black {
+    color: #000;
+}
+
+.text-decoration-underline {
+    text-decoration: underline;
+}
+
+.bg-accent {
+    background-color: #F6F6F6;
+}
