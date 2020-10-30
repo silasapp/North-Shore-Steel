@@ -273,7 +273,9 @@ namespace Nop.Web.Controllers
                 model = new SearchModel();
 
             model = _catalogModelFactory.PrepareSearchModel(model, command);
-            return View(model);
+            //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", model);
+            //return View(model);
+            return RedirectToRoute("catalog");
         }
 
         public virtual IActionResult SearchTermAutoComplete(string term)
