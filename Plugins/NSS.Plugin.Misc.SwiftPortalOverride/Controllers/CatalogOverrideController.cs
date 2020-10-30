@@ -159,7 +159,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 ContractResolver = contractResolver,
                 Formatting = Formatting.None
             });
-
         }
     }
 }
