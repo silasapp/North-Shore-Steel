@@ -11,7 +11,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string DeliveryMethod { get; set; }
 
         [JsonProperty("pickupLocationId")]
-        public long PickupLocationId { get; set; }
+        public int PickupLocationId { get; set; }
 
         [JsonProperty("destinationAddressLine1")]
         public string DestinationAddressLine1 { get; set; }
@@ -29,10 +29,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string PostalCode { get; set; }
 
         [JsonProperty("orderWeight")]
-        public long OrderWeight { get; set; }
+        public decimal OrderWeight { get; set; }
 
         [JsonProperty("maxLength")]
-        public double MaxLength { get; set; }
+        public decimal MaxLength { get; set; }
 
         [JsonProperty("items")]
         public Item[] Items { get; set; }
@@ -44,7 +44,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public long ItemId { get; set; }
 
         [JsonProperty("shapeId")]
-        public long ShapeId { get; set; }
+        public int ShapeId { get; set; }
 
         [JsonProperty("shapeName")]
         public string ShapeName { get; set; }
