@@ -10,11 +10,11 @@
     Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
 }
 
-@{
+@{    
     var noSelectedShape = true;
     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
-<div class="page home-page">
+<div id="app" class="page home-page">
     <div class="page-body">
         <div class="row">
             <div class="col-sm-3"></div>
@@ -194,7 +194,6 @@
     function populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames) {
         $("#overlay").css("display", "flex");
 
-
         var specValue = "";
         specValue = "<div style =\"display: flex; margin: 0 0 12px 0;\">";
         for (i = 0; i < specNames.length; i++) {
@@ -218,8 +217,10 @@
 
 
         $("#overlay").css("display", "flex");
-        var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs};
 
+        let searchKeyword = getUrlParameter('q');
+        console.log("getUrlParameter: ", searchKeyword);
+        var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs, SearchKeyword: searchKeyword };
 
         $.ajax({
             url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
@@ -229,8 +230,9 @@
             success: function (data) {
                 if(data != null)
                 {
+                    console.log("filterParams: ", filterParams);
                     $("#overlay").css("display", "none");
-                    $('#partialview').html(data)
+                    $('#partialview').html(data);
                 }
             },
             error: function (xhr, thrownError) {
@@ -300,8 +302,9 @@
 
         document.getElementById("shapes").innerHTML = shapeValue;
 
-
-        var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs };
+        let searchKeyword = getUrlParameter('q');
+        console.log("getUrlParameter: ", searchKeyword);
+        var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs, SearchKeyword: searchKeyword };
         console.log('filterParams', filterParams);
         $.ajax({
              url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
@@ -312,7 +315,7 @@
                 if(data != null)
                 {
                     $("#overlay").css("display", "none");
-                    $('#partialview').html(data)
+                    $('#partialview').html(data);
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -323,5 +326,11 @@
         });
     }
 
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    };
 </script>
 <ejs-scripts></ejs-scripts>

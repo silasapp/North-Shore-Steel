@@ -22,6 +22,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -86,7 +89,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     }
             }
 
-            ViewBag.dataSource = shapeData;
+            ViewBag.dataSource = JavaScriptConvert.ToString(shapeData);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
         }
 
@@ -104,12 +107,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var shapeIds = filterParams?.ShapeIds;
             var specIds = filterParams?.SpecIds;
+            var searchKeyword = filterParams?.SearchKeyword;
             if (shapeIds == null)
                 shapeIds = new List<int>();
             if (specIds == null)
                 specIds = new List<int>();
 
-            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds, searchKeyword);
             CatalogModel.FilterParams = filterParams;
 
             return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
@@ -120,8 +124,42 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             public List<int> SpecIds { get; set; }
             public List<int> ShapeIds { get; set; }
+            public string SearchKeyword { get; set; }
         }
 
         public CatalogModel CatalogModel { get; set; }
+    }
+
+    public static class JavaScriptConvert
+    {
+        //public static IHtmlString SerializeObject(object value)
+        //{
+        //    using (var stringWriter = new StringWriter())
+        //    using (var jsonWriter = new JsonTextWriter(stringWriter))
+        //    {
+        //        var serializer = new JsonSerializer
+        //        {
+        //            // Let's use camelCasing as is common practice in JavaScript
+        //            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        //        };
+
+        //        // We don't want quotes around object names
+        //        jsonWriter.QuoteName = false;
+        //        serializer.Serialize(jsonWriter, value);
+
+        //        return new HtmlString(stringWriter.ToString());
+        //    }
+        //}
+
+        public static string ToString(object data)
+        {
+            var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+            return JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver,
+                Formatting = Formatting.None
+            });
+
+        }
     }
 }

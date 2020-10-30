@@ -81,18 +81,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// <param name="model">Search model</param>
         /// <param name="command">Catalog paging filtering command</param>
         /// <returns>Search model</returns>
-        public CatalogModel PrepareSwiftCatalogModel(IList<int> shapeIds, IList<int> specIds)
+        public CatalogModel PrepareSwiftCatalogModel(IList<int> shapeIds, IList<int> specIds, string searchKeyword = null)
         {
             var model = new CatalogModel();
-            var searchTerms = string.Empty;
+            var searchTerms = searchKeyword; //string.Empty;
 
             IPagedList<Product> products = new PagedList<Product>(new List<Product>(), 0, 1);
             // only search if query string search keyword is set (used to avoid searching or displaying search term min length error message on /search page load)
             //we don't use "!string.IsNullOrEmpty(searchTerms)" in cases of "ProductSearchTermMinimumLength" set to 0 but searching by other parameters (e.g. category or price filter)
-            var isSearchTermSpecified = _httpContextAccessor.HttpContext.Request.Query.ContainsKey("q");
+            //var isSearchTermSpecified = _httpContextAccessor.HttpContext.Request.Query.ContainsKey("q");
 
-            if (_httpContextAccessor.HttpContext.Request.Query.TryGetValue("q", out var query))
-                searchTerms = query.FirstOrDefault();
+            //if (_httpContextAccessor.HttpContext.Request.Query.TryGetValue("q", out var query))
+            //    searchTerms = query.FirstOrDefault();
 
 
             decimal? minPriceConverted = null;
