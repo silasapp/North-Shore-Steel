@@ -252,14 +252,17 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 
     @foreach (var item in Model.Products)
     {
+        //string serialized = item.FirstOrDefault(x => x.Key == "serialized")?.Value;
         var productRowData = new Dictionary<string, string>();
         var attr = genericAttributeService.GetAttributesForEntity(item.Id, nameof(Product));
         string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
         @foreach (var it in headerColumns)
         {
+            var itemCode = it.Code;
             var Code = serialized == "True" ? "itemTagNo" : "itemNo";
-            productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == Code)?.Value);
+            itemCode = itemCode == "itemNo" ? Code : itemCode;
+            productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
         }
 
         productRowData.Add("_itemId", item.Id.ToString());
