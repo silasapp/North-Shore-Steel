@@ -1,7 +1,10 @@
 ﻿@using Nop.Core
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using NSS.Plugin.Misc.SwiftPortalOverride
+@using Nop.Services.Common
+@using Nop.Core.Domain.Catalog
 @inject IWorkContext workContext
+@inject IGenericAttributeService genericAttributeService
 @using Syncfusion.EJ2
 
 @model CatalogModel
@@ -250,10 +253,13 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
     @foreach (var item in Model.Products)
     {
         var productRowData = new Dictionary<string, string>();
+        var attr = genericAttributeService.GetAttributesForEntity(item.Id, nameof(Product));
+        string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
         @foreach (var it in headerColumns)
         {
-            productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Code)?.Value);
+            var Code = serialized == "True" ? "itemTagNo" : "itemNo";
+            productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == Code)?.Value);
         }
 
         productRowData.Add("_itemId", item.Id.ToString());
