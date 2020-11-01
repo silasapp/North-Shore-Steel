@@ -14,6 +14,7 @@
     var noSelectedShape = true;
     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
+
 <div id="app" class="page home-page">
     <div class="page-body">
         <div class="row">
@@ -85,7 +86,7 @@
                                         @foreach (var item in group)
                                         {
                                             <div id="collapse-@index" class="collapse show">
-                                                <div class="card-body">
+                                                <div class="card-body" style="padding-left: 2.8rem">
                                                     <label class="pure-material-checkbox">
                                                         <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
                                                         <span>@item.SpecificationAttributeOptionName</span>
@@ -107,7 +108,7 @@
                                     @foreach (var item in group)
                                     {
                                         <div id="collapse-@index" class="collapse show">
-                                            <div class="card-body">
+                                            <div class="card-body" style="padding-left: 2.8rem">
                                                 <label class="pure-material-checkbox">
                                                     <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
                                                     <span>@item.SpecificationAttributeOptionName</span>
