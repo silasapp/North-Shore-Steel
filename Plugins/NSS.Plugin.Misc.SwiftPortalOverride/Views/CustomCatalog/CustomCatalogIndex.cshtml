@@ -21,7 +21,8 @@
             <div class="col-sm-3"></div>
             <div class="col-sm-9">
                 <div id="specs" style="float:left"></div>
-                <div id="shapes"></div>
+                <div id="shapes" style="float:left"></div>
+                <div id="clearAllFilters" onclick=clearFilters() style="cursor:pointer"></div>
             </div>
         </div>
         <div class="row">
@@ -196,6 +197,7 @@
         $("#overlay").css("display", "flex");
 
         var specValue = "";
+        var allFilterValue = "";
         specValue = "<div style =\"display: flex; margin: 0 0 12px 0;\">";
         for (i = 0; i < specNames.length; i++) {
             var sChip = specNames[i].replace(/ /g, "_");
@@ -204,6 +206,7 @@
         specValue += "</div>";
 
         document.getElementById("specs").innerHTML = specValue;
+
 
 
         var shapeValue = "";
@@ -216,6 +219,11 @@
 
         document.getElementById("shapes").innerHTML = shapeValue;
 
+        if (specNames.length > 0 || shapeNames.length > 0) {
+            var allFilterValue = "";
+            allFilterValue = "<div style=\"display: flex; margin: 0 20px 12px 0;\">Clear Filters</div>";
+            document.getElementById("clearAllFilters").innerHTML = allFilterValue;
+        }
 
         $("#overlay").css("display", "flex");
 
@@ -242,6 +250,24 @@
                 $("#overlay").css("display", "none");
             }
         });
+    }
+
+    function clearFilters() {
+        $("#overlay").css("display", "flex");
+        specNames = [];
+        shapeNames = [];
+        specIDs = [];
+        shapeIDs = [];
+        populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
+
+        document.getElementById("clearAllFilters").innerHTML = "";
+        var inputs = document.querySelectorAll("input[type='checkbox']");
+        var treeObj = document.getElementById('treedata').ej2_instances[0];
+        treeObj.uncheckAll();
+        for (var i = 0; i < inputs.length; i++) {
+            boxId = inputs[i].id;
+            $("#" + inputs[i].id).prop('checked', false);
+        }
     }
 
     var boxId = 0;
@@ -289,7 +315,6 @@
             specValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
         }
         specValue += "</div>";
-
         document.getElementById("specs").innerHTML = specValue;
 
 
@@ -300,8 +325,13 @@
             shapeValue += "<span class=\"filter-tag\">" + shapeNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
         }
         shapeValue += "</div>";
-
         document.getElementById("shapes").innerHTML = shapeValue;
+
+        var allFilterValue = "";
+        if (specNames.length > 0 || shapeNames.length > 0) {
+            allFilterValue = "<div style=\"display: flex; margin: 0 20px 12px 0;\">Clear Filters</div>";
+        }
+         document.getElementById("clearAllFilters").innerHTML = allFilterValue;
 
         let searchKeyword = getUrlParameter('q');
         console.log("getUrlParameter: ", searchKeyword);
@@ -326,6 +356,7 @@
             }
         });
     }
+
 
     function getUrlParameter(name) {
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
