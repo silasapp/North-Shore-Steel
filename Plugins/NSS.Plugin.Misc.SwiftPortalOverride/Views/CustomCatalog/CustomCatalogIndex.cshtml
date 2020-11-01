@@ -74,33 +74,11 @@
                                     key = group.Key;
                                     break;
                             }
-                            if (noSelectedShape)
+                            //if (noSelectedShape)
+                            //{
+                            if (@key == "METAL" || @key == "COATING")
                             {
-                                if (@key == "METAL" || @key == "COATING")
-                                {
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                                @key
-                                            </a>
-                                        </div>
-                                        @foreach (var item in group)
-                                        {
-                                            <div id="collapse-@index" class="collapse show">
-                                                <div class="card-body" style="padding-left: 2.8rem">
-                                                    <label class="pure-material-checkbox">
-                                                        <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                                        <span>@item.SpecificationAttributeOptionName</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                            }
-                            else
-                            {
-                                <div class="card">
+                                <div class="card defaultSpecs" style="display: flex">
                                     <div class="card-header">
                                         <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
                                             @key
@@ -119,6 +97,28 @@
                                     }
                                 </div>
                             }
+                            //}
+                            //else
+                            //{
+                            <div class="card plateIndividualSpecs" style="display: none">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                        @key
+                                    </a>
+                                </div>
+                                @foreach (var item in group)
+                                {
+                                    <div id="collapse-@index" class="collapse show">
+                                        <div class="card-body" style="padding-left: 2.8rem">
+                                            <label class="pure-material-checkbox">
+                                                <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                <span>@item.SpecificationAttributeOptionName</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            //}
                         }
                     }
                 </div>
@@ -167,19 +167,45 @@
             var checkedValue = selectedShape.text
             shapeIDs.indexOf(shapeId) === -1 ? shapeIDs.push(shapeId) : shapeIDs.splice(shapeIDs.indexOf(shapeId), 1);
             shapeNames.indexOf(checkedValue) === -1 ? shapeNames.push(checkedValue) : shapeNames.splice(shapeNames.indexOf(checkedValue), 1);
-            populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
-
-
         } else {
             var shapeButtons = $('.e-frame.e-icons.e-check');
             if (shapeButtons.length == 0) {
                 shapeIDs = [];
                 shapeNames = [];
                 populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
-
             }
-
         }
+
+        var defaultSpecs = document.getElementsByClassName("defaultSpecs");
+        var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
+        var inputs = document.querySelectorAll("input[type='checkbox']");
+        var inputs = document.querySelectorAll("input[type='checkbox']");
+        if (getNodeDetails.text == "Plate - Individual" && getNodeDetails.isChecked == "true") {
+            specNames = [];
+            specIDs = [];
+            for (var i = 0; i < inputs.length; i++) {
+               $(inputs[i]).prop('checked', false);
+            }
+            defaultSpecs[0].style.display = "none"
+            defaultSpecs[1].style.display = "none"
+            for (var j = 0; j < plateIndividualSpecs.length; j++) {
+                plateIndividualSpecs[j].style.display = "flex"
+            }
+        }
+        else if (getNodeDetails.text == "Plate - Individual" && getNodeDetails.isChecked == "false") {
+            specNames = [];
+            specIDs = [];
+            for (var i = 0; i < inputs.length; i++) {
+               $(inputs[i]).prop('checked', false);
+            }
+            defaultSpecs[0].style.display = "flex"
+            defaultSpecs[1].style.display = "flex"
+            for (var i = 0; i < plateIndividualSpecs.length; i++) {
+                plateIndividualSpecs[i].style.display = "none"
+            }
+        };
+
+        populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
     }
 
 
@@ -219,11 +245,11 @@
 
         document.getElementById("shapes").innerHTML = shapeValue;
 
+        var allFilterValue = "";
         if (specNames.length > 0 || shapeNames.length > 0) {
-            var allFilterValue = "";
             allFilterValue = "<div style=\"display: flex; margin: 0 20px 12px 0;\">Clear Filters</div>";
-            document.getElementById("clearAllFilters").innerHTML = allFilterValue;
         }
+        document.getElementById("clearAllFilters").innerHTML = allFilterValue;
 
         $("#overlay").css("display", "flex");
 
@@ -263,6 +289,15 @@
         document.getElementById("clearAllFilters").innerHTML = "";
         var inputs = document.querySelectorAll("input[type='checkbox']");
         var treeObj = document.getElementById('treedata').ej2_instances[0];
+
+        var defaultSpecs = document.getElementsByClassName("defaultSpecs");
+        var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
+        defaultSpecs[0].style.display = "flex"
+        defaultSpecs[1].style.display = "flex"
+        for (var j = 0; j < plateIndividualSpecs.length; j++) {
+            plateIndividualSpecs[j].style.display = "none";
+        }
+
         treeObj.uncheckAll();
         for (var i = 0; i < inputs.length; i++) {
             boxId = inputs[i].id;
@@ -286,27 +321,38 @@
         }
         selectedChip = selectedChip.replace(/_/g, " ");
 
-            for (var i = 0; i < inputs.length; i++) {
-                if (inputs[i].checked == true && inputs[i].value == selectedChip) {
-                    boxId = inputs[i].id;
-                    $("#" + inputs[i].id).prop('checked', false);
-                    specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].checked == true && inputs[i].value == selectedChip) {
+                boxId = inputs[i].id;
+                $("#" + inputs[i].id).prop('checked', false);
+                specNames.indexOf(selectedChip) === -1 ? specNames.push(selectedChip) : specNames.splice(specNames.indexOf(selectedChip), 1);
 
-                    var specId = boxId.split('-')[1];
-                    specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
-                }
+                var specId = boxId.split('-')[1];
+                specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
+                break;
             }
+        }
 
-            for (var i = 0; i < elements.length; i++) {
-                var listElements = $(elements[i].childNodes[1]).find('span.e-list-text');
-                if (listElements[0].innerHTML == selectedChip) {
-                    checkedButtons.removeClass("e-check");
-                    boxId = elements[i].dataset.uid;
-                    elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
-                    shapeNames.indexOf(selectedChip) === -1 ? shapeNames.push(selectedChip) : shapeNames.splice(shapeNames.indexOf(selectedChip), 1);
-                    shapeIDs.indexOf(boxId) === -1 ? shapeIDs.push(boxId) : shapeIDs.splice(shapeIDs.indexOf(boxId), 1);
+        for (var i = 0; i < elements.length; i++) {
+             var listElements = $(elements[i].childNodes[1]).find('span.e-list-text');
+            if (listElements[0].innerHTML == selectedChip) {
+
+                var defaultSpecs = document.getElementsByClassName("defaultSpecs");
+                var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
+                defaultSpecs[0].style.display = "flex"
+                defaultSpecs[1].style.display = "flex"
+                for (var j = 0; j < plateIndividualSpecs.length; j++) {
+                    plateIndividualSpecs[j].style.display = "none";
                 }
+
+                checkedButtons.removeClass("e-check");
+                boxId = elements[i].dataset.uid;
+                elements[i].childNodes[1].childNodes[0].ariaChecked == "false";
+                shapeNames.indexOf(selectedChip) === -1 ? shapeNames.push(selectedChip) : shapeNames.splice(shapeNames.indexOf(selectedChip), 1);
+                shapeIDs.indexOf(boxId) === -1 ? shapeIDs.push(boxId) : shapeIDs.splice(shapeIDs.indexOf(boxId), 1);
+                break;
             }
+        }
 
         var specValue = "";
         specValue = "<div style =\"display: flex; margin: 0 0 12px 0;\">";
