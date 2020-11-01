@@ -114,7 +114,20 @@
 
                             <tr>
                                 <td>@(iNo)</td>
-                                <td>@item.ProductName</td>
+                                <td>
+                                    @item.ProductName
+                                    @if (item.Warnings.Count > 0)
+                                    {
+                                        <div class="message-error">
+                                            <ul>
+                                                @foreach (var warning in item.Warnings)
+                                                {
+                                                    <li>@Html.Raw(warning)</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                </td>
                                 <td>
                                     @if (custPartNoAttr != null)
                                     {
