@@ -20,6 +20,8 @@
     @using Newtonsoft.Json.Serialization;
     @using Newtonsoft.Json;
 
+    var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
+    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
     var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
     var shippingAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.ExistingAddresses, new JsonSerializerSettings
     {
@@ -39,7 +41,7 @@
                     <div class="d-flex flex-row justify-content-between mt-2">
                         <div class="d-flex flex-column">
                             <label for="purchaseOrder" class="fs-13 text-black">Purchase Order #</label>
-                            <label id="purchaseOrder" class="p-2 text-black">@purchaseOrder</label>
+                            <label id="" class="p-2 text-black">@purchaseOrder</label>
                         </div>
                         <div class="d-flex flex-column ml-5">
                             <label for="deliveryDate" class="fs-13 text-black">Estimated Delivery Date</label>
