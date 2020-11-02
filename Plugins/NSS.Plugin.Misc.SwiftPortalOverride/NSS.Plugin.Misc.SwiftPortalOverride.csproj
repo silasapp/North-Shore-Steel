@@ -29,6 +29,7 @@
     <None Remove="Views\CartOverride\Cart.cshtml" />
     <None Remove="Views\CartOverride\_GiftCardBox.cshtml" />
     <None Remove="Views\CheckoutOverride\Completed.cshtml" />
+    <None Remove="Views\CheckoutOverride\OpcPaymentInfo.cshtml" />
     <None Remove="Views\CustomShoppingCart\Checkout.cshtml" />
     <None Remove="Views\Shared\Components\CustomOrderSummary\Default.cshtml" />
     <None Remove="Views\Configure.cshtml" />
@@ -81,6 +82,10 @@
     </Content>
     <Content Include="Views\CheckoutOverride\Checkout.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CheckoutOverride\OpcPaymentInfo.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Views\Shared\Components\CustomOrderSummary\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
