@@ -149,9 +149,9 @@
             content: "";
             display: block;
             position: absolute;
-            top: 3px;
+            top: 5px;
             left: 1px;
-            width: 10px;
+            width: 12px;
             height: 5px;
             border: solid 2px transparent;
             border-right: none;
@@ -162,13 +162,13 @@
     /* Checked, Indeterminate */
     .pure-material-checkbox > input:checked,
     .pure-material-checkbox > input:indeterminate {
-        background-color: rgb(var(--pure-material-primary-rgb, 33, 150, 243));
+        background-color: #e3165b;
     }
 
         .pure-material-checkbox > input:checked + span::before,
         .pure-material-checkbox > input:indeterminate + span::before {
-            border-color: rgb(var(--pure-material-primary-rgb, 33, 150, 243));
-            background-color: rgb(var(--pure-material-primary-rgb, 33, 150, 243));
+            border-color: transparent;
+            background-color: #e3165b;
         }
 
         .pure-material-checkbox > input:checked + span::after,
@@ -390,3 +390,8 @@ th.sortable {
             background-color: #585858;
             color: #ffffff;
         }
+
+.chipsStyle {
+    display: flex;
+    margin: 0 20px 12px 0;
+}

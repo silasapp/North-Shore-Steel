@@ -32,6 +32,31 @@
     var deliverychkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option");
 }
 
+<style>
+    .modal-backdrop {
+        position: unset !important;
+    }
+</style>
+
+<!-- Modal -->
+<div id="overlay"></div>
+<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <textarea class="form-control rounded-0" name="productNote" id="productNote" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="order-summary-content">
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
     @await Html.PartialAsync("_OrderReviewData", Model.OrderReviewData)
@@ -114,7 +139,20 @@
 
                             <tr>
                                 <td>@(iNo)</td>
-                                <td>@item.ProductName</td>
+                                <td>
+                                    @item.ProductName
+                                    @if (item.Warnings.Count > 0)
+                                    {
+                                        <div class="message-error">
+                                            <ul>
+                                                @foreach (var warning in item.Warnings)
+                                                {
+                                                    <li>@Html.Raw(warning)</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                </td>
                                 <td>
                                     @if (custPartNoAttr != null)
                                     {
@@ -169,11 +207,11 @@
                                 <td id="itemweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00") </td>
                                 <td id="itemlength@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00") </td>
                                 <td>
-                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
-                                    @*<input style="width: 100px" type="number" name="quantity" id="">*@
+                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+
                                 </td>
                                 <td style="text-align:center">
-                                    <a style="background: none; border: none;" href="#">
+                                    <a style="background: none; border: none;" data-toggle="modal" onclick="handleSawOption(@item.ProductId)" ; data-target="#noteModal">
                                         <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
                                     </a>
                                 </td>
@@ -490,7 +528,21 @@
     }
 }
 
+
 <script>
+
+    function handleSawOption(itemId) {
+        console.log("itemId", itemId);
+        $('textarea[name="productNote"]').keyup(function () {
+            var note = $(this).val();
+            console.log(note);
+        });
+    }
+
+    $('#noteModal').on('hidden.bs.modal', function () {
+        $(this).find("input,textarea,select").val('').end();
+    });
+
     function calculateItemTotalPrice(attrId, itemId) {
         var qty = parseInt(document.getElementById('itemquantity' + itemId).value, 10);
         var itemUnit;

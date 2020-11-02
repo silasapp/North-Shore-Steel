@@ -1,16 +1,16 @@
 ﻿@using Nop.Core
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using NSS.Plugin.Misc.SwiftPortalOverride
+@using Nop.Services.Common
+@using Nop.Core.Domain.Catalog
 @inject IWorkContext workContext
+@inject IGenericAttributeService genericAttributeService
 @using Syncfusion.EJ2
 
 @model CatalogModel
 @using Nop.Core.Domain.Orders
 
 <style>
-    div.e-content {
-        height: 20rem !important;
-    }
 
     .e-dlg-header-content {
         background: #03175B;
@@ -249,11 +249,17 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 
     @foreach (var item in Model.Products)
     {
+        //string serialized = item.FirstOrDefault(x => x.Key == "serialized")?.Value;
         var productRowData = new Dictionary<string, string>();
+        var attr = genericAttributeService.GetAttributesForEntity(item.Id, nameof(Product));
+        string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
         @foreach (var it in headerColumns)
         {
-            productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Code)?.Value);
+            var itemCode = it.Code;
+            var Code = serialized == "True" ? "itemTagNo" : "itemNo";
+            itemCode = itemCode == "itemNo" ? Code : itemCode;
+            productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
         }
 
         productRowData.Add("_itemId", item.Id.ToString());
@@ -294,8 +300,9 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 
 }
 
+
 <script id="quantityTemplate" type="text/x-template">
-    <input style="width: 40px" type="number" name="quantity" min="1" id="qty${_itemId}">
+    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null">
 </script>
 
 <script id="optionsTemplate" type="text/x-template">

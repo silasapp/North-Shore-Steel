@@ -20,6 +20,8 @@
     @using Newtonsoft.Json.Serialization;
     @using Newtonsoft.Json;
 
+    var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
+    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
     var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
     var deliveryAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.ExistingAddresses, new JsonSerializerSettings
     {
