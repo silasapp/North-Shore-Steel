@@ -182,8 +182,8 @@
                                 <td id="itemweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00") </td>
                                 <td id="itemlength@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00") </td>
                                 <td>
-                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
-                                    @*<input style="width: 100px" type="number" name="quantity" id="">*@
+                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+
                                 </td>
                                 <td style="text-align:center">
                                     <a style="background: none; border: none;" href="#">
