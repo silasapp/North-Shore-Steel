@@ -35,7 +35,7 @@
                         </div>
                         <div id="collapseOne" class="collapse show" style="max-height: 36rem; overflow-x: auto;">
                             <div class="">
-                                <ejs-treeview id="treedata" showCheckBox="true" nodeClicked="nodeCheck">
+                                <ejs-treeview id="treedata" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
                                     <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
                                 </ejs-treeview>
                             </div>
@@ -128,7 +128,13 @@
     </div>
 </div>
 
+
 <script>
+    let isChecked = false;
+    function nodeChecking(args) {
+        return args.isInteracted ? isChecked = true : !isChecked;
+    }
+
     let specIDs = [];
     let specNames = [];
     let shapeIDs = [];
@@ -139,51 +145,54 @@
     });
 
     function nodeCheck(args) {
-        var checkedNode = [args.node];
-        var treeObj = document.getElementById('treedata').ej2_instances[0];
-        var selectedShape = treeObj.getNodeData(args.node);
-        var selectedShapeId = selectedShape.id;
-        var selectedShapeText = selectedShape.text
-        var defaultSpecs = document.getElementsByClassName("defaultSpecs");
-        var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
-        var inputs = document.querySelectorAll("input[type='checkbox']");
-        if (selectedShape.isChecked == 'true') {
-            treeObj.uncheckAll();
-            shapeIDs = [];
-            shapeNames = [];
-            treeObj.checkAll(checkedNode);
-            if (selectedShape.hasChildren) {
+        if (isChecked) {
+            var checkedNode = [args.node];
+            var treeObj = document.getElementById('treedata').ej2_instances[0];
+            var selectedShape = treeObj.getNodeData(args.node);
+            var selectedShapeId = selectedShape.id;
+            var selectedShapeText = selectedShape.text
+            var defaultSpecs = document.getElementsByClassName("defaultSpecs");
+            var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
+            var inputs = document.querySelectorAll("input[type='checkbox']");
+            if (selectedShape.isChecked == 'true') {
                 treeObj.uncheckAll();
-                $(args.node.children[1].childNodes[1]).find('span:nth-child(2)').addClass("e-check");
-            }
-            shapeIDs.indexOf(selectedShapeId) === -1 ? shapeIDs.push(selectedShapeId) : shapeIDs.splice(shapeIDs.indexOf(selectedShapeId), 1);
-            shapeNames.indexOf(selectedShapeText) === -1 ? shapeNames.push(selectedShapeText) : shapeNames.splice(shapeNames.indexOf(selectedShapeText), 1);
-        }
-        else {
-            var shapeButtons = $('.e-frame.e-icons.e-check');
-            if (shapeButtons.length == 0) {
                 shapeIDs = [];
                 shapeNames = [];
+                treeObj.checkAll(checkedNode);
+                if (selectedShape.hasChildren) {
+                    treeObj.uncheckAll();
+                    $(args.node.children[1].childNodes[1]).find('span:nth-child(2)').addClass("e-check");
+                }
+                shapeIDs.indexOf(selectedShapeId) === -1 ? shapeIDs.push(selectedShapeId) : shapeIDs.splice(shapeIDs.indexOf(selectedShapeId), 1);
+                shapeNames.indexOf(selectedShapeText) === -1 ? shapeNames.push(selectedShapeText) : shapeNames.splice(shapeNames.indexOf(selectedShapeText), 1);
             }
-        }
+            else {
+                var shapeButtons = $('.e-frame.e-icons.e-check');
+                if (shapeButtons.length == 0) {
+                    shapeIDs = [];
+                    shapeNames = [];
+                }
+            }
 
-        if (selectedShapeText == "Plate - Individual" && selectedShape.isChecked == "true") {
-            var i = resetSpecFilters(inputs);
-            defaultSpecs[0].style.display = "none";
-            defaultSpecs[1].style.display = "none";
-            for (var j = 0; j < plateIndividualSpecs.length; j++) {
-                plateIndividualSpecs[j].style.display = "flex";
+            if (selectedShapeText == "Plate - Individual" && selectedShape.isChecked == "true") {
+                var i = resetSpecFilters(inputs);
+                defaultSpecs[0].style.display = "none";
+                defaultSpecs[1].style.display = "none";
+                for (var j = 0; j < plateIndividualSpecs.length; j++) {
+                    plateIndividualSpecs[j].style.display = "flex";
+                }
             }
-        }
-        else if ((selectedShapeText == "Plate - Individual" && selectedShape.isChecked == "false") || defaultSpecs[0].style.display == "none") {
-            var i = resetSpecFilters(inputs);
-            defaultSpecs[0].style.display = "flex";
-            defaultSpecs[1].style.display = "flex";
-            for (var j = 0; j < plateIndividualSpecs.length; j++) {
-                plateIndividualSpecs[j].style.display = "none";
+            else if ((selectedShapeText == "Plate - Individual" && selectedShape.isChecked == "false") || defaultSpecs[0].style.display == "none") {
+                var i = resetSpecFilters(inputs);
+                defaultSpecs[0].style.display = "flex";
+                defaultSpecs[1].style.display = "flex";
+                for (var j = 0; j < plateIndividualSpecs.length; j++) {
+                    plateIndividualSpecs[j].style.display = "none";
+                }
             }
+            populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
         }
-        populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
+        isChecked = false;
     }
 
     function resetSpecFilters(inputs) {
