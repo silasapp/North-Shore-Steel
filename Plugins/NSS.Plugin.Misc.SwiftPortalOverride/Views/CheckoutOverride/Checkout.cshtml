@@ -20,8 +20,6 @@
     @using Newtonsoft.Json.Serialization;
     @using Newtonsoft.Json;
 
-    var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
-    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
     var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
     var deliveryAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.ExistingAddresses, new JsonSerializerSettings
     {
@@ -52,7 +50,7 @@
 
 <div id="checkout" class="page home-page" v-cloak>
     <div class="page-body">
-        <h1 class="heading1" style="text-align: center;margin: 15px 0;">CHECKOUT</h1>
+        <label class="h4 text-primary font-weight-bold text-center w-100 mt-4 mb-0">CHECKOUT</label>
         <hr style="height: 2px; color: #000; opacity: 0.5;margin-bottom: 30px;">
         <div class="row px-5" style="justify-content: space-between;">
             <div class="col-9">
@@ -197,8 +195,8 @@
                                 <label class="fs-14 text-black mb-1">Select card</label>
                                 <select type="text" class="nss-form-control" v-model="paymentCard.cardType">
                                     @*<option v-bind:value="option.id" v-for="option in states">
-                                        {{ option.name }}
-                                    </option>*@
+                                            {{ option.name }}
+                                        </option>*@
                                 </select>
                             </div>
                             <div class="col-md-9 d-flex flex-column w-50">
@@ -259,17 +257,17 @@
                                     </div>
                                     <div class="d-flex flex-column w-50 ml-2">
                                         <label class="fs-14 text-black mb-1">Address Line 2</label>
-                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.addressLine2" placeholder="Ex: Ste. 800" />
+                                        <input type="text" class="nss-form-control" v-model="newBillingAddress.addressLine2" placeholder="Ex: Ste. 800" />
                                     </div>
                                 </div>
                                 <div class="row d-flex flex-row mt-4">
                                     <div class="col-md-6 d-flex flex-column pr-2">
                                         <label class="fs-14 text-black mb-1">City</label>
-                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.city" placeholder="Ex: Dallas" />
+                                        <input type="text" class="nss-form-control" v-model="newBillingAddress.city" placeholder="Ex: Dallas" />
                                     </div>
                                     <div class="col-md-4 d-flex flex-column px-2">
                                         <label class="fs-14 text-black mb-1">State</label>
-                                        <select type="text" class="nss-form-control" v-model="newShippingAddress.state">
+                                        <select type="text" class="nss-form-control" v-model="newBillingAddress.state">
                                             <option value="null">-Select-</option>
                                             <option v-bind:value="option.id" v-for="option in states">
                                                 {{ option.name }}
@@ -278,20 +276,20 @@
                                     </div>
                                     <div class="col-md-2 d-flex flex-column pl-2">
                                         <label class="fs-14 text-black mb-1">Zip Code</label>
-                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.zipCode" placeholder="Ex: 77014" />
+                                        <input type="text" class="nss-form-control" v-model="newBillingAddress.zipCode" placeholder="Ex: 77014" />
                                     </div>
                                 </div>
                                 <div class="d-flex flex-row mt-4">
                                     <label class="nss-radio-button">
                                         Save to My Addresses
-                                        <input type="checkbox" v-bind:checked="newShippingAddress.saveToMyAddresses" />
+                                        <input type="checkbox" v-bind:checked="newBillingAddress.saveToMyAddresses" />
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>
                                 <div class="d-flex flex-row mt-3">
                                     <div class="d-flex flex-column w-75">
                                         <label class="fs-14 text-black mb-1">Address Nickname</label>
-                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.addressNickname" placeholder="Ex: 'South Warehouse'" />
+                                        <input type="text" class="nss-form-control" v-model="newBillingAddress.addressNickname" placeholder="Ex: 'South Warehouse'" />
                                     </div>
                                 </div>
                             </div>
@@ -414,9 +412,6 @@
     var states = @Html.Raw(states);
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
-    console.log("deliveryAddresses: ", deliveryAddresses);
-    console.log("pickupAddresses: ", pickupAddresses);
-    console.log("states: ", states);
     new Vue({
         el: '#checkout',
         data: {
@@ -463,9 +458,7 @@
             },
         },
         mounted: function () {
-            //this.getStates();
             this.generateExpirationMonthsAndYears();
-            console.log("purchaseOrder: ", this.purchaseOrder);
         },
         methods: {
             handlePaymentClick: function (item, model) {
@@ -490,23 +483,6 @@
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         console.log(thrownError, 'handlePaymentClick datadata-error', xhr);
-                    }
-                });
-            },
-            getStates: function () {
-                const request = { countryId: 1 };
-                $.ajax({
-                    url: "@Url.Action("GetStatesByCountryId", "Country")",
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    data: 1,
-                    success: function (data, textStatus, XMLHttpRequest) {
-                        console.log("getStates: ", data);
-                        if (data != null) {
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        console.log(thrownError, 'getStates datadata-error', xhr);
                     }
                 });
             },
