@@ -440,6 +440,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [IgnoreAntiforgeryToken]
         public virtual JsonResult PlaceOrder([FromBody] ErpCheckoutModel model)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model), "Checkout Model is null");
+
             if (model.HasError)
                 return Json(new { error = 1, message = "Something went wrong while placing order" });
 
@@ -461,23 +464,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             try
             {
-                var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
-                var savebillingAddress = model.ShippingAddress.SaveToAddressBook;
+                //var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
+                //var savebillingAddress = model.ShippingAddress.SaveToAddressBook;
 
-                // save shipping address if asked to
-                SaveShippingAddress(model.ShippingAddress);
+                //// save shipping address if asked to
+                //SaveShippingAddress(model.ShippingAddress);
 
-                // save billing address if asked to
-                SaveBillingAddress(model.BillingAddress);
-                
-                // payment
+                //// save billing address if asked to
+                //SaveBillingAddress(model.BillingAddress);
 
+                //// payment
+                //var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType);
 
+                return Json(new { success = 1, orderId = 5 });
 
-
-
-
-                return Json(new {success = 1, orderId = 5 });
+                //return result;
             }
             catch (Exception exc)
             {
@@ -604,6 +605,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private JsonResult ProcessPayment(int paymentMethodtype)
         {
+            //prevent 2 orders being placed within an X seconds time frame
+            if (!IsMinimumOrderPlacementIntervalValid(_workContext.CurrentCustomer))
+                throw new Exception(_localizationService.GetResource("Checkout.MinOrderPlacementInterval"));
+
+            //place order
             var processPaymentRequest = new ProcessPaymentRequest();
 
             _paymentService.GenerateOrderGuid(processPaymentRequest);
@@ -612,7 +618,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             processPaymentRequest.PaymentMethodSystemName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer,
                 NopCustomerDefaults.SelectedPaymentMethodAttribute, _storeContext.CurrentStore.Id);
             HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
+
+            // place order based on payment selected
+
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
+
             if (placeOrderResult.Success)
             {
                 HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", null);
@@ -620,6 +630,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 {
                     Order = placeOrderResult.PlacedOrder
                 };
+
 
                 //var paymentMethod = _paymentPluginManager
                 //    .LoadPluginBySystemName(placeOrderResult.PlacedOrder.PaymentMethodSystemName, _workContext.CurrentCustomer, _storeContext.CurrentStore.Id);
@@ -654,16 +665,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         break;
                 }
 
-                _paymentService.PostProcessPayment(postProcessPaymentRequest);
+                
                 //success
-                return Json(new { success = 1 });
+                return Json(new { success = 1, orderId = placeOrderResult.PlacedOrder.Id });
             }
 
+            return Json(new { error = 1, message = "Order could not be placed" });
         }
 
-        private void ProcessCreditCardPayment()
+        private void ProcessCreditCardPayment(PostProcessPaymentRequest postProcessPaymentRequest)
         {
-
+            _paymentService.PostProcessPayment(postProcessPaymentRequest);
         }
 
         private void ProcessPayPalPayment()
