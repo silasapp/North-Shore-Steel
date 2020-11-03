@@ -84,7 +84,7 @@
                                     @foreach (var item in group)
                                     {
                                         <div id="collapse-@index" class="collapse show">
-                                            <div class="card-body" style="padding-left: 2.8rem">
+                                            <div class="card-body" style="padding-left: 2.6rem">
                                                 <label class="pure-material-checkbox">
                                                     <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
                                                     <span>@item.SpecificationAttributeOptionName</span>
@@ -103,7 +103,7 @@
                                 @foreach (var item in group)
                                 {
                                     <div id="collapse-@index" class="collapse show">
-                                        <div class="card-body" style="padding-left: 2.8rem">
+                                        <div class="card-body" style="padding-left: 2.6rem">
                                             <label class="pure-material-checkbox">
                                                 <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
                                                 <span>@item.SpecificationAttributeOptionName</span>
@@ -240,7 +240,7 @@
 
 
       if (specNames.length > 0 || shapeNames.length > 0) {
-          allFilterValue = "<div class=\"chipsStyle\">Clear Filters</div>";
+          allFilterValue = "<div class=\"chipsStyle\">Clear filters</div>";
       }
       document.getElementById("clearAllFilters").innerHTML = allFilterValue;
 
@@ -364,7 +364,7 @@
 
 
         if (specNames.length > 0 || shapeNames.length > 0) {
-            allFilterValue = "<div class=\"chipsStyle\">Clear Filters</div>";
+            allFilterValue = "<div class=\"chipsStyle\">Clear filters</div>";
         }
         document.getElementById("clearAllFilters").innerHTML = allFilterValue;
 
