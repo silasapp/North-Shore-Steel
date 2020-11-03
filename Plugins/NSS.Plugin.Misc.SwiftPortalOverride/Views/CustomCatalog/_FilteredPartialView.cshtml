@@ -162,6 +162,7 @@
 
 
 
+
 @{
     Func<object, object> headerContent = @<div><div id='template' title='Saw Option Dialog' class=''>Saw Option</div></div>;
 
@@ -221,27 +222,32 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "itemNo",
-                DisplayName = "Item #"
+                DisplayName = "Item #",
+                Sort = "itemNo"
             },
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "itemName",
-                DisplayName = "Description"
+                DisplayName = "Description",
+                Sort = "itemName"
             },
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "displayHeight",
-                DisplayName = "Height (in)"
+                DisplayName = "Height (in)",
+                Sort = "height"
             },
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "displayLength",
-                DisplayName = "Length (ft)"
+                DisplayName = "Length (ft)",
+                Sort = "length"
             },
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "weight",
-                DisplayName = "Weight (lb)"
+                DisplayName = "Weight (lb)",
+                Sort = "weight"
             }
         };
 
@@ -260,6 +266,7 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
             var Code = serialized == "True" ? "itemTagNo" : "itemNo";
             itemCode = itemCode == "itemNo" ? Code : itemCode;
             productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
+            productRowData.Add(it.Sort, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Sort)?.Value);
         }
 
         productRowData.Add("_itemId", item.Id.ToString());
@@ -272,9 +279,35 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
         ObjectData.Add(productRowData);
     }
 
+    @*@foreach (var ite in Model.Products)
 
-    <div id="_partialview">
+        var productRowData2 = new Dictionary<string, string>();
+        var attr2 = genericAttributeService.GetAttributesForEntity(ite.Id, nameof(Product));
+        string serialized2 = attr2.FirstOrDefault(x => x.Key == "serialized")?.Value;
+
+        @foreach (var it in headerColumns)
+        {
+            var itemCode = it.Code;
+            var Code = serialized == "True" ? "itemTagNo" : "itemNo";
+            itemCode = itemCode == "itemNo" ? Code : itemCode;
+            productRowData2.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
+        }
+
+        productRowData2.Add("_itemId", item.Id.ToString());
+        productRowData2.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
+        productRowData2.Add("_sawOption", item.Shape?.SawOption.ToString());
+        productRowData2.Add("_cartId", shoppingCartTypeId.ToString());
+        productRowData2.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString());
+        productRowData2.Add("_wishListId", wishListShoppingCartId.ToString());
+
+        ObjectData2.Add(productRowData2);*@
+}
+
+
+<div id="_partialview">
+    <div class="control-section">
         <div class="control-section">
+
             <ejs-grid id="GridOverview" allowFiltering="true" allowSorting="true" allowPaging="true" allowResizing="true" rowHeight="38" enableHover="false" dataSource=ObjectData>
                 <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
                 <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
@@ -283,7 +316,19 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
                     {
                         if (!it.DisplayName.StartsWith("_"))
                         {
-                            <e-grid-column field=@it.DisplayName filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="150"></e-grid-column>
+                            if ((it.Code).Contains("display"))
+                            {
+                                <e-grid-column field=@it.DisplayName foreignKeyField=@it.DisplayName foreignKeyValue=@it.DisplayName dataSource="ObjectData"
+                                               filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="150"></e-grid-column>
+                            }
+                            else if ((it.DisplayName).Contains("Description"))
+                            {
+                                <e-grid-column field=@it.DisplayName filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="230"></e-grid-column>
+                            }
+                            else
+                            {
+                                <e-grid-column field=@it.DisplayName filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="150"></e-grid-column>
+                            }
                         }
                     }
                     <e-grid-column field="Quantity" headerText="Qty" allowFiltering="false" allowSorting="false" template="#quantityTemplate" width="82"></e-grid-column>
@@ -298,76 +343,75 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
         </div>
     </div>
 
-}
 
 
-<script id="quantityTemplate" type="text/x-template">
-    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null">
-</script>
+    <script id="quantityTemplate" type="text/x-template">
+        <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null">
+    </script>
 
-<script id="optionsTemplate" type="text/x-template">
-    ${if(_mtr)}
-    <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
-        <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
-    </a>
-    ${/if}
+    <script id="optionsTemplate" type="text/x-template">
+        ${if(_mtr)}
+        <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
+            <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+        </a>
+        ${/if}
 
-    ${if(_sawOption == "True")}
-    <button class="table-action-button" onclick="handleSawOption(`${_itemId}`); return false;">
-        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
-    </button>
-    ${/if}
-    ${if(_eRPCompanyIdExist == "True")}
-    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
-    </button>
-    ${/if}
-    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
-    </button>
-</script>
+        ${if(_sawOption == "True")}
+        <button class="table-action-button" onclick="handleSawOption(`${_itemId}`); return false;">
+            <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+        </button>
+        ${/if}
+        ${if(_eRPCompanyIdExist == "True")}
+        <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;">
+            <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+        </button>
+        ${/if}
+        <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
+            <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+        </button>
+    </script>
 
-<script>
-    function getInputQuantity(itemId, cartId) {
-        event.preventDefault();
-        let qty = $('#qty' + itemId).val();
-        if (!qty)
-            qty = 1;
-        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
-        $('#qty' + itemId).val("");
-        AjaxCart.addproducttocart_catalog(link);
-    }
+    <script>
+        function getInputQuantity(itemId, cartId) {
+            event.preventDefault();
+            let qty = $('#qty' + itemId).val();
+            if (!qty)
+                qty = 1;
+            let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
+            $('#qty' + itemId).val("");
+            AjaxCart.addproducttocart_catalog(link);
+        }
 
-    var sawOptionModal, toleranceLength;
-    let itemQuantity = document.getElementById('itemQuantity');
-    function onDialogCreated() {
-        sawOptionModal = this;
-    }
+        var sawOptionModal, toleranceLength;
+        let itemQuantity = document.getElementById('itemQuantity');
+        function onDialogCreated() {
+            sawOptionModal = this;
+        }
 
-    function handleSawOption(itemId) {
-        //event.preventDefault();
+        function handleSawOption(itemId) {
+            //event.preventDefault();
 
-        itemQuantity.value = 1;
-        console.log("handleSawOption: ", itemId);
-        sawOptionModal.show();
-    }
+            itemQuantity.value = 1;
+            console.log("handleSawOption: ", itemId);
+            sawOptionModal.show();
+        }
 
-    function onSawOptionModalClose() {
-        console.log("onSawOptionModalClose...");
-    }
+        function onSawOptionModalClose() {
+            console.log("onSawOptionModalClose...");
+        }
 
-    function onDecrementQuantity() {
-        console.log("onDecrementQuantity...");
-        var value = parseInt(itemQuantity.value) ?? 0;
+        function onDecrementQuantity() {
+            console.log("onDecrementQuantity...");
+            var value = parseInt(itemQuantity.value) ?? 0;
 
-        console.log("onDecrementQuantity...");
-        itemQuantity.value = value > 0 ? value - 1 : 0;
-    }
+            console.log("onDecrementQuantity...");
+            itemQuantity.value = value > 0 ? value - 1 : 0;
+        }
 
-    function onIncrementQuantity() {
-        console.log("onIncrementQuantity...");
-        var value = parseInt(itemQuantity.value) ?? 0;
-        itemQuantity.value = value ? value + 1 : 1;
-    }
-</script>
-<ejs-scripts></ejs-scripts>
+        function onIncrementQuantity() {
+            console.log("onIncrementQuantity...");
+            var value = parseInt(itemQuantity.value) ?? 0;
+            itemQuantity.value = value ? value + 1 : 1;
+        }
+    </script>
+    <ejs-scripts></ejs-scripts>
