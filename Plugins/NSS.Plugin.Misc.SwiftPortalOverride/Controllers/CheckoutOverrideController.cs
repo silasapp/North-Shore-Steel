@@ -468,17 +468,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             try
             {
-                //var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
-                //var savebillingAddress = model.ShippingAddress.SaveToAddressBook;
+                var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
+                var savebillingAddress = model.ShippingAddress.SaveToAddressBook;
 
-                //// save shipping address if asked to
-                //SaveShippingAddress(model.ShippingAddress);
+                // save shipping address if asked to
+                SaveShippingAddress(model.ShippingAddress);
 
-                //// save billing address if asked to
-                //SaveBillingAddress(model.BillingAddress);
+                // save billing address if asked to
+                SaveBillingAddress(model.BillingAddress);
 
-                //// payment
-                //var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType);
+                // payment
+                var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType);
 
                 return Json(new { success = 1, orderId = 5 });
 
@@ -625,6 +625,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // place order based on payment selected
 
+            //add custom avlue for payment type
+            processPaymentRequest.CustomValues.Add("paymentMethodType", paymentMethodtype);
+
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
 
             if (placeOrderResult.Success)
@@ -655,20 +658,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //    });
                 //}
 
-                var paymentMethod = (CheckoutPaymentMethodType)paymentMethodtype;
-
-                switch (paymentMethod)
-                {
-                    case CheckoutPaymentMethodType.CreditCard:
-                        break;
-                    case CheckoutPaymentMethodType.Paypal:
-                        break;
-                    case CheckoutPaymentMethodType.LineOfCredit:
-                        break;
-                    default:
-                        break;
-                }
-
                 
                 //success
                 return Json(new { success = 1, orderId = placeOrderResult.PlacedOrder.Id });
@@ -677,20 +666,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return Json(new { error = 1, message = "Order could not be placed" });
         }
 
-        private void ProcessCreditCardPayment(PostProcessPaymentRequest postProcessPaymentRequest)
-        {
-            _paymentService.PostProcessPayment(postProcessPaymentRequest);
-        }
-
-        private void ProcessPayPalPayment()
-        {
-
-        }
-
-        private void ProcessLineOfCreditPayment()
-        {
-
-        }
 
         private void ErpConfirmOrder()
         {
