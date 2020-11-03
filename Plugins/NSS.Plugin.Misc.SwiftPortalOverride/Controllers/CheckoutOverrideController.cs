@@ -211,6 +211,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var usaCountryId = "1";
             model.StateProvinces = _countryModelFactory.GetStatesByCountryId(usaCountryId, false);
 
+            // account credit
+            // TODO use endpoint
+            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = 15000 };
+
             //model
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);

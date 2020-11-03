@@ -22,5 +22,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public ShoppingCartModel ShoppingCartModel { get; set; }
         public CheckoutPaymentMethodModel PaymentMethodModel { get; set; }
         public IList<StateProvinceModel> StateProvinces { get; set; }
+        public AccountCreditModel AccountCreditModel { get; set; }
+    }
+
+    public class AccountCreditModel
+    {
+        public bool CanCredit { get; set; }
+        public decimal CreditAmount { get; set; }
     }
 }
