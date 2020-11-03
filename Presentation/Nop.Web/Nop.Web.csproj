@@ -75,6 +75,7 @@
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
     <Content Remove="Themes\SwiftPortal\Content\assets\credit-card.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\dollar.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\enter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\paypal.svg" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css.map" />

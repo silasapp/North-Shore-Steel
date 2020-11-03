@@ -400,6 +400,38 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
+        [IgnoreAntiforgeryToken]
+        public virtual IActionResult PlaceOrder([FromBody] ErpCheckoutModel model)
+        {
+            if (model.HasError)
+                return Json(new { error = 1, message = "Something went wrong while placing order" });
+
+            return Json(new
+            {
+                success = 1, orderId = 5
+            });
+        }
+
+        private void SaveBilling()
+        {
+
+        }
+
+        private void SaveShipping()
+        {
+
+        }
+
+        private void SavePaymentMethod()
+        {
+
+        }
+
+        private void ErpConfirmOrder()
+        {
+
+        }
+
         //[HttpPost]
         //[IgnoreAntiforgeryToken]
         //public IActionResult GetShippingRate(NSSCalculateShippingRequest requestParam)
