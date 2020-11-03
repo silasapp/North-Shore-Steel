@@ -6,14 +6,15 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class SwiftCheckoutModel
+    public class ErpCheckoutModel
     {
-        public SwiftCheckoutBillingAddress BillingAddress { get; set; }
-        public SwiftCheckoutShippingAddress ShippingAddress { get; set; }
-        public SwiftCheckoutPaymentMethodModel PaymentMethodModel { get; set; }
+        public ErpCheckoutBillingAddress BillingAddress { get; set; }
+        public ErpCheckoutShippingAddress ShippingAddress { get; set; }
+        public ErpCheckoutPaymentMethodModel PaymentMethodModel { get; set; }
+        public bool HasError { get; set; }
     }
 
-    public class SwiftCheckoutBillingAddress
+    public class ErpCheckoutBillingAddress
     {
         public AddressModel BillingNewAddress { get; set; }
         public int? BillingAddressId { get; set; }
@@ -21,7 +22,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public bool ShipToSameAddress { get; set; }
     }
 
-    public class SwiftCheckoutShippingAddress
+    public class ErpCheckoutShippingAddress
     {
         public AddressModel ShippingNewAddress { get; set; }
         public int? ShippingAddressId { get; set; }
@@ -30,7 +31,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public bool IsPickupInStore { get; set; }
     }
 
-    public class SwiftCheckoutPaymentMethodModel
+    public class ErpCheckoutPaymentMethodModel
     {
         public int CheckoutPaymentMethodType { get; set; }
     }
