@@ -272,7 +272,11 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
             var Code = serialized == "True" ? "itemTagNo" : "itemNo";
             itemCode = itemCode == "itemNo" ? Code : itemCode;
             productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
-            productRowData.Add(it.Sort, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Sort)?.Value);
+            //if ((it.Code).Contains("display"))
+            //{
+            //    productRowData.Add(it.Sort, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Sort)?.Value);
+
+            //}
         }
 
         productRowData.Add("_itemId", item.Id.ToString());
@@ -300,12 +304,12 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
                     {
                         if (!it.DisplayName.StartsWith("_"))
                         {
-                            if ((it.Code).Contains("display"))
-                            {
-                                <e-grid-column field=@it.DisplayName foreignKeyField=@it.DisplayName foreignKeyValue=@it.DisplayName dataSource="ObjectData"
-                                               filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="150"></e-grid-column>
-                            }
-                            else if ((it.DisplayName).Contains("Description"))
+                            @*if ((it.Code).Contains("display"))
+                                {
+                                    <e-grid-column field=@it.DisplayName foreignKeyField=@it.DisplayName foreignKeyValue=@it.Sort dataSource="ObjectData"
+                                                   filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="150"></e-grid-column>
+                                }*@
+                            @if ((it.DisplayName).Contains("Description"))
                             {
                                 <e-grid-column field=@it.DisplayName filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="230"></e-grid-column>
                             }
