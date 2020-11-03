@@ -174,7 +174,7 @@
                 }
             }
 
-            if (selectedShapeText == "Plate - Individual" && selectedShape.isChecked == "true") {
+            if (selectedShapeId == 13 && selectedShape.isChecked == "true") {
                 var i = resetSpecFilters(inputs);
                 defaultSpecs[0].style.display = "none";
                 defaultSpecs[1].style.display = "none";
@@ -182,7 +182,7 @@
                     plateIndividualSpecs[j].style.display = "flex";
                 }
             }
-            else if ((selectedShapeText == "Plate - Individual" && selectedShape.isChecked == "false") || defaultSpecs[0].style.display == "none") {
+            else if ((selectedShapeId == 13 && selectedShape.isChecked == "false") || defaultSpecs[0].style.display == "none") {
                 var i = resetSpecFilters(inputs);
                 defaultSpecs[0].style.display = "flex";
                 defaultSpecs[1].style.display = "flex";
