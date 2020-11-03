@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
@@ -62,11 +64,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
         private readonly NSSApiProvider _nSSApiProvider;
         private readonly IShapeService _shapeService;
+        private readonly ICountryModelFactory _countryModelFactory;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings, IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings, IAddressAttributeParser addressAttributeParser, IAddressService addressService, ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService, IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger, IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager, IPaymentService paymentService, IProductService productService, IShippingService shippingService, IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper, IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings, RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings) : base(addressSettings, customerSettings, addressAttributeParser, addressService, checkoutModelFactory, countryService, customerService, genericAttributeService, localizationService, logger, orderProcessingService, orderService, paymentPluginManager, paymentService, productService, shippingService, shoppingCartService, storeContext, webHelper, workContext, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings)
+        public CheckoutOverrideController(IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings, 
+            IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings, 
+            IAddressAttributeParser addressAttributeParser, IAddressService addressService, 
+            ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService, 
+            IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger, 
+            IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager, 
+            IPaymentService paymentService, IProductService productService, IShippingService shippingService, 
+            IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper, 
+            IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings, 
+            RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings, ICountryModelFactory countryModelFactory) : base(addressSettings, customerSettings, addressAttributeParser, addressService, checkoutModelFactory, countryService, customerService, genericAttributeService, localizationService, logger, orderProcessingService, orderService, paymentPluginManager, paymentService, productService, shippingService, shoppingCartService, storeContext, webHelper, workContext, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings)
         {
             _addressSettings = addressSettings;
             _customerSettings = customerSettings;
@@ -95,6 +107,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _shoppingCartModelFactory = shoppingCartModelFactory;
             _nSSApiProvider = nSSApiProvider;
             _shapeService = shapeService;
+            _countryModelFactory = countryModelFactory;
         }
         #endregion
 
@@ -193,6 +206,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 filterByCountryId = _customerService.GetCustomerBillingAddress(_workContext.CurrentCustomer)?.CountryId ?? 0;
             }
+
+            var usaCountryId = "1";
+            model.StateProvinces = _countryModelFactory.GetStatesByCountryId(usaCountryId, false);
 
             //model
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
@@ -312,6 +328,78 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
+        [IgnoreAntiforgeryToken]
+        public virtual IActionResult SwiftSavePaymentMethod([FromBody] PaymentMethodRequest filterParams)
+        {
+            try
+            {
+                string paymentmethod = filterParams.PaymentMethod;
+                CheckoutPaymentMethodModel model = filterParams.Model;
+                //validation
+                if (_orderSettings.CheckoutDisabled)
+                    throw new Exception(_localizationService.GetResource("Checkout.Disabled"));
+
+                var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
+                if (!cart.Any())
+                    throw new Exception("Your cart is empty");
+
+                if (!_orderSettings.OnePageCheckoutEnabled)
+                    throw new Exception("One page checkout is disabled");
+
+                if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
+                    throw new Exception("Anonymous checkout is not allowed");
+
+                //payment method 
+                if (string.IsNullOrEmpty(paymentmethod))
+                    throw new Exception("Selected payment method can't be parsed");
+
+                //reward points
+                if (_rewardPointsSettings.Enabled)
+                {
+                    _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+                        NopCustomerDefaults.UseRewardPointsDuringCheckoutAttribute, model.UseRewardPoints,
+                        _storeContext.CurrentStore.Id);
+                }
+
+                //Check whether payment workflow is required
+                var isPaymentWorkflowRequired = _orderProcessingService.IsPaymentWorkflowRequired(cart);
+                if (!isPaymentWorkflowRequired)
+                {
+                    //payment is not required
+                    _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
+                        NopCustomerDefaults.SelectedPaymentMethodAttribute, null, _storeContext.CurrentStore.Id);
+
+                    var confirmOrderModel = _checkoutModelFactory.PrepareConfirmOrderModel(cart);
+                    return Json(new
+                    {
+                        update_section = new UpdateSectionJsonModel
+                        {
+                            name = "confirm-order",
+                            html = RenderPartialViewToString("OpcConfirmOrder", confirmOrderModel)
+                        },
+                        goto_section = "confirm_order"
+                    });
+                }
+
+                var paymentMethodInst = _paymentPluginManager
+                    .LoadPluginBySystemName(paymentmethod, _workContext.CurrentCustomer, _storeContext.CurrentStore.Id);
+                if (!_paymentPluginManager.IsPluginActive(paymentMethodInst))
+                    throw new Exception("Selected payment method can't be parsed");
+
+                //save
+                _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+                    NopCustomerDefaults.SelectedPaymentMethodAttribute, paymentmethod, _storeContext.CurrentStore.Id);
+
+                return OpcLoadStepAfterPaymentMethod(paymentMethodInst, cart);
+            }
+            catch (Exception exc)
+            {
+                _logger.Warning(exc.Message, exc, _workContext.CurrentCustomer);
+                return Json(new { error = 1, message = exc.Message });
+            }
+        }
+
         //[HttpPost]
         //[IgnoreAntiforgeryToken]
         //public IActionResult GetShippingRate(NSSCalculateShippingRequest requestParam)
@@ -361,5 +449,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         //}
 
         #endregion
+
+        public static string GetJson(object data)
+        {
+            var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+            return JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver,
+                Formatting = Formatting.None
+            });
+        }
+    }
+
+    public class PaymentMethodRequest
+    {
+        public string PaymentMethod { get; set; }
+        public CheckoutPaymentMethodModel Model {get;set; }
     }
 }

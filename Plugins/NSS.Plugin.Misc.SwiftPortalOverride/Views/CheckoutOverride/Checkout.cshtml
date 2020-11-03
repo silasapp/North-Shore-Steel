@@ -23,14 +23,34 @@
     var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
     var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
     var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
-    var shippingAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.ExistingAddresses, new JsonSerializerSettings
+    var deliveryAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.ExistingAddresses, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+
+    var pickupAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.PickupPointsModel.PickupPoints, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+
+    var states = JsonConvert.SerializeObject(Model.StateProvinces, new JsonSerializerSettings
     {
         ContractResolver = contractResolver,
         Formatting = Formatting.None
     });
 }
 
-<div id="checkout" class="page home-page">
+@{
+    var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
+    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue ?? "0";
+    var shippingMethodsSelected = checkoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option")?.Values;
+    var isDelivery = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Ship to Customer")?.IsPreSelected ?? false;
+    var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
+}
+
+<div id="checkout" class="page home-page" v-cloak>
     <div class="page-body">
         <h1 class="heading1" style="text-align: center;margin: 15px 0;">CHECKOUT</h1>
         <hr style="height: 2px; color: #000; opacity: 0.5;margin-bottom: 30px;">
@@ -41,7 +61,7 @@
                     <div class="d-flex flex-row justify-content-between mt-2">
                         <div class="d-flex flex-column">
                             <label for="purchaseOrder" class="fs-13 text-black">Purchase Order #</label>
-                            <label id="" class="p-2 text-black">@purchaseOrder</label>
+                            <label id="purchaseOrder" class="p-2 text-black">{{ purchaseOrder }}</label>
                         </div>
                         <div class="d-flex flex-column ml-5">
                             <label for="deliveryDate" class="fs-13 text-black">Estimated Delivery Date</label>
@@ -67,13 +87,16 @@
                     <div class="d-flex flex-column mb-3" v-if="isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">Shipping Address</label>
                         <div class="d-flex flex-row">
-                            <select type="text" class="bg-accent text-black w-75 px-2 py-2"
-                                    name="shipping-address" id="shippingAddress">
-                                <option value="" v-for="address in shippingAddresses">
+                            <select type="text" class="bg-accent text-black px-2 py-2" name="shipping-address"
+                                    id="shippingAddress" v-on:change="showNewShippingAddress = false;" v-model="deliveryAddress"
+                                    v-bind:class="{'w-100': showNewShippingAddress, 'w-75' : !showNewShippingAddress}">
+                                <option v-bind:value="null">-Select Address-</option>
+                                <option v-bind:value="address.id" v-for="address in deliveryAddresses">
                                     {{ address.company }}, {{ address.address1 }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
                                 </option>
                             </select>
-                            <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline">
+                            <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline"
+                                    v-if="!showNewShippingAddress" v-on:click="showNewShippingAddress = true; deliveryAddress = null">
                                 Enter a new shiping address
                             </button>
                         </div>
@@ -81,115 +104,262 @@
                     <div class="d-flex flex-column mb-3" v-if="!isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
                         <div class="d-flex flex-row">
-                            <select type="text" class="bg-accent text-black w-100 px-2 py-2" name="shipping-address" id="shippingAddress">
-                                @foreach (var item in Model.ShippingAddressModel.ExistingAddresses)
-                                {
-                                    <option value="">@item.Company, @item.Address1, @item.City, @item.StateProvinceName @item.ZipPostalCode</option>
-                                }
+                            <select type="text" class="bg-accent text-black w-100 px-2 py-2"
+                                    name="shipping-address" id="shippingAddress" v-on:change="" v-model="pickupAddress">
+                                <option v-bind:value="null">-Select Address-</option>
+                                <option v-bind:value="address.id" v-for="address in pickupAddresses">
+                                    {{ address.name }}, {{ address.address }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                </option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="d-flex flex-column">
+                    <hr v-if="showNewShippingAddress && isDelivery" />
+                    <div class="d-flex flex-column" v-if="showNewShippingAddress && isDelivery">
                         <h1 class="h5 text-primary font-weight-bold mb-2">NEW ADDRESS</h1>
                         <div class="d-flex flex-row mt-3">
                             <div class="d-flex flex-column w-50 mr-2">
                                 <label class="fs-14 text-black mb-1">Address Line 1</label>
-                                <input type="text" class="" v-model="addressLine1" placeholder="Ex: 1234 Main St." />
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.addressLine1" placeholder="Ex: 1234 Main St." />
                             </div>
                             <div class="d-flex flex-column w-50 ml-2">
                                 <label class="fs-14 text-black mb-1">Address Line 2</label>
-                                <input type="text" class="" v-model="addressLine2" placeholder="Ex: Ste. 800" />
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.addressLine2" placeholder="Ex: Ste. 800" />
+                            </div>
+                        </div>
+                        <div class="row d-flex flex-row mt-4">
+                            <div class="col-md-6 d-flex flex-column pr-2">
+                                <label class="fs-14 text-black mb-1">City</label>
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.city" placeholder="Ex: Dallas" />
+                            </div>
+                            <div class="col-md-4 d-flex flex-column px-2">
+                                <label class="fs-14 text-black mb-1">State</label>
+                                <select type="text" class="nss-form-control" name="state" v-model="newShippingAddress.state">
+                                    <option v-bind:value="null">-Select-</option>
+                                    <option v-bind:value="option.id" v-for="option in states">
+                                        {{ option.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex flex-column pl-2">
+                                <label class="fs-14 text-black mb-1">Zip Code</label>
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.zipCode" placeholder="Ex: 77014" />
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row mt-4">
+                            <label class="nss-radio-button">
+                                Save to My Addresses
+                                <input type="checkbox" v-bind:checked="newShippingAddress.saveToMyAddresses" />
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div class="d-flex flex-row mt-3">
+                            <div class="d-flex flex-column w-75">
+                                <label class="fs-14 text-black mb-1">Address Nickname</label>
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.addressNickname" placeholder="Ex: 'South Warehouse'" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card card-mod">
-                    <h1 class="heading2">PAYMENT METHOD</h1>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <button class="font20 payment-type-btn active">
-                            <img src="Themes/@themeName/Content/assets/shopping-cart.svg" alt="">
-                            <div style="margin-left: 10px;">
-                                <p style="margin: 0;text-align: left;line-height: 1;">Credit/Debit</p>
-                                <p class="font12" style="margin: 5px 0;text-align: left;">Pay with credit/debit card</p>
+                    <label class="h5 text-primary font-weight-bold mb-4">PAYMENT METHOD</label>
+                    <div class="d-flex flex-column mb-3">
+                        <div class="d-flex flex-row flex-wrap justify-content-between">
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30 cursor-pointer"
+                                 v-bind:class="{'active': paymentMethodIndex === 0}" v-on:click="paymentMethodIndex = 0">
+                                <img src="Themes/@themeName/Content/assets/credit-card.svg" alt="" width="24">
+                                <div class="d-flex flex-column ml-2">
+                                    <label class="fs-18 font-weight-bold mb-1 cursor-pointer">Credit/Debit</label>
+                                    <label class="fs-12 mb-0 cursor-pointer">Pay with credit/debit card</label>
+                                </div>
                             </div>
-                        </button>
-                        <button class="font20 payment-type-btn">
-                            <img src="Themes/@themeName/Content/assets/saw-blade.svg" alt="">
-                            <div style="margin-left: 10px;">
-                                <p style="margin: 0;text-align: left;line-height: 1;">Paypal</p>
-                                <p class="font12" style="margin: 5px 0;text-align: left;">Pay with PayPal account</p>
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30 cursor-pointer"
+                                 v-bind:class="{'active': paymentMethodIndex === 1}" v-on:click="paymentMethodIndex = 1">
+                                <img src="Themes/@themeName/Content/assets/paypal.svg" alt="" width="24">
+                                <div class="d-flex flex-column ml-2">
+                                    <label class="fs-18 font-weight-bold mb-1 cursor-pointer">Paypal</label>
+                                    <label class="fs-12 mb-0 cursor-pointer">Pay with PayPal account</label>
+                                </div>
                             </div>
-                        </button>
-                        <button class="font20 payment-type-btn">
-                            <img src="Themes/@themeName/Content/assets/saw-blade.svg" alt="">
-                            <div style="margin-left: 10px;">
-                                <p style="margin: 0;text-align: left;line-height: 1;">Line of Credit</p>
-                                <p class="font12" style="margin: 5px 0;text-align: left;">Balance: $2,076.25</p>
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30 cursor-pointer"
+                                 v-bind:class="{'active': paymentMethodIndex === 2}" v-on:click="paymentMethodIndex = 2">
+                                <img src="Themes/@themeName/Content/assets/dollar.svg" alt="" width="24">
+                                <div class="d-flex flex-column ml-2">
+                                    <label class="fs-18 font-weight-bold mb-1 cursor-pointer">Line of Credit</label>
+                                    <label class="fs-12 mb-0 cursor-pointer">Balance: $2,076.25</label>
+                                </div>
                             </div>
-                        </button>
-                    </div>
-                    <div style="display: flex;justify-content: space-between;">
-                        <div style="display: inline-grid; flex-basis: 65%;">
-                            <label for="shippingAddress" class="font12">Saved Credit/Debit Cards</label>
-                            <select type="text" class="font14" style="color: rgb(7, 7, 107);" name="shipping-address"
-                                    id="shippingAddress">
-                                <option value="">
-                                    VISA 4321
-                                </option>
-                            </select>
                         </div>
-                        <a href="" class="font12"
-                           style="display: flex;align-items: flex-end;flex-basis: 30%;margin: 0;">
-                            Enter a new billing address
-                        </a>
                     </div>
-                    <div style="display: flex;align-items: center;">
-                        <input type="checkbox" name="" id="">
-                        <label for="" class="font12" style="margin: 10px 5px;">Same as shipping address</label>
+                    <div class="d-flex flex-column" v-if="paymentMethodIndex === 0">
+                        <div class="row d-flex flex-row mt-3">
+                            <div class="col-md-3 d-flex flex-column w-50">
+                                <label class="fs-14 text-black mb-1">Select card</label>
+                                <select type="text" class="nss-form-control" v-model="paymentCard.cardType">
+                                    @*<option v-bind:value="option.id" v-for="option in states">
+                                        {{ option.name }}
+                                    </option>*@
+                                </select>
+                            </div>
+                            <div class="col-md-9 d-flex flex-column w-50">
+                                <label class="fs-14 text-black mb-1">Cardholder name</label>
+                                <input type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
+                            </div>
+                        </div>
+                        <div class="row d-flex flex-row mt-3">
+                            <div class="col-md-7 d-flex flex-column w-50">
+                                <label class="fs-14 text-black mb-1">Card number</label>
+                                <input type="text" class="nss-form-control" v-model="paymentCard.cardNumber" placeholder="Ex: 000000000000000" />
+                            </div>
+                            <div class="col-md-3 d-flex flex-column w-50">
+                                <label class="fs-14 text-black mb-1">Expiration date</label>
+                                <div class="d-flex flex-row align-items-center">
+                                    <select type="text" class="bg-accent text-black px-2 py-2  w-50" id="shippingAddress" v-model="paymentCard.cardExpirationMonth">
+                                        <option v-bind:value="month" v-for="month in expirationMonths">
+                                            {{ month }}
+                                        </option>
+                                    </select>
+                                    <span class="fs-18 mx-3">/</span>
+                                    <select type="text" class="bg-accent text-black px-2 py-2 w-50" id="shippingAddress" v-model="paymentCard.cardExpirationYear">
+                                        <option v-bind:value="year" v-for="year in expirationYears">
+                                            {{ year }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex flex-column w-50">
+                                <label class="fs-14 text-black mb-1">Card code</label>
+                                <input type="text" class="nss-form-control" v-model="paymentCard.cardCode" placeholder="Ex: 000" />
+                            </div>
+                        </div>
+
+                        <h1 class="h5 text-primary font-weight-bold mt-3">Billing Address</h1>
+                        <div class="d-flex flex-column mt-2" v-if="!paymentCard.sameAsShippingAddress">
+                            <div class="d-flex flex-row">
+                                <select type="text" class="bg-accent text-black px-2 py-2"
+                                        id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddress"
+                                        v-bind:class="{'w-100': showNewBillingAddress, 'w-75' : !showNewBillingAddress}">
+                                    <option v-bind:value="null">-Select Address-</option>
+                                    <option v-bind:value="address.id" v-for="address in deliveryAddresses">
+                                        {{ address.company }}, {{ address.address1 }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                    </option>
+                                </select>
+                                <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline"
+                                        v-if="!showNewBillingAddress" v-on:click="showNewBillingAddress = true; billingAddress = null">
+                                    Enter new billing address
+                                </button>
+                            </div>
+
+                            <div class="d-flex flex-column" v-if="showNewBillingAddress">
+                                <h1 class="h5 text-primary font-weight-bold mb-2 mt-3">NEW ADDRESS</h1>
+                                <div class="d-flex flex-row mt-3">
+                                    <div class="d-flex flex-column w-50 mr-2">
+                                        <label class="fs-14 text-black mb-1">Address Line 1</label>
+                                        <input type="text" class="nss-form-control" v-model="newBillingAddress.addressLine1" placeholder="Ex: 1234 Main St." />
+                                    </div>
+                                    <div class="d-flex flex-column w-50 ml-2">
+                                        <label class="fs-14 text-black mb-1">Address Line 2</label>
+                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.addressLine2" placeholder="Ex: Ste. 800" />
+                                    </div>
+                                </div>
+                                <div class="row d-flex flex-row mt-4">
+                                    <div class="col-md-6 d-flex flex-column pr-2">
+                                        <label class="fs-14 text-black mb-1">City</label>
+                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.city" placeholder="Ex: Dallas" />
+                                    </div>
+                                    <div class="col-md-4 d-flex flex-column px-2">
+                                        <label class="fs-14 text-black mb-1">State</label>
+                                        <select type="text" class="nss-form-control" v-model="newShippingAddress.state">
+                                            <option value="null">-Select-</option>
+                                            <option v-bind:value="option.id" v-for="option in states">
+                                                {{ option.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 d-flex flex-column pl-2">
+                                        <label class="fs-14 text-black mb-1">Zip Code</label>
+                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.zipCode" placeholder="Ex: 77014" />
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row mt-4">
+                                    <label class="nss-radio-button">
+                                        Save to My Addresses
+                                        <input type="checkbox" v-bind:checked="newShippingAddress.saveToMyAddresses" />
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="d-flex flex-row mt-3">
+                                    <div class="d-flex flex-column w-75">
+                                        <label class="fs-14 text-black mb-1">Address Nickname</label>
+                                        <input type="text" class="nss-form-control" v-model="newShippingAddress.addressNickname" placeholder="Ex: 'South Warehouse'" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="nss-checkbox">
+                                Same as shipping address
+                                <input type="checkbox" v-bind:checked="paymentCard.sameAsShippingAddress"
+                                       v-on:change="paymentCard.sameAsShippingAddress = !paymentCard.sameAsShippingAddress;">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div v-if="paymentMethodIndex === 1">
+                        <label class="text-primary">
+                            You will be redirected to a paypal page where you'll be able to make payment.
+                            Click <a href="">here</a> to continue
+                        </label>
+                    </div>
+                    <div v-if="paymentMethodIndex === 2">
+                        <label>The following will be deducted from your account.</label>
                     </div>
                 </div>
-                <h1 class="heading1" style="text-align: center;margin: 15px 0;">ORDER SUMMARY</h1>
-                <hr style="color: rgb(7, 7, 107); opacity: 0.5; margin-bottom: 20px;">
-                <table class="table table-bordered catalog-table font12" id="catalogTable" onload="sortTable(0)">
-                    <thead>
-                        <tr>
-                            <th scope="col">Item #</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Customer Part #</th>
-                            <th scope="col">Unit Price</th>
-                            <th scope="col">Total Price</th>
-                            <th scope="col">Total Weight (lbs)</th>
-                            <th scope="col">Qty.</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.ShoppingCartModel.Items)
-                        {
-                            var product = productService.GetProductById(item.ProductId);
-                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                <div class="d-flex flex-column">
 
-                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
-                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
-                            string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                            var iNo = serialized == "True" ? itemTagNo : itemNo;
-                            var weight = Decimal.ToDouble(product.Weight);
-                            weight = (weight * item.Quantity);
-                            var totalWeight = DoFormat(weight);
-
+                    <label class="h4 text-primary font-weight-bold text-center mt-4 mb-0">ORDER SUMMARY</label>
+                    <hr style="color: rgb(7, 7, 107); margin-bottom: 20px;">
+                    <table class="table table-bordered catalog-table font12" id="catalogTable" onload="sortTable(0)">
+                        <thead>
                             <tr>
-                                <td>@iNo</td>
-                                <td>@item.ProductName</td>
-                                <td>P-12345</td>
-                                <td>@item.UnitPrice / CW</td>
-                                <td>@item.SubTotal</td>
-                                <td>@totalWeight</td>
-                                <td>@item.Quantity</td>
+                                <th scope="col">Item #</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Customer Part #</th>
+                                <th scope="col">Unit Price</th>
+                                <th scope="col">Total Price</th>
+                                <th scope="col">Total Weight (lbs)</th>
+                                <th scope="col">Qty.</th>
                             </tr>
-                        }
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ShoppingCartModel.Items)
+                            {
+                                var product = productService.GetProductById(item.ProductId);
+                                var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
 
-                    </tbody>
-                </table>
+                                var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                var iNo = serialized == "True" ? itemTagNo : itemNo;
+                                var weight = Decimal.ToDouble(product.Weight);
+                                weight = (weight * item.Quantity);
+                                var totalWeight = DoFormat(weight);
+
+                                <tr>
+                                    <td>@iNo</td>
+                                    <td>@item.ProductName</td>
+                                    <td>P-12345</td>
+                                    <td>@item.UnitPrice / CW</td>
+                                    <td>@item.SubTotal</td>
+                                    <td>@totalWeight</td>
+                                    <td>@item.Quantity</td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="col-3">
                 <div class="card card-mod">
@@ -239,19 +409,126 @@
     }
 }
 <script>
-    var shippingAddresses = @Html.Raw(shippingAddresses);
-    console.log("addresses: ", shippingAddresses);
+    var deliveryAddresses = @Html.Raw(deliveryAddresses);
+    var pickupAddresses = @Html.Raw(pickupAddresses);
+    var states = @Html.Raw(states);
+    var purchaseOrder = '@purchaseOrder';
+    var isDelivery = '@isDelivery' === 'True';
+    console.log("deliveryAddresses: ", deliveryAddresses);
+    console.log("pickupAddresses: ", pickupAddresses);
+    console.log("states: ", states);
     new Vue({
         el: '#checkout',
         data: {
-            isDelivery: true,
-            shippingAddresses,
-            addressLine1: null,
-            addressLine2: null,
+            purchaseOrder,
+            isDelivery,
+            deliveryAddresses,
+            deliveryAddress: deliveryAddresses.length > 0 ? deliveryAddresses[0].id : null,
+            pickupAddresses,
+            pickupAddress: pickupAddresses.length > 0 ? pickupAddresses[0].id : null,
+            showNewShippingAddress: false,
+            showPaymentInfo: false,
+            paymentHtml: null,
+            newShippingAddress: {
+                addressLine1: null,
+                addressLine2: null,
+                city: null,
+                state: null,
+                zipCode: null,
+                saveToMyAddresses: false,
+                addressNickname: null,
+            },
+            paymentMethodIndex: 0,
+            paymentCard: {
+                cardType: null,
+                cardHolderName: null,
+                cardNumber: null,
+                cardExpirationMonth: null,
+                cardExpirationYear: null,
+                cardCode: null,
+                sameAsShippingAddress: true,
+            },
+            expirationMonths: [],
+            expirationYears: [],
+            billingAddress: null,
+            showNewBillingAddress: false,
+            newBillingAddress: {
+                addressLine1: null,
+                addressLine2: null,
+                city: null,
+                state: null,
+                zipCode: null,
+                saveToMyAddresses: false,
+                addressNickname: null,
+            },
         },
         mounted: function () {
+            //this.getStates();
+            this.generateExpirationMonthsAndYears();
+            console.log("purchaseOrder: ", this.purchaseOrder);
         },
         methods: {
+            handlePaymentClick: function (item, model) {
+                console.log("item: ", item);
+                console.log("model: ", JSON.stringify(model));
+                const request = { PaymentMethod: item.paymentMethodSystemName, Model: model };
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("SwiftSavePaymentMethod", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        if (data != null) {
+                            self.showPaymentInfo = true;
+                            self.paymentHtml = data.update_section.html;
+                            var paymentInfo = $('#payment-info-section');
+                            console.log("paymentInfo: ", paymentInfo);
+                            console.log("handlePaymentClick success: ", self.paymentHtml);
+                            paymentInfo.html(data.update_section.html);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(thrownError, 'handlePaymentClick datadata-error', xhr);
+                    }
+                });
+            },
+            getStates: function () {
+                const request = { countryId: 1 };
+                $.ajax({
+                    url: "@Url.Action("GetStatesByCountryId", "Country")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: 1,
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        console.log("getStates: ", data);
+                        if (data != null) {
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(thrownError, 'getStates datadata-error', xhr);
+                    }
+                });
+            },
+
+            generateExpirationMonthsAndYears: function () {
+                let months = [];
+                for (let i = 1; i <= 12; i++) {
+                    const retVal = i < 10 ? `0${i}` : i;
+                    months = [...months, retVal];
+                }
+                let years = [];
+                const currentYear = (new Date()).getFullYear();
+                for (let i = 0; i < 15; i++) {
+                    const retVal = currentYear + i;
+                    years = [...years, retVal];
+                }
+
+                this.expirationMonths = months;
+                this.paymentCard.cardExpirationMonth = months[0];
+                this.expirationYears = years;
+                this.paymentCard.cardExpirationYear = years[0];
+            },
         },
     });
 </script>
