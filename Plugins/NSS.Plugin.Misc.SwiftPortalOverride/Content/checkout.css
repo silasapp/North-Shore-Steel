@@ -341,6 +341,7 @@ button, button:focus {
 .payment-item-card {
     border: 2px solid #C3C3C3;
     border-radius: 4px;
+    cursor: pointer;
 }
 
     .payment-item-card label {
@@ -358,6 +359,20 @@ button, button:focus {
         }
 
         .payment-item-card.active img {
+            filter: brightness(0) invert(1);
+        }
+
+    .payment-item-card.disabled {
+        border: 2px solid #C3C3C3;
+        background: #C3C3C3;
+        cursor: not-allowed;
+    }
+
+        .payment-item-card.disabled label {
+            color: #FFF;
+        }
+
+        .payment-item-card.disabled img {
             filter: brightness(0) invert(1);
         }
 
@@ -562,4 +577,8 @@ td {
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+.cursor-notallowed {
+    cursor: not-allowed;
 }
