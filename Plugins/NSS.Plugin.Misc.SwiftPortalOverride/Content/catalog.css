@@ -395,3 +395,7 @@ th.sortable {
     display: flex;
     margin: 0 20px 12px 0;
 }
+
+.e-treeview .e-list-item.e-active > .e-text-content .e-list-text {
+    color: black !important;
+}
