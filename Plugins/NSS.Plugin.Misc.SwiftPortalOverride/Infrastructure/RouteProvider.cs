@@ -29,7 +29,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
         /// Register routes
         /// </summary>
         /// <param name="endpointRouteBuilder">Route builder</param>
-       
+
         public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
         {
             // register
@@ -75,8 +75,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
              );
 
-            //endpointRouteBuilder.MapControllerRoute("ProductSearch", $"{pattern}search/",
-            //    new { controller = "Catalog", action = "Search" });
+           
         }
     }
 }
