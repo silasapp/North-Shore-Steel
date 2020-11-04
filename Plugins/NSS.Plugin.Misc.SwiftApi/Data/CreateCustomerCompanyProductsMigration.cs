@@ -35,8 +35,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
 
 
             Create.ForeignKey("FK_CustomerCompanyProduct_Product").FromTable("CustomerCompanyProduct").ForeignColumn("ProductId").ToTable("Product").PrimaryColumn("Id");
-            Create.ForeignKey("FK_CustomerCompanyProduct_Company").FromTable("CustomerCompanyProduct").ForeignColumn("CompanyId").ToTable("Company").PrimaryColumn("Id");
-            Create.ForeignKey("FK_CustomerCompanyProduct_Customer").FromTable("CustomerCompanyProduct").ForeignColumn("CustomerId").ToTable("Customer").PrimaryColumn("Id");
+            Create.ForeignKey("FK_CustomerCompanyProduct_CustomerCompany").FromTable("CustomerCompanyProduct").ForeignColumn("CustomerCompanyId").ToTable("CustomerCompany").PrimaryColumn("Id");
         }
         #endregion
     }

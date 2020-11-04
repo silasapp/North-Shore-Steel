@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
-    public interface ICustomerCompanyProductsService
+    public interface ICustomerCompanyProductService
     {
         void InsertCustomerCompanyProducts(List<CustomerCompanyProduct> customerCompanyProducts);
 
         IList<CustomerCompanyProduct> GetCustomerCompanyProducts();
 
-        CustomerCompanyProduct GetCustomerCompanyProductById(int customerId, int companyId, int productId);
+        void UpdateCustomerCompanyProducts(List<CustomerCompanyProduct> customerCompanyProducts);
+
+        CustomerCompanyProduct GetCustomerCompanyProductById(int customerCompanyId, int productId);
 
     }
 }
