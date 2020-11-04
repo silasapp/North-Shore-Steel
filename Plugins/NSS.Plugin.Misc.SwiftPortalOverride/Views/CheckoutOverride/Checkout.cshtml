@@ -115,6 +115,7 @@
                                 Enter a new shiping address
                             </button>
                         </div>
+                        <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required</label>
                     </div>
                     <div class="d-flex flex-column mb-3" v-if="!isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
@@ -127,6 +128,7 @@
                                 </option>
                             </select>
                         </div>
+                        <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Billing Address is required</label>
                     </div>
 
                     <hr v-if="showNewShippingAddress && isDelivery" />
@@ -136,6 +138,7 @@
                             <div class="d-flex flex-column w-50 mr-2">
                                 <label class="fs-14 text-black mb-1">Address Line 1</label>
                                 <input type="text" class="nss-form-control" v-model="newShippingAddress.address1" placeholder="Ex: 1234 Main St." />
+                                <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.address1">Address Line 1 is required</label>
                             </div>
                             <div class="d-flex flex-column w-50 ml-2">
                                 <label class="fs-14 text-black mb-1">Address Line 2</label>
@@ -146,6 +149,7 @@
                             <div class="col-md-6 d-flex flex-column pr-2">
                                 <label class="fs-14 text-black mb-1">City</label>
                                 <input type="text" class="nss-form-control" v-model="newShippingAddress.city" placeholder="Ex: Dallas" />
+                                <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.city">City is required</label>
                             </div>
                             <div class="col-md-4 d-flex flex-column px-2">
                                 <label class="fs-14 text-black mb-1">State</label>
@@ -155,10 +159,12 @@
                                         {{ option.name }}
                                     </option>
                                 </select>
+                                <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.stateProvinceId">State is required</label>
                             </div>
                             <div class="col-md-2 d-flex flex-column pl-2">
                                 <label class="fs-14 text-black mb-1">Zip Code</label>
                                 <input type="text" class="nss-form-control" v-model="newShippingAddress.zipPostalCode" placeholder="Ex: 77014" />
+                                <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.zipPostalCode">Zip Code is required</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row mt-4">
@@ -185,8 +191,8 @@
                                  v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_CREDIT_CARD">
                                 <img src="Themes/@themeName/Content/assets/credit-card.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
-                                    <label class="fs-18 font-weight-bold mb-1 cursor-pointer">Credit/Debit</label>
-                                    <label class="fs-12 mb-0 cursor-pointer">Pay with credit/debit card</label>
+                                    <label class="fs-18 font-weight-bold mb-1">Credit/Debit</label>
+                                    <label class="fs-12 mb-0">Pay with credit/debit card</label>
                                 </div>
                             </div>
                             <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30"
@@ -194,8 +200,8 @@
                                  v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_PAYPAL">
                                 <img src="Themes/@themeName/Content/assets/paypal.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
-                                    <label class="fs-18 font-weight-bold mb-1 cursor-pointer">Paypal</label>
-                                    <label class="fs-12 mb-0 cursor-pointer">Pay with PayPal account</label>
+                                    <label class="fs-18 font-weight-bold mb-1">Paypal</label>
+                                    <label class="fs-12 mb-0">Pay with PayPal account</label>
                                 </div>
                             </div>
                             <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30"
@@ -207,12 +213,13 @@
                                  v-if="shared.accountCredit.canCredit">
                                 <img src="Themes/@themeName/Content/assets/dollar.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
-                                    <label class="fs-18 font-weight-bold mb-1 cursor-pointer">Line of Credit</label>
-                                    <label class="fs-12 mb-0 cursor-pointer">Balance: $2,076.25</label>
+                                    <label class="fs-18 font-weight-bold mb-1">Line of Credit</label>
+                                    <label class="fs-12 mb-0">Balance: ${{ formatMoney(shared.accountCredit.creditAmount) }}</label>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="d-flex flex-column" v-if="paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD">
                         <div class="row d-flex flex-row mt-3">
                             <div class="col-md-3 d-flex flex-column w-50">
@@ -222,16 +229,19 @@
                                             {{ option.name }}
                                         </option>*@
                                 </select>
+                                <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardType">Select a card type</label>
                             </div>
                             <div class="col-md-9 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Cardholder name</label>
                                 <input type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
+                                <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardHolderName">Cardholder name is required</label>
                             </div>
                         </div>
                         <div class="row d-flex flex-row mt-3">
                             <div class="col-md-7 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Card number</label>
                                 <input type="text" class="nss-form-control" v-model="paymentCard.cardNumber" placeholder="Ex: 000000000000000" />
+                                <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardNumber">Cardholder number is required</label>
                             </div>
                             <div class="col-md-3 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Expiration date</label>
@@ -248,15 +258,17 @@
                                         </option>
                                     </select>
                                 </div>
+                                <label class="text-danger mt-1 mb-0" v-if="dirty && (!paymentCard.cardExpirationMonth || !paymentCard.cardExpirationYear)">Expiration date is required</label>
                             </div>
                             <div class="col-md-2 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Card code</label>
                                 <input type="text" class="nss-form-control" v-model="paymentCard.cardCode" placeholder="Ex: 000" />
+                                <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardCode">Card code is required</label>
                             </div>
                         </div>
 
                         <h1 class="h5 text-primary font-weight-bold mt-3">Billing Address</h1>
-                        <div class="d-flex flex-column mt-2" v-if="!shipToSameAddress">
+                        <div class="d-flex flex-column mt-2" v-if="!shipToSameAddress || !isDelivery">
                             <div class="d-flex flex-row">
                                 <select type="text" class="bg-accent text-black px-2 py-2"
                                         id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddressId"
@@ -271,6 +283,7 @@
                                     Enter new billing address
                                 </button>
                             </div>
+                            <label class="text-danger mt-1 mb-0" v-if="dirty && !billingAddressId && !showNewBillingAddress">Billing address is required</label>
 
                             <div class="d-flex flex-column" v-if="showNewBillingAddress">
                                 <h1 class="h5 text-primary font-weight-bold mb-2 mt-3">NEW ADDRESS</h1>
@@ -278,6 +291,7 @@
                                     <div class="d-flex flex-column w-50 mr-2">
                                         <label class="fs-14 text-black mb-1">Address Line 1</label>
                                         <input type="text" class="nss-form-control" v-model="newBillingAddress.address1" placeholder="Ex: 1234 Main St." />
+                                        <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.address1">Address Line 1 is required</label>
                                     </div>
                                     <div class="d-flex flex-column w-50 ml-2">
                                         <label class="fs-14 text-black mb-1">Address Line 2</label>
@@ -288,6 +302,7 @@
                                     <div class="col-md-6 d-flex flex-column pr-2">
                                         <label class="fs-14 text-black mb-1">City</label>
                                         <input type="text" class="nss-form-control" v-model="newBillingAddress.city" placeholder="Ex: Dallas" />
+                                        <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.city">City is required</label>
                                     </div>
                                     <div class="col-md-4 d-flex flex-column px-2">
                                         <label class="fs-14 text-black mb-1">State</label>
@@ -297,10 +312,12 @@
                                                 {{ option.name }}
                                             </option>
                                         </select>
+                                        <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.stateProvinceId">State is required</label>
                                     </div>
                                     <div class="col-md-2 d-flex flex-column pl-2">
                                         <label class="fs-14 text-black mb-1">Zip Code</label>
                                         <input type="text" class="nss-form-control" v-model="newBillingAddress.zipPostalCode" placeholder="Ex: 77014" />
+                                        <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.zipPostalCode">Zip Code is required</label>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-row mt-4">
@@ -318,7 +335,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-3">
+                        <div class="mt-3" v-if="isDelivery">
                             <label class="nss-checkbox">
                                 Same as shipping address
                                 <input type="checkbox" v-bind:checked="shipToSameAddress"
@@ -487,7 +504,7 @@
                 cardExpirationYear: null,
                 cardCode: null,
             },
-            shipToSameAddress: false,
+            shipToSameAddress: true,
             expirationMonths: [],
             expirationYears: [],
             billingAddressId: null,
@@ -501,6 +518,7 @@
                 saveToMyAddresses: false,
                 countryId: 1,
             },
+            dirty: false,
         },
         mounted: function () {
             this.generateExpirationMonthsAndYears();
@@ -562,13 +580,21 @@
                 this.expirationYears = years;
                 this.paymentCard.cardExpirationYear = years[0];
             },
+            formatMoney: function (input) {
+                return input.toLocaleString();
+            },
 
             placeOrder: function () {
+                this.dirty = true;
+                const isValid = this.validate();
+                console.log("isValid: ", isValid);
+                if (!isValid) return;
                 const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
 
-                const shipToSameAddress = this.shipToSameAddress;
+                const shipToSameAddress = this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
+                    ? true : this.shipToSameAddress;
                 const billingAddressId = shipToSameAddress ? shippingAddressId : (this.billingAddressId ? this.billingAddressId : 0);
                 const billingNewAddress = {...this.newBillingAddress};
 
@@ -604,7 +630,7 @@
                             return;
                         }
                         if (data != null) {
-                            window.location.href = '/Completed?OrderId=' + data.orderId;
+                            window.location.href = '/Completed';
                         }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
@@ -612,6 +638,28 @@
                     }
                 });
             },
+
+            validate: function () {
+                if ((!this.pickupPointId && !this.isDelivery) || (this.isDelivery && !this.showNewShippingAddress && !this.shippingAddressId))
+                    return false;
+
+                if (this.showNewShippingAddress && this.isDelivery) {
+                    if (!this.newShippingAddress.address1 || !this.newShippingAddress.city || this.newShippingAddress.zipPostalCode ||
+                        this.newShippingAddress.stateProvinceId)
+                        return false;
+                }
+                if (this.showNewBillingAddress) {
+                    if (!this.newBillingAddress.address1 || !this.newBillingAddress.city || this.newBillingAddress.zipPostalCode ||
+                        this.newBillingAddress.stateProvinceId)
+                        return false;
+                }
+                if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_CREDIT_CARD) {
+                    if (!this.paymentCard.cardType || !this.paymentCard.cardHolderName || !this.paymentCard.cardNumber ||
+                        !this.paymentCard.cardExpirationMonth || !this.paymentCard.cardExpirationYear || !this.paymentCard.cardCode)
+                        return false;
+                }
+                return true;
+            }
         },
     });
 </script>
