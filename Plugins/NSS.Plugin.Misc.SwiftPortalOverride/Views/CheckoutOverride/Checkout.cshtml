@@ -233,36 +233,37 @@
                             </div>
                             <div class="col-md-9 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Cardholder name</label>
-                                <input type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
+                                <input id="cardholdername" type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
                                 <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardHolderName">Cardholder name is required</label>
                             </div>
                         </div>
                         <div class="row d-flex flex-row mt-3">
                             <div class="col-md-7 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Card number</label>
-                                <input type="text" class="nss-form-control" v-model="paymentCard.cardNumber" placeholder="Ex: 000000000000000" />
+                                <input id="cardnumber" type="text" class="nss-form-control" v-model="paymentCard.cardNumber" placeholder="Ex: 000000000000000" />
                                 <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardNumber">Cardholder number is required</label>
                             </div>
                             <div class="col-md-3 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Expiration date</label>
                                 <div class="d-flex flex-row align-items-center">
-                                    <select type="text" class="bg-accent text-black px-2 py-2  w-50" id="shippingAddress" v-model="paymentCard.cardExpirationMonth">
-                                        <option v-bind:value="month" v-for="month in expirationMonths">
-                                            {{ month }}
-                                        </option>
-                                    </select>
-                                    <span class="fs-18 mx-3">/</span>
-                                    <select type="text" class="bg-accent text-black px-2 py-2 w-50" id="shippingAddress" v-model="paymentCard.cardExpirationYear">
-                                        <option v-bind:value="year" v-for="year in expirationYears">
-                                            {{ year }}
-                                        </option>
-                                    </select>
+                                    <input id="expiration-date" type="text" class="nss-form-control" v-model="paymentCard.cardExpirationMonth" placeholder="Ex: MM/YYYY" />
+                                    @*<select type="text" class="bg-accent text-black px-2 py-2  w-50" id="shippingAddress" v-model="paymentCard.cardExpirationMonth">
+                                            <option v-bind:value="month" v-for="month in expirationMonths">
+                                                {{ month }}
+                                            </option>
+                                        </select>
+                                        <span class="fs-18 mx-3">/</span>
+                                        <select type="text" class="bg-accent text-black px-2 py-2 w-50" id="shippingAddress" v-model="paymentCard.cardExpirationYear">
+                                            <option v-bind:value="year" v-for="year in expirationYears">
+                                                {{ year }}
+                                            </option>
+                                        </select>*@
                                 </div>
                                 <label class="text-danger mt-1 mb-0" v-if="dirty && (!paymentCard.cardExpirationMonth || !paymentCard.cardExpirationYear)">Expiration date is required</label>
                             </div>
                             <div class="col-md-2 d-flex flex-column w-50">
                                 <label class="fs-14 text-black mb-1">Card code</label>
-                                <input type="text" class="nss-form-control" v-model="paymentCard.cardCode" placeholder="Ex: 000" />
+                                <input id="cvv" type="text" class="nss-form-control" v-model="paymentCard.cardCode" placeholder="Ex: 000" />
                                 <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardCode">Card code is required</label>
                             </div>
                         </div>
@@ -429,7 +430,7 @@
                     </div>
                 </div>
                 <div style="display:flex;justify-content: center;">
-                    <button class="font14"
+                    <button id="place-order" class="font14"
                             v-on:click="placeOrder"
                             style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
                         PLACE ORDER
@@ -522,6 +523,7 @@
         },
         mounted: function () {
             this.generateExpirationMonthsAndYears();
+            //this.renderPaypalCard();
         },
         computed: {
             subTotal: function () {
@@ -585,6 +587,7 @@
             },
 
             placeOrder: function () {
+
                 this.dirty = true;
                 const isValid = this.validate();
                 console.log("isValid: ", isValid);
@@ -644,13 +647,13 @@
                     return false;
 
                 if (this.showNewShippingAddress && this.isDelivery) {
-                    if (!this.newShippingAddress.address1 || !this.newShippingAddress.city || this.newShippingAddress.zipPostalCode ||
-                        this.newShippingAddress.stateProvinceId)
+                    if (!this.newShippingAddress.address1 || !this.newShippingAddress.city || !this.newShippingAddress.zipPostalCode ||
+                        !this.newShippingAddress.stateProvinceId)
                         return false;
                 }
                 if (this.showNewBillingAddress) {
-                    if (!this.newBillingAddress.address1 || !this.newBillingAddress.city || this.newBillingAddress.zipPostalCode ||
-                        this.newBillingAddress.stateProvinceId)
+                    if (!this.newBillingAddress.address1 || !this.newBillingAddress.city || !this.newBillingAddress.zipPostalCode ||
+                        !this.newBillingAddress.stateProvinceId)
                         return false;
                 }
                 if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_CREDIT_CARD) {
@@ -659,7 +662,78 @@
                         return false;
                 }
                 return true;
+            },
+
+            renderPaypalCard: function () {
+                if (paypal.HostedFields.isEligible()) {
+                    const self = this;
+                    paypal.HostedFields.render({
+                        createOrder: function () {
+                            return 'order-ID';
+                        }, // replace order-ID with the order ID
+                        styles: {
+                            input: {
+                                'font-size': '17px',
+                                'font-family': 'helvetica, tahoma, calibri, sans-serif',
+                                color: '#3a3a3a',
+                            },
+                            ':focus': {
+                                color: 'black',
+                            },
+                        },
+                        fields: {
+                            number: {
+                                selector: '#cardnumber',
+                                placeholder: 'card number',
+                            },
+                            cvv: {
+                                selector: '#cvv',
+                                placeholder: 'card security number',
+                            },
+                            expirationDate: {
+                                selector: '#expiration-date',
+                                placeholder: 'mm/yy',
+                            },
+                        },
+                    }).then(function (hf) {
+                        $('#place-order').click(function (event) {
+                            event.preventDefault();
+
+                            const shipToSameAddress = this.shipToSameAddress;
+                            const billingAddressId = shipToSameAddress ? shippingAddressId : (this.billingAddressId ? this.billingAddressId : 0);
+                            const billingAddress = { ...this.newBillingAddress };
+
+                            hf.submit({
+                                // Cardholder Name
+                                cardholderName: self.paymentCard.cardHolderName,
+                                // Billing Address
+                                billingAddress: {
+                                    streetAddress: billingAddress.address1, // address_line_1 - street
+                                    extendedAddress: billingAddress.address2, // address_line_2 - unit
+                                    region: billingAddress.stateProvinceId, // admin_area_1 - state
+                                    locality: billingAddress.city, // admin_area_2 - town / city
+                                    postalCode: billingAddress.zipPostalCode, // postal_code - postal_code
+                                    countryCodeAlpha2: billingAddress.countryId, // country_code - country
+                                },
+                                // redirect after successful order approval
+                            })
+                                .then(function () {
+                                    window.location.replace('http://www.somesite.com/review');
+                                })
+                                .catch(function (err) {
+                                    console.log('error: ', JSON.stringify(err));
+                                    document.getElementById(
+                                        'consoleLog'
+                                    ).innerHTML = JSON.stringify(err);
+                                });
+                        });
+                    });
+                } else {
+                    $('#my-sample-form').hide(); // hides the advanced credit and debit card payments fields if merchant isn't eligible
+                }
             }
+
         },
     });
+
 </script>
