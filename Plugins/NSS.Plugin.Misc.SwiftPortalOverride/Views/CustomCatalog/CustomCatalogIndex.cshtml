@@ -19,6 +19,7 @@
         <div class="row">
             <div class="col-sm-3"></div>
             <div class="col-sm-9">
+                <div id="searchWord" style="float: left"></div>
                 <div id="specs" style="float:left"></div>
                 <div id="shapes" style="float:left"></div>
                 <div id="clearAllFilters" onclick=clearFilters() style="cursor:pointer"></div>
@@ -139,6 +140,7 @@
     let specNames = [];
     let shapeIDs = [];
     let shapeNames = [];
+    let searchKeyword = getUrlParameter('q');
 
     $(document).ready(function () {
         populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
@@ -214,40 +216,47 @@
     })
 
     function populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames) {
-      $("#overlay").css("display", "flex");
+        $("#overlay").css("display", "flex");
 
-      var specChipsValue = "";
-      var shapeChipsValue = "";
-      var allFilterValue = "";
+        var specChipsValue = "";
+        var shapeChipsValue = "";
+        var allFilterValue = "";
+        var searchChipsValue = "";
 
-      specChipsValue = "<div class =\"chipsStyle\">";
-      for (i = 0; i < specNames.length; i++) {
-          var sChip = specNames[i].replace(/ /g, "_");
-          specChipsValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
-      }
-      specChipsValue += "</div>";
-      document.getElementById("specs").innerHTML = specChipsValue;
-
-
-      var shapeChipsValue = "";
-      shapeChipsValue = "<div class =\"chipsStyle\">";
-      for (i = 0; i < shapeNames.length; i++) {
-          var sChip = shapeNames[i].replace(/ /g, "_");
-          shapeChipsValue += "<span class=\"filter-tag\">" + shapeNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
-      }
-      shapeChipsValue += "</div>";
-      document.getElementById("shapes").innerHTML = shapeChipsValue;
+        for (i = 0; i < specNames.length; i++) {
+            specChipsValue = "<div class =\"chipsStyle\">";
+            var sChip = specNames[i].replace(/ /g, "_");
+            specChipsValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
+            specChipsValue += "</div>";
+        }
+        document.getElementById("specs").innerHTML = specChipsValue;
 
 
-      if (specNames.length > 0 || shapeNames.length > 0) {
-          allFilterValue = "<div class=\"chipsStyle\">Clear filters</div>";
-      }
-      document.getElementById("clearAllFilters").innerHTML = allFilterValue;
+        for (i = 0; i < shapeNames.length; i++) {
+            shapeChipsValue = "<div class =\"chipsStyle\">";
+            var sChip = shapeNames[i].replace(/ /g, "_");
+            shapeChipsValue += "<span class=\"filter-tag\">" + shapeNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
+            shapeChipsValue += "</div>";
+        }
+        document.getElementById("shapes").innerHTML = shapeChipsValue;
 
 
-      let searchKeyword = getUrlParameter('q');
-      console.log("getUrlParameter: ", searchKeyword);
-      var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs, SearchKeyword: searchKeyword };
+        if (searchKeyword.length > 0) {
+            searchChipsValue = "<div class =\"chipsStyl\" style=\"display: flex;margin: 0 0px 12px 0;\">";
+            searchChipsValue += "<span class=\"filter-tag\">" + "\" searchKeyword \"" + "<button><img src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeParam()></button></span>";
+            searchChipsValue += "</div>";
+        }
+        document.getElementById("searchWord").innerHTML = searchChipsValue;
+
+        if (specNames.length > 0 || shapeNames.length > 0 || searchKeyword.length > 0) {
+            allFilterValue = "<div class=\"chipsStyle\">Clear filters</div>";
+        }
+        document.getElementById("clearAllFilters").innerHTML = allFilterValue;
+
+
+
+        console.log("getUrlParameter: ", searchKeyword);
+        var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs, SearchKeyword: searchKeyword };
 
       $.ajax({
           url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
@@ -270,6 +279,14 @@
       });
 }
 
+    function removeParam() {
+        var url = window.location.href;
+        searchKeyword = '';
+        window.history.pushState("object or string", "Title", "/" + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]);
+        populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
+    }
+
+
     function clearFilters() {
         specNames = [];
         shapeNames = [];
@@ -280,6 +297,9 @@
         var defaultSpecs = document.getElementsByClassName("defaultSpecs");
         var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
         document.getElementById("clearAllFilters").innerHTML = "";
+
+        searchKeyword = '';
+        window.history.pushState("object or string", "Title", "/" + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]);
 
         defaultSpecs[0].style.display = "flex";
         defaultSpecs[1].style.display = "flex";
@@ -352,8 +372,6 @@
         specChipsValue += "</div>";
         document.getElementById("specs").innerHTML = specChipsValue;
 
-
-
         shapeChipsValue = "<div class =\"chipsStyle\">";
         for (i = 0; i < shapeNames.length; i++) {
             var sChip = shapeNames[i].replace(/ /g, "_");
@@ -362,14 +380,15 @@
         shapeChipsValue += "</div>";
         document.getElementById("shapes").innerHTML = shapeChipsValue;
 
+        let searchKeyword = getUrlParameter('q');
+        console.log("getUrlParameter: ", searchKeyword);
 
-        if (specNames.length > 0 || shapeNames.length > 0) {
+        if (specNames.length > 0 || shapeNames.length > 0 || searchKeyword.length > 0) {
             allFilterValue = "<div class=\"chipsStyle\">Clear filters</div>";
         }
         document.getElementById("clearAllFilters").innerHTML = allFilterValue;
 
-        let searchKeyword = getUrlParameter('q');
-        console.log("getUrlParameter: ", searchKeyword);
+
         var filterParams = { SpecIds: specIDs, ShapeIds: shapeIDs, SearchKeyword: searchKeyword };
         console.log('filterParams', filterParams);
         $.ajax({
