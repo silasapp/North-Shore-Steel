@@ -213,7 +213,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // account credit
             // TODO use endpoint
-            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = 150 };
+            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = 1000 };
 
             //model
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
