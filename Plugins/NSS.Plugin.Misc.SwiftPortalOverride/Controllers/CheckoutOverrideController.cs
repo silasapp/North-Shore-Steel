@@ -221,7 +221,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);
         }
-                
+
         public override IActionResult Completed(int? orderId)
         {
             //validation
@@ -468,13 +468,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             try
             {
                 var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
-                var savebillingAddress = model.ShippingAddress.SaveToAddressBook;
+                var savebillingAddress = model.BillingAddress.SaveToAddressBook;
 
                 // save shipping address if asked to
                 SaveShippingAddress(model.ShippingAddress);
 
                 // save billing address if asked to
-                SaveBillingAddress(model.BillingAddress, model.ShippingAddress.ShippingAddressId);
+                if(!model.ShippingAddress.IsPickupInStore)
+                    SaveBillingAddress(model.BillingAddress);
 
                 // payment
                 var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType);
@@ -491,15 +492,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
 
-        private void SaveBillingAddress(ErpCheckoutBillingAddress model, int shippingAddressId)
+        private void SaveBillingAddress(ErpCheckoutBillingAddress model)
         {
             var SaveToAddressBook = model.SaveToAddressBook;
             var billingAddressId = model.BillingAddressId;
 
-            if (model.ShipToSameAddress)
+            if (model.ShipToSameAddress && _workContext.CurrentCustomer.ShippingAddressId.GetValueOrDefault() > 0)
             {
                 //existing address
-                var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, shippingAddressId)
+                var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, _workContext.CurrentCustomer.ShippingAddressId.GetValueOrDefault())
                     ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
 
                 _workContext.CurrentCustomer.BillingAddressId = address.Id;
@@ -519,7 +520,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 else
                 {
                     //new address
+                    var customer = _workContext.CurrentCustomer;
+                    //new address
                     var newAddress = model.BillingNewAddress;
+
+                    // populate fields
+                    newAddress.Email = customer.Email;
+                    newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
+                    newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
 
                     string customAttributes = null;
 
@@ -573,8 +581,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     SavePickupOption(pickupOption);
 
-                    //set value indicating that "pick up in store" option has not been chosen
-                    _genericAttributeService.SaveAttribute<PickupPoint>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedPickupPointAttribute, null, _storeContext.CurrentStore.Id);
+                    //set value indicating that "pick up in store" option has been chosen
+                    _genericAttributeService.SaveAttribute<PickupPoint>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedPickupPointAttribute, pickupOption, _storeContext.CurrentStore.Id);
                 }
 
             }
@@ -595,42 +603,46 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
                 else
                 {
-                    if (SaveToAddressBook)
+                    var customer = _workContext.CurrentCustomer;
+                    //new address
+                    var newAddress = model.ShippingNewAddress;
+
+                    // populate fields
+                    newAddress.Email = customer.Email;
+                    newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
+                    newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
+
+                    //custom address attributes
+                    string customAttributes = null;
+                    // REMOVED
+
+                    //try to find an address with the same values (don't duplicate records)
+                    var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
+                        newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
+                        newAddress.Email, newAddress.FaxNumber, newAddress.Company,
+                        newAddress.Address1, newAddress.Address2, newAddress.City,
+                        newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
+                        newAddress.CountryId, customAttributes);
+
+                    if (address == null)
                     {
-                        //new address
-                        var newAddress = model.ShippingNewAddress;
+                        address = newAddress.ToEntity();
+                        address.CustomAttributes = customAttributes;
+                        address.CreatedOnUtc = DateTime.UtcNow;
 
-                        //custom address attributes
-                        string customAttributes = null;
-                        // REMOVED
+                        _addressService.InsertAddress(address);
 
-                        //try to find an address with the same values (don't duplicate records)
-                        var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
-                            newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
-                            newAddress.Email, newAddress.FaxNumber, newAddress.Company,
-                            newAddress.Address1, newAddress.Address2, newAddress.City,
-                            newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
-                            newAddress.CountryId, customAttributes);
-
-                        if (address == null)
-                        {
-                            address = newAddress.ToEntity();
-                            address.CustomAttributes = customAttributes;
-                            address.CreatedOnUtc = DateTime.UtcNow;
-
-                            _addressService.InsertAddress(address);
-
-                            _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
-                        }
-
-                        _workContext.CurrentCustomer.ShippingAddressId = address.Id;
-
-                        _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                        _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
                     }
 
+                    _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+
+                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
                 }
+
             }
         }
+
 
         private JsonResult ProcessPayment(int paymentMethodtype)
         {
@@ -649,7 +661,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
 
             // place order based on payment selected
-             
+
             var checkoutPaymentMethod = (CheckoutPaymentMethodType)paymentMethodtype;
             string paymentMethod = "";
             var result = Json(new { error = 1, message = "payment method selected was not found" });
@@ -714,8 +726,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var orderItems = _orderService.GetOrderItems(order.Id);
 
-            var request = new NSSCreateOrderRequest() 
-            { 
+            var request = new NSSCreateOrderRequest()
+            {
             };
 
             _nSSApiProvider.CreateNSSOrder(12345, request, useMock: true);
