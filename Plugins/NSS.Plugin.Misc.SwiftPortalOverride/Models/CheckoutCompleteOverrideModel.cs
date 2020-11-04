@@ -23,6 +23,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public CheckoutPaymentMethodModel PaymentMethodModel { get; set; }
         public IList<StateProvinceModel> StateProvinces { get; set; }
         public AccountCreditModel AccountCreditModel { get; set; }
+        public OrderTotalsModel OrderTotals { get; set; }
     }
 
     public class AccountCreditModel
