@@ -225,36 +225,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public override IActionResult Completed(int? orderId)
         {
             //validation
-            //if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
-            //    return Challenge();
+            if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
+                return Challenge();
 
-            //Nop.Core.Domain.Orders.Order order = null;
-            //if (orderId.HasValue)
-            //{
-            //    //load order by identifier (if provided)
-            //    order = _orderService.GetOrderById(orderId.Value);
-            //}
-            //if (order == null)
-            //{
-            //    order = _orderService.SearchOrders(storeId: _storeContext.CurrentStore.Id,
-            //    customerId: _workContext.CurrentCustomer.Id, pageSize: 1)
-            //        .FirstOrDefault();
-            //}
-            //if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
-            //{
-            //    return RedirectToRoute("Homepage");
-            //}
+            Nop.Core.Domain.Orders.Order order = null;
+            if (orderId.HasValue)
+            {
+                //load order by identifier (if provided)
+                order = _orderService.GetOrderById(orderId.Value);
+            }
+            if (order == null)
+            {
+                order = _orderService.SearchOrders(storeId: _storeContext.CurrentStore.Id,
+                customerId: _workContext.CurrentCustomer.Id, pageSize: 1)
+                    .FirstOrDefault();
+            }
+            if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
+            {
+                return RedirectToRoute("Homepage");
+            }
 
-            ////disable "order completed" page?
+            //disable "order completed" page?
             //if (_orderSettings.DisableOrderCompletedPage)
             //{
             //    return RedirectToRoute("OrderDetails", new { orderId = order.Id });
             //}
 
-            //model
-            //var model = _checkoutModelFactory.PrepareCheckoutCompletedModel(order);
-            var model = new ErpMockOrder();
-            model.OrderId = orderId.Value;
+            var model = _checkoutModelFactory.PrepareCheckoutCompletedModel(order);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Completed.cshtml", model);
         }
 

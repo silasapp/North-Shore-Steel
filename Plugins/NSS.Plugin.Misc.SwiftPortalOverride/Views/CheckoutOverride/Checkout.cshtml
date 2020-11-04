@@ -504,7 +504,7 @@
                 cardExpirationYear: null,
                 cardCode: null,
             },
-            shipToSameAddress: false,
+            shipToSameAddress: true,
             expirationMonths: [],
             expirationYears: [],
             billingAddressId: null,
@@ -593,7 +593,8 @@
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
 
-                const shipToSameAddress = this.shipToSameAddress;
+                const shipToSameAddress = this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
+                    ? true : this.shipToSameAddress;
                 const billingAddressId = shipToSameAddress ? shippingAddressId : (this.billingAddressId ? this.billingAddressId : 0);
                 const billingNewAddress = {...this.newBillingAddress};
 
@@ -629,7 +630,7 @@
                             return;
                         }
                         if (data != null) {
-                            window.location.href = '/Completed?OrderId=' + data.orderId;
+                            window.location.href = '/Completed';
                         }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
