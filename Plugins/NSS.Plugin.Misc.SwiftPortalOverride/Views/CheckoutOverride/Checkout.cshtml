@@ -39,6 +39,12 @@
         Formatting = Formatting.None
     });
 
+    var accountCredit = JsonConvert.SerializeObject(Model.AccountCreditModel, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+
     var states = JsonConvert.SerializeObject(Model.StateProvinces, new JsonSerializerSettings
     {
         ContractResolver = contractResolver,
@@ -174,7 +180,7 @@
                     <label class="h5 text-primary font-weight-bold mb-4">PAYMENT METHOD</label>
                     <div class="d-flex flex-column mb-3">
                         <div class="d-flex flex-row flex-wrap justify-content-between">
-                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30 cursor-pointer"
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30"
                                  v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD}"
                                  v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_CREDIT_CARD">
                                 <img src="Themes/@themeName/Content/assets/credit-card.svg" alt="" width="24">
@@ -183,7 +189,7 @@
                                     <label class="fs-12 mb-0 cursor-pointer">Pay with credit/debit card</label>
                                 </div>
                             </div>
-                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30 cursor-pointer"
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30"
                                  v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL}"
                                  v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_PAYPAL">
                                 <img src="Themes/@themeName/Content/assets/paypal.svg" alt="" width="24">
@@ -192,9 +198,13 @@
                                     <label class="fs-12 mb-0 cursor-pointer">Pay with PayPal account</label>
                                 </div>
                             </div>
-                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30 cursor-pointer"
-                                 v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT}"
-                                 v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT">
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4 w-30"
+                                 v-bind:class="{
+                                 'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT,
+                                 'disabled': lineOfCreditDisabled
+                                 }"
+                                 v-on:click="lineOfCreditDisabled ? null : paymentMethodIndex = shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT"
+                                 v-if="shared.accountCredit.canCredit">
                                 <img src="Themes/@themeName/Content/assets/dollar.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
                                     <label class="fs-18 font-weight-bold mb-1 cursor-pointer">Line of Credit</label>
@@ -374,30 +384,30 @@
             </div>
             <div class="col-3">
                 <div class="card card-mod">
-                    <h2 class="heading3" style="text-align: center;">ORDER INFORMATION</h2>
-                    <div class="order-summary">
+                    <label class="fs-12 text-primary font-weight-bold text-center">ORDER INFORMATION</label>
+                    <div class="order-summary mt-2">
                         <div class="price-summary">
-                            <p class="title">Sub-Total</p>
-                            <p class="amount">78.33</p>
+                            <label class="text-muted">Sub-Total:</label>
+                            <label class="text-black">{{ subTotal }}</label>
                         </div>
                         <div class="price-summary">
-                            <p class="title">Shipping</p>
-                            <p class="amount">TBD</p>
+                            <label class="text-muted">Shipping:</label>
+                            <label class="text-black">TBD</label>
                         </div>
                         <div class="price-summary">
-                            <p class="title">Discount</p>
-                            <p class="amount">0.00</p>
+                            <label class="text-muted">Discount:</label>
+                            <label class="text-black">TBD</label>
                         </div>
                         <div class="price-summary">
                             <p class="discount-tag font12">10% OFF | 10,000lbs</p>
                         </div>
                         <div class="price-summary">
-                            <p class="title">Tax</p>
-                            <p class="amount">12.00</p>
+                            <label class="text-muted">Tax:</label>
+                            <label class="text-black">TBD</label>
                         </div>
                         <div class="price-summary">
-                            <p class="total">Total</p>
-                            <p class="total">$135.33</p>
+                            <label class="h5 text-black font-weight-bold">TOTAL</label>
+                            <label class="h5 text-black font-weight-bold">${{ orderTotal }}</label>
                         </div>
                     </div>
                 </div>
@@ -425,6 +435,7 @@
     var shippingAddresses = @Html.Raw(shippingAddresses);
     var billingAddresses = @Html.Raw(billingAddresses);
     var pickupPoints = @Html.Raw(pickupPoints);
+    var accountCredit = @Html.Raw(accountCredit);
     var states = @Html.Raw(states);
     var cart = @Html.Raw(cart);
     var purchaseOrder = '@purchaseOrder';
@@ -437,6 +448,7 @@
             shippingAddresses,
             billingAddresses,
             pickupPoints,
+            accountCredit,
             states,
             cart,
 
@@ -493,6 +505,18 @@
         mounted: function () {
             this.generateExpirationMonthsAndYears();
         },
+        computed: {
+            subTotal: function () {
+                const subTotals = this.shared.cart.items.map(x => Number(x.subTotal.replace('$', '')));
+                return subTotals.reduce((a, b) => a + b, 0);
+            },
+            orderTotal: function () {
+                return this.subTotal;
+            },
+            lineOfCreditDisabled: function () {
+                return this.shared.accountCredit.creditAmount < this.orderTotal;
+            },
+        },
         methods: {
             handlePaymentClick: function (item, model) {
                 console.log("item: ", item);
@@ -540,12 +564,12 @@
             },
 
             placeOrder: function () {
-                const shippingAddressId = this.shippingAddressId;
+                const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
 
                 const shipToSameAddress = this.shipToSameAddress;
-                const billingAddressId = shipToSameAddress ? shippingAddressId : this.billingAddressId;
+                const billingAddressId = shipToSameAddress ? shippingAddressId : (this.billingAddressId ? this.billingAddressId : 0);
                 const billingNewAddress = {...this.newBillingAddress};
 
                 const request = {

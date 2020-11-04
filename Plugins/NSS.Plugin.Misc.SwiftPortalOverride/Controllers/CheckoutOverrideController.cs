@@ -30,6 +30,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nop.Core.Http.Extensions;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -69,15 +70,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings, 
-            IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings, 
-            IAddressAttributeParser addressAttributeParser, IAddressService addressService, 
-            ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService, 
-            IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger, 
-            IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager, 
-            IPaymentService paymentService, IProductService productService, IShippingService shippingService, 
-            IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper, 
-            IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings, 
+        public CheckoutOverrideController(IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
+            IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
+            IAddressAttributeParser addressAttributeParser, IAddressService addressService,
+            ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
+            IGenericAttributeService genericAttributeService, ILocalizationService localizationService, ILogger logger,
+            IOrderProcessingService orderProcessingService, IOrderService orderService, IPaymentPluginManager paymentPluginManager,
+            IPaymentService paymentService, IProductService productService, IShippingService shippingService,
+            IShoppingCartService shoppingCartService, IStoreContext storeContext, IWebHelper webHelper,
+            IWorkContext workContext, OrderSettings orderSettings, PaymentSettings paymentSettings,
             RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings, ICountryModelFactory countryModelFactory) : base(addressSettings, customerSettings, addressAttributeParser, addressService, checkoutModelFactory, countryService, customerService, genericAttributeService, localizationService, logger, orderProcessingService, orderService, paymentPluginManager, paymentService, productService, shippingService, shoppingCartService, storeContext, webHelper, workContext, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings)
         {
             _addressSettings = addressSettings;
@@ -209,6 +210,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var usaCountryId = "1";
             model.StateProvinces = _countryModelFactory.GetStatesByCountryId(usaCountryId, false);
+
+            // account credit
+            // TODO use endpoint
+            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = 150 };
 
             //model
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
@@ -437,28 +442,252 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [IgnoreAntiforgeryToken]
-        public virtual IActionResult PlaceOrder([FromBody] ErpCheckoutModel model)
+        public virtual JsonResult PlaceOrder([FromBody] ErpCheckoutModel model)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model), "Checkout Model is null");
+
             if (model.HasError)
                 return Json(new { error = 1, message = "Something went wrong while placing order" });
 
-            return Json(new
+
+            //validation
+            if (_orderSettings.CheckoutDisabled)
+                throw new Exception(_localizationService.GetResource("Checkout.Disabled"));
+
+            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
+            if (!cart.Any())
+                throw new Exception("Your cart is empty");
+
+            if (!_orderSettings.OnePageCheckoutEnabled)
+                throw new Exception("One page checkout is disabled");
+
+            if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
+                throw new Exception("Anonymous checkout is not allowed");
+
+            try
             {
-                success = 1, orderId = 5
-            });
+                //var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
+                //var savebillingAddress = model.ShippingAddress.SaveToAddressBook;
+
+                //// save shipping address if asked to
+                //SaveShippingAddress(model.ShippingAddress);
+
+                //// save billing address if asked to
+                //SaveBillingAddress(model.BillingAddress);
+
+                //// payment
+                //var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType);
+
+                return Json(new { success = 1, orderId = 5 });
+
+                //return result;
+            }
+            catch (Exception exc)
+            {
+                _logger.Warning(exc.Message, exc, _workContext.CurrentCustomer);
+                return Json(new { error = 1, message = exc.Message });
+            }
         }
 
-        private void SaveBilling()
+
+        private void SaveBillingAddress(ErpCheckoutBillingAddress model)
+        {
+            var SaveToAddressBook = model.SaveToAddressBook;
+            var addressId = model.BillingAddressId;
+
+            if (addressId > 0)
+            {
+                // existing
+                //existing address
+                var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, addressId)
+                    ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
+
+                _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+                _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+            }
+            else
+            {
+                if (SaveToAddressBook)
+                {
+                    //new address
+                    var newAddress = model.BillingNewAddress;
+
+                    //custom address attributes
+                    string customAttributes = null;
+                    // REMOVED
+
+                    //try to find an address with the same values (don't duplicate records)
+                    var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
+                        newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
+                        newAddress.Email, newAddress.FaxNumber, newAddress.Company,
+                        newAddress.Address1, newAddress.Address2, newAddress.City,
+                        newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
+                        newAddress.CountryId, customAttributes);
+
+                    if (address == null)
+                    {
+                        address = newAddress.ToEntity();
+                        address.CustomAttributes = customAttributes;
+                        address.CreatedOnUtc = DateTime.UtcNow;
+
+                        _addressService.InsertAddress(address);
+
+                        _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+                    }
+
+                    _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+
+                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                }
+
+            }
+        }
+
+        private void SaveShippingAddress(ErpCheckoutShippingAddress model)
+        {
+            var pickUpInStore = model.IsPickupInStore;
+
+            if (pickUpInStore)
+            {
+
+            }
+            else
+            {
+                var SaveToAddressBook = model.SaveToAddressBook;
+                var addressId = model.ShippingAddressId;
+
+                if (addressId > 0)
+                {
+                    // existing
+                    //existing address
+                    var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, addressId)
+                        ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
+
+                    _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                }
+                else
+                {
+                    if (SaveToAddressBook)
+                    {
+                        //new address
+                        var newAddress = model.ShippingNewAddress;
+
+                        //custom address attributes
+                        string customAttributes = null;
+                        // REMOVED
+
+                        //try to find an address with the same values (don't duplicate records)
+                        var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
+                            newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
+                            newAddress.Email, newAddress.FaxNumber, newAddress.Company,
+                            newAddress.Address1, newAddress.Address2, newAddress.City,
+                            newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
+                            newAddress.CountryId, customAttributes);
+
+                        if (address == null)
+                        {
+                            address = newAddress.ToEntity();
+                            address.CustomAttributes = customAttributes;
+                            address.CreatedOnUtc = DateTime.UtcNow;
+
+                            _addressService.InsertAddress(address);
+
+                            _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+                        }
+
+                        _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+
+                        _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                    }
+
+                }
+            }
+        }
+
+        private JsonResult ProcessPayment(int paymentMethodtype)
+        {
+            //prevent 2 orders being placed within an X seconds time frame
+            if (!IsMinimumOrderPlacementIntervalValid(_workContext.CurrentCustomer))
+                throw new Exception(_localizationService.GetResource("Checkout.MinOrderPlacementInterval"));
+
+            //place order
+            var processPaymentRequest = new ProcessPaymentRequest();
+
+            _paymentService.GenerateOrderGuid(processPaymentRequest);
+            processPaymentRequest.StoreId = _storeContext.CurrentStore.Id;
+            processPaymentRequest.CustomerId = _workContext.CurrentCustomer.Id;
+            processPaymentRequest.PaymentMethodSystemName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer,
+                NopCustomerDefaults.SelectedPaymentMethodAttribute, _storeContext.CurrentStore.Id);
+            HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
+
+            // place order based on payment selected
+
+            var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
+
+            if (placeOrderResult.Success)
+            {
+                HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", null);
+                var postProcessPaymentRequest = new PostProcessPaymentRequest
+                {
+                    Order = placeOrderResult.PlacedOrder
+                };
+
+
+                //var paymentMethod = _paymentPluginManager
+                //    .LoadPluginBySystemName(placeOrderResult.PlacedOrder.PaymentMethodSystemName, _workContext.CurrentCustomer, _storeContext.CurrentStore.Id);
+                //if (paymentMethod == null)
+                //    //payment method could be null if order total is 0
+                //    //success
+                //    return Json(new { success = 1 });
+
+                //if (paymentMethod.PaymentMethodType == PaymentMethodType.Redirection)
+                //{
+                //    //Redirection will not work because it's AJAX request.
+                //    //That's why we don't process it here (we redirect a user to another page where he'll be redirected)
+
+                //    //redirect
+                //    return Json(new
+                //    {
+                //        redirect = $"{_webHelper.GetStoreLocation()}checkout/OpcCompleteRedirectionPayment"
+                //    });
+                //}
+
+                var paymentMethod = (CheckoutPaymentMethodType)paymentMethodtype;
+
+                switch (paymentMethod)
+                {
+                    case CheckoutPaymentMethodType.CreditCard:
+                        break;
+                    case CheckoutPaymentMethodType.Paypal:
+                        break;
+                    case CheckoutPaymentMethodType.LineOfCredit:
+                        break;
+                    default:
+                        break;
+                }
+
+                
+                //success
+                return Json(new { success = 1, orderId = placeOrderResult.PlacedOrder.Id });
+            }
+
+            return Json(new { error = 1, message = "Order could not be placed" });
+        }
+
+        private void ProcessCreditCardPayment(PostProcessPaymentRequest postProcessPaymentRequest)
+        {
+            _paymentService.PostProcessPayment(postProcessPaymentRequest);
+        }
+
+        private void ProcessPayPalPayment()
         {
 
         }
 
-        private void SaveShipping()
-        {
-
-        }
-
-        private void SavePaymentMethod()
+        private void ProcessLineOfCreditPayment()
         {
 
         }
@@ -532,7 +761,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
     public class PaymentMethodRequest
     {
         public string PaymentMethod { get; set; }
-        public CheckoutPaymentMethodModel Model {get;set; }
+        public CheckoutPaymentMethodModel Model { get; set; }
     }
 
     public class ErpMockOrder

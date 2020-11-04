@@ -17,7 +17,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     public class ErpCheckoutBillingAddress
     {
         public AddressModel BillingNewAddress { get; set; }
-        public int? BillingAddressId { get; set; }
+        public int BillingAddressId { get; set; }
         public bool SaveToAddressBook { get; set; }
         public bool ShipToSameAddress { get; set; }
     }
@@ -25,7 +25,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     public class ErpCheckoutShippingAddress
     {
         public AddressModel ShippingNewAddress { get; set; }
-        public int? ShippingAddressId { get; set; }
+        public int ShippingAddressId { get; set; }
         public bool SaveToAddressBook { get; set; }
         public CheckoutPickupPointModel PickupPoint { get; set; }
         public bool IsPickupInStore { get; set; }
