@@ -240,10 +240,9 @@
         }
         document.getElementById("shapes").innerHTML = shapeChipsValue;
 
-
         if (searchKeyword.length > 0) {
             searchChipsValue = "<div class =\"chipsStyl\" style=\"display: flex;margin: 0 0px 12px 0;\">";
-            searchChipsValue += "<span class=\"filter-tag\">" + "\" searchKeyword \"" + "<button><img src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeParam()></button></span>";
+            searchChipsValue += "<span class=\"filter-tag\">\"" + searchKeyword + "\"<button><img src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeParam()></button></span>";
             searchChipsValue += "</div>";
         }
         document.getElementById("searchWord").innerHTML = searchChipsValue;
