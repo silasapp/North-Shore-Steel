@@ -211,7 +211,7 @@
 
                                 </td>
                                 <td style="text-align:center">
-                                    <a style="background: none; border: none;" data-toggle="modal" onclick="handleSawOption(@item.ProductId)" ; data-target="#noteModal">
+                                    <a style="background: none; border: none;" data-toggle="modal" onclick="handleNotesModal(@item.ProductId)" ; data-target="#noteModal">
                                         <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
                                     </a>
                                 </td>
@@ -531,7 +531,7 @@
 
 <script>
 
-    function handleSawOption(itemId) {
+    function handleNotesModal(itemId) {
         console.log("itemId", itemId);
         $('textarea[name="productNote"]').keyup(function () {
             var note = $(this).val();
