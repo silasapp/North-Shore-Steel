@@ -107,7 +107,9 @@
                                     v-bind:class="{'w-100': showNewShippingAddress, 'w-75': !showNewShippingAddress}">
                                 <option v-bind:value="null">-Select Address-</option>
                                 <option v-bind:value="address.id" v-for="address in shared.shippingAddresses">
-                                    {{ address.company }}, {{ address.address1 }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                    {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
+                                    {{ address.city }}{{ address.city ? ', ' : '' }}
+                                    {{ address.stateProvinceName }} {{ address.zipPostalCode }}
                                 </option>
                             </select>
                             <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline"
@@ -128,7 +130,7 @@
                                 </option>
                             </select>
                         </div>
-                        <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Billing Address is required</label>
+                        <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Pickup Location is required</label>
                     </div>
 
                     <hr v-if="showNewShippingAddress && isDelivery" />
@@ -222,49 +224,23 @@
 
                     <div class="d-flex flex-column" v-if="paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD">
                         <div class="row d-flex flex-row mt-3">
-                            <div class="col-md-3 d-flex flex-column w-50">
-                                <label class="fs-14 text-black mb-1">Select card</label>
-                                <select type="text" class="nss-form-control" v-model="paymentCard.cardType">
-                                    @*<option v-bind:value="option.id" v-for="option in states">
-                                            {{ option.name }}
-                                        </option>*@
-                                </select>
-                                <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardType">Select a card type</label>
-                            </div>
-                            <div class="col-md-9 d-flex flex-column w-50">
+                            <div class="col-md-7 d-flex flex-column">
                                 <label class="fs-14 text-black mb-1">Cardholder name</label>
                                 <input id="cardholdername" type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
                                 <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardHolderName">Cardholder name is required</label>
                             </div>
                         </div>
                         <div class="row d-flex flex-row mt-3">
-                            <div class="col-md-7 d-flex flex-column w-50">
-                                <label class="fs-14 text-black mb-1">Card number</label>
-                                <input id="cardnumber" type="text" class="nss-form-control" v-model="paymentCard.cardNumber" placeholder="Ex: 000000000000000" />
-                                <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardNumber">Cardholder number is required</label>
+
+                            <label for="card-number">Card Number</label>
+                            <div id="card-number" class="card_field"></div>
+                            <div>
+                                <label for="expiration-date">Expiration Date</label>
+                                <div id="expiration-date" class="card_field"></div>
                             </div>
-                            <div class="col-md-3 d-flex flex-column w-50">
-                                <label class="fs-14 text-black mb-1">Expiration date</label>
-                                <div class="d-flex flex-row align-items-center">
-                                    <input id="expiration-date" type="text" class="nss-form-control" v-model="paymentCard.cardExpirationMonth" placeholder="Ex: MM/YYYY" />
-                                    @*<select type="text" class="bg-accent text-black px-2 py-2  w-50" id="shippingAddress" v-model="paymentCard.cardExpirationMonth">
-                                            <option v-bind:value="month" v-for="month in expirationMonths">
-                                                {{ month }}
-                                            </option>
-                                        </select>
-                                        <span class="fs-18 mx-3">/</span>
-                                        <select type="text" class="bg-accent text-black px-2 py-2 w-50" id="shippingAddress" v-model="paymentCard.cardExpirationYear">
-                                            <option v-bind:value="year" v-for="year in expirationYears">
-                                                {{ year }}
-                                            </option>
-                                        </select>*@
-                                </div>
-                                <label class="text-danger mt-1 mb-0" v-if="dirty && (!paymentCard.cardExpirationMonth || !paymentCard.cardExpirationYear)">Expiration date is required</label>
-                            </div>
-                            <div class="col-md-2 d-flex flex-column w-50">
-                                <label class="fs-14 text-black mb-1">Card code</label>
-                                <input id="cvv" type="text" class="nss-form-control" v-model="paymentCard.cardCode" placeholder="Ex: 000" />
-                                <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardCode">Card code is required</label>
+                            <div>
+                                <label for="cvv">CVV</label>
+                                <div id="cvv" class="card_field"></div>
                             </div>
                         </div>
 
@@ -276,7 +252,9 @@
                                         v-bind:class="{'w-100': showNewBillingAddress, 'w-75' : !showNewBillingAddress}">
                                     <option v-bind:value="null">-Select Address-</option>
                                     <option v-bind:value="address.id" v-for="address in shared.billingAddresses">
-                                        {{ address.company }}, {{ address.address1 }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                        {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
+                                        {{ address.city }}{{ address.city ? ', ' : '' }}
+                                        {{ address.stateProvinceName }} {{ address.zipPostalCode }}
                                     </option>
                                 </select>
                                 <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline"
@@ -406,7 +384,7 @@
                     <div class="order-summary mt-2">
                         <div class="price-summary">
                             <label class="text-muted">Sub-Total:</label>
-                            <label class="text-black">{{ subTotal }}</label>
+                            <label class="text-black">{{ formatMoney(subTotal) }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Shipping:</label>
@@ -425,7 +403,7 @@
                         </div>
                         <div class="price-summary">
                             <label class="h5 text-black font-weight-bold">TOTAL</label>
-                            <label class="h5 text-black font-weight-bold">${{ orderTotal }}</label>
+                            <label class="h5 text-black font-weight-bold">${{ formatMoney(orderTotal) }}</label>
                         </div>
                     </div>
                 </div>
@@ -460,6 +438,8 @@
     var isDelivery = '@isDelivery' === 'True';
 
     console.log("cart: ", cart);
+    console.log("shippingAddresses: ", shippingAddresses);
+    console.log("billingAddresses: ", billingAddresses);
 
     const store = {
         state: {
@@ -503,6 +483,7 @@
                 cardNumber: null,
                 cardExpirationMonth: null,
                 cardExpirationYear: null,
+                expirationDate: null,
                 cardCode: null,
             },
             shipToSameAddress: true,
@@ -523,7 +504,7 @@
         },
         mounted: function () {
             this.generateExpirationMonthsAndYears();
-            //this.renderPaypalCard();
+            this.renderPaypalCard();
         },
         computed: {
             subTotal: function () {
@@ -583,15 +564,18 @@
                 this.paymentCard.cardExpirationYear = years[0];
             },
             formatMoney: function (input) {
-                return input.toLocaleString();
+                return input.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
             },
 
             placeOrder: function () {
-
                 this.dirty = true;
-                const isValid = this.validate();
-                console.log("isValid: ", isValid);
-                if (!isValid) return;
+                if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_CREDIT_CARD) return;
+
+                console.log("isValid: ", this.validate());
+                if (!this.validate()) return;
                 const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
@@ -657,8 +641,7 @@
                         return false;
                 }
                 if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_CREDIT_CARD) {
-                    if (!this.paymentCard.cardType || !this.paymentCard.cardHolderName || !this.paymentCard.cardNumber ||
-                        !this.paymentCard.cardExpirationMonth || !this.paymentCard.cardExpirationYear || !this.paymentCard.cardCode)
+                    if (!this.paymentCard.cardHolderName)
                         return false;
                 }
                 return true;
@@ -669,7 +652,7 @@
                     const self = this;
                     paypal.HostedFields.render({
                         createOrder: function () {
-                            return 'order-ID';
+                            return '5MW91664D6475100X';
                         }, // replace order-ID with the order ID
                         styles: {
                             input: {
@@ -683,7 +666,7 @@
                         },
                         fields: {
                             number: {
-                                selector: '#cardnumber',
+                                selector: '#card-number',
                                 placeholder: 'card number',
                             },
                             cvv: {
@@ -699,9 +682,23 @@
                         $('#place-order').click(function (event) {
                             event.preventDefault();
 
-                            const shipToSameAddress = this.shipToSameAddress;
-                            const billingAddressId = shipToSameAddress ? shippingAddressId : (this.billingAddressId ? this.billingAddressId : 0);
-                            const billingAddress = { ...this.newBillingAddress };
+                            if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD) return;
+
+                            console.log("isValid: ", self.validate());
+                            if (!self.validate()) return;
+
+                            let billingAddress;
+                            if (self.shipToSameAddress && self.showNewShippingAddress) {
+                                billingAddress = { ...self.newShippingAddress };
+                            } else if (self.shipToSameAddress && !self.showNewShippingAddress) {
+                                billingAddress = self.shared.shippingAddresses.find(x => x.id === self.shippingAddressId);
+                            } else if (self.showNewBillingAddress) {
+                                billingAddress = { ...self.newBillingAddress };
+                            } else  {
+                                billingAddress = self.shared.billingAddresses.find(x => x.id === self.billingAddressId);
+                            }
+
+                            console.log("billingAddress: ", billingAddress);
 
                             hf.submit({
                                 // Cardholder Name
@@ -710,26 +707,24 @@
                                 billingAddress: {
                                     streetAddress: billingAddress.address1, // address_line_1 - street
                                     extendedAddress: billingAddress.address2, // address_line_2 - unit
-                                    region: billingAddress.stateProvinceId, // admin_area_1 - state
+                                    region: 'TX',//billingAddress.stateProvinceId, // admin_area_1 - state
                                     locality: billingAddress.city, // admin_area_2 - town / city
                                     postalCode: billingAddress.zipPostalCode, // postal_code - postal_code
-                                    countryCodeAlpha2: billingAddress.countryId, // country_code - country
+                                    countryCodeAlpha2: 'US', //billingAddress.countryId, // country_code - country
                                 },
                                 // redirect after successful order approval
                             })
-                                .then(function () {
-                                    window.location.replace('http://www.somesite.com/review');
+                                .then(function (data) {
+                                    console.log("data successful...", data);
+                                    //window.location.replace('http://www.somesite.com/review');
                                 })
                                 .catch(function (err) {
                                     console.log('error: ', JSON.stringify(err));
-                                    document.getElementById(
-                                        'consoleLog'
-                                    ).innerHTML = JSON.stringify(err);
                                 });
                         });
                     });
                 } else {
-                    $('#my-sample-form').hide(); // hides the advanced credit and debit card payments fields if merchant isn't eligible
+                    //$('#my-sample-form').hide(); // hides the advanced credit and debit card payments fields if merchant isn't eligible
                 }
             }
 

@@ -528,6 +528,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     newAddress.Email = customer.Email;
                     newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
                     newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
+                    newAddress.PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute);
 
                     string customAttributes = null;
 
@@ -580,9 +581,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     var pickupOption = pickupPointsResponse.PickupPoints.FirstOrDefault(x => x.Id == model.PickupPoint.Id);
 
                     SavePickupOption(pickupOption);
-
-                    //set value indicating that "pick up in store" option has been chosen
-                    _genericAttributeService.SaveAttribute<PickupPoint>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedPickupPointAttribute, pickupOption, _storeContext.CurrentStore.Id);
                 }
 
             }
@@ -611,6 +609,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     newAddress.Email = customer.Email;
                     newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
                     newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
+                    newAddress.PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute);
 
                     //custom address attributes
                     string customAttributes = null;
