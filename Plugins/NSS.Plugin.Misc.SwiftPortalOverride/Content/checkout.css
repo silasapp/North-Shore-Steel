@@ -344,6 +344,10 @@ button, button:focus {
     cursor: pointer;
 }
 
+    .payment-item-card * {
+        cursor: pointer;
+    }
+
     .payment-item-card label {
         color: #03175B;
         line-height: 1;
@@ -367,6 +371,10 @@ button, button:focus {
         background: #C3C3C3;
         cursor: not-allowed;
     }
+
+        .payment-item-card.disabled * {
+            cursor: not-allowed;
+        }
 
         .payment-item-card.disabled label {
             color: #FFF;
