@@ -475,12 +475,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 SaveShippingAddress(model.ShippingAddress);
 
                 // save billing address if asked to
-                SaveBillingAddress(model.BillingAddress);
+                SaveBillingAddress(model.BillingAddress, model.ShippingAddress.ShippingAddressId);
 
                 // payment
                 var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType);
 
-                return Json(new { success = 1, orderId = 5 });
+                return result;
 
                 //return result;
             }
@@ -492,31 +492,37 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
 
-        private void SaveBillingAddress(ErpCheckoutBillingAddress model)
+        private void SaveBillingAddress(ErpCheckoutBillingAddress model, int shippingAddressId)
         {
             var SaveToAddressBook = model.SaveToAddressBook;
-            var addressId = model.BillingAddressId;
+            var billingAddressId = model.BillingAddressId;
 
-            if (addressId > 0)
+            if (model.ShipToSameAddress)
             {
-                // existing
                 //existing address
-                var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, addressId)
+                var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, shippingAddressId)
                     ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
 
-                _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+                _workContext.CurrentCustomer.BillingAddressId = address.Id;
                 _customerService.UpdateCustomer(_workContext.CurrentCustomer);
             }
             else
             {
-                if (SaveToAddressBook)
+                if (billingAddressId > 0)
+                {
+                    //existing address
+                    var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, billingAddressId)
+                        ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
+
+                    _workContext.CurrentCustomer.BillingAddressId = address.Id;
+                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                }
+                else
                 {
                     //new address
                     var newAddress = model.BillingNewAddress;
 
-                    //custom address attributes
                     string customAttributes = null;
-                    // REMOVED
 
                     //try to find an address with the same values (don't duplicate records)
                     var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
@@ -528,21 +534,29 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     if (address == null)
                     {
+                        //address is not found. let's create a new one
                         address = newAddress.ToEntity();
                         address.CustomAttributes = customAttributes;
                         address.CreatedOnUtc = DateTime.UtcNow;
+
+                        //some validation
+                        if (address.CountryId == 0)
+                            address.CountryId = null;
+
+                        if (address.StateProvinceId == 0)
+                            address.StateProvinceId = null;
 
                         _addressService.InsertAddress(address);
 
                         _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
                     }
 
-                    _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+                    _workContext.CurrentCustomer.BillingAddressId = address.Id;
 
                     _customerService.UpdateCustomer(_workContext.CurrentCustomer);
                 }
-
             }
+
         }
 
         private void SaveShippingAddress(ErpCheckoutShippingAddress model)
@@ -551,6 +565,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (pickUpInStore)
             {
+                var pickupPointsResponse = _shippingService.GetPickupPoints(_workContext.CurrentCustomer.BillingAddressId ?? 0,
+                    _workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id);
+
+                if (pickupPointsResponse.Success)
+                {
+                    var pickupOption = pickupPointsResponse.PickupPoints.FirstOrDefault(x => x.Id == model.PickupPoint.Id);
+
+                    SavePickupOption(pickupOption);
+
+                    //set value indicating that "pick up in store" option has not been chosen
+                    _genericAttributeService.SaveAttribute<PickupPoint>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedPickupPointAttribute, null, _storeContext.CurrentStore.Id);
+                }
 
             }
             else
@@ -625,8 +651,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // place order based on payment selected
 
-            //add custom avlue for payment type
+
+            var creditAmount = (decimal)15000;
+
+            //add custom values
             processPaymentRequest.CustomValues.Add("paymentMethodType", paymentMethodtype);
+            processPaymentRequest.CustomValues.Add("creditAmount", creditAmount);
 
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
 

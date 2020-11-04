@@ -257,7 +257,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             processPaymentRequest.CustomValues.TryGetValue("creditAmount", out var creditAmount);
 
 
-
             if(paymentMethodType != null)
             {
                 switch ((int)paymentMethodType)
@@ -272,12 +271,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         break;
 
                     default:
-                        processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Paid };
                         break;
                 }
             }
 
-            processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Paid };
+            processPaymentResult = new ProcessPaymentResult();
 
             return processPaymentResult;
         }
@@ -296,11 +294,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
         private ProcessPaymentResult ProcessLineOfCreditPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details, decimal creditAmount)
         {
-            var isElligible = creditAmount > details.OrderTotal;
+            var isElligible = creditAmount >= details.OrderTotal;
             var processPaymentResult = new ProcessPaymentResult();
 
             if (isElligible)
-                processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Paid };
+                processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
 
             return processPaymentResult;
         }
