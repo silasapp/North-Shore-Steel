@@ -23,6 +23,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
             builder.RegisterType<ShapeService>().As<IShapeService>().InstancePerLifetimeScope();
             builder.RegisterType<AzureStorageService>().As<IStorageService>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomerCompanyProductService>().As<ICustomerCompanyProductService>().InstancePerLifetimeScope();
+
 
             // overrides
             builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();

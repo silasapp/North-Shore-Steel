@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
-    public class CustomerCompanyProductService : ICustomerCompanyProductsService
+    public class CustomerCompanyProductService : ICustomerCompanyProductService
     {
         private readonly IRepository<CustomerCompanyProduct> _customerCompanyProductRepository;
 
@@ -34,9 +34,9 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
         }
 
-        public CustomerCompanyProduct GetCustomerCompanyProductById(int customerId, int companyId, int productId)
+        public CustomerCompanyProduct GetCustomerCompanyProductById(int customerCompanyId, int productId)
         {
-            var company = _customerCompanyProductRepository.Table.FirstOrDefault(c => c.CompanyId == companyId && c.CustomerId == customerId && c.ProductId == productId);
+            var company = _customerCompanyProductRepository.Table.FirstOrDefault(c => c.CustomerCompanyId == customerCompanyId && c.ProductId == productId);
 
             return company;
         }
@@ -44,6 +44,22 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         public IList<CustomerCompanyProduct> GetCustomerCompanyProducts()
         {
             throw new NotImplementedException();
+        }
+
+        public void UpdateCustomerCompanyProducts(List<CustomerCompanyProduct> customerCompanyProducts)
+        {
+            foreach (CustomerCompanyProduct customerCompanyProduct in customerCompanyProducts)
+            {
+                var company = _customerCompanyProductRepository.Table.FirstOrDefault(c => c.CustomerCompanyId == customerCompanyProduct.CustomerCompanyId && c.ProductId == customerCompanyProduct.ProductId);
+                if (company == null)
+                {
+                    _customerCompanyProductRepository.Insert(customerCompanyProduct);
+                } 
+                else {
+                    _customerCompanyProductRepository.Update(customerCompanyProduct);
+                }
+            }
+
         }
     }
 }

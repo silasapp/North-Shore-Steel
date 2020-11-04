@@ -6,14 +6,9 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
     public class CustomerCompanyProduct : BaseEntity
     {
         /// <summary>
-        /// Gets or sets the customer id
+        /// Gets or sets the customer company id
         /// </summary>
-        public int CustomerId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the company id
-        /// </summary>
-        public int CompanyId { get; set; }
+        public int CustomerCompanyId { get; set; }
 
         /// <summary>
         /// Gets or sets the product id
@@ -23,6 +18,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
         /// <summary>
         /// Gets or sets the Customer Part No
         /// </summary>
-        public string CustPartNo { get; set; }
+        public string CustomerPartNo { get; set; }
     }
 }

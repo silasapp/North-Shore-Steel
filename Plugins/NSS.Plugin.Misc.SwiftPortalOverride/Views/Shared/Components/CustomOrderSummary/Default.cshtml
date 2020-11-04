@@ -11,6 +11,9 @@
 @using Nop.Web.Models.Catalog
 @using Nop.Services.Localization
 @using Nop.Core.Domain
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services 
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers 
 @using Nop.Services.Orders
 @inject IWebHelper webHelper
 @inject IWorkContext workContext
@@ -22,14 +25,27 @@
 @inject ILocalizationService localizationService
 @inject IProductService productService
 @inject IShoppingCartService shoppingCartService
+@inject ICustomerCompanyProductService customerCompanyProductService
+@inject ICustomerCompanyService customerCompanyService
+@inject ICompanyService companyService  
 @inject IWorkContext workContext
 
 @{
     var customer = workContext.CurrentCustomer;
+
+    var customerId = customer.Id;
+    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+    ERPComId += customerId;
+    int ERPCompanyId = int.Parse(Context.Request.Cookies[ERPComId]);
+
+    Company company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
+    CustomerCompany customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
+
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
 
     var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #");
     var deliverychkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option");
+    var customerCompanyProduct = new CustomerCompanyProduct();
 }
 
 <style>
@@ -123,6 +139,10 @@
                             var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
                             var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
                             var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
+                            if (customerCompany != null)
+                            {
+                                customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                            }
 
                             // get attribute
 
@@ -154,10 +174,10 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (custPartNoAttr != null)
+                                    @if (customerCompanyProduct != null)
                                     {
-                                        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";
-                                        <input style="width: 100px;height: 30px;" type="text" name="@(controlId)" id="@(controlId)" value="@(custPartNoAttr.DefaultValue)" />
+                                        //var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";
+                                        <input style="width: 100px;height: 30px;" type="text" name="customer-part" id="no-@item.Id" value="@customerCompanyProduct.CustomerPartNo" />
                                     }
                                     else
                                     {
