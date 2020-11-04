@@ -211,9 +211,10 @@
 
                                 </td>
                                 <td style="text-align:center">
-                                    <a style="background: none; border: none;" data-toggle="modal" onclick="handleSawOption(@item.ProductId)" ; data-target="#noteModal">
+                                    <a style="background: none; border: none;" data-toggle="modal" onclick="handleNotesModal(@item.ProductId)" ; data-target="#noteModal">
                                         <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
                                     </a>
+                                    <input type="hidden" id=note-@item.ProductId value="" />
                                 </td>
                                 <td class="remove-from-cart" style="text-align:center">
                                     <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" aria-label="@T("ShoppingCart.Remove")" />
@@ -531,16 +532,15 @@
 
 <script>
 
-    function handleSawOption(itemId) {
-        console.log("itemId", itemId);
-        $('textarea[name="productNote"]').keyup(function () {
-            var note = $(this).val();
-            console.log(note);
-        });
+    let itemNoteId;
+    function handleNotesModal(itemId) {
+        itemNoteId = itemId;
+        $("#productNote").val($(`#note-${itemNoteId}`).val());
     }
 
     $('#noteModal').on('hidden.bs.modal', function () {
-        $(this).find("input,textarea,select").val('').end();
+        $(`#note-${itemNoteId}`).val($(this).find("textarea").val());
+        $(this).find("textarea").val('').end();
     });
 
     function calculateItemTotalPrice(attrId, itemId) {
