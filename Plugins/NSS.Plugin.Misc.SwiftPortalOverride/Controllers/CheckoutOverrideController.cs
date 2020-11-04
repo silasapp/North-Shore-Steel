@@ -212,8 +212,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.StateProvinces = _countryModelFactory.GetStatesByCountryId(usaCountryId, false);
 
             // account credit
-            // TODO use endpoint
-            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = 150 };
+            // TODO add can credit in db
+            //nss get credit amount
+            var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
+            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount };
 
             //model
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
@@ -650,13 +652,40 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
 
             // place order based on payment selected
+             
+            var checkoutPaymentMethod = (CheckoutPaymentMethodType)paymentMethodtype;
+            string paymentMethod = "";
+            var result = Json(new { error = 1, message = "payment method selected was not found" });
 
+            switch (checkoutPaymentMethod)
+            {
+                case CheckoutPaymentMethodType.CreditCard:
+                    paymentMethod = "CREDITCARD";
+                    result = ProcessCreditCardPayment(processPaymentRequest, paymentMethod);
+                    break;
+                case CheckoutPaymentMethodType.Paypal:
+                    paymentMethod = "PAYPAL";
+                    result = ProcePaypalPayment(processPaymentRequest, paymentMethod);
+                    break;
+                case CheckoutPaymentMethodType.LineOfCredit:
+                    paymentMethod = "LINEOFCREDIT";
+                    result = ProcessLineOfCreditPayment(processPaymentRequest, paymentMethod);
+                    break;
+                default:
+                    break;
+            }
 
-            var creditAmount = (decimal)15000;
+            return result;
+        }
+
+        private JsonResult ProcessLineOfCreditPayment(ProcessPaymentRequest processPaymentRequest, string paymentMethod)
+        {
+            //nss get credit amount
+            var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
 
             //add custom values
-            processPaymentRequest.CustomValues.Add("paymentMethodType", paymentMethodtype);
-            processPaymentRequest.CustomValues.Add("creditAmount", creditAmount);
+            processPaymentRequest.CustomValues.Add("paymentMethodType", paymentMethod);
+            processPaymentRequest.CustomValues.Add("creditAmount", creditResult.CreditAmount);
 
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
 
@@ -668,34 +697,42 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     Order = placeOrderResult.PlacedOrder
                 };
 
+                // call nss place Order
+                NSSPlaceOrderRequest(placeOrderResult.PlacedOrder);
 
-                //var paymentMethod = _paymentPluginManager
-                //    .LoadPluginBySystemName(placeOrderResult.PlacedOrder.PaymentMethodSystemName, _workContext.CurrentCustomer, _storeContext.CurrentStore.Id);
-                //if (paymentMethod == null)
-                //    //payment method could be null if order total is 0
-                //    //success
-                //    return Json(new { success = 1 });
+                placeOrderResult.PlacedOrder.PaymentStatus = PaymentStatus.Paid;
+                _orderService.UpdateOrder(placeOrderResult.PlacedOrder);
 
-                //if (paymentMethod.PaymentMethodType == PaymentMethodType.Redirection)
-                //{
-                //    //Redirection will not work because it's AJAX request.
-                //    //That's why we don't process it here (we redirect a user to another page where he'll be redirected)
+                _orderProcessingService.CheckOrderStatus(placeOrderResult.PlacedOrder);
 
-                //    //redirect
-                //    return Json(new
-                //    {
-                //        redirect = $"{_webHelper.GetStoreLocation()}checkout/OpcCompleteRedirectionPayment"
-                //    });
-                //}
-
-                
                 //success
                 return Json(new { success = 1, orderId = placeOrderResult.PlacedOrder.Id });
             }
 
-            return Json(new { error = 1, message = "Order could not be placed" });
+            // error
+            return Json(new { error = 1, message = "Order was not placed. Line of credit payment error" });
         }
 
+        private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order)
+        {
+            var orderItems = _orderService.GetOrderItems(order.Id);
+
+            var request = new NSSCreateOrderRequest() 
+            { 
+            };
+
+            _nSSApiProvider.CreateNSSOrder(12345, request, useMock: true);
+        }
+
+        private JsonResult ProcessCreditCardPayment(ProcessPaymentRequest processPaymentRequest, string paymentMethod)
+        {
+            return Json(new { error = 1, message = "Debit/Credit card payment not supported yet." });
+        }
+
+        private JsonResult ProcePaypalPayment(ProcessPaymentRequest processPaymentRequest, string paymentMethod)
+        {
+            return Json(new { error = 1, message = "Paypal payment not supported yet." });
+        }
 
         private void ErpConfirmOrder()
         {

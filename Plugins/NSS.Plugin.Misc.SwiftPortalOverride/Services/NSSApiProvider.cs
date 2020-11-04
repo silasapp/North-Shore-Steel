@@ -411,7 +411,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             {
                 var resp = new NSSGetCompanyCreditBalance
                 {
-                    CreditAmount = (decimal)200.00
+                    CreditAmount = (decimal)1500.00
                 };
 
                 return resp;

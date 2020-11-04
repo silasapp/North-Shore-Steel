@@ -259,14 +259,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             if(paymentMethodType != null)
             {
-                switch ((int)paymentMethodType)
+                switch (paymentMethodType.ToString())
                 {
-                    case 1:
-
+                    case "CREDITCARD":
                         break;
-                    case 2:
+                    case "PAYPAL":
                         break;
-                    case 3:
+                    case "LINEOFCREDIT":
                         processPaymentResult = ProcessLineOfCreditPayment(processPaymentRequest, details, Convert.ToDecimal(creditAmount ?? 0.00));
                         break;
 
