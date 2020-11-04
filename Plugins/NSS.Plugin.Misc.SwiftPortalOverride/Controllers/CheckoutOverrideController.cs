@@ -201,6 +201,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.ShippingMethodModel = _checkoutModelFactory.PrepareShippingMethodModel(cart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer));
             model.ConfirmModel = _checkoutModelFactory.PrepareConfirmOrderModel(cart);
             model.ShoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, cart);
+            model.OrderTotals = _shoppingCartModelFactory.PrepareOrderTotalsModel(cart, false);
+
             //filter by country
             var filterByCountryId = 0;
             if (_addressSettings.CountryEnabled)
