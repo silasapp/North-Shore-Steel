@@ -20,6 +20,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
         public int CompanyId { get; set; }
 
         /// <summary>
+        /// Gets or sets the can credit
+        /// </summary>
+        public bool CanCredit { get; set; }
+
+        /// <summary>
         /// Gets or sets the Company entity
         /// </summary>
         public Company Company { get; set; }

@@ -4,7 +4,7 @@ using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftApi.Data
 {
-    [NopMigration("2020/09/21 14:00:00", "Swift.Api Approve user schema")]
+    [NopMigration("2020/11/04 19:20:00", "Swift.Api Approve user schema")]
     public class ApproveUserMigration : AutoReversingMigration
     {
 
@@ -29,14 +29,33 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
         /// </summary>
         public override void Up()
         {
-            _migrationManager.BuildTable<Company>(Create);
-            _migrationManager.BuildTable<CustomerCompany>(Create);
+            if (!Schema.Table("Company").Exists())
+            {
+                _migrationManager.BuildTable<Company>(Create);
+            }
 
-            var compKey = new[] { "CustomerId", "CompanyId" };
-            Create.UniqueConstraint("Customer_Company_Unique").OnTable("CustomerCompany").Columns(compKey);
+            if (!Schema.Table("CustomerCompany").Exists())
+            {
+                _migrationManager.BuildTable<CustomerCompany>(Create);
 
-            Create.ForeignKey("FK_CustomerCompany_Customer").FromTable("CustomerCompany").ForeignColumn("CustomerId").ToTable("Customer").PrimaryColumn("Id");
-            Create.ForeignKey("FK_CustomerCompany_Company").FromTable("CustomerCompany").ForeignColumn("CompanyId").ToTable("Company").PrimaryColumn("Id");
+
+                var compKey = new[] { "CustomerId", "CompanyId" };
+                Create.UniqueConstraint("Customer_Company_Unique").OnTable("CustomerCompany").Columns(compKey);
+
+                Create.ForeignKey("FK_CustomerCompany_Customer").FromTable("CustomerCompany").ForeignColumn("CustomerId").ToTable("Customer").PrimaryColumn("Id");
+                Create.ForeignKey("FK_CustomerCompany_Company").FromTable("CustomerCompany").ForeignColumn("CompanyId").ToTable("Company").PrimaryColumn("Id");
+            }
+
+            if (!Schema.Table("CustomerCompany").Column("CanCredit").Exists())
+            {
+
+                Alter
+                    .Table("CustomerCompany")
+                    .AddColumn("CanCredit")
+                    .AsBoolean()
+                    .WithDefaultValue("");
+
+            }
         }
         #endregion
     }
