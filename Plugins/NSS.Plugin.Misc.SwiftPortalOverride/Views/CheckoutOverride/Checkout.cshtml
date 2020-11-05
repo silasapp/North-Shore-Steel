@@ -55,6 +55,11 @@
         ContractResolver = contractResolver,
         Formatting = Formatting.None
     });
+    var orderTotals = JsonConvert.SerializeObject(Model.OrderTotals, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
 }
 
 @{
@@ -222,7 +227,7 @@
                         </div>
                     </div>
 
-                    <div class="d-flex flex-column" v-if="paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD">
+                    <div class="d-flex flex-column" v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD">
                         <div class="row d-flex flex-row mt-3">
                             <div class="col-md-7 d-flex flex-column">
                                 <label class="fs-14 text-black mb-1">Cardholder name</label>
@@ -324,12 +329,12 @@
                         </div>
                     </div>
 
-                    <div v-if="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL">
+                    <div v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL">
                         <label class="text-primary">
                             You will be redirected to a paypal page where you'll be able to make payment when you click "PLACE ORDER".
                         </label>
                     </div>
-                    <div v-if="paymentMethodIndex === shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT">
+                    <div v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT">
                         <label class="text-primary">Line of credit payment method will be used when you click "PLACE ORDER".</label>
                     </div>
                 </div>
@@ -384,11 +389,11 @@
                     <div class="order-summary mt-2">
                         <div class="price-summary">
                             <label class="text-muted">Sub-Total:</label>
-                            <label class="text-black">{{ formatMoney(subTotal) }}</label>
+                            <label class="text-black">{{ shared.orderTotals.subTotal }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Shipping:</label>
-                            <label class="text-black">TBD</label>
+                            <label class="text-black">{{ shared.orderTotals.shipping }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Discount:</label>
@@ -399,11 +404,15 @@
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Tax:</label>
-                            <label class="text-black">TBD</label>
+                            <label class="text-black">
+                                {{ shared.orderTotals.tax }}
+                            </label>
                         </div>
                         <div class="price-summary">
                             <label class="h5 text-black font-weight-bold">TOTAL</label>
-                            <label class="h5 text-black font-weight-bold">${{ formatMoney(orderTotal) }}</label>
+                            <label class="h5 text-black font-weight-bold">
+                                {{ shared.orderTotals.orderTotal }}
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -434,12 +443,12 @@
     var accountCredit = @Html.Raw(accountCredit);
     var states = @Html.Raw(states);
     var cart = @Html.Raw(cart);
+    var orderTotals = @Html.Raw(orderTotals);
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
 
     console.log("cart: ", cart);
-    console.log("shippingAddresses: ", shippingAddresses);
-    console.log("billingAddresses: ", billingAddresses);
+    console.log("orderTotals: ", orderTotals);
 
     const store = {
         state: {
@@ -449,6 +458,7 @@
             accountCredit,
             states,
             cart,
+            orderTotals,
 
             constants: {
                 PAYMENT_METHOD_CREDIT_CARD: 1,
