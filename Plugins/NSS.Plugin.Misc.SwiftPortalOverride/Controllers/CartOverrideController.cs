@@ -156,8 +156,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
             ERPComId += customerId;
             int ERPCompanyId = int.Parse(Request.Cookies[ERPComId]);
-            Company company = _companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
-            CustomerCompany customerCompany = _customerCompanyService.GetCustomerCompany(customerId, company.Id);
+            Company company = new Company();
+            CustomerCompany customerCompany = new CustomerCompany();
+            if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
+                company = _companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
+            if (company != null)
+                customerCompany = _customerCompanyService.GetCustomerCompany(customerId, company.Id);
+
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
             //get identifiers of items to remove

@@ -36,10 +36,13 @@
     string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
     ERPComId += customerId;
     int ERPCompanyId = int.Parse(Context.Request.Cookies[ERPComId]);
-    Company company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
+    Company company = new Company();
     CustomerCompany customerCompany = new CustomerCompany();
     CustomerCompanyProduct customerCompanyProduct = new CustomerCompanyProduct();
-    if (company != null) { customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id); }
+    if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
+        company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
+    if (company != null)
+        customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
 
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
 
