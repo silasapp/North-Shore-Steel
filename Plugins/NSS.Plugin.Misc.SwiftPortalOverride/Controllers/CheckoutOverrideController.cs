@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nop.Core.Http.Extensions;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -66,11 +67,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly NSSApiProvider _nSSApiProvider;
         private readonly IShapeService _shapeService;
         private readonly ICountryModelFactory _countryModelFactory;
+        private readonly PayPalServiceManager _payPalServiceManager;
+        private readonly SwiftCoreSettings _settings;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
+        public CheckoutOverrideController(SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -109,6 +112,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _nSSApiProvider = nSSApiProvider;
             _shapeService = shapeService;
             _countryModelFactory = countryModelFactory;
+            _payPalServiceManager = payPalServiceManager;
+            _settings = swiftCoreSettings;
         }
         #endregion
 
@@ -443,6 +448,41 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [IgnoreAntiforgeryToken]
+        public virtual JsonResult CreatePayPalOrder([FromBody] ErpCheckoutModel model)
+        {
+            try
+            {
+                var result = Json(new { });
+                //prepare order GUID
+                var paymentRequest = new ProcessPaymentRequest();
+                _paymentService.GenerateOrderGuid(paymentRequest);
+
+                //try to create an order
+                var (order, errorMessage) = _payPalServiceManager.CreateOrder(_settings, paymentRequest.OrderGuid, model);
+                if (order != null)
+                {
+                    //save order details for future using
+                    paymentRequest.CustomValues.Add(_localizationService.GetResource("Plugins.Payments.PayPalSmartPaymentButtons.OrderId"), order.Id);
+
+                    result = Json(new { success = 1, orderId = order.Id });
+                }
+                else if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    result = Json(new { error = 1, message = errorMessage });
+                }
+
+                HttpContext.Session.Set("OrderPaymentInfo", paymentRequest);
+
+                return result;
+            }
+            catch (Exception exc)
+            {
+
+                return Json(new { error = 1, message = exc.Message });
+            }
+        }
+
+        [IgnoreAntiforgeryToken]
         public virtual JsonResult PlaceOrder([FromBody] ErpCheckoutModel model)
         {
             if (model == null)
@@ -652,7 +692,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 throw new Exception(_localizationService.GetResource("Checkout.MinOrderPlacementInterval"));
 
             //place order
-            var processPaymentRequest = new ProcessPaymentRequest();
+            var processPaymentRequest = HttpContext.Session.Get<ProcessPaymentRequest>("OrderPaymentInfo");
+            if (processPaymentRequest == null)
+                processPaymentRequest = new ProcessPaymentRequest();
 
             _paymentService.GenerateOrderGuid(processPaymentRequest);
             processPaymentRequest.StoreId = _storeContext.CurrentStore.Id;
@@ -671,24 +713,23 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 case CheckoutPaymentMethodType.CreditCard:
                     paymentMethod = "CREDITCARD";
-                    result = ProcessCreditCardPayment(processPaymentRequest, paymentMethod);
                     break;
                 case CheckoutPaymentMethodType.Paypal:
                     paymentMethod = "PAYPAL";
-                    result = ProcePaypalPayment(processPaymentRequest, paymentMethod);
                     break;
                 case CheckoutPaymentMethodType.LineOfCredit:
-                    paymentMethod = "LINEOFCREDIT";
-                    result = ProcessLineOfCreditPayment(processPaymentRequest, paymentMethod);
+                    paymentMethod = "CREDIT";
                     break;
                 default:
                     break;
             }
 
+            result = ProcessPaymentType(processPaymentRequest, paymentMethod);
+
             return result;
         }
 
-        private JsonResult ProcessLineOfCreditPayment(ProcessPaymentRequest processPaymentRequest, string paymentMethod)
+        private JsonResult ProcessPaymentType(ProcessPaymentRequest processPaymentRequest, string paymentMethod)
         {
             //nss get credit amount
             var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);

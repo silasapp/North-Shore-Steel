@@ -540,7 +540,6 @@
             dirty: false,
         },
         mounted: function () {
-            this.generateExpirationMonthsAndYears();
             this.renderPaypalCard();
         },
         computed: {
@@ -555,6 +554,7 @@
                 console.log("model: ", JSON.stringify(model));
                 const request = { PaymentMethod: item.paymentMethodSystemName, Model: model };
                 const self = this;
+                AjaxCart.addproducttocart_catalog
                 $.ajax({
                     url: "@Url.Action("SwiftSavePaymentMethod", "CheckoutOverride")",
                     type: 'POST',
@@ -576,24 +576,6 @@
                 });
             },
 
-            generateExpirationMonthsAndYears: function () {
-                let months = [];
-                for (let i = 1; i <= 12; i++) {
-                    const retVal = i < 10 ? `0${i}` : i;
-                    months = [...months, retVal];
-                }
-                let years = [];
-                const currentYear = (new Date()).getFullYear();
-                for (let i = 0; i < 15; i++) {
-                    const retVal = currentYear + i;
-                    years = [...years, retVal];
-                }
-
-                this.expirationMonths = months;
-                this.paymentCard.cardExpirationMonth = months[0];
-                this.expirationYears = years;
-                this.paymentCard.cardExpirationYear = years[0];
-            },
             formatMoney: function (input) {
                 return input.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -607,7 +589,10 @@
 
                 console.log("isValid: ", this.validate());
                 if (!this.validate()) return;
-                const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
+                this.createOrder();
+            },
+            createOrder: function () {
+                 const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
 
@@ -682,8 +667,53 @@
                 if (paypal.HostedFields.isEligible()) {
                     const self = this;
                     paypal.HostedFields.render({
-                        createOrder: function () {
-                            return '5DC73856MX1106213';
+                        createOrder: async function () {
+                            const shippingAddressId = self.shippingAddressId ? self.shippingAddressId : 0;
+                            let shippingNewAddress = { ...self.newShippingAddress };
+                            let pickupPoint = self.shared.pickupPoints.find(x => x.id === self.pickupPointId);
+
+                            const shipToSameAddress = self.paymentMethodIndex === self.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
+                                ? true : self.shipToSameAddress;
+                            const billingAddressId = shipToSameAddress ? shippingAddressId : (self.billingAddressId ? self.billingAddressId : 0);
+                            const billingNewAddress = { ...self.newBillingAddress };
+
+                            const request = {
+                                shippingAddress: {
+                                    shippingNewAddress,
+                                    pickupPoint,
+                                    shippingAddressId,
+                                    saveToAddressBook: self.newShippingAddress.saveToMyAddresses,
+                                    isPickupInStore: !self.isDelivery,
+                                },
+                                billingAddress: {
+                                    shipToSameAddress,
+                                    billingNewAddress,
+                                    billingAddressId,
+                                    saveToAddressBook: self.newBillingAddress.saveToMyAddresses,
+                                },
+                                paymentMethodModel: {
+                                    checkoutPaymentMethodType: self.paymentMethodIndex,
+                                },
+                                hasError: false,
+                            };
+                            console.log('creating order...', request);
+                            let orderId = '';
+                            await $.ajax({
+                                url: "@Url.Action("CreatePayPalOrder", "CheckoutOverride")",
+                                type: 'POST',
+                                contentType: 'application/json; charset=utf-8',
+                                data: JSON.stringify(request),
+                                success: function (data, textStatus, XMLHttpRequest) {
+                                    console.log('success - created order...', data);
+                                    //if (data?.error === 1) return;
+                                    orderId = data.orderId;
+                                },
+                                error: function (xhr, ajaxOptions, thrownError) {
+                                    console.log("createOrder error: ", thrownError, xhr);
+                                }
+                            });
+                            console.log('going to call paypal submit...', orderId);
+                            return orderId;
                         }, // replace order-ID with the order ID
                         styles: {
                             input: {
@@ -720,6 +750,8 @@
                             console.log("isValid: ", self.validate());
                             if (!self.validate()) return;
 
+                            AjaxCart.setLoadWaiting(true);
+
                             let billingAddress;
                             if (self.shipToSameAddress && self.showNewShippingAddress) {
                                 billingAddress = { ...self.newShippingAddress };
@@ -730,8 +762,6 @@
                             } else  {
                                 billingAddress = self.shared.billingAddresses.find(x => x.id === self.billingAddressId);
                             }
-
-                            console.log("billingAddress: ", billingAddress);
 
                             hf.submit({
                                 // Cardholder Name
@@ -749,10 +779,11 @@
                             })
                                 .then(function (data) {
                                     console.log("data successful...", data);
-                                    //window.location.replace('http://www.somesite.com/review');
+                                    self.createOrder();
                                 })
                                 .catch(function (err) {
                                     console.log('error: ', JSON.stringify(err));
+                                    AjaxCart.setLoadWaiting(false);
                                     const title = 'The following error(s) occured: \n\n';
                                     const errors = err.details.map(x => '•  ' + x.description).join('\n');
                                     const footer = '\n\n' + err.message;
