@@ -34,7 +34,7 @@
                                 SHAPES
                             </a>
                         </div>
-                        <div id="collapseOne" class="collapse show" style="max-height: 36rem; overflow-x: auto;">
+                        <div id="collapseOne" class="collapse show">
                             <div class="">
                                 <ejs-treeview id="treedata" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
                                     <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
@@ -88,7 +88,7 @@
                                             <div class="card-body" style="padding-left: 2.6rem">
                                                 <label class="pure-material-checkbox">
                                                     <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                                    <span>@item.SpecificationAttributeOptionName</span>
+                                                    <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;">@item.SpecificationAttributeOptionName</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -107,7 +107,7 @@
                                         <div class="card-body" style="padding-left: 2.6rem">
                                             <label class="pure-material-checkbox">
                                                 <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                                <span>@item.SpecificationAttributeOptionName</span>
+                                                <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;">@item.SpecificationAttributeOptionName</span>
                                             </label>
                                         </div>
                                     </div>

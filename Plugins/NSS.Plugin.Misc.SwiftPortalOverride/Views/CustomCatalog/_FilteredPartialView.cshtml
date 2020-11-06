@@ -212,10 +212,6 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 @if (Model.Products != null && Model.Products.Count > 0)
 {
     var shapeIds = Model.FilterParams.ShapeIds;
-    var isPlateIndividual = shapeIds.FirstOrDefault(x => x == 13);
-    bool _isPlateIndividual = false;
-    if (isPlateIndividual > 0)
-        _isPlateIndividual = true;
 
     if (shapeIds.Count > 0)
     {
@@ -263,12 +259,12 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
     {
         var productRowData = new Dictionary<string, string>();
         var attr = genericAttributeService.GetAttributesForEntity(item.Id, nameof(Product));
-        string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+        string _isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
         @foreach (var it in headerColumns)
         {
             var itemCode = it.Code;
-            var Code = serialized == "True" ? "itemTagNo" : "itemNo";
+            var Code = _isSerialized == "True" ? "itemTagNo" : "itemNo";
             itemCode = itemCode == "itemNo" ? Code : itemCode;
             productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
             // productRowData.Add(it.Sort, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Sort)?.Value);
@@ -284,7 +280,7 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
         productRowData.Add("_cartId", shoppingCartTypeId.ToString());
         productRowData.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString());
         productRowData.Add("_wishListId", wishListShoppingCartId.ToString());
-        productRowData.Add("_isPlateIndividual", _isPlateIndividual.ToString());
+        productRowData.Add("_isSerialized", _isSerialized.ToString());
 
         ObjectData.Add(productRowData);
     }
@@ -333,7 +329,7 @@ Func<object, object> footerContent = @<div>@Html.EJS().Button("primarybtn").Cont
 
 
     <script id="quantityTemplate" type="text/x-template">
-        ${if(_isPlateIndividual == "True")}
+        ${if(_isSerialized == "True")}
         <label style="width: 30px" for="">1</label>
         ${else}
         <input type="number" min="1" name="quantity" style="width: 35px" id="qty${_itemId}" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null">
