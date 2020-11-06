@@ -213,7 +213,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// <param name="settings">Plugin settings</param>
         /// <returns>Script; error message if exists</returns>
         public (string Script, string ErrorMessage) GetScript(SwiftCoreSettings settings)
-        {
+        {            
             return HandleFunction(settings, () =>
             {
                 var parameters = new Dictionary<string, string>
@@ -230,13 +230,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     //["buyer-country"] = null, //available in the sandbox only
                     //["locale"] = null, //PayPal auto detects it
                 };
+                
                 //if (!string.IsNullOrEmpty(settings.DisabledFunding))
                 //    parameters["disable-funding"] = settings.DisabledFunding;
                 //if (!string.IsNullOrEmpty(settings.DisabledCards))
                 //    parameters["disable-card"] = settings.DisabledCards;
                 var scriptUrl = QueryHelpers.AddQueryString(PaypalDefaults.ServiceScriptUrl, parameters);
 
-                return $@"<script src=""{scriptUrl}"" data-partner-attribution-id=""{PaypalDefaults.PartnerCode}"" data-client-token=""dddddd""></script>";
+                var accessToken = GetAccessToken(settings);
+
+                var clientToken = GetClientToken(settings, accessToken.AccessToken?.Token);
+
+                return $@"<script src=""{scriptUrl}"" data-partner-attribution-id=""{PaypalDefaults.PartnerCode}"" data-client-token=""{clientToken}""></script>";
             });
         }
 
@@ -464,6 +469,42 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// </summary>
         /// <param name="settings">Plugin settings</param>
         /// <returns>Access token; error message if exists</returns>
+        public string GetClientToken(SwiftCoreSettings settings, string accessToken)
+        {
+            var _baseUrl = settings.PayPalUseSandbox ? "https://api.sandbox.paypal.com" : "";
+            using (var client = new System.Net.Http.HttpClient())
+            {
+                client.BaseAddress = new Uri(_baseUrl);
+
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    _logger.Warning($"Paypal Access Token -> ", new Exception("Paypal Access Token is empty"));
+                    throw new Exception("Paypal Access Token is empty");
+                }
+
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                var resource = $"/v1/identity/generate-token";
+
+                client.DefaultRequestHeaders.Accept.Clear();
+
+                var response = client.PostAsync(resource, null).Result;
+
+                // throw error if not successful
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = response.Content.ReadAsStringAsync().Result;
+                var _response = JsonConvert.DeserializeObject<PaypalClientTokenResponse>(responseBody);
+                return _response.client_token;
+            }
+        }
+
+        /// <summary>
+        /// Get access token
+        /// </summary>
+        /// <param name="settings">Plugin settings</param>
+        /// <returns>Access token; error message if exists</returns>
         //public ( , string ErrorMessage) GetClientToken(SwiftCoreSettings settings)
         //{
         //    //try to get client token
@@ -480,4 +521,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
         #endregion
     }
+
+    public class PaypalClientTokenResponse
+    {
+        public string client_token { get; set; }
+        public int expires_in { get; set; }
+    }
 }
+
