@@ -56,7 +56,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                     _customerCompanyProductRepository.Insert(customerCompanyProduct);
                 } 
                 else {
-                    _customerCompanyProductRepository.Update(customerCompanyProduct);
+                    company.CustomerPartNo = customerCompanyProduct.CustomerPartNo;
+                    _customerCompanyProductRepository.Update(company);
                 }
             }
 
