@@ -19,6 +19,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             builder.RegisterType<NSSApiProvider>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<WorkFlowMessageServiceOverride>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PayPalServiceManager>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<PayPalProcessor>().AsSelf().InstancePerLifetimeScope();
 
             // core
             builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
