@@ -51,5 +51,22 @@ namespace NSS.Plugin.Misc.SwiftCore.Configuration
         /// Gets or sets the Storage Container Name
         /// </summary>
         public string StorageContainerName { get; set; }
+
+        #region PayPal
+        /// <summary>
+        /// Gets or sets PayPal environment
+        /// </summary>
+        public bool PayPalUseSandbox { get; set; }
+
+        /// <summary>
+        /// Gets or sets the PayPal ClientId
+        /// </summary>
+        public string PayPalClientId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the PayPal Secret Key
+        /// </summary>
+        public string PayPalSecretKey { get; set; }
+        #endregion
     }
 }

@@ -152,6 +152,9 @@
     <Folder Include="Areas\Admin\Models\" />  </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="PayPal" Version="2.0.0-rc2" />
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.3" />
+    <PackageReference Include="PayPalHttp" Version="1.0.0" />
     <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.3.0.40" />
   </ItemGroup>
 

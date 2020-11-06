@@ -69,6 +69,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 StorageAccountKey = swiftPortalOverrideSettings.StorageAccountKey,
                 StorageAccountName = swiftPortalOverrideSettings.StorageAccountName,
                 StorageContainerName = swiftPortalOverrideSettings.StorageContainerName,
+                PayPalUseSandbox = swiftPortalOverrideSettings.PayPalUseSandbox,
+                PayPalClientId = swiftPortalOverrideSettings.PayPalClientId,
+                PayPalSecretKey = swiftPortalOverrideSettings.PayPalSecretKey,
                 ActiveStoreScopeConfiguration = storeScope
             };
             if (storeScope > 0)
@@ -82,6 +85,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 model.StorageAccountKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountKey, storeScope);
                 model.StorageAccountName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountName, storeScope);
                 model.StorageContainerName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageContainerName, storeScope);
+                model.PayPalUseSandBox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, storeScope);
+                model.PayPalClientId_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalClientId, storeScope);
+                model.PayPalSecretKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalSecretKey, storeScope);
             }
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/Configure.cshtml", model);
@@ -110,6 +116,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             swiftPortalOverrideSettings.StorageAccountKey = model.StorageAccountKey;
             swiftPortalOverrideSettings.StorageAccountName = model.StorageAccountName;
             swiftPortalOverrideSettings.StorageContainerName = model.StorageContainerName;
+            swiftPortalOverrideSettings.PayPalUseSandbox = model.PayPalUseSandbox;
+            swiftPortalOverrideSettings.PayPalClientId = model.PayPalClientId;
+            swiftPortalOverrideSettings.PayPalSecretKey = model.PayPalSecretKey;
 
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
@@ -124,6 +133,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountKey, model.StorageAccountKey_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountName, model.StorageAccountName_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageContainerName, model.StorageContainerName_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, model.PayPalUseSandBox_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalClientId, model.PayPalClientId_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalSecretKey, model.PayPalSecretKey_OverrideForStore, storeScope, false);
 
             //now clear settings cache
             _settingService.ClearCache();
