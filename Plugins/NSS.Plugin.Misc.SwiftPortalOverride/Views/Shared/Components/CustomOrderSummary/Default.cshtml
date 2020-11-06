@@ -37,13 +37,14 @@
     ERPComId += customerId;
     int ERPCompanyId = int.Parse(Context.Request.Cookies[ERPComId]);
     Company company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
-    CustomerCompany customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
+    CustomerCompany customerCompany = new CustomerCompany();
+    CustomerCompanyProduct customerCompanyProduct = new CustomerCompanyProduct();
+    if (company != null) { customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id); }
 
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
 
     var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #");
     var deliverychkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option");
-    var customerCompanyProduct = new CustomerCompanyProduct();
 }
 
 <style>
