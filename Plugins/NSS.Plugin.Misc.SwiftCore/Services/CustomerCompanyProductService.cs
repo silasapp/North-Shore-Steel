@@ -62,5 +62,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
         }
+
+        public void DeleteCustomerCompanyProduct(CustomerCompanyProduct customerCompanyProduct)
+        {
+            if (customerCompanyProduct == null)
+                throw new ArgumentNullException(nameof(customerCompanyProduct));
+
+            _customerCompanyProductRepository.Delete(customerCompanyProduct);
+        }
     }
 }

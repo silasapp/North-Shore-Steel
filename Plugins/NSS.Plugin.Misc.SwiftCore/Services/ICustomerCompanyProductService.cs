@@ -13,5 +13,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         CustomerCompanyProduct GetCustomerCompanyProductById(int customerCompanyId, int productId);
 
+        void DeleteCustomerCompanyProduct(CustomerCompanyProduct customerCompanyProduct);
+
     }
 }

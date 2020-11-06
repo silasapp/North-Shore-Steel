@@ -19,6 +19,12 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies
         public string CompanyName { get; set; }
 
         /// <summary>
+        /// Gets or sets the Company name
+        /// </summary>
+        [JsonProperty("canCredit", Required = Required.Always)]
+        public bool CanCredit { get; set; }
+
+        /// <summary>
         /// Gets or sets the Sales contact
         /// </summary>
         [JsonProperty("salesContact")]

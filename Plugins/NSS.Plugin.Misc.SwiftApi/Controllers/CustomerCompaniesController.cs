@@ -28,6 +28,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly ICustomerService _customerService;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ICustomerCompanyProductService _customerCompanyProductService;
         private readonly ILogger _logger;
 
         public CustomerCompaniesController(
@@ -43,6 +44,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             ICompanyService companyService,
             ICustomerCompanyService customerCompanyService,
             IGenericAttributeService genericAttributeService,
+            ICustomerCompanyProductService customerCompanyProductService,
             ILogger logger) :
             base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService,
                  localizationService, pictureService)
@@ -51,6 +53,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
             _genericAttributeService = genericAttributeService;
+            _customerCompanyProductService = customerCompanyProductService;
             _logger = logger;
         }
 
@@ -101,8 +104,16 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             CustomerCompany customerCompany = new CustomerCompany
             {
                 CustomerId = customer.Id,
-                CompanyId = company.Id
+                CompanyId = company.Id,
+                CanCredit = input.Dto.CanCredit
             };
+
+            CustomerCompany cc = _customerCompanyService.GetCustomerCompany(customerCompany.CustomerId, customerCompany.CompanyId);
+            if (cc != null)
+            {
+                //_customerCompanyProductService.DeleteCustomerCompanyProductByCustomerCompanyId(customerCompanyProduct);
+                //DeleteCustomerCompany(customerCompany.CustomerId, company.ErpCompanyId);
+            }
 
             _customerCompanyService.InsertCustomerCompany(customerCompany);
 
