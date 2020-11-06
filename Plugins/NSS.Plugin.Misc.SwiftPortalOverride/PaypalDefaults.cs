@@ -92,6 +92,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         /// <summary>
         /// Gets a name of the view component to display logo
         /// </summary>
-        public const string LOGO_VIEW_COMPONENT_NAME = "PayPalSmartPaymentButtonsLogo";
+        public const string LOGO_VIEW_COMPONENT_NAME = "PayPalSmartPaymentButtonsLogo";        
+        
+        /// <summary>
+        /// Gets a name of the view component to display logo
+        /// </summary>
+        public static string PayPalOrderIdKey = "PayPal order ID";
+
+        /// <summary>
+        /// Gets a name of the view component to display logo
+        /// </summary>
+        public static string PaymentMethodTypeKey = "Payment Method Type";
+
+        /// <summary>
+        /// Gets a name of the view component to display logo
+        /// </summary>
+        public static string CreditBalanceKey = "Credit Balance";
     }
 }

@@ -224,6 +224,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
             model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount };
 
+            (model.PaypalScript, _) = _payPalServiceManager.GetScript(_settings);
+
             //model
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);
@@ -462,7 +464,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (order != null)
                 {
                     //save order details for future using
-                    paymentRequest.CustomValues.Add(_localizationService.GetResource("Plugins.Payments.PayPalSmartPaymentButtons.OrderId"), order.Id);
+                    paymentRequest.CustomValues.Add(PaypalDefaults.PayPalOrderIdKey, order.Id);
 
                     result = Json(new { success = 1, orderId = order.Id });
                 }
@@ -735,8 +737,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
 
             //add custom values
-            processPaymentRequest.CustomValues.Add("paymentMethodType", paymentMethod);
-            processPaymentRequest.CustomValues.Add("creditAmount", creditResult.CreditAmount);
+            processPaymentRequest.CustomValues.Add(PaypalDefaults.PaymentMethodTypeKey, paymentMethod);
+            if(paymentMethod == "CREDIT")
+                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult.CreditAmount);
 
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
 
@@ -751,10 +754,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 // call nss place Order
                 NSSPlaceOrderRequest(placeOrderResult.PlacedOrder);
 
-                placeOrderResult.PlacedOrder.PaymentStatus = PaymentStatus.Paid;
-                _orderService.UpdateOrder(placeOrderResult.PlacedOrder);
+                if (paymentMethod == "CREDIT")
+                {
+                    placeOrderResult.PlacedOrder.PaymentStatus = PaymentStatus.Paid;
+                    _orderService.UpdateOrder(placeOrderResult.PlacedOrder);
 
-                _orderProcessingService.CheckOrderStatus(placeOrderResult.PlacedOrder);
+                    _orderProcessingService.CheckOrderStatus(placeOrderResult.PlacedOrder);
+                }
 
                 //success
                 return Json(new { success = 1, orderId = placeOrderResult.PlacedOrder.Id });
@@ -768,11 +774,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var orderItems = _orderService.GetOrderItems(order.Id);
 
+            // billing detail
+
+            // shipping detail
+
+            // 
+
             var request = new NSSCreateOrderRequest()
             {
             };
 
-            _nSSApiProvider.CreateNSSOrder(12345, request, useMock: true);
+            var resp = _nSSApiProvider.CreateNSSOrder(12345, request, useMock: true);
         }
 
         private JsonResult ProcessCreditCardPayment(ProcessPaymentRequest processPaymentRequest, string paymentMethod)

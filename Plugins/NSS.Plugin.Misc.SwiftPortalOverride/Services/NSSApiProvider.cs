@@ -468,17 +468,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public void CreateNSSOrder(int companyId, NSSCreateOrderRequest request, bool useMock = false)
+        public NSSCreateOrderResponse CreateNSSOrder(int companyId, NSSCreateOrderRequest request, bool useMock = false)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
             if (useMock)
-            { 
-                return;
+            {
+                return new NSSCreateOrderResponse { NSSOrderNo = 1462176 };
             }
 
             //initialize
+            var retVal = new NSSCreateOrderResponse();
             var respContent = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -518,6 +519,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     // throw error if not successful
                     response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<NSSCreateOrderResponse>(respContent);
                 }
 
             }
@@ -528,6 +532,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             // log request & resp
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateOrder details => orderid: {request.OrderId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+
+            return retVal;
         }
 
         private void ConfigureNSSApiSettings()
