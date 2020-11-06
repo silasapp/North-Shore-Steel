@@ -222,7 +222,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             // TODO add can credit in db
             //nss get credit amount
             var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
-            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount };
+            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount ?? (decimal)0.00 };
 
             (model.PaypalScript, _) = _payPalServiceManager.GetScript(_settings);
 
@@ -739,7 +739,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //add custom values
             processPaymentRequest.CustomValues.Add(PaypalDefaults.PaymentMethodTypeKey, paymentMethod);
             if(paymentMethod == "CREDIT")
-                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult.CreditAmount);
+                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult.CreditAmount ?? (decimal)0.00);
 
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
 

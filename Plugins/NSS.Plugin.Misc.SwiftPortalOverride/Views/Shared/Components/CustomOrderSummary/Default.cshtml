@@ -35,12 +35,10 @@
     var customerId = customer.Id;
     string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
     ERPComId += customerId;
-    int ERPCompanyId = default(int);
-    if (Context.Request.Cookies[ERPComId] != null && (!string.IsNullOrEmpty(Context.Request.Cookies[ERPComId].ToString())))
-        ERPCompanyId = int.Parse(Context.Request.Cookies[ERPComId]);
     Company company = new Company();
     CustomerCompany customerCompany = new CustomerCompany();
     CustomerCompanyProduct customerCompanyProduct = new CustomerCompanyProduct();
+    int.TryParse(Context.Request.Cookies[ERPComId], out int ERPCompanyId);
     if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
         company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
     if (company != null)
