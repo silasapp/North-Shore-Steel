@@ -254,8 +254,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 if (string.IsNullOrEmpty(currency))
                     throw new NopException("Primary store currency not set");
 
-                var billingAddress = _addresService.GetAddressById(model.BillingAddress.BillingAddressId);
-                var billingAddressModel = model.BillingAddress.BillingNewAddress;
+                var billingAddress = model.BillingAddress.ShipToSameAddress  ? _addresService.GetAddressById(model.ShippingAddress.ShippingAddressId)  : _addresService.GetAddressById(model.BillingAddress.BillingAddressId);
+                var billingAddressModel = model.BillingAddress.ShipToSameAddress ? model.ShippingAddress.ShippingNewAddress : model.BillingAddress.BillingNewAddress;
 
                 if (billingAddress == null && model.BillingAddress != null && model.BillingAddress.BillingNewAddress == null)
                     throw new NopException("Customer billing address not set");
