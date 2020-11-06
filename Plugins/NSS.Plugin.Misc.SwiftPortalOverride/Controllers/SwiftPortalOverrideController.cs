@@ -85,7 +85,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 model.StorageAccountKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountKey, storeScope);
                 model.StorageAccountName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountName, storeScope);
                 model.StorageContainerName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageContainerName, storeScope);
-                model.PayPalUseSandBox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, storeScope);
+                model.PayPalUseSandbox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, storeScope);
                 model.PayPalClientId_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalClientId, storeScope);
                 model.PayPalSecretKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalSecretKey, storeScope);
             }
@@ -133,7 +133,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountKey, model.StorageAccountKey_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountName, model.StorageAccountName_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageContainerName, model.StorageContainerName_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, model.PayPalUseSandBox_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, model.PayPalUseSandbox_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalClientId, model.PayPalClientId_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalSecretKey, model.PayPalSecretKey_OverrideForStore, storeScope, false);
 

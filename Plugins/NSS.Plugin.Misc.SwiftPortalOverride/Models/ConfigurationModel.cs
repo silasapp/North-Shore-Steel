@@ -44,7 +44,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         // pay pal
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.PayPalUseSandbox")]
         public bool PayPalUseSandbox { get; set; }
-        public bool PayPalUseSandBox_OverrideForStore { get; set; }
+        public bool PayPalUseSandbox_OverrideForStore { get; set; }
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.PayPalClientId")]
         public string PayPalClientId { get; set; }
         public bool PayPalClientId_OverrideForStore { get; set; }
