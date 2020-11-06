@@ -531,6 +531,7 @@
                 console.log("model: ", JSON.stringify(model));
                 const request = { PaymentMethod: item.paymentMethodSystemName, Model: model };
                 const self = this;
+                AjaxCart.addproducttocart_catalog
                 $.ajax({
                     url: "@Url.Action("SwiftSavePaymentMethod", "CheckoutOverride")",
                     type: 'POST',
@@ -690,7 +691,7 @@
                 if (paypal.HostedFields.isEligible()) {
                     const self = this;
                     paypal.HostedFields.render({
-                        createOrder: function () {
+                        createOrder: async function () {
                             const shippingAddressId = self.shippingAddressId ? self.shippingAddressId : 0;
                             let shippingNewAddress = { ...self.newShippingAddress };
                             let pickupPoint = self.shared.pickupPoints.find(x => x.id === self.pickupPointId);
@@ -720,24 +721,23 @@
                                 hasError: false,
                             };
                             console.log('creating order...', request);
-                            return $.ajax({
+                            let orderId = '';
+                            await $.ajax({
                                 url: "@Url.Action("CreatePayPalOrder", "CheckoutOverride")",
                                 type: 'POST',
                                 contentType: 'application/json; charset=utf-8',
                                 data: JSON.stringify(request),
                                 success: function (data, textStatus, XMLHttpRequest) {
-                                    console.log('created order...', data);
-                                    if (data?.error === 1) {
-                                        return '';
-                                    }
-                                    if (data != null) {
-                                        return data.orderId;
-                                    }
+                                    console.log('success - created order...', data);
+                                    if (data?.error === 1) return;
+                                    orderId = data.orderId;
                                 },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                     console.log("createOrder error: ", thrownError, xhr);
                                 }
                             });
+                            console.log('going to call paypal submit...', orderId);
+                            return orderId;
                         }, // replace order-ID with the order ID
                         styles: {
                             input: {
@@ -803,7 +803,7 @@
                             })
                                 .then(function (data) {
                                     console.log("data successful...", data);
-                                    //window.location.replace('http://www.somesite.com/review');
+                                    //self.placeOrder(true);
                                 })
                                 .catch(function (err) {
                                     console.log('error: ', JSON.stringify(err));
