@@ -23,6 +23,7 @@ using Nop.Services.Security;
 using Nop.Services.Shipping;
 using Nop.Services.Tax;
 using Nop.Services.Vendors;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -78,12 +79,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
         private readonly TaxSettings _taxSettings;
+        private readonly PayPalServiceManager _payPalServiceManager;
+        private readonly SwiftCoreSettings _swiftCoreSettings;
 
         #endregion
 
         #region Ctor
 
-        public CustomOrderProcessingService(CurrencySettings currencySettings, IAddressService addressService, IAffiliateService affiliateService, ICheckoutAttributeFormatter checkoutAttributeFormatter, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerService customerService, ICustomNumberFormatter customNumberFormatter, IDiscountService discountService, IEncryptionService encryptionService, IEventPublisher eventPublisher, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILanguageService languageService, ILocalizationService localizationService, ILogger logger, IOrderService orderService, IOrderTotalCalculationService orderTotalCalculationService, IPaymentPluginManager paymentPluginManager, IPaymentService paymentService, IPdfService pdfService, IPriceCalculationService priceCalculationService, IPriceFormatter priceFormatter, IProductAttributeFormatter productAttributeFormatter, IProductAttributeParser productAttributeParser, IProductService productService, IRewardPointService rewardPointService, IShipmentService shipmentService, IShippingService shippingService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, ITaxService taxService, IVendorService vendorService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, OrderSettings orderSettings, PaymentSettings paymentSettings, RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings, TaxSettings taxSettings) : base(currencySettings, addressService, affiliateService, checkoutAttributeFormatter, countryService, currencyService, customerActivityService, customerService, customNumberFormatter, discountService, encryptionService, eventPublisher, genericAttributeService, giftCardService, languageService, localizationService, logger, orderService, orderTotalCalculationService, paymentPluginManager, paymentService, pdfService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeParser, productService, rewardPointService, shipmentService, shippingService, shoppingCartService, stateProvinceService, taxService, vendorService, webHelper, workContext, workflowMessageService, localizationSettings, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings, taxSettings)
+        public CustomOrderProcessingService(PayPalServiceManager payPalServiceManager, SwiftCoreSettings swiftCoreSettings, CurrencySettings currencySettings, IAddressService addressService, IAffiliateService affiliateService, ICheckoutAttributeFormatter checkoutAttributeFormatter, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerService customerService, ICustomNumberFormatter customNumberFormatter, IDiscountService discountService, IEncryptionService encryptionService, IEventPublisher eventPublisher, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILanguageService languageService, ILocalizationService localizationService, ILogger logger, IOrderService orderService, IOrderTotalCalculationService orderTotalCalculationService, IPaymentPluginManager paymentPluginManager, IPaymentService paymentService, IPdfService pdfService, IPriceCalculationService priceCalculationService, IPriceFormatter priceFormatter, IProductAttributeFormatter productAttributeFormatter, IProductAttributeParser productAttributeParser, IProductService productService, IRewardPointService rewardPointService, IShipmentService shipmentService, IShippingService shippingService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, ITaxService taxService, IVendorService vendorService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, OrderSettings orderSettings, PaymentSettings paymentSettings, RewardPointsSettings rewardPointsSettings, ShippingSettings shippingSettings, TaxSettings taxSettings) : base(currencySettings, addressService, affiliateService, checkoutAttributeFormatter, countryService, currencyService, customerActivityService, customerService, customNumberFormatter, discountService, encryptionService, eventPublisher, genericAttributeService, giftCardService, languageService, localizationService, logger, orderService, orderTotalCalculationService, paymentPluginManager, paymentService, pdfService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeParser, productService, rewardPointService, shipmentService, shippingService, shoppingCartService, stateProvinceService, taxService, vendorService, webHelper, workContext, workflowMessageService, localizationSettings, orderSettings, paymentSettings, rewardPointsSettings, shippingSettings, taxSettings)
         {
             _currencySettings = currencySettings;
             _addressService = addressService;
@@ -128,6 +131,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
             _taxSettings = taxSettings;
+            _swiftCoreSettings = swiftCoreSettings;
+            _payPalServiceManager = payPalServiceManager;
         }
 
         #endregion
@@ -601,18 +606,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             //else
             //payment is not required
 
-            processPaymentRequest.CustomValues.TryGetValue("paymentMethodType", out var paymentMethodType);
+            processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.PaymentMethodTypeKey, out var paymentMethodType);
 
             if(paymentMethodType != null)
             {
                 switch (paymentMethodType.ToString())
                 {
                     case "CREDITCARD":
+                        processPaymentResult = ProcessPayPalPayment(processPaymentRequest);
                         break;
                     case "PAYPAL":
+                        processPaymentResult = ProcessPayPalPayment(processPaymentRequest);
                         break;
                     case "CREDIT":
-                        processPaymentRequest.CustomValues.TryGetValue("creditAmount", out var creditAmount);
+                        processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.CreditBalanceKey, out var creditAmount);
                         var isElligible = Convert.ToDecimal(creditAmount ?? 0.00) >= details.OrderTotal;
                         if (!isElligible)
                             throw new Exception("Credit Amount is less than the Order Total");
@@ -642,6 +649,46 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         //    var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
         //    return processPaymentResult;
         //}
+
+        /// <summary>
+        /// Process a payment
+        /// </summary>
+        /// <param name="processPaymentRequest">Payment info required for an order processing</param>
+        /// <returns>Process payment result</returns>
+        public ProcessPaymentResult ProcessPayPalPayment(ProcessPaymentRequest processPaymentRequest)
+        {
+            //try to get an order id from custom values
+            var orderIdKey = PaypalDefaults.PayPalOrderIdKey;
+            if (!processPaymentRequest.CustomValues.TryGetValue(orderIdKey, out var orderId) || string.IsNullOrEmpty(orderId?.ToString()))
+                throw new NopException("Failed to get the PayPal order ID");
+
+            //authorize or capture the order
+            var (order, error) = _payPalServiceManager.Authorize(_swiftCoreSettings, orderId.ToString());
+
+            if (!string.IsNullOrEmpty(error))
+                return new ProcessPaymentResult { Errors = new[] { error } };
+
+            //request succeeded
+            var result = new ProcessPaymentResult();
+
+            var purchaseUnit = order.PurchaseUnits.FirstOrDefault(item => item.ReferenceId.Equals(processPaymentRequest.OrderGuid.ToString()));
+            var authorization = purchaseUnit.Payments?.Authorizations?.FirstOrDefault();
+            if (authorization != null)
+            {
+                result.AuthorizationTransactionId = authorization.Id;
+                result.AuthorizationTransactionResult = authorization.Status;
+                result.NewPaymentStatus = PaymentStatus.Authorized;
+            }
+            var capture = purchaseUnit.Payments?.Captures?.FirstOrDefault();
+            if (capture != null)
+            {
+                result.CaptureTransactionId = capture.Id;
+                result.CaptureTransactionResult = capture.Status;
+                result.NewPaymentStatus = PaymentStatus.Paid;
+            }
+
+            return result;
+        }
 
         private ProcessPaymentResult ProcessLineOfCreditPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details, decimal creditAmount)
         {
