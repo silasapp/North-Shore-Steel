@@ -48,26 +48,26 @@
     }
 
         .nss-radio:checked + .e-primary::after { /* csslint allow: adjoining-classes */
-            background-color: #0076B4;
-            border-color: #0076B4;
-        }
+        background-color: #0076B4;
+        border-color: #0076B4;
+    }
 
         .nss-radio:checked:focus + .e-primary::after, .nss-radio:checked + .e-primary:hover::after { /* csslint allow: adjoining-classes */
-            background-color: #0076B4;
-            border-color: #0076B4;
-        }
+        background-color: #0076B4;
+        border-color: #0076B4;
+    }
 
         .nss-radio:checked + .e-primary::before {
-            border-color: #0076B4;
-        }
+        border-color: #0076B4;
+    }
 
         .nss-radio:checked:focus + .e-success::before, .e-radio:checked + .e-primary:hover::before { /* csslint allow: adjoining-classes */
-            border-color: #0076B4;
-        }
+        border-color: #0076B4;
+    }
 
         .nss-radio + .e-primary:hover::before {
-            border-color: #0076B4;
-        }
+        border-color: #0076B4;
+    }
 
     .nss-textarea {
         border: 1px solid grey;
@@ -177,28 +177,28 @@
     Func<object, object>
     Content1 =
     @<form id="sawOptionModal">
-        <div class="d-flex flex-column">
-            <div class="d-flex flex-column mt-4 mb-2">
-                <label class="nss-modal-title">SAW OPTIONS</label>
-                <div class="d-flex flex-row">
+    <div class="d-flex flex-column">
+        <div class="d-flex flex-column mt-4 mb-2">
+            <label class="nss-modal-title">SAW OPTIONS</label>
+            <div class="d-flex flex-row">
                     <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
                            class="mr-3 d-flex align-items-center cursor-pointer">
                         <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
                                v-bind:value="option.id" v-model="sawOption">
                         {{ option.name }}
                     </label>
-                </div>
             </div>
-            <hr />
-            <div class="d-flex flex-column">
-                <label class="nss-modal-title">WORK ORDER INSTRUCTIONS</label>
+        </div>
+        <hr />
+        <div class="d-flex flex-column">
+            <label class="nss-modal-title">WORK ORDER INSTRUCTIONS</label>
                 <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
-            </div>
-            <hr />
-            <div class="d-flex flex-row justify-content-between mb-3">
-                <div class="d-flex flex-column">
-                    <label class="nss-modal-title">LENGTH TOLERANCE CUT</label>
-                    <div class="d-flex flex-row">
+        </div>
+        <hr />
+        <div class="d-flex flex-row justify-content-between mb-3">
+            <div class="d-flex flex-column">
+                <label class="nss-modal-title">LENGTH TOLERANCE CUT</label>
+                <div class="d-flex flex-row">
                         <button type="button" class="nss-btn-box"
                                 v-on:click="decrementToleranceCut">
                             -
@@ -208,35 +208,31 @@
                                 v-on:click="incrementToleranceCut">
                             +
                         </button>
-                    </div>
                 </div>
-                <div class="d-flex flex-column">
-                    <label class="nss-modal-title">ITEM QUANTITY</label>
-                    <div class="d-flex flex-row">
+            </div>
+            <div class="d-flex flex-column">
+                <label class="nss-modal-title">ITEM QUANTITY</label>
+                <div class="d-flex flex-row">
                         <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
                         <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
                         <button type="button" class="nss-btn-box" v-on:click="incrementQuantity">+</button>
-                    </div>
                 </div>
             </div>
+        </div>
             <div class="d-flex flex-row-reverse mt-4">
                 <button type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
                         v-on:click="addToCart">
                     ADD TO CART
                 </button>
-            </div>
+    </div>
         </div>
-    </form>;
+</form>;
 }
 
 @if (Model.Products != null && Model.Products.Count > 0)
 {
 
     var shapeIds = Model.FilterParams.ShapeIds;
-    var isPlateIndividual = shapeIds.FirstOrDefault(x => x == 13);
-    bool _isPlateIndividual = false;
-    if (isPlateIndividual > 0)
-        _isPlateIndividual = true;
 
     if (shapeIds.Count > 0)
     {
@@ -246,37 +242,37 @@
     {
         headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>()
 {
-new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
-{
-Code = "itemNo",
-DisplayName = "Item #",
-Sort = "itemNo"
-},
-new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
-{
-Code = "itemName",
-DisplayName = "Description",
-Sort = "itemName"
-},
-new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
-{
-Code = "displayHeight",
-DisplayName = "Height (in)",
-Sort = "height"
-},
-new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
-{
-Code = "displayLength",
-DisplayName = "Length (ft)",
-Sort = "length"
-},
-new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
-{
-Code = "weight",
-DisplayName = "Weight (lb)",
-Sort = "weight"
-}
-};
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            {
+                Code = "itemNo",
+                DisplayName = "Item #",
+                Sort = "itemNo"
+            },
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            {
+                Code = "itemName",
+                DisplayName = "Description",
+                Sort = "itemName"
+            },
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            {
+                Code = "displayHeight",
+                DisplayName = "Height (in)",
+                Sort = "height"
+            },
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            {
+                Code = "displayLength",
+                DisplayName = "Length (ft)",
+                Sort = "length"
+            },
+            new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
+            {
+                Code = "weight",
+                DisplayName = "Weight (lb)",
+                Sort = "weight"
+            }
+        };
 
     }
 
@@ -285,7 +281,7 @@ Sort = "weight"
     {
         var productRowData = new Dictionary<string, string>();
         var attr = genericAttributeService.GetAttributesForEntity(item.Id, nameof(Product));
-        string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+        string _isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
         var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
 
@@ -315,7 +311,7 @@ Sort = "weight"
         @foreach (var it in headerColumns)
         {
             var itemCode = it.Code;
-            var Code = serialized == "True" ? "itemTagNo" : "itemNo";
+            var Code = _isSerialized == "True" ? "itemTagNo" : "itemNo";
             itemCode = itemCode == "itemNo" ? Code : itemCode;
             productRowData.Add(it.DisplayName, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
             // productRowData.Add(it.Sort, item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Sort)?.Value);
@@ -331,7 +327,7 @@ Sort = "weight"
         productRowData.Add("_cartId", shoppingCartTypeId.ToString());
         productRowData.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString());
         productRowData.Add("_wishListId", wishListShoppingCartId.ToString());
-        productRowData.Add("_isPlateIndividual", _isPlateIndividual.ToString());
+        productRowData.Add("_isSerialized", _isSerialized.ToString());
         productRowData.Add("_productAttributes", GetJson(prodAttrs));
         productRowData.Add("_product", "");
 
@@ -359,11 +355,11 @@ Sort = "weight"
                                 }*@
                             @if ((it.DisplayName).Contains("Description"))
                             {
-                                <e-grid-column field=@it.DisplayName filter="@(new { type = "CheckBox" })" headerText=@it.DisplayName width="230"></e-grid-column>
+                                <e-grid-column field=@it.DisplayName filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="230"></e-grid-column>
                             }
                             else
                             {
-                                <e-grid-column field=@it.DisplayName filter="@(new { type = "CheckBox" })" headerText=@it.DisplayName width="150"></e-grid-column>
+                                <e-grid-column field=@it.DisplayName filter="@(new { type="CheckBox"})" headerText=@it.DisplayName width="150"></e-grid-column>
                             }
                         }
                     }
@@ -381,38 +377,38 @@ Sort = "weight"
 </div>
 
 
-<script id="quantityTemplate" type="text/x-template">
-    ${if(_isPlateIndividual == "True")}
+    <script id="quantityTemplate" type="text/x-template">
+        ${if(_isSerialized == "True")}
     <label style="width: 40px" for="">1</label>
-    ${else}
+        ${else}
     <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null">
-    ${/if}
-</script>
+        ${/if}
+    </script>
 
-<script id="optionsTemplate" type="text/x-template">
-    ${if(_mtr)}
-    <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
-        <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
-    </a>
-    ${/if}
+    <script id="optionsTemplate" type="text/x-template">
+        ${if(_mtr)}
+        <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
+            <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+        </a>
+        ${/if}
 
-    ${if(_sawOption == "True")}
+        ${if(_sawOption == "True")}
     <button class="table-action-button"
             onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_product}`); return false;">
-        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
-    </button>
-    ${/if}
-    ${if(_eRPCompanyIdExist == "True")}
-    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
-    </button>
-    ${/if}
-    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
-    </button>
-</script>
+            <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+        </button>
+        ${/if}
+        ${if(_eRPCompanyIdExist == "True")}
+        <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;">
+            <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+        </button>
+        ${/if}
+        <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
+            <img src="Themes/SwiftPortal/Content/assets/heart.svg" width="20" height="20" alt="">
+        </button>
+    </script>
 
-<script>
+    <script>
 
     var modalVm = new Vue({
         el: '#sawOptionModal',
@@ -475,21 +471,21 @@ Sort = "weight"
         },
     });
 
-    function getInputQuantity(itemId, cartId) {
-        event.preventDefault();
-        let qty = $('#qty' + itemId).val();
-        if (!qty)
-            qty = 1;
-        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
-        $('#qty' + itemId).val("");
-        AjaxCart.addproducttocart_catalog(link);
-    }
+        function getInputQuantity(itemId, cartId) {
+            event.preventDefault();
+            let qty = $('#qty' + itemId).val();
+            if (!qty)
+                qty = 1;
+            let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
+            $('#qty' + itemId).val("");
+            AjaxCart.addproducttocart_catalog(link);
+        }
 
-    var sawOptionModal, toleranceLength;
-    let itemQuantity = document.getElementById('itemQuantity');
-    function onDialogCreated() {
-        sawOptionModal = this;
-    }
+        var sawOptionModal, toleranceLength;
+        let itemQuantity = document.getElementById('itemQuantity');
+        function onDialogCreated() {
+            sawOptionModal = this;
+        }
 
     function handleSawOption(productId, attributes) {
         const at = JSON.parse(attributes);
@@ -505,12 +501,12 @@ Sort = "weight"
         modalVm.workOrderInstructionsId = prefix + at.find(x => x.name === "Work Order Instructions").id;
         modalVm.lengthToleranceCutControlId = prefix + at.find(x => x.name === "Length Tolerance Cut").id;
         modalVm.lengthToleranceCut = 0;
-        sawOptionModal.show();
-    }
+            sawOptionModal.show();
+        }
 
-    function onSawOptionModalClose() {
-        console.log("onSawOptionModalClose...");
-    }
+        function onSawOptionModalClose() {
+            console.log("onSawOptionModalClose...");
+        }
 </script>
 <ejs-scripts></ejs-scripts>
 
@@ -526,5 +522,5 @@ Sort = "weight"
             ContractResolver = contractResolver,
             Formatting = Formatting.None
         });
-    }
-}
+        }
+        }

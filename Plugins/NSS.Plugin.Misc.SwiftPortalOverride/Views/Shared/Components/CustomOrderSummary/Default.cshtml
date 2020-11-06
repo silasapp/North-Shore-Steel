@@ -27,8 +27,7 @@
 @inject IShoppingCartService shoppingCartService
 @inject ICustomerCompanyProductService customerCompanyProductService
 @inject ICustomerCompanyService customerCompanyService
-@inject ICompanyService companyService  
-@inject IWorkContext workContext
+@inject ICompanyService companyService
 
 @{
     var customer = workContext.CurrentCustomer;
@@ -133,8 +132,8 @@
 
                             var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                             var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
-                            string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                            var iNo = serialized == "True" ? itemTagNo : itemNo;
+                            string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                            var iNo = isSerialized == "True" ? itemTagNo : itemNo;
                             var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
                             var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
                             var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
@@ -226,7 +225,14 @@
                                 <td id="itemweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00") </td>
                                 <td id="itemlength@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00") </td>
                                 <td>
-                                    <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+                                    @if (isSerialized == "True")
+                                    {
+                                        <label style="width: 100px" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
+                                    }
+                                    else
+                                    {
+                                        <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+                                    }
 
                                 </td>
                                 <td style="text-align:center">

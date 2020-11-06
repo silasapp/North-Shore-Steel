@@ -2,9 +2,17 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Nop.Core.Domain.Catalog
 @using Nop.Services.Common
+@using Nop.Core
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using NSS.Plugin.Misc.SwiftPortalOverride
 @using Nop.Services.Catalog
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @inject IGenericAttributeService genericAttributeService
 @inject IProductService productService
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
+@inject ICompanyService companyService
+@inject ICustomerCompanyProductService customerCompanyProductService
 
 @model CheckoutCompleteOverrideModel
 @{
@@ -70,8 +78,21 @@
     var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
 }
 
+@{
+    var customer = workContext.CurrentCustomer;
+    var customerId = customer.Id;
+    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+    ERPComId += customerId;
+    int ERPCompanyId = int.Parse(Context.Request.Cookies[ERPComId]);
+    Company company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
+    CustomerCompany customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
+
+}
+
 <div id="checkout" class="page home-page" v-cloak>
+    @Html.Raw(Model.PaypalScript)
     <div class="page-body">
+
         <label class="h4 text-primary font-weight-bold text-center w-100 mt-4 mb-0">CHECKOUT</label>
         <hr style="height: 2px; color: #000; opacity: 0.5;margin-bottom: 30px;">
         <div class="row px-5" style="justify-content: space-between;">
@@ -96,10 +117,10 @@
                 <div class="card card-mod">
                     <h1 class="h5 text-primary font-weight-bold mb-4">SHIPPING OR PICKUP</h1>
                     <div class="d-flex flex-row justify-content-center mb-3">
-                        <button class="fs-14 shipping-tab mr-2" :class="{'active': isDelivery}" v-on:click="isDelivery = true;">
+                        <button class="fs-14 shipping-tab mr-2" v-bind:class="{'active': isDelivery}" v-on:click="isDelivery = true;">
                             Delivery
                         </button>
-                        <button class="font14 shipping-tab" :class="{'active': !isDelivery}" v-on:click="isDelivery = false;">
+                        <button id="pickup" class="font14 shipping-tab" v-bind:class="{'active': !isDelivery}" v-on:click="isDelivery = false;">
                             Pickup
                         </button>
                     </div>
@@ -362,7 +383,12 @@
                             {
                                 var product = productService.GetProductById(item.ProductId);
                                 var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-
+                                var customerPathNo = "";
+                                if (customerCompany != null)
+                                {
+                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                    customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
+                                }
                                 var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                 var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                 string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
@@ -374,7 +400,7 @@
                                 <tr>
                                     <td>@iNo</td>
                                     <td>@item.ProductName</td>
-                                    <td>P-12345</td>
+                                    <td>@customerPathNo</td>
                                     <td>@item.UnitPrice / CW</td>
                                     <td>@item.SubTotal</td>
                                     <td>@totalWeight</td>
@@ -425,6 +451,7 @@
                             style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
                         PLACE ORDER
                     </button>
+                    <div id="paypal-button-container"></div>
                 </div>
             </div>
         </div>
@@ -516,7 +543,8 @@
             dirty: false,
         },
         mounted: function () {
-            this.renderPaypalCard();
+            this.setupCreditCardMethod();
+            this.setupPaypalMethod();
         },
         computed: {
             lineOfCreditDisabled: function () {
@@ -565,9 +593,61 @@
 
                 console.log("isValid: ", this.validate());
                 if (!this.validate()) return;
-                this.createOrder();
+                if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_PAYPAL) {
+                    $(".paypal-button.paypal-button-number-0.paypal-button-number-single").click();
+                    return;
+                }
+                AjaxCart.setLoadWaiting(true);
+                this.finalizeOrder();
             },
-            createOrder: function () {
+            initializeOrder: async function (self) {
+                let orderId = '';
+                const shippingAddressId = self.shippingAddressId ? self.shippingAddressId : 0;
+                let shippingNewAddress = { ...self.newShippingAddress };
+                let pickupPoint = self.shared.pickupPoints.find(x => x.id === self.pickupPointId);
+
+                const shipToSameAddress = self.paymentMethodIndex === self.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
+                    ? true : self.shipToSameAddress;
+                const billingAddressId = shipToSameAddress ? shippingAddressId : (self.billingAddressId ? self.billingAddressId : 0);
+                const billingNewAddress = { ...self.newBillingAddress };
+
+                const request = {
+                    shippingAddress: {
+                        shippingNewAddress,
+                        pickupPoint,
+                        shippingAddressId,
+                        saveToAddressBook: self.newShippingAddress.saveToMyAddresses,
+                        isPickupInStore: !self.isDelivery,
+                    },
+                    billingAddress: {
+                        shipToSameAddress,
+                        billingNewAddress,
+                        billingAddressId,
+                        saveToAddressBook: self.newBillingAddress.saveToMyAddresses,
+                    },
+                    paymentMethodModel: {
+                        checkoutPaymentMethodType: self.paymentMethodIndex,
+                    },
+                    hasError: false,
+                };
+                console.log('creating order...', request);
+                await $.ajax({
+                    url: "@Url.Action("CreatePayPalOrder", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        console.log('success - created order...', data);
+                        //if (data?.error === 1) return;
+                        orderId = data.orderId;
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log("createOrder error: ", thrownError, xhr);
+                    }
+                });
+                return orderId;
+            },
+            finalizeOrder: function () {
                  const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
@@ -613,6 +693,7 @@
                         }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
+                        AjaxCart.setLoadWaiting(false);
                         console.log("PlaceOrder error: ", thrownError, xhr);
                     }
                 });
@@ -639,7 +720,7 @@
                 return true;
             },
 
-            renderPaypalCard: function () {
+            setupCreditCardMethod: function () {
                 if (paypal.HostedFields.isEligible()) {
                     const self = this;
                     paypal.HostedFields.render({
@@ -754,8 +835,7 @@
                                 // redirect after successful order approval
                             })
                                 .then(function (data) {
-                                    console.log("data successful...", data);
-                                    self.createOrder();
+                                    self.finalizeOrder();
                                 })
                                 .catch(function (err) {
                                     console.log('error: ', JSON.stringify(err));
@@ -770,8 +850,27 @@
                 } else {
                     //$('#my-sample-form').hide(); // hides the advanced credit and debit card payments fields if merchant isn't eligible
                 }
-            }
+            },
 
+            setupPaypalMethod: function () {
+                const self = this;
+                paypal
+                    .Buttons({
+                        commit: false,
+                        createOrder: async function (data, actions) {
+                            // This function sets up the details of the transaction, including the amount and line item details
+                            return await self.initializeOrder(self);
+                        },
+                        onCancel: function (data) {
+                            // Show a cancel page, or return to cart
+                        },
+                        onApprove: function (data, actions) {
+                            // This function captures the funds from the transaction
+                            debugger;
+                            return self.finalizeOrder();
+                        },
+                    }).render('#paypal-button-container');
+            },
         },
     });
 

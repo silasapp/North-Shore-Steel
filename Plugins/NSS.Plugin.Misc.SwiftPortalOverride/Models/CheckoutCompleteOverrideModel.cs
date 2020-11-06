@@ -24,6 +24,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public IList<StateProvinceModel> StateProvinces { get; set; }
         public AccountCreditModel AccountCreditModel { get; set; }
         public OrderTotalsModel OrderTotals { get; set; }
+        public string PaypalScript { get; set; }
     }
 
     public class AccountCreditModel

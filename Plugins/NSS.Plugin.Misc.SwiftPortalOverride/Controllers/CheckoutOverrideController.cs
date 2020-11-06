@@ -224,6 +224,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
             model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount };
 
+            (model.PaypalScript, _) = _payPalServiceManager.GetScript(_settings);
+
             //model
             model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);
