@@ -155,7 +155,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var customerId = _workContext.CurrentCustomer.Id;
             string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
             ERPComId += customerId;
-            int ERPCompanyId = int.Parse(Request.Cookies[ERPComId]);
+            int ERPCompanyId = default(int);
+            if (Request.Cookies[ERPComId] != null && (!string.IsNullOrEmpty(Request.Cookies[ERPComId].ToString())))
+                ERPCompanyId = int.Parse(Request.Cookies[ERPComId]);
             Company company = new Company();
             CustomerCompany customerCompany = new CustomerCompany();
             if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
