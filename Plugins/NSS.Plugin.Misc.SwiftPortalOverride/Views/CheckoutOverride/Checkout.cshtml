@@ -516,7 +516,6 @@
             dirty: false,
         },
         mounted: function () {
-            this.generateExpirationMonthsAndYears();
             this.renderPaypalCard();
         },
         computed: {
@@ -553,61 +552,11 @@
                 });
             },
 
-            generateExpirationMonthsAndYears: function () {
-                let months = [];
-                for (let i = 1; i <= 12; i++) {
-                    const retVal = i < 10 ? `0${i}` : i;
-                    months = [...months, retVal];
-                }
-                let years = [];
-                const currentYear = (new Date()).getFullYear();
-                for (let i = 0; i < 15; i++) {
-                    const retVal = currentYear + i;
-                    years = [...years, retVal];
-                }
-
-                this.expirationMonths = months;
-                this.paymentCard.cardExpirationMonth = months[0];
-                this.expirationYears = years;
-                this.paymentCard.cardExpirationYear = years[0];
-            },
             formatMoney: function (input) {
                 return input.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-            },
-            getCheckoutModel: function () {
-                const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
-                let shippingNewAddress = { ...this.newShippingAddress };
-                let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
-
-                const shipToSameAddress = this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
-                    ? true : this.shipToSameAddress;
-                const billingAddressId = shipToSameAddress ? shippingAddressId : (this.billingAddressId ? this.billingAddressId : 0);
-                const billingNewAddress = { ...this.newBillingAddress };
-
-                const obj = {
-                    shippingAddress: {
-                        shippingNewAddress,
-                        pickupPoint,
-                        shippingAddressId,
-                        saveToAddressBook: this.newShippingAddress.saveToMyAddresses,
-                        isPickupInStore: !this.isDelivery,
-                    },
-                    billingAddress: {
-                        shipToSameAddress,
-                        billingNewAddress,
-                        billingAddressId,
-                        saveToAddressBook: this.newBillingAddress.saveToMyAddresses,
-                    },
-                    paymentMethodModel: {
-                        checkoutPaymentMethodType: this.paymentMethodIndex,
-                    },
-                    hasError: false,
-                };
-                console.log("request: ", obj);
-                return obj;
             },
 
             placeOrder: function () {
@@ -616,7 +565,10 @@
 
                 console.log("isValid: ", this.validate());
                 if (!this.validate()) return;
-                const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
+                this.createOrder();
+            },
+            createOrder: function () {
+                 const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
 
@@ -729,7 +681,7 @@
                                 data: JSON.stringify(request),
                                 success: function (data, textStatus, XMLHttpRequest) {
                                     console.log('success - created order...', data);
-                                    if (data?.error === 1) return;
+                                    //if (data?.error === 1) return;
                                     orderId = data.orderId;
                                 },
                                 error: function (xhr, ajaxOptions, thrownError) {
@@ -774,6 +726,8 @@
                             console.log("isValid: ", self.validate());
                             if (!self.validate()) return;
 
+                            AjaxCart.setLoadWaiting(true);
+
                             let billingAddress;
                             if (self.shipToSameAddress && self.showNewShippingAddress) {
                                 billingAddress = { ...self.newShippingAddress };
@@ -784,8 +738,6 @@
                             } else  {
                                 billingAddress = self.shared.billingAddresses.find(x => x.id === self.billingAddressId);
                             }
-
-                            console.log("billingAddress: ", billingAddress);
 
                             hf.submit({
                                 // Cardholder Name
@@ -803,10 +755,11 @@
                             })
                                 .then(function (data) {
                                     console.log("data successful...", data);
-                                    //self.placeOrder(true);
+                                    self.createOrder();
                                 })
                                 .catch(function (err) {
                                     console.log('error: ', JSON.stringify(err));
+                                    AjaxCart.setLoadWaiting(false);
                                     const title = 'The following error(s) occured: \n\n';
                                     const errors = err.details.map(x => '•  ' + x.description).join('\n');
                                     const footer = '\n\n' + err.message;
