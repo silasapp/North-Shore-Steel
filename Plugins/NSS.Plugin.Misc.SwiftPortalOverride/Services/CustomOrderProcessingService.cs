@@ -565,7 +565,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         protected override ProcessPaymentResult GetProcessPaymentResult(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
         {
             //process payment
-            ProcessPaymentResult processPaymentResult;
+            ProcessPaymentResult processPaymentResult = processPaymentResult = new ProcessPaymentResult();
             //skip payment workflow if order total equals zero
             //var skipPaymentWorkflow = details.OrderTotal == decimal.Zero;
             //if (!skipPaymentWorkflow)
@@ -602,8 +602,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             //payment is not required
 
             processPaymentRequest.CustomValues.TryGetValue("paymentMethodType", out var paymentMethodType);
-            processPaymentRequest.CustomValues.TryGetValue("creditAmount", out var creditAmount);
-
 
             if(paymentMethodType != null)
             {
@@ -613,39 +611,46 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         break;
                     case "PAYPAL":
                         break;
-                    case "LINEOFCREDIT":
-                        processPaymentResult = ProcessLineOfCreditPayment(processPaymentRequest, details, Convert.ToDecimal(creditAmount ?? 0.00));
+                    case "CREDIT":
+                        processPaymentRequest.CustomValues.TryGetValue("creditAmount", out var creditAmount);
+                        var isElligible = Convert.ToDecimal(creditAmount ?? 0.00) >= details.OrderTotal;
+                        if (!isElligible)
+                            throw new Exception("Credit Amount is less than the Order Total");
+
                         break;
 
                     default:
                         break;
                 }
             }
-
-            processPaymentResult = new ProcessPaymentResult();
+            else
+            {
+                throw new Exception("Payment method type not found");
+            }
 
             return processPaymentResult;
         }
 
-        private ProcessPaymentResult ProcessCreditCardPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
-        {
-            var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Paid };
-            return processPaymentResult;
-        }
+        //private ProcessPaymentResult ProcessCreditCardPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
+        //{
+        //    var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
+        //    return processPaymentResult;
+        //}
 
-        private ProcessPaymentResult ProcessPayPalPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
-        {
-            var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Paid };
-            return processPaymentResult;
-        }
+        //private ProcessPaymentResult ProcessPayPalPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
+        //{
+        //    var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
+        //    return processPaymentResult;
+        //}
 
         private ProcessPaymentResult ProcessLineOfCreditPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details, decimal creditAmount)
         {
             var isElligible = creditAmount >= details.OrderTotal;
-            var processPaymentResult = new ProcessPaymentResult();
 
-            if (isElligible)
-                processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
+            if (!isElligible)
+                throw new Exception("Credit Amount is less than the Order Total");
+
+            var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
 
             return processPaymentResult;
         }

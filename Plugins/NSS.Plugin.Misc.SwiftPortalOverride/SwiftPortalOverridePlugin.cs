@@ -95,6 +95,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.StorageAccountKey.Hint"] = "Enter Storage Account key.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.StorageContainerName"] = "Storage Container Name",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.StorageContainerName.Hint"] = "Enter Storage Container Name.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalUseSandbox"] = "PayPal Use Sandbox",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalUseSandbox.Hint"] = "Enable PayPal sandbox environment.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalClientId"] = "PayPal ClientID",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalClientId.Hint"] = "Enter PayPal ClientID.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey"] = "PayPal Secret Key",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey.Hint"] = "Enter PayPal Secret Key.",
             });
 
             // email template

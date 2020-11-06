@@ -2,6 +2,7 @@
 using Nop.Web.Framework.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
@@ -38,5 +39,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.StorageContainerName")]
         public string StorageContainerName { get; set; }
         public bool StorageContainerName_OverrideForStore { get; set; }
+
+
+        // pay pal
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.PayPalUseSandbox")]
+        public bool PayPalUseSandbox { get; set; }
+        public bool PayPalUseSandBox_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.PayPalClientId")]
+        public string PayPalClientId { get; set; }
+        public bool PayPalClientId_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey")]
+        [DataType(DataType.Password)]
+        [NoTrim]
+        public string PayPalSecretKey { get; set; }
+        public bool PayPalSecretKey_OverrideForStore { get; set; }
     }
 }

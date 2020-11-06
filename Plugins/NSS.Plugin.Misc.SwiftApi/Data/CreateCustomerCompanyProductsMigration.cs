@@ -46,10 +46,11 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
         public override void MapEntity(CreateTableExpressionBuilder table)
         {
             table
-                .WithColumn(nameof(CustomerCompanyProduct.Id))
+                .WithColumn("Id")
                 .AsInt32()
                 .NotNullable()
-                .PrimaryKey();
+                .PrimaryKey()
+                .Identity();
         }
     }
 }

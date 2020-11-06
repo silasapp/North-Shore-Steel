@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
@@ -27,8 +28,11 @@ using Nop.Services.Tax;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
 using Nop.Web.Factories;
+using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Models.ShoppingCart;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
@@ -77,11 +81,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly MediaSettings _mediaSettings;
         private readonly OrderSettings _orderSettings;
         private readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly ICustomerCompanyProductService _customerCompanyProductService;
+        private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly ICompanyService _companyService;
 
         #endregion
 
         #region Constructor
-        public CartOverrideController(CaptchaSettings captchaSettings, CustomerSettings customerSettings, ICacheKeyService cacheKeyService, ICheckoutAttributeParser checkoutAttributeParser, ICheckoutAttributeService checkoutAttributeService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerService customerService, IDiscountService discountService, IDownloadService downloadService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, INopFileProvider fileProvider, INotificationService notificationService, IPermissionService permissionService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, IProductService productService, IShippingService shippingService, IShoppingCartModelFactory shoppingCartModelFactory, IShoppingCartService shoppingCartService, IStaticCacheManager staticCacheManager, IStoreContext storeContext, ITaxService taxService, IUrlRecordService urlRecordService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, MediaSettings mediaSettings, OrderSettings orderSettings, ShoppingCartSettings shoppingCartSettings) : base(captchaSettings, customerSettings, cacheKeyService, checkoutAttributeParser, checkoutAttributeService, currencyService, customerActivityService, customerService, discountService, downloadService, genericAttributeService, giftCardService, localizationService, fileProvider, notificationService, permissionService, pictureService, priceFormatter, productAttributeParser, productAttributeService, productService, shippingService, shoppingCartModelFactory, shoppingCartService, staticCacheManager, storeContext, taxService, urlRecordService, webHelper, workContext, workflowMessageService, mediaSettings, orderSettings, shoppingCartSettings)
+        public CartOverrideController(CaptchaSettings captchaSettings, ICustomerCompanyProductService customerCompanyProductService, ICompanyService companyService, ICustomerCompanyService customerCompanyService, CustomerSettings customerSettings, ICacheKeyService cacheKeyService, ICheckoutAttributeParser checkoutAttributeParser, ICheckoutAttributeService checkoutAttributeService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerService customerService, IDiscountService discountService, IDownloadService downloadService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, INopFileProvider fileProvider, INotificationService notificationService, IPermissionService permissionService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, IProductService productService, IShippingService shippingService, IShoppingCartModelFactory shoppingCartModelFactory, IShoppingCartService shoppingCartService, IStaticCacheManager staticCacheManager, IStoreContext storeContext, ITaxService taxService, IUrlRecordService urlRecordService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, MediaSettings mediaSettings, OrderSettings orderSettings, ShoppingCartSettings shoppingCartSettings) : base(captchaSettings, customerSettings, cacheKeyService, checkoutAttributeParser, checkoutAttributeService, currencyService, customerActivityService, customerService, discountService, downloadService, genericAttributeService, giftCardService, localizationService, fileProvider, notificationService, permissionService, pictureService, priceFormatter, productAttributeParser, productAttributeService, productService, shippingService, shoppingCartModelFactory, shoppingCartService, staticCacheManager, storeContext, taxService, urlRecordService, webHelper, workContext, workflowMessageService, mediaSettings, orderSettings, shoppingCartSettings)
         {
             _captchaSettings = captchaSettings;
             _customerSettings = customerSettings;
@@ -117,6 +124,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _mediaSettings = mediaSettings;
             _orderSettings = orderSettings;
             _shoppingCartSettings = shoppingCartSettings;
+            _customerCompanyProductService = customerCompanyProductService;
+            _customerCompanyService = customerCompanyService;
+            _companyService = companyService;
         }
 
 
@@ -127,10 +137,94 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
                 return RedirectToRoute("Homepage");
-
+            
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
             var model = new ShoppingCartModel();
             model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart);
+            return View(model);
+        }
+
+
+        [HttpPost, ActionName("Cart")]
+        [FormValueRequired("updatecart")]
+        public override IActionResult UpdateCart(IFormCollection form)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
+                return RedirectToRoute("Homepage");
+
+            var customerId = _workContext.CurrentCustomer.Id;
+            string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+            ERPComId += customerId;
+            int ERPCompanyId = int.Parse(Request.Cookies[ERPComId]);
+            Company company = _companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
+            CustomerCompany customerCompany = _customerCompanyService.GetCustomerCompany(customerId, company.Id);
+            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
+            //get identifiers of items to remove
+            var itemIdsToRemove = form["removefromcart"]
+                .SelectMany(value => value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                .Select(idString => int.TryParse(idString, out var id) ? id : 0)
+                .Distinct().ToList();
+
+            var products = _productService.GetProductsByIds(cart.Select(item => item.ProductId).Distinct().ToArray())
+                .ToDictionary(item => item.Id, item => item);
+
+            var customerkey = new Dictionary<string, int>();
+            List<CustomerCompanyProduct> customerCompanyProduct = new List<CustomerCompanyProduct>();
+            foreach (var product in products)
+            {
+                var custpartNo = form[$"customerpartNo{product.Key}"];
+                customerCompanyProduct.Add(new CustomerCompanyProduct { CustomerCompanyId = customerCompany.CompanyId, ProductId = product.Key, CustomerPartNo = custpartNo });
+            }
+            _customerCompanyProductService.UpdateCustomerCompanyProducts(customerCompanyProduct);
+
+            //get order items with changed quantity
+            var itemsWithNewQuantity = cart.Select(item => new
+            {
+                //try to get a new quantity for the item, set 0 for items to remove
+                NewQuantity = itemIdsToRemove.Contains(item.Id) ? 0 : int.TryParse(form[$"itemquantity{item.Id}"], out var quantity) ? quantity : item.Quantity,
+                Item = item,
+                Product = products.ContainsKey(item.ProductId) ? products[item.ProductId] : null
+            }).Where(item => item.NewQuantity != item.Item.Quantity);
+
+            //order cart items
+            //first should be items with a reduced quantity and that require other products; or items with an increased quantity and are required for other products
+            var orderedCart = itemsWithNewQuantity
+                .OrderByDescending(cartItem =>
+                    (cartItem.NewQuantity < cartItem.Item.Quantity &&
+                     (cartItem.Product?.RequireOtherProducts ?? false)) ||
+                    (cartItem.NewQuantity > cartItem.Item.Quantity && cartItem.Product != null && _shoppingCartService
+                         .GetProductsRequiringProduct(cart, cartItem.Product).Any()))
+                .ToList();
+
+            //try to update cart items with new quantities and get warnings
+            var warnings = orderedCart.Select(cartItem => new
+            {
+                ItemId = cartItem.Item.Id,
+                Warnings = _shoppingCartService.UpdateShoppingCartItem(_workContext.CurrentCustomer,
+                    cartItem.Item.Id, cartItem.Item.AttributesXml, cartItem.Item.CustomerEnteredPrice,
+                    cartItem.Item.RentalStartDateUtc, cartItem.Item.RentalEndDateUtc, cartItem.NewQuantity, true)
+            }).ToList();
+
+            //updated cart
+            cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
+            //parse and save checkout attributes
+            ParseAndSaveCheckoutAttributes(cart, form);
+
+            //prepare model
+            var model = new ShoppingCartModel();
+            model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart);
+
+            //update current warnings
+            foreach (var warningItem in warnings.Where(warningItem => warningItem.Warnings.Any()))
+            {
+                //find shopping cart item model to display appropriate warnings
+                var itemModel = model.Items.FirstOrDefault(item => item.Id == warningItem.ItemId);
+                if (itemModel != null)
+                    itemModel.Warnings = warningItem.Warnings.Concat(itemModel.Warnings).Distinct().ToList();
+            }
+
             return View(model);
         }
 
