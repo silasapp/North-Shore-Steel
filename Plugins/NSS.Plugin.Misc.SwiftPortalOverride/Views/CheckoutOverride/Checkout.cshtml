@@ -83,7 +83,7 @@
     var customerId = customer.Id;
     string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
     ERPComId += customerId;
-    int ERPCompanyId = int.Parse(Context.Request.Cookies[ERPComId]);
+    int.TryParse(Context.Request.Cookies[ERPComId], out int ERPCompanyId);
     Company company = new Company();
     CustomerCompany customerCompany = new CustomerCompany();
     if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))

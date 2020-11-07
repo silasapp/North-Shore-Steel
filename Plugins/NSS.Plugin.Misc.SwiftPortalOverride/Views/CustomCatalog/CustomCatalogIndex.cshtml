@@ -17,8 +17,8 @@
 <div id="app" class="page home-page">
     <div class="page-body">
         <div class="row">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-9">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-10">
                 <div id="searchWord" style="float: left"></div>
                 <div id="specs" style="float:left"></div>
                 <div id="shapes" style="float:left"></div>
@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <div id="accordion">
                     <div class="card">
                         <div class="card-header">
@@ -84,14 +84,14 @@
                                     </div>
                                     @foreach (var item in group)
                                     {
-                                        <div id="collapse-@index" class="collapse show">
-                                            <div class="card-body" style="padding-left: 2.6rem">
-                                                <label class="pure-material-checkbox">
-                                                    <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                                    <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;">@item.SpecificationAttributeOptionName</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                <div id="collapse-@index" class="collapse show">
+                                    <div class="card-body" style="padding-left: 2.6rem">
+                                        <label class="pure-material-checkbox">
+                                            <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                            <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;"><span class="nss-iSpec">@item.SpecificationAttributeOptionName</span></span>
+                                        </label>
+                                    </div>
+                                </div>
                                     }
                                 </div>
                             }
@@ -103,21 +103,21 @@
                                 </div>
                                 @foreach (var item in group)
                                 {
-                                    <div id="collapse-@index" class="collapse show">
-                                        <div class="card-body" style="padding-left: 2.6rem">
-                                            <label class="pure-material-checkbox">
-                                                <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                                <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;">@item.SpecificationAttributeOptionName</span>
-                                            </label>
-                                        </div>
-                                    </div>
+                            <div id="collapse-@index" class="collapse show">
+                                <div class="card-body" style="padding-left: 2.6rem">
+                                    <label class="pure-material-checkbox">
+                                        <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                        <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;"><span class="nss-iSpec"> @item.SpecificationAttributeOptionName</span></span>
+                                    </label>
+                                </div>
+                            </div>
                                 }
                             </div>
                         }
                     }
                 </div>
             </div>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
                 <div id="partialview"></div>
             </div>
         </div>

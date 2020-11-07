@@ -399,3 +399,12 @@ th.sortable {
 .e-treeview .e-list-item.e-active > .e-text-content .e-list-text {
     color: black !important;
 }
+
+/*specfication filters*/
+
+.nss-iSpec {
+    position: relative !important;
+    right: 2px !important;
+    display: inline-block !important;
+    padding-top: 3px !important;
+}

@@ -111,11 +111,12 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             CustomerCompany cc = _customerCompanyService.GetCustomerCompany(customerCompany.CustomerId, customerCompany.CompanyId);
             if (cc != null)
             {
-                //_customerCompanyProductService.DeleteCustomerCompanyProductByCustomerCompanyId(customerCompanyProduct);
-                //DeleteCustomerCompany(customerCompany.CustomerId, company.ErpCompanyId);
+                _customerCompanyService.UpdateCustomerCompany(customerCompany);
+            } else
+            {
+                _customerCompanyService.InsertCustomerCompany(customerCompany);
             }
 
-            _customerCompanyService.InsertCustomerCompany(customerCompany);
 
             // update customer as NSS Approved
             _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, true);
