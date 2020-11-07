@@ -58,5 +58,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
             return customerCompanies;
         }
+
+        public void UpdateCustomerCompany(CustomerCompany customerCompany)
+        {
+            var cCompany = _customerCompanyRepository.Table.FirstOrDefault(c => c.CustomerId == customerCompany.CustomerId && c.CompanyId == customerCompany.CompanyId);
+            cCompany.CanCredit = customerCompany.CanCredit;
+            _customerCompanyRepository.Update(cCompany);
+        }
+
     }
 }
