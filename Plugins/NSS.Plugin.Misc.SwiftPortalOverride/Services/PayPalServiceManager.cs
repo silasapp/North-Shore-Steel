@@ -2,6 +2,7 @@
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Services.Catalog;
@@ -11,8 +12,11 @@ using Nop.Services.Logging;
 using Nop.Services.Orders;
 using Nop.Services.Tax;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
+using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Domains;
 using NSS.Plugin.Misc.SwiftPortalOverride.Domains.PayPal;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
@@ -22,6 +26,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Item = PayPalCheckoutSdk.Orders.Item;
 using Order = PayPalCheckoutSdk.Orders.Order;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
@@ -46,6 +51,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         private readonly ITaxService _taxService;
         private readonly IWorkContext _workContext;
         private readonly CurrencySettings _currencySettings;
+        private readonly IShapeService _shapeService;
+        private readonly NSSApiProvider _nSSApiProvider;
 
         #endregion
 
@@ -66,7 +73,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             IStoreContext storeContext,
             ITaxService taxService,
             IWorkContext workContext,
-            CurrencySettings currencySettings)
+            CurrencySettings currencySettings,
+            IShapeService shapeService,
+            NSSApiProvider nSSApiProvider)
         {
             _addresService = addresService;
             _checkoutAttributeParser = checkoutAttributeParser;
@@ -84,6 +93,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             _taxService = taxService;
             _workContext = workContext;
             _currencySettings = currencySettings;
+            _shapeService = shapeService;
+            _nSSApiProvider = nSSApiProvider;
         }
 
         #endregion
@@ -251,7 +262,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// <param name="settings">Plugin settings</param>
         /// <param name="orderGuid">Order GUID</param>
         /// <returns>Created order; error message if exists</returns>
-        public (Order Order, string ErrorMessage) CreateOrder(SwiftCoreSettings settings, Guid orderGuid, ErpCheckoutModel model)
+        public (Order Order, string ErrorMessage) CreateOrder(SwiftCoreSettings settings, Guid orderGuid, ErpCheckoutModel model, decimal shippingCost)
         {
             return HandleFunction(settings, () =>
             {
@@ -280,7 +291,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     BrandName = CommonHelper.EnsureMaximumLength(_storeContext.CurrentStore.Name, 127),
                     LandingPage = LandingPageType.Billing.ToString().ToUpper(),
                     UserAction = UserActionType.Continue.ToString().ToUpper(),
-                    ShippingPreference = (shippingAddress != null ? ShippingPreferenceType.Set_provided_address : ShippingPreferenceType.No_shipping)
+                    ShippingPreference = (!model.ShippingAddress.IsPickupInStore ? ShippingPreferenceType.Set_provided_address : ShippingPreferenceType.No_shipping)
                         .ToString().ToUpper()
                 };
 
@@ -346,7 +357,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 };
 
                 //prepare shipping address details
-                if (shippingAddress != null)
+                if (!model.ShippingAddress.IsPickupInStore)
                 {
                     purchaseUnit.ShippingDetail = new ShippingDetail
                     {
@@ -409,6 +420,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 //set totals
                 itemTotal = Math.Round(itemTotal, 2);
                 var discountTotal = Math.Round(itemTotal + taxTotal + shippingTotal - orderTotal, 2);
+
+                // set shipping cost
+                shippingTotal += shippingCost;
+                orderTotal += shippingTotal; 
+
                 purchaseUnit.AmountWithBreakdown = new AmountWithBreakdown
                 {
                     CurrencyCode = currency,
@@ -471,7 +487,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// <returns>Access token; error message if exists</returns>
         public string GetClientToken(SwiftCoreSettings settings, string accessToken)
         {
-            var _baseUrl = settings.PayPalUseSandbox ? "https://api.sandbox.paypal.com" : "";
+            var _baseUrl = settings.PayPalUseSandbox ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
             using (var client = new System.Net.Http.HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
@@ -499,25 +515,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 return _response.client_token;
             }
         }
-
-        /// <summary>
-        /// Get access token
-        /// </summary>
-        /// <param name="settings">Plugin settings</param>
-        /// <returns>Access token; error message if exists</returns>
-        //public ( , string ErrorMessage) GetClientToken(SwiftCoreSettings settings)
-        //{
-        //    //try to get client token
-        //    return HandleFunction(settings, () =>
-        //    {
-        //        var environment = settings.PayPalUseSandBox
-        //            ? new SandboxEnvironment(settings.PayPalClientID, settings.PayPalSecretKey) as PayPalEnvironment
-        //            : new LiveEnvironment(settings.PayPalClientID, settings.PayPalSecretKey) as PayPalEnvironment;
-        //        var request = new AccessTokenRequest(environment);
-        //        return HandleCheckoutRequest<AccessTokenRequest, AccessToken>(settings, request);
-        //    });
-        //}
-
 
         #endregion
     }

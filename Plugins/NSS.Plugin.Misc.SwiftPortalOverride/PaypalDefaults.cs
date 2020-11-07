@@ -108,5 +108,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         /// Gets a name of the view component to display logo
         /// </summary>
         public static string CreditBalanceKey = "Credit Balance";
+
+        /// <summary>
+        /// Gets a name of the view component to display logo
+        /// </summary>
+        public static string ShippingCostKey = "Shipping Cost";        
+        
+        /// <summary>
+        /// Gets a name of the view component to display logo
+        /// </summary>
+        public static string ShippingDeliveryDateKey = "Shipping Delivery Date";
     }
 }

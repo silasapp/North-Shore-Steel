@@ -8,10 +8,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
     public partial class NSSCalculateShippingResponse
     {
         [JsonProperty("shippingCost")]
-        public long ShippingCost { get; set; }
+        public decimal ShippingCost { get; set; }
 
         [JsonProperty("distanceMiles")]
-        public long DistanceMiles { get; set; }
+        public decimal DistanceMiles { get; set; }
 
         [JsonProperty("allowed")]
         public bool Allowed { get; set; }

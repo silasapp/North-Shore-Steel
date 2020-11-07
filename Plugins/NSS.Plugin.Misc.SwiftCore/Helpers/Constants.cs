@@ -9,7 +9,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         /// <summary>
         /// Gets NSS Wintrix key name
         /// </summary>
-        public static string WintrixKeyAttribute => "ErpId";
+        public static string ErpKeyAttribute => "ErpId";
+        public static string ErpOrderNoAttribute => "ErpOrderNo";
 
         #region NSSCustomerAttributes           
         public static string IsExistingCustomerAttribute => "Existing Customer";

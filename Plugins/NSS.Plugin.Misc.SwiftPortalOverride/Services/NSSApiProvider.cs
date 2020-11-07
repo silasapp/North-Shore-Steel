@@ -334,7 +334,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     Allowed = true,
                     DeliveryDate = "2020-10-20",
                     DistanceMiles = 100,
-                    PickupTime = "4pm"
+                    PickupTime = "4pm",
+                    ShippingCost = 20
                 };
 
                 return resp;

@@ -151,6 +151,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 //prepare order details
                 var details = PreparePlaceOrderDetails(processPaymentRequest);
 
+                //override shipping cost and total
+                decimal shippingCost = decimal.Zero;
+                var isNum = processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.ShippingCostKey, out var shippingCostObj) && decimal.TryParse(shippingCostObj?.ToString(), out shippingCost);
+
+                details.OrderShippingTotalExclTax += shippingCost;
+                details.OrderShippingTotalInclTax += shippingCost;
+
+                details.OrderTotal += shippingCost;
+
                 var processPaymentResult = GetProcessPaymentResult(processPaymentRequest, details);
 
                 if (processPaymentResult == null)
@@ -160,8 +169,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 {
                     var order = SaveOrderDetails(processPaymentRequest, processPaymentResult, details);
                     result.PlacedOrder = order;
-
-                    // call nss api place order
 
                     //move shopping cart items to order items
                     MoveShoppingCartItemsToOrderItems(details, order);

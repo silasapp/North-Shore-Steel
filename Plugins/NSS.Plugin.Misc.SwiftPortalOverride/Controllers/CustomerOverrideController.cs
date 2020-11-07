@@ -637,7 +637,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (response != null && response.WitnrixId != null)
                 {
                     // save wintrix id
-                    _genericAttributeService.SaveAttribute(customer, Constants.WintrixKeyAttribute, response.WitnrixId);
+                    _genericAttributeService.SaveAttribute(customer, Constants.ErpKeyAttribute, response.WitnrixId);
                 }
 
                 // send nss an email
