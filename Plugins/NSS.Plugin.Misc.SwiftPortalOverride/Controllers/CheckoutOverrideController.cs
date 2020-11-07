@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nop.Core.Http.Extensions;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
+using Nop.Services.Discounts;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -69,11 +70,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICountryModelFactory _countryModelFactory;
         private readonly PayPalServiceManager _payPalServiceManager;
         private readonly SwiftCoreSettings _settings;
+        private readonly IStateProvinceService _stateProvinceService;
+        private readonly ICheckoutAttributeParser _checkoutAttributeParser;
+        private readonly IDiscountService _discountService;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
+        public CheckoutOverrideController(IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -114,6 +118,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _countryModelFactory = countryModelFactory;
             _payPalServiceManager = payPalServiceManager;
             _settings = swiftCoreSettings;
+            _stateProvinceService = stateProvinceService;
+            _checkoutAttributeParser = checkoutAttributeParser;
+            _discountService = discountService;
         }
         #endregion
 
@@ -752,7 +759,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 };
 
                 // call nss place Order
-                NSSPlaceOrderRequest(placeOrderResult.PlacedOrder);
+                NSSPlaceOrderRequest(placeOrderResult.PlacedOrder, paymentMethod);
 
                 if (paymentMethod == "CREDIT")
                 {
@@ -770,21 +777,103 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return Json(new { error = 1, message = "Order was not placed. Line of credit payment error" });
         }
 
-        private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order)
+        private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod)
         {
-            var orderItems = _orderService.GetOrderItems(order.Id);
-
-            // billing detail
-
-            // shipping detail
-
-            // 
-
-            var request = new NSSCreateOrderRequest()
+            try
             {
-            };
+                var shippingAddress = _addressService.GetAddressById(order.ShippingAddressId ?? 0);
+                var pickupAddress = _addressService.GetAddressById(order.PickupAddressId ?? 0);
 
-            var resp = _nSSApiProvider.CreateNSSOrder(12345, request, useMock: true);
+                var chkAttr = _checkoutAttributeParser.ParseCheckoutAttributes(order.CheckoutAttributesXml);
+                var poAttr = chkAttr.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CheckoutPONoAttribute);
+                var poValues = poAttr != null ? _checkoutAttributeParser.ParseValues(order.CheckoutAttributesXml, poAttr.Id) : new List<string>();
+
+                // discounts
+                var discounts = new List<Discount>();
+                var discounUsagetList = _discountService.GetAllDiscountUsageHistory(customerId: _workContext.CurrentCustomer.Id, orderId: order.Id);
+                foreach (var item in discounUsagetList)
+                {
+                    var discount = _discountService.GetDiscountById(item.Id);
+                    if (discount != null)
+                        discounts.Add(new Discount { Amount = discount.DiscountAmount, Code = discount.CouponCode, Description = discount.Name });
+                }
+
+                // order items
+                var orderItemList = _orderService.GetOrderItems(order.Id);
+                var orderItems = new List<DTOs.Requests.OrderItem>();
+                foreach (var item in orderItemList)
+                {
+                    var attrs = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                    var json = JsonConvert.SerializeObject(new Dictionary<string, object>(attrs.Select(x => new KeyValuePair<string, object>(x.Key, x.Value))));
+
+                    //var model = JsonConvert.DeserializeObject<ErpProductModel>(json);
+
+
+                    orderItems.Add(new DTOs.Requests.OrderItem
+                    {
+                        Description = attrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
+                        ItemId = (int.TryParse(attrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId: 0),
+                        Quantity = item.Quantity,
+                        TotalPrice = item.PriceExclTax,
+                        UnitPrice = item.UnitPriceExclTax,
+                        TotalWeight = (decimal.TryParse(attrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? weight * item.Quantity :  (decimal)0.00),
+                        // product attr
+                        Notes = "",
+                        SawOptions = "",
+                        SawTolerance = "",
+                        Uom = ""
+                    });
+                }
+
+                var request = new NSSCreateOrderRequest()
+                {
+                    OrderId = order.Id,
+                    OrderTotal = order.OrderTotal,
+                    PaymentMethodReferenceNo = order.AuthorizationTransactionId,
+                    PaymentMethodType = paymentMethod,
+                    ContactEmail = _workContext.CurrentCustomer.Email,
+                    ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute, _storeContext.CurrentStore.Id),
+                    ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id),
+                    ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute, _storeContext.CurrentStore.Id),
+
+                    ShippingAddressLine1 = shippingAddress?.Address1,
+                    ShippingAddressLine2 = shippingAddress?.Address2,
+                    ShippingAddressState = _stateProvinceService.GetStateProvinceById(shippingAddress?.StateProvinceId ?? 0)?.Abbreviation,
+                    ShippingAddressCity = shippingAddress?.City,
+                    ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
+
+                    PickupInStore = order.PickupInStore,
+                    PickupLocationId = pickupAddress?.City?.ToLower() == "houston" ? 1 : (pickupAddress?.City?.ToLower() == "beaumont" ? 2 : 0),
+                    UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.WintrixKeyAttribute, _storeContext.CurrentStore.Id),
+
+                    PoNo = poValues.FirstOrDefault(),
+
+                    DeliveryDate = "",
+                    ShippingTotal = order.OrderShippingExclTax,
+
+                    TaxTotal = order.OrderTax,
+
+                    // discounts
+                    DiscountTotal = order.OrderDiscount,
+                    Discounts = discounts.ToArray(),
+
+                    // order items
+                    LineItemTotal = order.OrderSubtotalExclTax,
+                    OrderItems = orderItems.ToArray()
+                };
+
+                var resp = _nSSApiProvider.CreateNSSOrder(12345, request, useMock: true);
+
+                if (resp.NSSOrderNo > 0)
+                    _genericAttributeService.SaveAttribute<long>(order, "ErpOrderNo", resp.NSSOrderNo, _storeContext.CurrentStore.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.Message, ex, _workContext.CurrentCustomer);
+                // silent;
+            }
+
         }
 
         private JsonResult ProcessCreditCardPayment(ProcessPaymentRequest processPaymentRequest, string paymentMethod)

@@ -8,16 +8,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
     public partial class NSSCreateOrderRequest
     {
         [JsonProperty("orderId")]
-        public long OrderId { get; set; }
+        public int OrderId { get; set; }
 
         [JsonProperty("pickupInStore")]
         public bool PickupInStore { get; set; }
 
         [JsonProperty("pickupLocationId")]
-        public long PickupLocationId { get; set; }
+        public int PickupLocationId { get; set; }
 
         [JsonProperty("userId")]
-        public long UserId { get; set; }
+        public int UserId { get; set; }
 
         [JsonProperty("contactFirstName")]
         public string ContactFirstName { get; set; }
@@ -47,19 +47,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string ShippingAddressPostalCode { get; set; }
 
         [JsonProperty("lineItemTotal")]
-        public long LineItemTotal { get; set; }
+        public decimal LineItemTotal { get; set; }
 
         [JsonProperty("shippingTotal")]
-        public long ShippingTotal { get; set; }
+        public decimal ShippingTotal { get; set; }
 
         [JsonProperty("discountTotal")]
-        public long DiscountTotal { get; set; }
+        public decimal DiscountTotal { get; set; }
 
         [JsonProperty("taxTotal")]
-        public long TaxTotal { get; set; }
+        public decimal TaxTotal { get; set; }
 
         [JsonProperty("orderTotal")]
-        public long OrderTotal { get; set; }
+        public decimal OrderTotal { get; set; }
 
         [JsonProperty("deliveryDate")]
         public string DeliveryDate { get; set; }
@@ -89,31 +89,31 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string Description { get; set; }
 
         [JsonProperty("amount")]
-        public long Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 
     public partial class OrderItem
     {
         [JsonProperty("itemId")]
-        public long ItemId { get; set; }
+        public int ItemId { get; set; }
 
         [JsonProperty("description")]
         public string Description { get; set; }
 
         [JsonProperty("quantity")]
-        public long Quantity { get; set; }
+        public int Quantity { get; set; }
 
         [JsonProperty("unitPrice")]
-        public double UnitPrice { get; set; }
+        public decimal UnitPrice { get; set; }
 
         [JsonProperty("uom")]
         public string Uom { get; set; }
 
         [JsonProperty("totalWeight")]
-        public double TotalWeight { get; set; }
+        public decimal TotalWeight { get; set; }
 
         [JsonProperty("totalPrice")]
-        public long TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
         [JsonProperty("sawOptions")]
         public string SawOptions { get; set; }

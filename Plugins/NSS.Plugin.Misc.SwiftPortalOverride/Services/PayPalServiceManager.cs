@@ -237,9 +237,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 //    parameters["disable-card"] = settings.DisabledCards;
                 var scriptUrl = QueryHelpers.AddQueryString(PaypalDefaults.ServiceScriptUrl, parameters);
 
-                var accessToken = GetAccessToken(settings);
+                var (accessToken, _) = GetAccessToken(settings);
 
-                var clientToken = GetClientToken(settings, accessToken.AccessToken?.Token);
+                var clientToken = GetClientToken(settings, accessToken?.Token);
 
                 return $@"<script src=""{scriptUrl}"" data-partner-attribution-id=""{PaypalDefaults.PartnerCode}"" data-client-token=""{clientToken}""></script>";
             });
@@ -260,16 +260,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     throw new NopException("Primary store currency not set");
 
                 var billingAddress = model.BillingAddress.ShipToSameAddress  ? _addresService.GetAddressById(model.ShippingAddress.ShippingAddressId)  : _addresService.GetAddressById(model.BillingAddress.BillingAddressId);
-                var billingAddressModel = model.BillingAddress.ShipToSameAddress ? model.ShippingAddress.ShippingNewAddress : model.BillingAddress.BillingNewAddress;
+                var billingAddressNew = model.BillingAddress.ShipToSameAddress ? model.ShippingAddress.ShippingNewAddress : model.BillingAddress.BillingNewAddress;
 
                 if (billingAddress == null && model.BillingAddress != null && model.BillingAddress.BillingNewAddress == null)
                     throw new NopException("Customer billing address not set");
 
                 var shippingAddress = _addresService.GetAddressById(model.ShippingAddress.ShippingAddressId);
-                var shippingAddressModel = model.ShippingAddress.ShippingNewAddress;
+                var shippingAddressNew = model.ShippingAddress.ShippingNewAddress;
 
-                var billStateProvince = billingAddress == null ? _stateProvinceService.GetStateProvinceByAddress(billingAddress) : _stateProvinceService.GetStateProvinceById(model.BillingAddress.BillingNewAddress.StateProvinceId ?? 0);
-                var shipStateProvince = shippingAddress == null ? _stateProvinceService.GetStateProvinceByAddress(shippingAddress): _stateProvinceService.GetStateProvinceById(shippingAddressModel.StateProvinceId ?? 0);
+                var billStateProvince = billingAddress == null ? _stateProvinceService.GetStateProvinceByAddress(billingAddress) : _stateProvinceService.GetStateProvinceById(billingAddressNew.StateProvinceId ?? 0);
+                var shipStateProvince = shippingAddress == null ? _stateProvinceService.GetStateProvinceByAddress(shippingAddress): _stateProvinceService.GetStateProvinceById(shippingAddressNew.StateProvinceId ?? 0);
 
                 //prepare order details
                 var orderDetails = new OrderRequest { CheckoutPaymentIntent = "AUTHORIZE" };
@@ -289,19 +289,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 var email = _workContext.CurrentCustomer.Email;
 
                 // billing
-                var billingAddress1 = billingAddress != null ? billingAddress.Address1 : billingAddressModel.Address1;
-                var billingAddress2 = billingAddress != null ? billingAddress.Address2 : billingAddressModel.Address2;
-                var billingCity = billingAddressModel != null ? billingAddress.City : billingAddressModel.City;
-                var billingCountryId = billingAddressModel != null ? billingAddress.CountryId : billingAddressModel.CountryId;
-                var billingZipPostalCode = billingAddressModel != null ? billingAddress.ZipPostalCode : billingAddressModel.ZipPostalCode;
+                var billingAddress1 = billingAddress != null ? billingAddress.Address1 : billingAddressNew.Address1;
+                var billingAddress2 = billingAddress != null ? billingAddress.Address2 : billingAddressNew.Address2;
+                var billingCity = billingAddressNew != null ? billingAddress.City : billingAddressNew.City;
+                var billingCountryId = billingAddressNew != null ? billingAddress.CountryId : billingAddressNew.CountryId;
+                var billingZipPostalCode = billingAddressNew != null ? billingAddress.ZipPostalCode : billingAddressNew.ZipPostalCode;
                 var billingPhoneNumber = billingAddress != null ? billingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id);
 
                 // shipping
-                var shippingAddress1 = shippingAddress != null ? shippingAddress.Address1 : shippingAddressModel.Address1;
-                var shippingAddress2 = shippingAddress != null ? shippingAddress.Address2 : shippingAddressModel.Address2;
-                var shippingCity = shippingAddress != null ? shippingAddress.City : shippingAddressModel.City;
-                var shippingCountryId = shippingAddress != null ? shippingAddress.CountryId : shippingAddressModel.CountryId;
-                var shippingZipPostalCode = shippingAddress != null ? shippingAddress.ZipPostalCode : shippingAddressModel.ZipPostalCode;
+                var shippingAddress1 = shippingAddress != null ? shippingAddress.Address1 : shippingAddressNew.Address1;
+                var shippingAddress2 = shippingAddress != null ? shippingAddress.Address2 : shippingAddressNew.Address2;
+                var shippingCity = shippingAddress != null ? shippingAddress.City : shippingAddressNew.City;
+                var shippingCountryId = shippingAddress != null ? shippingAddress.CountryId : shippingAddressNew.CountryId;
+                var shippingZipPostalCode = shippingAddress != null ? shippingAddress.ZipPostalCode : shippingAddressNew.ZipPostalCode;
                 var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id);
 
                 //prepare customer billing details

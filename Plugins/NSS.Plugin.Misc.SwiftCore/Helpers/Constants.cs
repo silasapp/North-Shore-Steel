@@ -26,6 +26,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string LengthToleranceCutAttribute => "Length Tolerance Cut";
         public static string PurchaseUnitAttribute => "Purchase Unit";
         public static string CustomerPartNoAttribute => "Customer Part No";
+        #endregion      
+        
+        #region CheckoutAttributes
+        public static string CheckoutPONoAttribute => "Purchase Order #";
+        public static string CheckoutDeliveryOptionAttribute => "Delivery Option";
         #endregion
 
         #region ProductFields

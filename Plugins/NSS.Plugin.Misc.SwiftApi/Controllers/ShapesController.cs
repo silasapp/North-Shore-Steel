@@ -120,10 +120,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             // create checkout attribute
             if (!_checkoutAttributeService.GetAllCheckoutAttributes().Any(x => x.Name == "Purchase Order #"))
             {
-                var checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.TextBox, IsRequired = true, Name = "Purchase Order #" };
+                var checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.TextBox, Name = Constants.CheckoutPONoAttribute };
                 _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
 
-                checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.RadioList, IsRequired = true, Name = "Delivery Option" };
+                checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.RadioList, IsRequired = true, Name = Constants.CheckoutDeliveryOptionAttribute };
                 _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
 
                 _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Ship to Customer", DisplayOrder = 1, IsPreSelected = true });
