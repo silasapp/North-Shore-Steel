@@ -490,7 +490,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 });
             }
 
-            request.Items = orderItems.ToArray();
+            request.Items = JsonConvert.SerializeObject(orderItems.ToArray());
 
             var response = _nSSApiProvider.GetShippingRate(request, useMock: false);
             return response;
@@ -791,9 +791,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     PaymentMethodReferenceNo = order.AuthorizationTransactionId,
                     PaymentMethodType = paymentMethod,
                     ContactEmail = _workContext.CurrentCustomer.Email,
-                    ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute, _storeContext.CurrentStore.Id),
-                    ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id),
-                    ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute, _storeContext.CurrentStore.Id),
+                    ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute),
+                    ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute),
+                    ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute),
 
                     ShippingAddressLine1 = shippingAddress?.Address1,
                     ShippingAddressLine2 = shippingAddress?.Address2,
@@ -803,7 +803,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     PickupInStore = order.PickupInStore,
                     PickupLocationId = pickupAddress?.City?.ToLower() == "houston" ? 1 : (pickupAddress?.City?.ToLower() == "beaumont" ? 2 : 0),
-                    UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute, _storeContext.CurrentStore.Id),
+                    UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
 
                     PoNo = poValues.FirstOrDefault(),
 
@@ -814,11 +814,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     // discounts
                     DiscountTotal = order.OrderDiscount,
-                    Discounts = discounts.ToArray(),
+                    Discounts = JsonConvert.SerializeObject(discounts.ToArray()),
 
                     // order items
                     LineItemTotal = order.OrderSubtotalExclTax,
-                    OrderItems = orderItems.ToArray()
+                    OrderItems = JsonConvert.SerializeObject(orderItems.ToArray())
                 };
 
                 var (erpCompId, _) = GetCustomerCompanyDetails();
