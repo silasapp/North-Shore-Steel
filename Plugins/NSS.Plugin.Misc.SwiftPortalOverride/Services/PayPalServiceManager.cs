@@ -302,9 +302,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 // billing
                 var billingAddress1 = billingAddress != null ? billingAddress.Address1 : billingAddressNew.Address1;
                 var billingAddress2 = billingAddress != null ? billingAddress.Address2 : billingAddressNew.Address2;
-                var billingCity = billingAddressNew != null ? billingAddress.City : billingAddressNew.City;
-                var billingCountryId = billingAddressNew != null ? billingAddress.CountryId : billingAddressNew.CountryId;
-                var billingZipPostalCode = billingAddressNew != null ? billingAddress.ZipPostalCode : billingAddressNew.ZipPostalCode;
+                var billingCity = billingAddress != null ? billingAddress.City : billingAddressNew.City;
+                var billingCountryId = billingAddress != null ? billingAddress.CountryId : billingAddressNew.CountryId;
+                var billingZipPostalCode = billingAddress != null ? billingAddress.ZipPostalCode : billingAddressNew.ZipPostalCode;
                 var billingPhoneNumber = billingAddress != null ? billingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute);
 
                 // shipping
@@ -334,9 +334,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         PostalCode = CommonHelper.EnsureMaximumLength(billingZipPostalCode, 60)
                     }
                 };
-                if (!string.IsNullOrEmpty(billingAddress.PhoneNumber))
+                if (!string.IsNullOrEmpty(billingPhoneNumber))
                 {
-                    var cleanPhone = CommonHelper.EnsureMaximumLength(CommonHelper.EnsureNumericOnly(billingAddress.PhoneNumber), 14);
+                    var cleanPhone = CommonHelper.EnsureMaximumLength(CommonHelper.EnsureNumericOnly(billingPhoneNumber), 14);
                     orderDetails.Payer.PhoneWithType = new PhoneWithType { PhoneNumber = new Phone { NationalNumber = cleanPhone } };
                 }
 

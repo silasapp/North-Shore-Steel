@@ -429,7 +429,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var request = new NSSCalculateShippingRequest
             {
-                DeliveryMethod = model.ShippingAddress.IsPickupInStore ? "pickup" : "shipping",
+                DeliveryMethod = model.ShippingAddress.IsPickupInStore ? "Pickup" : "Shipping",
                 DestinationAddressLine1 = shippingAddress1,
                 DestinationAddressLine2 = shippingAddress2,
                 State = shipStateProvince?.Abbreviation,
