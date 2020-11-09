@@ -16,10 +16,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
         [JsonProperty("allowed")]
         public bool Allowed { get; set; }
 
-        [JsonProperty("deliveryDate")]
+        [JsonProperty("date")]
         public string DeliveryDate { get; set; }
 
-        [JsonProperty("pickupTime")]
+        [JsonProperty("time")]
         public string PickupTime { get; set; }
     }
 }
