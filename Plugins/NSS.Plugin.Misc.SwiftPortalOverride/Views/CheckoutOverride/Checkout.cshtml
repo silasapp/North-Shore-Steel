@@ -115,7 +115,7 @@
                         </div>
                         <div class="d-flex flex-column ml-5">
                             <label for="deliveryDate" class="fs-13 text-black">Estimated Delivery Date</label>
-                            <label id="deliveryDate" class="p-2 text-black">{{ formatDate(deliveryDate) }}</label>
+                            <label id="deliveryDate" class="p-2 text-black">{{ deliveryDate }}</label>
                         </div>
                         <button class="h6 text-primary mr-5" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
                             <img src="Themes/@themeName/Content/assets/enter.svg" alt="" width="20" class="mr-2">
@@ -623,7 +623,7 @@
                             self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
                             self.discountAmount = data.orderDiscountAmount;
                             self.orderTotal = data.orderTotal;
-                            self.deliveryDate = data.shippingCalculatorResponse.deliveryDate;
+                            self.deliveryDate = data.shippingCalculatorResponse.date ? data.shippingCalculatorResponse.date : 'N/A';
                         }
                         if (!disableSpinner)
                             self.hideLoading();
