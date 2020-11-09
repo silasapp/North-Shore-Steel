@@ -2,18 +2,9 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Nop.Core.Domain.Catalog
 @using Nop.Services.Common
-@using Nop.Core
-@using NSS.Plugin.Misc.SwiftCore.Services
-@using NSS.Plugin.Misc.SwiftPortalOverride
 @using Nop.Services.Catalog
-@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
-
 @inject IGenericAttributeService genericAttributeService
 @inject IProductService productService
-@inject IWorkContext workContext
-@inject ICustomerCompanyService customerCompanyService
-@inject ICompanyService companyService
-@inject ICustomerCompanyProductService customerCompanyProductService
 
 @model CheckoutCompleteOverrideModel
 @{
@@ -79,22 +70,6 @@
     var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
 }
 
-@{
-    var customer = workContext.CurrentCustomer;
-    var customerId = customer.Id;
-    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-    ERPComId += customerId;
-    int.TryParse(Context.Request.Cookies[ERPComId], out int ERPCompanyId);
-    Company company = new Company();
-    CustomerCompany customerCompany = new CustomerCompany();
-    if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
-        company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
-    if (company != null)
-        customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
-
-}
-
-
 @Html.Raw(Model.PaypalScript);
 <style>
     .paypal-button.paypal-button-color-blue, .paypal-button-row.paypal-button-color-blue .menu-button {
@@ -117,7 +92,7 @@
                         </div>
                         <div class="d-flex flex-column ml-5">
                             <label for="deliveryDate" class="fs-13 text-black">Estimated Delivery Date</label>
-                            <label id="deliveryDate" class="p-2 text-black">TBD</label>
+                            <label id="deliveryDate" class="p-2 text-black">{{ formatDate(deliveryDate) }}</label>
                         </div>
                         <button class="h6 text-primary mr-5" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
                             <img src="Themes/@themeName/Content/assets/enter.svg" alt="" width="20" class="mr-2">
@@ -396,12 +371,7 @@
                             {
                                 var product = productService.GetProductById(item.ProductId);
                                 var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-                                var customerPathNo = "";
-                                if (customerCompany != null)
-                                {
-                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
-                                    customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
-                                }
+
                                 var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                 var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                 string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
@@ -410,11 +380,10 @@
                                 weight = (weight * item.Quantity);
                                 var totalWeight = DoFormat(weight);
 
-
                                 <tr>
                                     <td>@iNo</td>
                                     <td>@item.ProductName</td>
-                                    <td>@customerPathNo</td>
+                                    <td>P-12345</td>
                                     <td>@item.UnitPrice / CW</td>
                                     <td>@item.SubTotal</td>
                                     <td>@totalWeight</td>
@@ -456,7 +425,7 @@
                 </div>
                 <div style="display:flex;justify-content: center;">
                     <button id="place-order" v-show="paymentMethodIndex !== shared.constants.PAYMENT_METHOD_PAYPAL"
-                            v-on:click="placeOrder">
+                            v-on:click="placeOrder" v-bind:disabled="disableSubmit">
                         PLACE ORDER
                     </button>
                     <div id="paypal-button-container" v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL"></div>
@@ -485,8 +454,6 @@
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
 
-    console.log("orderTotals: ", orderTotals);
-
     const store = {
         state: {
             shippingAddresses,
@@ -509,6 +476,7 @@
         el: '#checkout',
         data: {
             shared: store.state,
+            deliveryDate: null,
             purchaseOrder,
             isDelivery,
             shippingAddressId: shippingAddresses.length > 0 ? shippingAddresses[0].id : null,
@@ -553,6 +521,7 @@
             discountAmount: orderTotals.subTotalDiscount ? orderTotals.subTotalDiscount : 0,
             taxAmount: orderTotals.tax.replace("$", ""),
             orderTotal: orderTotals.orderTotal.replace("$", ""),
+            disableSubmit: false,
         },
         mounted: function () {
             this.setupCreditCardMethod();
@@ -577,15 +546,20 @@
                     maximumFractionDigits: 2
                 });
             },
+            formatDate: function (date) {
+                if (!date) return 'N/A';
+                const localTime = moment.utc(date).toDate();
+                return moment(localTime).format("MM/DD/YYYY");
+            },
 
             getShippingRate: function (disableSpinner) {
-
                 if (this.showNewShippingAddress && (!this.newShippingAddress.address1 ||
                     !this.newShippingAddress.city || !this.newShippingAddress.stateProvinceId ||
                     !this.newShippingAddress.zipPostalCode)) return;
 
                 if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) return;
 
+                this.disableSubmit = true;
                 let address;
                 if (this.isDelivery) {
                     if (this.showNewShippingAddress) address = this.newShippingAddress;
@@ -614,15 +588,18 @@
                     data: JSON.stringify(request),
                     success: function (data, _, _) {
                         console.log("GetShippingRate success: ", data);
+                        self.disableSubmit = false;
                         if (data != null) {
                             self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
                             self.discountAmount = data.orderDiscountAmount;
                             self.orderTotal = data.orderTotal;
+                            self.deliveryDate = data.shippingCalculatorResponse.deliveryDate;
                         }
                         if (!disableSpinner)
                             self.hideLoading();
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
+                        self.disableSubmit = false;
                         if (!disableSpinner)
                             self.hideLoading();
                         console.log(thrownError, 'GetShippingRate datadata-error', xhr);
@@ -846,7 +823,7 @@
                         //},
                         onClick: function (e, actions) {
                             self.dirty = true;
-                            if (!self.validate()) return actions.reject();
+                            if (!self.validate() || self.disableSubmit) return actions.reject();
                             else return actions.resolve();
                         },
                         createOrder: async function (data, actions) {

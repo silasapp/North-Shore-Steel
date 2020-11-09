@@ -594,3 +594,12 @@ td {
     #place-order:hover {
         background-color: #0076B4 !important;
     }
+
+    #place-order:disabled {
+        background-color: #C3C3C3 !important;
+        cursor: not-allowed;
+    }
+
+[v-cloak] {
+    display: none;
+}
