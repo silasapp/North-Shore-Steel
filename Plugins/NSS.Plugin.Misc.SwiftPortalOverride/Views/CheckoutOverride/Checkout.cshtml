@@ -73,7 +73,7 @@
 
 @{
     var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
-    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue ?? "0";
+    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
     var shippingMethodsSelected = checkoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option")?.Values;
     var isDelivery = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Ship to Customer")?.IsPreSelected ?? false;
     var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
@@ -111,7 +111,7 @@
                     <div class="d-flex flex-row justify-content-between mt-2">
                         <div class="d-flex flex-column">
                             <label for="purchaseOrder" class="fs-13 text-black">Purchase Order #</label>
-                            <label id="purchaseOrder" class="p-2 text-black">{{ purchaseOrder }}</label>
+                            <label id="purchaseOrder" class="p-2 text-black" style="min-height: 30px">{{ purchaseOrder }}</label>
                         </div>
                         <div class="d-flex flex-column ml-5">
                             <label for="deliveryDate" class="fs-13 text-black">Estimated Delivery Date</label>
@@ -483,6 +483,8 @@
     var orderTotals = @Html.Raw(orderTotals);
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
+
+    console.log("purchaseOrder: ", purchaseOrder);
 
     const store = {
         state: {
