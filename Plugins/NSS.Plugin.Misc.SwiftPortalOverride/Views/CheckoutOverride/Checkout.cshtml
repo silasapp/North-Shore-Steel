@@ -2,9 +2,18 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Nop.Core.Domain.Catalog
 @using Nop.Services.Common
+@using Nop.Core
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using NSS.Plugin.Misc.SwiftPortalOverride
 @using Nop.Services.Catalog
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
+
 @inject IGenericAttributeService genericAttributeService
 @inject IProductService productService
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
+@inject ICompanyService companyService
+@inject ICustomerCompanyProductService customerCompanyProductService
 
 @model CheckoutCompleteOverrideModel
 @{
@@ -68,6 +77,20 @@
     var shippingMethodsSelected = checkoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option")?.Values;
     var isDelivery = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Ship to Customer")?.IsPreSelected ?? false;
     var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
+}
+
+@{
+    var customer = workContext.CurrentCustomer;
+    var customerId = customer.Id;
+    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+    ERPComId += customerId;
+    int.TryParse(Context.Request.Cookies[ERPComId], out int ERPCompanyId);
+    Company company = new Company();
+    CustomerCompany customerCompany = new CustomerCompany();
+    if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
+        company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
+    if (company != null)
+        customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
 }
 
 @Html.Raw(Model.PaypalScript);
@@ -372,6 +395,13 @@
                                 var product = productService.GetProductById(item.ProductId);
                                 var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
 
+                                var customerPathNo = "";
+                                if (customerCompany != null)
+                                {
+                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                    customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
+                                }
+
                                 var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                 var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                 string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
@@ -383,7 +413,7 @@
                                 <tr>
                                     <td>@iNo</td>
                                     <td>@item.ProductName</td>
-                                    <td>P-12345</td>
+                                    <td>@customerPathNo</td>
                                     <td>@item.UnitPrice / CW</td>
                                     <td>@item.SubTotal</td>
                                     <td>@totalWeight</td>
