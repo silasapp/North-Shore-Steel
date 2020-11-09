@@ -446,7 +446,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     //    new AuthenticationHeaderValue("Bearer", token);
 
                     // acc credit bal resource
-                    var resource = $"/{companyId}/credit";
+                    var resource = $"companies/{companyId}/credit";
 
                     var response = httpClient.GetAsync(resource).Result;
 
@@ -486,6 +486,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
                 _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
             }
 
             //create swift user
@@ -509,7 +510,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     //    new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
-                    var resource = $"/{companyId}/orders";
+                    var resource = $"companies/{companyId}/orders";
 
                     //body params
                     var param = request.ToKeyValue();

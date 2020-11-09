@@ -11,6 +11,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         CustomerCompany GetCustomerCompany(int customerId, int companyId);
 
+        CustomerCompany GetCustomerCompanyByErpCompId(int customerId, int ErpCompId);
+
         IEnumerable<CustomerCompany> GetCustomerCompanies(int customerId);
 
         void UpdateCustomerCompany(CustomerCompany customerCompany);

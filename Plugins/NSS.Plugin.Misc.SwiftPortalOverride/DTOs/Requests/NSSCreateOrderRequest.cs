@@ -74,10 +74,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string PoNo { get; set; }
 
         [JsonProperty("orderItems")]
-        public OrderItem[] OrderItems { get; set; }
+        public string OrderItems { get; set; }
 
         [JsonProperty("discounts")]
-        public Discount[] Discounts { get; set; }
+        public string Discounts { get; set; }
     }
 
     public partial class Discount

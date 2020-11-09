@@ -35,7 +35,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public decimal MaxLength { get; set; }
 
         [JsonProperty("items")]
-        public Item[] Items { get; set; }
+        public string Items { get; set; }
     }
 
     public partial class Item
