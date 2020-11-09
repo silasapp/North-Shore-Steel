@@ -295,8 +295,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         .ToString().ToUpper()
                 };
 
-                var firstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute, _storeContext.CurrentStore.Id);
-                var lastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id);
+                var firstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute);
+                var lastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute);
                 var email = _workContext.CurrentCustomer.Email;
 
                 // billing
@@ -305,7 +305,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 var billingCity = billingAddressNew != null ? billingAddress.City : billingAddressNew.City;
                 var billingCountryId = billingAddressNew != null ? billingAddress.CountryId : billingAddressNew.CountryId;
                 var billingZipPostalCode = billingAddressNew != null ? billingAddress.ZipPostalCode : billingAddressNew.ZipPostalCode;
-                var billingPhoneNumber = billingAddress != null ? billingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id);
+                var billingPhoneNumber = billingAddress != null ? billingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute);
 
                 // shipping
                 var shippingAddress1 = shippingAddress != null ? shippingAddress.Address1 : shippingAddressNew.Address1;
@@ -313,7 +313,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 var shippingCity = shippingAddress != null ? shippingAddress.City : shippingAddressNew.City;
                 var shippingCountryId = shippingAddress != null ? shippingAddress.CountryId : shippingAddressNew.CountryId;
                 var shippingZipPostalCode = shippingAddress != null ? shippingAddress.ZipPostalCode : shippingAddressNew.ZipPostalCode;
-                var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id);
+                var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute);
 
                 //prepare customer billing details
                 orderDetails.Payer = new Payer

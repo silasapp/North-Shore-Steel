@@ -292,7 +292,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var model = _checkoutModelFactory.PrepareCheckoutCompletedModel(order);
             //add erp order no
-            model.CustomProperties.TryAdd(SwiftCore.Helpers.Constants.ErpOrderNoAttribute, _genericAttributeService.GetAttribute<long?>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, _storeContext.CurrentStore.Id));
+            model.CustomProperties.TryAdd(SwiftCore.Helpers.Constants.ErpOrderNoAttribute, _genericAttributeService.GetAttribute<long?>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute));
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Completed.cshtml", model);
         }
 
@@ -425,7 +425,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var shippingCity = shippingAddress != null ? shippingAddress.City : shippingAddressNew.City;
             var shippingCountryId = shippingAddress != null ? shippingAddress.CountryId : shippingAddressNew.CountryId;
             var shippingZipPostalCode = shippingAddress != null ? shippingAddress.ZipPostalCode : shippingAddressNew.ZipPostalCode;
-            var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute, _storeContext.CurrentStore.Id);
+            var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute);
 
             var request = new NSSCalculateShippingRequest
             {
@@ -826,7 +826,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
 
                 if (resp.NSSOrderNo > 0)
-                    _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo, _storeContext.CurrentStore.Id);
+                    _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo);
             }
             catch (Exception ex)
             {
