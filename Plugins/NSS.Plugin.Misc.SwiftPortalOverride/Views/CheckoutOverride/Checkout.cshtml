@@ -397,7 +397,7 @@
             </div>
             <div class="col-3">
                 <div class="card card-mod">
-                    <label class="fs-12 text-primary font-weight-bold text-center">ORDER INFORMATION</label>
+                    <label class="fs-14 text-primary font-weight-bold text-center">ORDER SUMMARY</label>
                     <div class="order-summary mt-2">
                         <div class="price-summary">
                             <label class="text-muted">Sub-Total:</label>
@@ -405,11 +405,11 @@
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Shipping:</label>
-                            <label class="text-black">{{ shippingAmount }}</label>
+                            <label class="text-black">{{ formatMoney(shippingAmount) }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Discount:</label>
-                            <label class="text-black">{{ discountAmount }}</label>
+                            <label class="text-black">{{ formatMoney(discountAmount) }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Tax:</label>
@@ -419,7 +419,7 @@
                         </div>
                         <div class="price-summary">
                             <label class="h5 text-black font-weight-bold">TOTAL</label>
-                            <label class="h5 text-black font-weight-bold">${{ orderTotal }}</label>
+                            <label class="h5 text-black font-weight-bold">${{ formatMoney(orderTotal) }}</label>
                         </div>
                     </div>
                 </div>
@@ -601,14 +601,10 @@
 
             placeOrder: function () {
                 this.dirty = true;
-                if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_CREDIT_CARD) return;
+                if (this.paymentMethodIndex !== this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT) return;
 
                 console.log("isValid: ", this.validate());
                 if (!this.validate()) return;
-                if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_PAYPAL) {
-
-                    return;
-                }
                 this.showLoading();
                 this.finalizeOrder();
             },
@@ -770,32 +766,9 @@
 
                             self.showLoading();
 
-                            let billingAddress;
-                            if (self.shipToSameAddress && self.showNewShippingAddress) {
-                                billingAddress = { ...self.newShippingAddress };
-                            } else if (self.shipToSameAddress && !self.showNewShippingAddress) {
-                                billingAddress = self.shared.shippingAddresses.find(x => x.id === self.shippingAddressId);
-                            } else if (self.showNewBillingAddress) {
-                                billingAddress = { ...self.newBillingAddress };
-                            } else  {
-                                billingAddress = self.shared.billingAddresses.find(x => x.id === self.billingAddressId);
-                            }
-
                             hf.submit({
-                                // Cardholder Name
                                 cardholderName: self.paymentCard.cardHolderName,
-                                // Billing Address
-                                //billingAddress: {
-                                //    streetAddress: billingAddress.address1, // address_line_1 - street
-                                //    extendedAddress: billingAddress.address2, // address_line_2 - unit
-                                //    region: 'TX',//billingAddress.stateProvinceId, // admin_area_1 - state
-                                //    locality: billingAddress.city, // admin_area_2 - town / city
-                                //    postalCode: billingAddress.zipPostalCode, // postal_code - postal_code
-                                //    countryCodeAlpha2: 'US', //billingAddress.countryId, // country_code - country
-                                //},
-                                // redirect after successful order approval
-                            })
-                                .then(function (data) {
+                            }).then(function (data) {
                                     self.finalizeOrder();
                                 })
                                 .catch(function (err) {
@@ -841,8 +814,7 @@
                         //    //    });
                         //},
                         onClick: function (e, actions) {
-                            console.log("onClick e: ", e);
-                            console.log("onClick actions: ", self.validate());
+                            self.dirty = true;
                             if (!self.validate()) return actions.reject();
                             else return actions.resolve();
                         },
