@@ -838,15 +838,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private (int companyId, bool canCredit) GetCustomerCompanyDetails()
         {
-            var customerId = _workContext.CurrentCustomer.Id;
-            string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-            ERPComId += customerId;
-            int.TryParse(Request.Cookies[ERPComId], out int ERPCompanyId);
-            var company = new Company();
+            string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int.TryParse(Request.Cookies[erpCompIdCookieKey], out int ERPCompanyId);
+
             var customerCompany = new CustomerCompany();
 
             if (ERPCompanyId > 0)
-                customerCompany = _customerCompanyService.GetCustomerCompany(customerId, company.Id);
+                customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, ERPCompanyId);
 
             return (ERPCompanyId, customerCompany?.CanCredit ?? false);
         }
