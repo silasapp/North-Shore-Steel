@@ -311,7 +311,7 @@ BEGIN
 
     -- shape
 	SET @sql = @sql + '
-	INNER JOIN (SELECT * FROM GenericAttribute with (NOLOCK) WHERE KeyGroup = ''Product'' and [Key] = ''ShapeId'') pga 
+	INNER JOIN (SELECT ga.EntityId, sh.Id, sh.ParentId FROM GenericAttribute ga with (NOLOCK) INNER JOIN Shape sh on sh.Id = CAST(ga.[Value] AS INT) AND ga.KeyGroup = ''Product'' and ga.[Key] = ''ShapeId'') pga 
 		ON p.Id = pga.EntityId'
 
 	
@@ -352,11 +352,15 @@ BEGIN
 	IF @shapeIdsCount > 0
 	BEGIN
 		SET @sql = @sql + '
-		AND pga.Value IN ('
+		AND pga.Id IN ('
 		
 		SET @sql = @sql + + CAST(@ShapeIds AS nvarchar(max))
 
-		SET @sql = @sql + ')'
+		SET @sql = @sql + ') OR pga.ParentId IN ('
+
+		SET @sql = @sql + + CAST(@ShapeIds AS nvarchar(max))
+
+		SET @sql = @sql + ') '
 	END
 	
 	--filter by category
