@@ -2,17 +2,9 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Nop.Core.Domain.Catalog
 @using Nop.Services.Common
-@using Nop.Core
-@using NSS.Plugin.Misc.SwiftCore.Services
-@using NSS.Plugin.Misc.SwiftPortalOverride
 @using Nop.Services.Catalog
-@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @inject IGenericAttributeService genericAttributeService
 @inject IProductService productService
-@inject IWorkContext workContext
-@inject ICustomerCompanyService customerCompanyService
-@inject ICompanyService companyService
-@inject ICustomerCompanyProductService customerCompanyProductService
 
 @model CheckoutCompleteOverrideModel
 @{
@@ -78,23 +70,13 @@
     var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
 }
 
-@{
-    var customer = workContext.CurrentCustomer;
-    var customerId = customer.Id;
-    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-    ERPComId += customerId;
-    int.TryParse(Context.Request.Cookies[ERPComId], out int ERPCompanyId);
-    Company company = new Company();
-    CustomerCompany customerCompany = new CustomerCompany();
-    if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
-        company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
-    if (company != null)
-        customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
-
-}
-
+@Html.Raw(Model.PaypalScript);
+<style>
+    .paypal-button.paypal-button-color-blue, .paypal-button-row.paypal-button-color-blue .menu-button {
+        background: red !important;
+    }
+</style>
 <div id="checkout" class="page home-page" v-cloak>
-    @Html.Raw(Model.PaypalScript)
     <div class="page-body">
 
         <label class="h4 text-primary font-weight-bold text-center w-100 mt-4 mb-0">CHECKOUT</label>
@@ -121,10 +103,10 @@
                 <div class="card card-mod">
                     <h1 class="h5 text-primary font-weight-bold mb-4">SHIPPING OR PICKUP</h1>
                     <div class="d-flex flex-row justify-content-center mb-3">
-                        <button class="fs-14 shipping-tab mr-2" v-bind:class="{'active': isDelivery}" v-on:click="isDelivery = true;">
+                        <button class="fs-14 shipping-tab mr-2" v-bind:class="{'active': isDelivery}" v-on:click="isDelivery = true; getShippingRate();">
                             Delivery
                         </button>
-                        <button id="pickup" class="font14 shipping-tab" v-bind:class="{'active': !isDelivery}" v-on:click="isDelivery = false;">
+                        <button id="pickup" class="font14 shipping-tab" v-bind:class="{'active': !isDelivery}" v-on:click="isDelivery = false; getShippingRate()">
                             Pickup
                         </button>
                     </div>
@@ -133,7 +115,8 @@
                         <label for="shippingAddress" class="fs-14 text-black mb-1">Shipping Address</label>
                         <div class="d-flex flex-row">
                             <select type="text" class="bg-accent text-black px-2 py-2" id="shippingAddress"
-                                    v-on:change="showNewShippingAddress = false;" v-model="shippingAddressId"
+                                    v-on:change="showNewShippingAddress = false; $event.target.value ? getShippingRate() : null;"
+                                    v-model="shippingAddressId"
                                     v-bind:class="{'w-100': showNewShippingAddress, 'w-75': !showNewShippingAddress}">
                                 <option v-bind:value="null">-Select Address-</option>
                                 <option v-bind:value="address.id" v-for="address in shared.shippingAddresses">
@@ -153,7 +136,8 @@
                         <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
                         <div class="d-flex flex-row">
                             <select type="text" class="bg-accent text-black w-100 px-2 py-2"
-                                    name="shipping-address" id="shippingAddress" v-on:change="" v-model="pickupPointId">
+                                    name="shipping-address" id="shippingAddress"
+                                    v-on:change="$event.target.value ? getShippingRate() : null;" v-model="pickupPointId">
                                 <option v-bind:value="null">-Select Address-</option>
                                 <option v-bind:value="address.id" v-for="address in shared.pickupPoints">
                                     {{ address.name }}, {{ address.address }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
@@ -169,23 +153,23 @@
                         <div class="d-flex flex-row mt-3">
                             <div class="d-flex flex-column w-50 mr-2">
                                 <label class="fs-14 text-black mb-1">Address Line 1</label>
-                                <input type="text" class="nss-form-control" v-model="newShippingAddress.address1" placeholder="Ex: 1234 Main St." />
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.address1" placeholder="Ex: 1234 Main St." v-on:blur="getShippingRate" />
                                 <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.address1">Address Line 1 is required</label>
                             </div>
                             <div class="d-flex flex-column w-50 ml-2">
                                 <label class="fs-14 text-black mb-1">Address Line 2</label>
-                                <input type="text" class="nss-form-control" v-model="newShippingAddress.address2" placeholder="Ex: Ste. 800" />
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.address2" placeholder="Ex: Ste. 800" v-on:blur="getShippingRate" />
                             </div>
                         </div>
                         <div class="row d-flex flex-row mt-4">
                             <div class="col-md-6 d-flex flex-column pr-2">
                                 <label class="fs-14 text-black mb-1">City</label>
-                                <input type="text" class="nss-form-control" v-model="newShippingAddress.city" placeholder="Ex: Dallas" />
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.city" placeholder="Ex: Dallas" v-on:blur="getShippingRate" />
                                 <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.city">City is required</label>
                             </div>
                             <div class="col-md-4 d-flex flex-column px-2">
                                 <label class="fs-14 text-black mb-1">State</label>
-                                <select type="text" class="nss-form-control" name="state" v-model="newShippingAddress.stateProvinceId">
+                                <select type="text" class="nss-form-control" name="state" v-model="newShippingAddress.stateProvinceId" v-on:blur="getShippingRate">
                                     <option v-bind:value="null">-Select-</option>
                                     <option v-bind:value="option.id" v-for="option in shared.states">
                                         {{ option.name }}
@@ -195,7 +179,7 @@
                             </div>
                             <div class="col-md-2 d-flex flex-column pl-2">
                                 <label class="fs-14 text-black mb-1">Zip Code</label>
-                                <input type="text" class="nss-form-control" v-model="newShippingAddress.zipPostalCode" placeholder="Ex: 77014" />
+                                <input type="text" class="nss-form-control" v-model="newShippingAddress.zipPostalCode" placeholder="Ex: 77014" v-on:blur="getShippingRate" />
                                 <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.zipPostalCode">Zip Code is required</label>
                             </div>
                         </div>
@@ -387,12 +371,7 @@
                             {
                                 var product = productService.GetProductById(item.ProductId);
                                 var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-                                var customerPathNo = "";
-                                if (customerCompany != null)
-                                {
-                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
-                                    customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
-                                }
+
                                 var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                 var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                 string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
@@ -405,7 +384,7 @@
                                 <tr>
                                     <td>@iNo</td>
                                     <td>@item.ProductName</td>
-                                    <td>@customerPathNo</td>
+                                    <td>P-12345</td>
                                     <td>@item.UnitPrice / CW</td>
                                     <td>@item.SubTotal</td>
                                     <td>@totalWeight</td>
@@ -423,40 +402,34 @@
                     <div class="order-summary mt-2">
                         <div class="price-summary">
                             <label class="text-muted">Sub-Total:</label>
-                            <label class="text-black">{{ shared.orderTotals.subTotal }}</label>
+                            <label class="text-black">{{ subTotal }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Shipping:</label>
-                            <label class="text-black">{{ shared.orderTotals.shipping }}</label>
+                            <label class="text-black">{{ shippingAmount }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Discount:</label>
-                            <label class="text-black">TBD</label>
-                        </div>
-                        <div class="price-summary">
-                            <p class="discount-tag font12">10% OFF | 10,000lbs</p>
+                            <label class="text-black">{{ discountAmount }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Tax:</label>
                             <label class="text-black">
-                                {{ shared.orderTotals.tax }}
+                                {{ taxAmount }}
                             </label>
                         </div>
                         <div class="price-summary">
                             <label class="h5 text-black font-weight-bold">TOTAL</label>
-                            <label class="h5 text-black font-weight-bold">
-                                {{ shared.orderTotals.orderTotal }}
-                            </label>
+                            <label class="h5 text-black font-weight-bold">${{ orderTotal }}</label>
                         </div>
                     </div>
                 </div>
                 <div style="display:flex;justify-content: center;">
-                    <button id="place-order" class="font14"
-                            v-on:click="placeOrder"
-                            style="margin-right:2px;background-color: rgb(68, 89, 145);color: #fff; padding: 5px 15px;">
+                    <button id="place-order" v-show="paymentMethodIndex !== shared.constants.PAYMENT_METHOD_PAYPAL"
+                            v-on:click="placeOrder">
                         PLACE ORDER
                     </button>
-                    <div id="paypal-button-container"></div>
+                    <div id="paypal-button-container" v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL"></div>
                 </div>
             </div>
         </div>
@@ -482,7 +455,6 @@
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
 
-    console.log("cart: ", cart);
     console.log("orderTotals: ", orderTotals);
 
     const store = {
@@ -546,49 +518,85 @@
                 countryId: 1,
             },
             dirty: false,
+            subTotal: orderTotals.subTotal.replace("$", ""),
+            shippingAmount: orderTotals.shipping.replace("$", ""),
+            discountAmount: orderTotals.subTotalDiscount ? orderTotals.subTotalDiscount : 0,
+            taxAmount: orderTotals.tax.replace("$", ""),
+            orderTotal: orderTotals.orderTotal.replace("$", ""),
         },
         mounted: function () {
             this.setupCreditCardMethod();
             this.setupPaypalMethod();
+            this.getShippingRate(true);
         },
         computed: {
             lineOfCreditDisabled: function () {
-                const total = Number(this.shared.orderTotals.orderTotal.replace('$', '').replace(',', ''));
-                return this.shared.accountCredit.creditAmount < total;
+                return this.shared.accountCredit.creditAmount < Number(this.orderTotal);
             },
         },
         methods: {
-            handlePaymentClick: function (item, model) {
-                console.log("item: ", item);
-                console.log("model: ", JSON.stringify(model));
-                const request = { PaymentMethod: item.paymentMethodSystemName, Model: model };
-                const self = this;
-                AjaxCart.addproducttocart_catalog
-                $.ajax({
-                    url: "@Url.Action("SwiftSavePaymentMethod", "CheckoutOverride")",
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify(request),
-                    success: function (data, textStatus, XMLHttpRequest) {
-                        if (data != null) {
-                            self.showPaymentInfo = true;
-                            self.paymentHtml = data.update_section.html;
-                            var paymentInfo = $('#payment-info-section');
-                            console.log("paymentInfo: ", paymentInfo);
-                            console.log("handlePaymentClick success: ", self.paymentHtml);
-                            paymentInfo.html(data.update_section.html);
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        console.log(thrownError, 'handlePaymentClick datadata-error', xhr);
-                    }
-                });
+            showLoading: function () {
+                AjaxCart.setLoadWaiting(true);
             },
-
+            hideLoading: function () {
+                AjaxCart.setLoadWaiting(false);
+            },
             formatMoney: function (input) {
                 return input.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
+                });
+            },
+
+            getShippingRate: function (disableSpinner) {
+
+                if (this.showNewShippingAddress && (!this.newShippingAddress.address1 ||
+                    !this.newShippingAddress.city || !this.newShippingAddress.stateProvinceId ||
+                    !this.newShippingAddress.zipPostalCode)) return;
+
+                if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) return;
+
+                let address;
+                if (this.isDelivery) {
+                    if (this.showNewShippingAddress) address = this.newShippingAddress;
+                    else address = this.shared.shippingAddresses.find(x => x.id === this.shippingAddressId);
+                } else {
+                    address = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
+                    address.address1 = address.address;
+                }
+                console.log("address: ", address);
+
+                const request = {
+                    isPickup: !this.isDelivery,
+                    address1: address.address1,
+                    address2: address.address2,
+                    stateProvinceId: address.stateProvinceId,
+                    city: address.city,
+                    zipPostalCode: address.zipPostalCode,
+                };
+                const self = this;
+                if (!disableSpinner)
+                    this.showLoading();
+                $.ajax({
+                    url: "@Url.Action("GetShippingRate", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, _, _) {
+                        console.log("GetShippingRate success: ", data);
+                        if (data != null) {
+                            self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
+                            self.discountAmount = data.orderDiscountAmount;
+                            self.orderTotal = data.orderTotal;
+                        }
+                        if (!disableSpinner)
+                            self.hideLoading();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (!disableSpinner)
+                            self.hideLoading();
+                        console.log(thrownError, 'GetShippingRate datadata-error', xhr);
+                    }
                 });
             },
 
@@ -599,13 +607,14 @@
                 console.log("isValid: ", this.validate());
                 if (!this.validate()) return;
                 if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_PAYPAL) {
-                    $(".paypal-button.paypal-button-number-0.paypal-button-number-single").click();
+
                     return;
                 }
-                AjaxCart.setLoadWaiting(true);
+                this.showLoading();
                 this.finalizeOrder();
             },
-            initializeOrder: async function (self) {
+            initializeOrder: async function () {
+                const self = this;
                 let orderId = '';
                 const shippingAddressId = self.shippingAddressId ? self.shippingAddressId : 0;
                 let shippingNewAddress = { ...self.newShippingAddress };
@@ -698,7 +707,7 @@
                         }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
-                        AjaxCart.setLoadWaiting(false);
+                        self.hideLoading();
                         console.log("PlaceOrder error: ", thrownError, xhr);
                     }
                 });
@@ -730,57 +739,9 @@
                     const self = this;
                     paypal.HostedFields.render({
                         createOrder: async function () {
-                            const shippingAddressId = self.shippingAddressId ? self.shippingAddressId : 0;
-                            let shippingNewAddress = { ...self.newShippingAddress };
-                            let pickupPoint = self.shared.pickupPoints.find(x => x.id === self.pickupPointId);
-
-                            const shipToSameAddress = self.paymentMethodIndex === self.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
-                                ? true : self.shipToSameAddress;
-                            const billingAddressId = shipToSameAddress ? shippingAddressId : (self.billingAddressId ? self.billingAddressId : 0);
-                            const billingNewAddress = { ...self.newBillingAddress };
-
-                            const request = {
-                                shippingAddress: {
-                                    shippingNewAddress,
-                                    pickupPoint,
-                                    shippingAddressId,
-                                    saveToAddressBook: self.newShippingAddress.saveToMyAddresses,
-                                    isPickupInStore: !self.isDelivery,
-                                },
-                                billingAddress: {
-                                    shipToSameAddress,
-                                    billingNewAddress,
-                                    billingAddressId,
-                                    saveToAddressBook: self.newBillingAddress.saveToMyAddresses,
-                                },
-                                paymentMethodModel: {
-                                    checkoutPaymentMethodType: self.paymentMethodIndex,
-                                },
-                                hasError: false,
-                            };
-                            console.log('creating order...', request);
-                            let orderId = '';
-                            await $.ajax({
-                                url: "@Url.Action("CreatePayPalOrder", "CheckoutOverride")",
-                                type: 'POST',
-                                contentType: 'application/json; charset=utf-8',
-                                data: JSON.stringify(request),
-                                success: function (data, textStatus, XMLHttpRequest) {
-                                    console.log('success - created order...', data);
-                                    //if (data?.error === 1) return;
-                                    orderId = data.orderId;
-                                },
-                                error: function (xhr, ajaxOptions, thrownError) {
-                                    console.log("createOrder error: ", thrownError, xhr);
-                                }
-                            });
-                            console.log('going to call paypal submit...', orderId);
-                            return orderId;
+                            return await self.initializeOrder();
                         }, // replace order-ID with the order ID
                         styles: {
-                            input: {
-
-                            },
                             ':focus': {
                                 color: 'black',
                             },
@@ -806,13 +767,9 @@
                     }).then(function (hf) {
                         $('#place-order').click(function (event) {
                             event.preventDefault();
+                            if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD || !self.validate()) return;
 
-                            if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD) return;
-
-                            console.log("isValid: ", self.validate());
-                            if (!self.validate()) return;
-
-                            AjaxCart.setLoadWaiting(true);
+                            self.showLoading();
 
                             let billingAddress;
                             if (self.shipToSameAddress && self.showNewShippingAddress) {
@@ -829,14 +786,14 @@
                                 // Cardholder Name
                                 cardholderName: self.paymentCard.cardHolderName,
                                 // Billing Address
-                                billingAddress: {
-                                    streetAddress: billingAddress.address1, // address_line_1 - street
-                                    extendedAddress: billingAddress.address2, // address_line_2 - unit
-                                    region: 'TX',//billingAddress.stateProvinceId, // admin_area_1 - state
-                                    locality: billingAddress.city, // admin_area_2 - town / city
-                                    postalCode: billingAddress.zipPostalCode, // postal_code - postal_code
-                                    countryCodeAlpha2: 'US', //billingAddress.countryId, // country_code - country
-                                },
+                                //billingAddress: {
+                                //    streetAddress: billingAddress.address1, // address_line_1 - street
+                                //    extendedAddress: billingAddress.address2, // address_line_2 - unit
+                                //    region: 'TX',//billingAddress.stateProvinceId, // admin_area_1 - state
+                                //    locality: billingAddress.city, // admin_area_2 - town / city
+                                //    postalCode: billingAddress.zipPostalCode, // postal_code - postal_code
+                                //    countryCodeAlpha2: 'US', //billingAddress.countryId, // country_code - country
+                                //},
                                 // redirect after successful order approval
                             })
                                 .then(function (data) {
@@ -844,7 +801,7 @@
                                 })
                                 .catch(function (err) {
                                     console.log('error: ', JSON.stringify(err));
-                                    AjaxCart.setLoadWaiting(false);
+                                    self.hideLoading();
                                     const title = 'The following error(s) occured: \n\n';
                                     const errors = err.details.map(x => '•  ' + x.description).join('\n');
                                     const footer = '\n\n' + err.message;
@@ -862,16 +819,43 @@
                 paypal
                     .Buttons({
                         commit: false,
+                        style: {
+                            layout: 'vertical',
+                            color: 'blue',
+                            shape: 'rect',
+                        },
+                        //onInit: function (data, actions) {
+
+                        //    // Disable the buttons
+                        //    actions.disable();
+
+                        //    // Listen for changes to the checkbox
+                        //    //document.querySelector('#check')
+                        //    //    .addEventListener('change', function (event) {
+
+                        //    //        // Enable or disable the button when it is checked or unchecked
+                        //    //        if (event.target.checked) {
+                        //    //            actions.enable();
+                        //    //        } else {
+                        //    //            actions.disable();
+                        //    //        }
+                        //    //    });
+                        //},
+                        onClick: function (e, actions) {
+                            console.log("onClick e: ", e);
+                            console.log("onClick actions: ", self.validate());
+                            if (!self.validate()) return actions.reject();
+                            else return actions.resolve();
+                        },
                         createOrder: async function (data, actions) {
                             // This function sets up the details of the transaction, including the amount and line item details
-                            return await self.initializeOrder(self);
+                            return await self.initializeOrder();
                         },
                         onCancel: function (data) {
                             // Show a cancel page, or return to cart
                         },
                         onApprove: function (data, actions) {
                             // This function captures the funds from the transaction
-                            debugger;
                             return self.finalizeOrder();
                         },
                     }).render('#paypal-button-container');
