@@ -418,7 +418,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var shippingAddress = _addressService.GetAddressById(model.ShippingAddress.ShippingAddressId);
             var shippingAddressNew = model.ShippingAddress.ShippingNewAddress;
 
-            var shipStateProvince = shippingAddress == null ? _stateProvinceService.GetStateProvinceByAddress(shippingAddress) : _stateProvinceService.GetStateProvinceById(shippingAddressNew.StateProvinceId ?? 0);
+            var shipStateProvince = shippingAddress != null ? _stateProvinceService.GetStateProvinceByAddress(shippingAddress) : _stateProvinceService.GetStateProvinceById(shippingAddressNew.StateProvinceId ?? 0);
 
             var shippingAddress1 = shippingAddress != null ? shippingAddress.Address1 : shippingAddressNew.Address1;
             var shippingAddress2 = shippingAddress != null ? shippingAddress.Address2 : shippingAddressNew.Address2;
@@ -492,7 +492,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             request.Items = orderItems.ToArray();
 
-            var response = _nSSApiProvider.GetShippingRate(request, true);
+            var response = _nSSApiProvider.GetShippingRate(request, useMock: false);
             return response;
         }
 

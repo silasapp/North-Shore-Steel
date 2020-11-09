@@ -279,8 +279,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 var shippingAddress = _addresService.GetAddressById(model.ShippingAddress.ShippingAddressId);
                 var shippingAddressNew = model.ShippingAddress.ShippingNewAddress;
 
-                var billStateProvince = billingAddress == null ? _stateProvinceService.GetStateProvinceByAddress(billingAddress) : _stateProvinceService.GetStateProvinceById(billingAddressNew.StateProvinceId ?? 0);
-                var shipStateProvince = shippingAddress == null ? _stateProvinceService.GetStateProvinceByAddress(shippingAddress): _stateProvinceService.GetStateProvinceById(shippingAddressNew.StateProvinceId ?? 0);
+                var billStateProvince = billingAddress != null ? _stateProvinceService.GetStateProvinceByAddress(billingAddress) : _stateProvinceService.GetStateProvinceById(billingAddressNew.StateProvinceId ?? 0);
+                var shipStateProvince = shippingAddress != null ? _stateProvinceService.GetStateProvinceByAddress(shippingAddress): _stateProvinceService.GetStateProvinceById(shippingAddressNew.StateProvinceId ?? 0);
 
                 //prepare order details
                 var orderDetails = new OrderRequest { CheckoutPaymentIntent = "AUTHORIZE" };
