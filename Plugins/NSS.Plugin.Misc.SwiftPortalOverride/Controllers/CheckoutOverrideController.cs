@@ -35,6 +35,7 @@ using NSS.Plugin.Misc.SwiftCore.Configuration;
 using Nop.Services.Discounts;
 using Nop.Web.Models.Common;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -76,11 +77,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICheckoutAttributeParser _checkoutAttributeParser;
         private readonly IDiscountService _discountService;
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly ICustomerCompanyService _customerCompanyService;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
+        public CheckoutOverrideController(ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -125,6 +127,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _checkoutAttributeParser = checkoutAttributeParser;
             _discountService = discountService;
             _orderTotalCalculationService = orderTotalCalculationService;
+            _customerCompanyService = customerCompanyService;
         }
         #endregion
 
@@ -240,10 +243,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.StateProvinces = _countryModelFactory.GetStatesByCountryId(usaCountryId, false);
 
             // account credit
-            // TODO add can credit in db
-            //nss get credit amount
-            var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
-            model.AccountCreditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount ?? (decimal)0.00 };
+            var creditModel = new AccountCreditModel();
+            var (erpCompId, canCredit) = GetCustomerCompanyDetails();
+
+            if (canCredit)
+            {
+                var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
+                creditModel = new AccountCreditModel { CanCredit = canCredit, CreditAmount = creditResult.CreditAmount ?? (decimal)0.00 };
+            }
+
+            model.AccountCreditModel = creditModel;
 
             (model.PaypalScript, _) = _payPalServiceManager.GetScript(_settings);
 
@@ -696,7 +705,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if(paymentMethod == "CREDIT")
             {
                 //nss get credit amount
-                var creditResult = _nSSApiProvider.GetCompanyCreditBalance(12345, useMock: true);
+                var (erpCompId, _) = GetCustomerCompanyDetails();
+                var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
                 processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult.CreditAmount ?? (decimal)0.00);
             }
 
@@ -811,7 +821,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     OrderItems = orderItems.ToArray()
                 };
 
-                var resp = _nSSApiProvider.CreateNSSOrder(12345, request, useMock: true);
+                var (erpCompId, _) = GetCustomerCompanyDetails();
+
+                var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
 
                 if (resp.NSSOrderNo > 0)
                     _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo, _storeContext.CurrentStore.Id);
@@ -822,6 +834,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 // silent;
             }
 
+        }
+
+        private (int companyId, bool canCredit) GetCustomerCompanyDetails()
+        {
+            var customerId = _workContext.CurrentCustomer.Id;
+            string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
+            ERPComId += customerId;
+            int.TryParse(Request.Cookies[ERPComId], out int ERPCompanyId);
+            var company = new Company();
+            var customerCompany = new CustomerCompany();
+
+            if (ERPCompanyId > 0)
+                customerCompany = _customerCompanyService.GetCustomerCompany(customerId, company.Id);
+
+            return (ERPCompanyId, customerCompany?.CanCredit ?? false);
         }
 
 

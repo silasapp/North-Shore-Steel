@@ -45,6 +45,19 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             return _customerCompanyRepository.Table.FirstOrDefault(c => c.CustomerId == customerId && c.CompanyId == companyId);
         }
 
+        public virtual CustomerCompany GetCustomerCompanyByErpCompId(int customerId, int erpCompanyId)
+        {
+            if (customerId == 0 || erpCompanyId == 0)
+                return null;
+
+            var companny = _companyRepository.Table.FirstOrDefault(c => c.ErpCompanyId == erpCompanyId);
+
+            if (companny == null)
+                return null;
+
+            return _customerCompanyRepository.Table.FirstOrDefault(c => c.CustomerId == customerId && c.CompanyId == companny.Id);
+        }
+
         public virtual IEnumerable<CustomerCompany> GetCustomerCompanies(int customerId)
         {
             if (customerId == 0)
