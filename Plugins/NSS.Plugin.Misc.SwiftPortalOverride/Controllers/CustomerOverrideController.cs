@@ -210,6 +210,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #endregion
 
         #region Methods
+
+
+        #region Login / logout
+
+        [HttpsRequirement]
+        //available even when a store is closed
+        [CheckAccessClosedStore(true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(true)]
+        public override IActionResult Login(bool? checkoutAsGuest)
+        {
+            var model = _customerModelFactory.PrepareLoginModel(checkoutAsGuest);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCustomer/Login.cshtml", model);
+        }
+
+        #endregion
+
+
         [HttpsRequirement]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
@@ -223,7 +241,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model = _customerModelFactory.PrepareRegisterModel(model, false, setDefaultValues: true);
 
             //For view give full path of your published plugin
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/Register.cshtml", model);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCustomer/Register.cshtml", model);
 
         }
 

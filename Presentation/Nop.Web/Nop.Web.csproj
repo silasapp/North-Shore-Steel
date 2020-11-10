@@ -63,6 +63,8 @@
 
     <Content Include="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
 
+    <Content Include="Themes\SwiftPortal\Views\Shared\_ExternalAuthentication.Errors.cshtml" />
+
     <Content Include="Themes\SwiftPortal\Views\Shared\_Header.cshtml" />
 
     <Content Include="Themes\SwiftPortal\Views\Shared\_Root.cshtml" />
@@ -84,6 +86,7 @@
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\_GiftCardBox.cshtml" />
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\_ExternalAuthentication.Errors.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\_Header.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\_Root.cshtml" />
 
@@ -103,6 +106,10 @@
 
   <ItemGroup>
     <Content Update="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\_ExternalAuthentication.Errors.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

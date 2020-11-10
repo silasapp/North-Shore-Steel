@@ -283,9 +283,9 @@ a:not([href]):not([class]) {
 .checkout-card > .actions-1 > button,
 .order-search-btn > button,
 .buttons > .button-2 {
-  background-color: #f6f6f6 !important;
+  /*background-color: #f6f6f6 !important;*/
   text-transform: none !important;
-  color: #03175b;
+  color: #fff;
   border: none;
 }
 
