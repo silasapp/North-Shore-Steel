@@ -543,7 +543,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             //If we got this far, something failed, redisplay form
             model = _customerModelFactory.PrepareRegisterModel(model, true, customerAttributesXml);
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/Register.cshtml", model);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCustomer/Register.cshtml", model);
         }
 
         
