@@ -7,36 +7,30 @@
     var isGuestCustomer = EngineContext.Current.Resolve<ICustomerService>().IsGuest(customer);
 }
 
-<div class="header">
-    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })
-    @if (!isGuestCustomer)
-    {
-        <div class="header-upper">
-            <div class="header-selectors-wrapper">
-                @await Component.InvokeAsync("TaxTypeSelector")
-                @await Component.InvokeAsync("CurrencySelector")
-                @await Component.InvokeAsync("LanguageSelector")
-                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderSelectors })
-            </div>
-            <div class="header-links-wrapper">
-                @await Component.InvokeAsync("HeaderLinks")
-                @await Component.InvokeAsync("FlyoutShoppingCart")
-            </div>
-        </div>
-    }
-
-    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMiddle })
-    <div class="header-lower">
+<div class="header-upper nss-nav-bar">
+    <div class="master-wrapper-content nav-bar-content d-flex flex-row align-items-center">
         <div class="header-logo">
             @await Component.InvokeAsync("Logo")
         </div>
         @if (!isGuestCustomer)
         {
-    <div class="search-box store-search-box">
-        @await Component.InvokeAsync("CustomSearchBox")
-    </div>
+            <div class="nav-bar-search">
+                @await Component.InvokeAsync("CustomSearchBox")
+            </div>
         }
-
+        @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })*@
+        @if (!isGuestCustomer)
+        {
+            @*<div class="header-selectors-wrapper">
+                    @await Component.InvokeAsync("TaxTypeSelector")
+                    @await Component.InvokeAsync("CurrencySelector")
+                    @await Component.InvokeAsync("LanguageSelector")
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderSelectors })
+                </div>*@
+            <div class="header-links-wrapper">
+                @await Component.InvokeAsync("HeaderLinks")
+                @await Component.InvokeAsync("FlyoutShoppingCart")
+            </div>
+        }
     </div>
-    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderAfter })
 </div>
