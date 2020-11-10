@@ -20,6 +20,10 @@
     .welcome-msg {
         font: normal normal 500 34px/24px "Teko" !important;
     }
+
+    .user-input-field {
+        background: #f6f6f6 0% 0% no-repeat padding-box !important
+    }
 </style>
 <div class="page login-page">
     <div class="page-title">
@@ -39,7 +43,7 @@
                         {
                             <div class="inputs">
                                 <label asp-for="Username" asp-postfix=":" class="text-left"></label>
-                                <input asp-for="Username" class="username" autofocus="autofocus" />
+                                <input asp-for="Username" class="username user-input-field" autofocus="autofocus" />
                                 <span asp-validation-for="Username"></span>
                             </div>
                         }
@@ -47,13 +51,13 @@
                         {
                             <div class="inputs">
                                 <label asp-for="Email" asp-postfix=":" class="text-left"></label>
-                                <input asp-for="Email" class="email" autofocus="autofocus" />
+                                <input asp-for="Email" class="email user-input-field" autofocus="autofocus" />
                                 <span asp-validation-for="Email"></span>
                             </div>
                         }
                         <div class="inputs">
                             <label asp-for="Password" asp-postfix=":" class="text-left"></label>
-                            <input asp-for="Password" class="password" />
+                            <input asp-for="Password" class="password user-input-field" />
                             <span asp-validation-for="Password"></span>
                         </div>
                         <div class="inputs reversed">
