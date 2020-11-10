@@ -10,7 +10,7 @@
     var themeName = themeContext.WorkingThemeName;
     var routeUrl = webHelper.GetRawUrl(Context.Request);
 }
-@if (routeUrl.Contains("login"))
+@if (routeUrl.Contains("login") || routeUrl.Contains("register") || routeUrl.Contains("passwordrecovery"))
 {
     <div class="linda-block">
         [CUSTOMER EXPERIENCE / LINDA EXPERIENCE MARKETING COPY HERE]
