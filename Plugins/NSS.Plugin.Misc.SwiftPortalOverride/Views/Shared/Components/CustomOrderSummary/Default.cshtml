@@ -12,9 +12,10 @@
 @using Nop.Services.Localization
 @using Nop.Core.Domain
 @using NSS.Plugin.Misc.SwiftPortalOverride
-@using NSS.Plugin.Misc.SwiftCore.Services 
-@using NSS.Plugin.Misc.SwiftCore.Domain.Customers 
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @using Nop.Services.Orders
+@using NSS.Plugin.Misc.SwiftCore.Helpers
 @inject IWebHelper webHelper
 @inject IWorkContext workContext
 @inject OrderSettings orderSettings
@@ -32,22 +33,13 @@
 @{
     var customer = workContext.CurrentCustomer;
 
-    var customerId = customer.Id;
-    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-    ERPComId += customerId;
-    Company company = new Company();
-    CustomerCompany customerCompany = new CustomerCompany();
-    CustomerCompanyProduct customerCompanyProduct = new CustomerCompanyProduct();
-    int.TryParse(Context.Request.Cookies[ERPComId], out int ERPCompanyId);
-    if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
-        company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
-    if (company != null)
-        customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
+    // get cust company
+    var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
 
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
 
-    var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #");
-    var deliverychkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option");
+    var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == Constants.CheckoutPONoAttribute);
+    var deliverychkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == Constants.CheckoutDeliveryOptionAttribute);
 }
 
 <style>
@@ -101,10 +93,6 @@
                         var controlId = $"checkout_attribute_{purchasechkattr.Id}";
                         <input type="text" name="@(controlId)" id="@(controlId)" value="@(purchasechkattr.DefaultValue)" placeholder="ENTER..." />
                     }
-                    else
-                    {
-                        <input type="text" name="purchase-order" id="purchase-order" placeholder="ENTER...">
-                    }
 
                 </div>
                 <div class="cart-filter-menu">
@@ -141,6 +129,8 @@
                             var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
                             var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
                             var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
+
+                            var customerCompanyProduct = new CustomerCompanyProduct();
                             if (customerCompany != null)
                             {
                                 customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
@@ -151,13 +141,13 @@
                             var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
                             var attributes = PrepareProductAttributeModels(product, cartItem);
 
-                            var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == "Customer Part No");
-                            var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == "Purchase Unit");
-                            string unitControlId = purchaseUnitAttr == null ? null : $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}";
+                            var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == Constants.CustomerPartNoAttribute);
+                            var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                            var noteAttr = attributes.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
+
+                            var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}{item.Id}" : $"itemuom{item.Id}";
 
                             var unitPrice = "0.00";
-
-
 
                             <tr>
                                 <td>@(iNo)</td>
@@ -176,16 +166,8 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (customerCompanyProduct != null)
-                                    {
-                                        //var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";
-                                        <input style="width: 100px;height: 30px;" type="text" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct.CustomerPartNo" />
-                                    }
-                                    else
-                                    {
-                                        <input style="width: 100px;height: 30px;" type="text" name="customerpartNo@(item.ProductId)" id="no-@item.Id">
-                                    }
-
+                                    @*//var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";*@
+                                    <input style="width: 100px;height: 30px;" type="text" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" />
                                 </td>
                                 <td>
                                     @{unitPrice = !string.IsNullOrEmpty(pricePerPiece) ? pricePerPiece : !string.IsNullOrEmpty(pricePerCWT) ? pricePerCWT : !string.IsNullOrEmpty(pricePerFt) ? pricePerFt : unitPrice; }
@@ -193,43 +175,23 @@
 
                                     @if (purchaseUnitAttr != null)
                                     {
-                                        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}";
-                                        <select name="@(controlId)" id="@(controlId)" style="height: 30px;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
+                                        <select name="@(unitControlId)" id="@(unitControlId)" style="height: 30px;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
                                             @foreach (var attributeValue in purchaseUnitAttr.Values)
                                             {
                                                 if (attributeValue.Name == "EA" && string.IsNullOrEmpty(pricePerPiece) || attributeValue.Name == "CWT" && string.IsNullOrEmpty(pricePerCWT) || attributeValue.Name == "FT" && string.IsNullOrEmpty(pricePerFt))
                                                     continue;
 
-
                                                 <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
                                             }
                                         </select>
                                     }
-                                    else
-                                    {
-                                        <select name="itemunit@(item.Id)" id="itemunit@(item.Id)" style="height: 30px;" onchange="toggleUnitPrice(this, null, @item.Id, @pricePerCWT, @pricePerPiece, @pricePerFt)">
-                                            @if (!string.IsNullOrEmpty(pricePerPiece))
-                                            {
-                                                <option value="EA">EA</option>
-                                            }
-                                            @if (!string.IsNullOrEmpty(pricePerCWT))
-                                            {
-                                                <option value="CWT">CWT</option>
-                                            }
-                                            @if (!string.IsNullOrEmpty(pricePerFt))
-                                            {
-                                                <option value="FT">FT</option>
-                                            }
-                                        </select>
-                                    }
-
 
                                 </td>
                                 <td id="itemsubtotal@(item.Id)"> @item.SubTotal </td>
                                 <td id="itemweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00") </td>
                                 <td id="itemlength@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00") </td>
                                 <td>
-                                    @if (isSerialized == "True")
+                                    @if (isSerialized?.ToLower() == "true")
                                     {
                                         <label style="width: 100px" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
                                     }
@@ -240,10 +202,14 @@
 
                                 </td>
                                 <td style="text-align:center">
-                                    <a style="background: none; border: none;" data-toggle="modal" onclick="handleNotesModal(@item.ProductId)" ; data-target="#noteModal">
-                                        <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
-                                    </a>
-                                    <input type="hidden" id=note-@item.ProductId value="" />
+                                    @if (noteAttr != null)
+                                    {
+                                        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
+                                        <a style="background: none; border: none;" data-toggle="modal" onclick="handleNotesModal('@controlId')" data-target="#noteModal">
+                                            <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                        </a>
+                                        <input type="hidden" id=@controlId name="@controlId" value="@noteAttr.DefaultValue" />
+                                    }
                                 </td>
                                 <td class="remove-from-cart" style="text-align:center">
                                     <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" aria-label="@T("ShoppingCart.Remove")" />
@@ -437,6 +403,20 @@
         return s;
     }
 
+    (int, CustomerCompany) GetCustomerCompanyDetails()
+    {
+        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+
+        int.TryParse(Context.Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+
+        CustomerCompany customerCompany = null;
+
+        if (eRPCompanyId > 0)
+            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(workContext.CurrentCustomer.Id, eRPCompanyId);
+
+        return (eRPCompanyId, customerCompany);
+    }
+    #region PrepareProductAttributeModels
     IList<ProductDetailsModel.ProductAttributeModel> PrepareProductAttributeModels(Product product, ShoppingCartItem updatecartitem)
     {
         if (product == null)
@@ -556,6 +536,7 @@
 
         return model;
     }
+    #endregion
 }
 
 
@@ -564,11 +545,11 @@
     let itemNoteId;
     function handleNotesModal(itemId) {
         itemNoteId = itemId;
-        $("#productNote").val($(`#note-${itemNoteId}`).val());
+        $("#productNote").val($(`#${itemNoteId}`).val());
     }
 
     $('#noteModal').on('hidden.bs.modal', function () {
-        $(`#note-${itemNoteId}`).val($(this).find("textarea").val());
+        $(`#${itemNoteId}`).val($(this).find("textarea").val());
         $(this).find("textarea").val('').end();
     });
 

@@ -30,6 +30,11 @@
     <None Remove="Views\CartOverride\_GiftCardBox.cshtml" />
     <None Remove="Views\CheckoutOverride\Completed.cshtml" />
     <None Remove="Views\CheckoutOverride\OpcPaymentInfo.cshtml" />
+    <None Remove="Views\CustomOrder\CustomerOrders.cshtml" />
+    <None Remove="Views\CustomOrder\Details.cshtml" />
+    <None Remove="Views\CustomCustomer\CustomCatalogIndex.cshtml" />
+    <None Remove="Views\CustomCustomer\Login.cshtml" />
+    <None Remove="Views\CustomCustomer\_FilteredPartialView.cshtml" />
     <None Remove="Views\CustomShoppingCart\Checkout.cshtml" />
     <None Remove="Views\Shared\Components\CustomOrderSummary\Default.cshtml" />
     <None Remove="Views\Configure.cshtml" />
@@ -42,6 +47,7 @@
     <None Remove="Views\HomeIndex.cshtml" />
     <None Remove="Views\SelectAccount.cshtml" />
     <None Remove="Views\Shared\Components\CustomSearchBox\Default.cshtml" />
+    <None Remove="Views\Shared\_ExternalAuthentication.Errors.cshtml" />
     <None Remove="Views\TermsOfService.cshtml" />
     <None Remove="Views\_ViewImports.cshtml" />
     <None Remove="Views\Confirmation.cshtml" />
@@ -87,6 +93,20 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="Views\CustomOrder\CustomerOrders.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomOrder\Details.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\CustomCustomer\Login.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Shared\Components\CustomOrderSummary\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -111,13 +131,18 @@
     <Content Include="Views\HomeIndex.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Register.cshtml">
+    <Content Include="Views\CustomCustomer\Register.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configure.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Shared\Components\CustomSearchBox\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Shared\_ExternalAuthentication.Errors.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -149,7 +174,8 @@
     <Folder Include="Areas\Admin\Extensions\" />
     <Folder Include="Areas\Admin\Factories\" />
     <Folder Include="Areas\Admin\Factories\" />
-    <Folder Include="Areas\Admin\Models\" />  </ItemGroup>
+    <Folder Include="Areas\Admin\Models\" />
+    <Folder Include="Views\Shared\Components\CustomLogo\" />  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="PayPal" Version="2.0.0-rc2" />

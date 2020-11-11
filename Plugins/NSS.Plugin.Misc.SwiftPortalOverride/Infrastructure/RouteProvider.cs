@@ -32,6 +32,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 
         public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
         {
+
+            //login
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Login", "login/",
+              new { controller = "CustomerOverride", action = "Login" },
+              new { },
+              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+              );
+
+
             // register
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Register", "register/",
                new { controller = "CustomerOverride", action = "Register" },
@@ -50,6 +59,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new { },
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/",
+               new { controller = "OrderOverride", action = "CustomerOrders" },
+               new { },
+               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/{orderId:min(0)}/",
+              new { controller = "OrderOverride", action = "Details" },
+              new { },
+              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+              );
 
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Catalog", "cart/",
                new { controller = "CartOverride", action = "Cart" },

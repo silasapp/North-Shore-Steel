@@ -8,26 +8,34 @@
     Html.AppendPageCssClassParts("html-registration-page");
 
     //Loading CSS file
-    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/customstyle.css");
+    //Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/customstyle.css");
 }
 
-<style>
+@*<style>
     .header-menu {
         display: none !important;
-</style>
+</style>*@
 
-<div class="page registration-page">
-    <div class="page-title">
-        <h1>Welcome</h1>
+<div class="page registration-result-page">
+    <div class=page-title>
+        <h1>WELCOME!</h1>
     </div>
     <div class="page-body">
-        Before you can make a purchase an account representative will review your account and make sure your account is setup just right for you
-        with your own dedicated sales representative that you can call upon any time. Don't worry you can still take shop through the store and once your account is setup you will
-        be able to make purchases.
+        <div class="fieldset welcome-fieldset">
+            <p class="text">
+                Thanks for registering! We'll need to finish setting up your account
+                on our end before you're able to make purchases. Don't worry it won't take long
+                and you can shop around until then! Welcome to SWIFT&#8482;!
+            </p>
+            <div class=buttons>
+                @*<input type=submit name=send-email class="button-1 password-recovery-button" value="Continue">*@
+                <input type="button" class="button-1 password-recovery-button" onclick="location.href='@Url.RouteUrl("Homepage")'" value="Continue" />
+            </div>
+        </div>
     </div>
     <br />
     <br />
-    <div class="buttons">
+    @*<div class="buttons">
         <input type="button" class="button-1 checkout-as-guest-button" onclick="location.href='@Url.RouteUrl("Homepage")'" value="Continue" />
-    </div>
+    </div>*@
 </div>

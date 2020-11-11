@@ -13,6 +13,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
     <!-- Essentail JS2 for Vue  (All components Styles) -->
     <link href="https://cdn.syncfusion.com/ej2/material.css" rel="stylesheet" type="text/css" />
     <!-- Vue library file-->
@@ -30,6 +32,7 @@
     }
     else
     {
+        Html.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles-custom.css");
         Html.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles.css");
     }
     //add jQuery UI css file
