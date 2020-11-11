@@ -14,11 +14,12 @@
 @inject ICustomerCompanyService customerCompanyService
 @inject ICompanyService companyService
 @inject ICustomerCompanyProductService customerCompanyProductService
-
+@using Nop.Web.Framework.Themes
+@inject IThemeContext themeContext
 @model CheckoutCompleteOverrideModel
 @{
     Layout = "_ColumnsOne";
-    var themeName = Constants.ThemeName;
+    var themeName = themeContext.WorkingThemeName;
 
     //page class
     Html.AppendPageCssClassParts("html-home-page");
@@ -100,11 +101,11 @@
     }
 </style>
 <div id="checkout" class="page home-page" v-cloak>
+    <div class=page-title>
+        <h1>CHECKOUT</h1>
+    </div>
     <div class="page-body">
-
-        <label class="h4 text-primary font-weight-bold text-center w-100 mt-4 mb-0">CHECKOUT</label>
-        <hr style="height: 2px; color: #000; opacity: 0.5;margin-bottom: 30px;">
-        <div class="row px-5" style="justify-content: space-between;">
+        <div class="row" style="justify-content: space-between;">
             <div class="col-9">
                 <div class="card card-mod">
                     <label class="h5 text-primary font-weight-bold mb-4">ORDER INFORMATION</label>
@@ -118,13 +119,13 @@
                             <label id="deliveryDate" class="p-2 text-black">{{ deliveryDate }}</label>
                         </div>
                         <button class="h6 text-primary mr-5" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
-                            <img src="Themes/@themeName/Content/assets/enter.svg" alt="" width="20" class="mr-2">
+                            <img src="Themes/@themeName/Content/assets/return.svg" alt="" width="20" class="mr-2">
                             Edit Shopping Cart
                         </button>
                     </div>
                 </div>
                 <div class="card card-mod">
-                    <h1 class="h5 text-primary font-weight-bold mb-4">SHIPPING OR PICKUP</h1>
+                    <label class="h5 text-primary font-weight-bold mb-4">SHIPPING OR PICKUP</label>
                     <div class="d-flex flex-row justify-content-center mb-3">
                         <button class="fs-14 shipping-tab mr-2" v-bind:class="{'active': isDelivery}" v-on:click="isDelivery = true; getShippingRate();">
                             Delivery
@@ -375,9 +376,11 @@
                 </div>
                 <div class="d-flex flex-column">
 
-                    <label class="h4 text-primary font-weight-bold text-center mt-4 mb-0">ORDER SUMMARY</label>
-                    <hr style="color: rgb(7, 7, 107); margin-bottom: 20px;">
-                    <table class="table table-bordered catalog-table font12" id="catalogTable" onload="sortTable(0)">
+                    <div class=page-title>
+                        <h1>ORDER SUMMARY</h1>
+                    </div>
+
+                    <table class="table table-striped nss-table checkout-table" id="catalogTable" onload="sortTable(0)">
                         <thead>
                             <tr>
                                 <th scope="col">Item #</th>
@@ -476,7 +479,7 @@
 <script>
     var shippingAddresses = @Html.Raw(shippingAddresses);
     var billingAddresses = @Html.Raw(billingAddresses);
-    var pickupPoints = @Html.Raw(pickupPoints);
+     var pickupPoints = @Html.Raw(pickupPoints);
     var accountCredit = @Html.Raw(accountCredit);
     var states = @Html.Raw(states);
     var cart = @Html.Raw(cart);
