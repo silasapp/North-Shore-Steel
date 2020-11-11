@@ -33,7 +33,6 @@
     <Content Remove="obj\**" />
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
-    <Content Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
     <Compile Remove="bin\**" />
     <Compile Remove="obj\**" />
@@ -43,25 +42,113 @@
     <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
 
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
-
-    <Compile Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
     <Content Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="obj\**" />
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
-    <EmbeddedResource Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
     <None Remove="bin\**" />
     <None Remove="obj\**" />
     <None Remove="Plugins\**;Themes\**" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
-    <None Remove="Themes\SwiftPortal\Views\Shared\Components\**" />
 
     <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
 
     <Content Include="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Order\CustomerOrders.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Order\CustomerRewardPoints.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Order\Details.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Order\ShipmentDetails.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\AdminHeaderLinks\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\BlogRssHeaderLink\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\CategoryNavigation\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\CheckoutProgress\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\CrossSellProducts\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\CurrencySelector\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\CustomerNavigation\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\EuCookieLaw\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\ExternalMethods\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\Favicon\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\FlyoutShoppingCart\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\Footer\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\HeaderLinks\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\HomepageBestSellers\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\HomepageCategories\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\HomepageNews\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\HomepagePolls\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\HomepageProducts\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\LanguageSelector\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\Logo\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\ManufacturerNavigation\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\NewsletterBox\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\NewsRssHeaderLink\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\OrderSummary\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\OrderTotals\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\PollBlock\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\PopularProductTags\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\PrivateMessagesInbox\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\PrivateMessagesSentItems\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\ProductsAlsoPurchased\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\RecentlyViewedProductsBlock\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\RelatedProducts\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\SearchBox\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\SelectedCheckoutAttributes\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\ShoppingCartEstimateShipping\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\SocialButtons\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\StoreThemeSelector\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\TaxTypeSelector\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\TopicBlock\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\TopMenu\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\VendorNavigation\Default.cshtml" />
+
+    <Content Include="Themes\SwiftPortal\Views\Shared\Components\Widget\Default.cshtml" />
 
     <Content Include="Themes\SwiftPortal\Views\Shared\_Header.cshtml" />
 
@@ -73,10 +160,50 @@
 
     <!-- We copy the \Logs directory -->
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\abma.png" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\awmi.png" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\bck.PNG" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\cart.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\credit-card.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\discount-2.PNG" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\discount.PNG" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\dislike.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\dollar.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\enter.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\facebook.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\headset.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-add.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-cal-range.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-download.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-error.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-expand.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-key.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-location.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-more-vert.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-notifications.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-payment.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-person.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-remove-person.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-store-dark.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-users.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\instagram.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\linkedin.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\logo-nasa.png" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\logo.PNG" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\logout.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\mail.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\menu.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\mobile-phone.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\no-photo.png" />
     <Content Remove="Themes\SwiftPortal\Content\assets\paypal.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\person.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\phone.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\search.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\smile.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\truck.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\twitter.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\youtube.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\css\styles-custom.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css.map" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css" />
@@ -84,6 +211,52 @@
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\_GiftCardBox.cshtml" />
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Order\CustomerOrders.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Order\CustomerRewardPoints.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Order\Details.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Order\ShipmentDetails.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\AdminHeaderLinks\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\BlogRssHeaderLink\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\CategoryNavigation\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\CheckoutProgress\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\CrossSellProducts\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\CurrencySelector\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\CustomerNavigation\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\EuCookieLaw\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\ExternalMethods\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\Favicon\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\FlyoutShoppingCart\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\Footer\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\HeaderLinks\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\HomepageBestSellers\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\HomepageCategories\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\HomepageNews\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\HomepagePolls\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\HomepageProducts\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\LanguageSelector\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\Logo\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\ManufacturerNavigation\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\NewsletterBox\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\NewsRssHeaderLink\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\OrderSummary\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\OrderTotals\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\PollBlock\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\PopularProductTags\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\PrivateMessagesInbox\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\PrivateMessagesSentItems\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\ProductsAlsoPurchased\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\RecentlyViewedProductsBlock\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\RelatedProducts\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\SearchBox\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\SelectedCheckoutAttributes\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\ShoppingCartEstimateShipping\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\SocialButtons\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\StoreThemeSelector\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\TaxTypeSelector\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\TopicBlock\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\TopMenu\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\VendorNavigation\Default.cshtml" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\Widget\Default.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\_Header.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\_Root.cshtml" />
 
@@ -106,6 +279,190 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Update="Themes\SwiftPortal\Views\Order\CustomerOrders.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Order\CustomerRewardPoints.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Order\Details.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Order\ShipmentDetails.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\AdminHeaderLinks\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\BlogRssHeaderLink\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\CategoryNavigation\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\CheckoutProgress\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\CrossSellProducts\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\CurrencySelector\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\CustomerNavigation\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\EuCookieLaw\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\ExternalMethods\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\Favicon\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\FlyoutShoppingCart\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\Footer\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\HeaderLinks\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\HomepageBestSellers\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\HomepageCategories\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\HomepageNews\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\HomepagePolls\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\HomepageProducts\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\LanguageSelector\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\Logo\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\ManufacturerNavigation\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\NewsletterBox\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\NewsRssHeaderLink\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\OrderSummary\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\OrderTotals\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\PollBlock\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\PopularProductTags\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\PrivateMessagesInbox\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\PrivateMessagesSentItems\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\ProductsAlsoPurchased\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\RecentlyViewedProductsBlock\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\RelatedProducts\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\SearchBox\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\SelectedCheckoutAttributes\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\ShoppingCartEstimateShipping\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\SocialButtons\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\StoreThemeSelector\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\TaxTypeSelector\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\TopicBlock\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\TopMenu\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\VendorNavigation\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\SwiftPortal\Views\Shared\Components\Widget\Default.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="Themes\SwiftPortal\Views\Shared\_Header.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -120,6 +477,7 @@
     <Folder Include="Plugins\Misc.SwiftApi\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Content\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\" />
+    <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\" />
   </ItemGroup>
 
   <!-- This target execute after "Build" target.
