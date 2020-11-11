@@ -172,6 +172,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 Product = products.ContainsKey(item.ProductId) ? products[item.ProductId] : null
             }).Where(item => item.NewQuantity != item.Item.Quantity);
 
+
+            var errors = new List<string>();
+            // var attributeXml = _productAttributeParser.ParseProductAttributes(product, form, errors);
+
             //order cart items
             //first should be items with a reduced quantity and that require other products; or items with an increased quantity and are required for other products
             var orderedCart = itemsWithNewQuantity
@@ -479,6 +483,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var cartType = (ShoppingCartType)shoppingCartTypeId;
 
             var product = _productService.GetProductById(productId);
+
+            if (quantity == 0)
+                //we can only add when quantity is more than zero
+                return Json(new
+                {
+                    success = false,
+                    message = "Quantity should be more than zero (0)"
+                });
+
             if (product == null)
                 //no product found
                 return Json(new
