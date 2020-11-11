@@ -67,7 +67,7 @@
 </div>
 
 
-<div class="order-summary-content">
+<div class="cart-summary-content card">
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
     @await Html.PartialAsync("_OrderReviewData", Model.OrderReviewData)
     @if (Model.Items.Count > 0)
@@ -85,35 +85,65 @@
         }
         @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
         <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
-            <div style="display: flex; margin: 20px 0; justify-content: space-between;" class="col-lg-5">
-                <div class="filter-menu">
-                    <label for="purchase-order">Purchase Order #</label>
-                    @if (purchasechkattr != null)
-                    {
-                        var controlId = $"checkout_attribute_{purchasechkattr.Id}";
-                        <input type="text" name="@(controlId)" id="@(controlId)" value="@(purchasechkattr.DefaultValue)" placeholder="ENTER..." />
-                    }
+            <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
 
+                <div style="display: flex;">
+                    <div class="cart-filter-menu">
+                        <label for="purchase-order">Purchase Order #</label>
+                        @if (purchasechkattr != null)
+                        {
+                            var controlId = $"checkout_attribute_{purchasechkattr.Id}";
+                            <input type="text" name="@(controlId)" id="@(controlId)" value="@(purchasechkattr.DefaultValue)" placeholder="ENTER..." />
+                        }
+
+                    </div>
+                    <div class="cart-filter-menu">
+                        <label for="estimated-date">Delivery Date</label>
+                        <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
+                    </div>
                 </div>
-                <div class="filter-menu">
-                    <label for="estimated-date">Delivery Date</label>
-                    <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
+                <div class="cart-options">
+                    @if (Model.IsEditable)
+                    {
+                        <div class="common-buttons" style="display: flex">
+                            @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
+                                <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
+                            <div style="position: relative;display: flex;align-items: center;">
+                                <input style="z-index: 1;" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")" class="button-2 update-cart-button" />
+
+                                <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/return.svg" width="20" height="20" alt="">
+                            </div>
+                            <div style="position: relative;display: flex;align-items: center;">
+                                <input style="z-index: 1;" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")" class="button-2 continue-shopping-button" />
+
+                                <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/reload.svg" width="20" height="20" alt="">
+                            </div>
+                            @*@await Component.InvokeAsync("ShoppingCartEstimateShipping")*@
+                        </div>
+                    }
+                    @*@if (Model.IsEditable)
+                        {
+                            @await Html.PartialAsync("_CheckoutAttributes", Model)
+                        }*@
+                    @await Component.InvokeAsync("SelectedCheckoutAttributes")
                 </div>
+
             </div>
+
             <div class="table-wrapper">
                 <table class="table table-bordered cart-table">
                     <thead>
                         <tr>
-                            <th scope="col">Item #</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Customer Part #</th>
-                            <th scope="col">Unit Price</th>
-                            <th scope="col">Total Price</th>
-                            <th scope="col">Weight</th>
-                            <th scope="col">Length</th>
-                            <th scope="col">Order Qty</th>
-                            <th scope="col">Notes</th>
-                            <th scope="col">Remove</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Item #</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Description</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Customer Part #</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Unit Price</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Total Price</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Weight</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Length</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Order Qty</th>
+                            <th style="background-color: transparent !important; border: none !important;" scope="col">Notes</th>
+                            <th style="background-color: transparent !important; border: none !important;" scope="col">Remove</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -193,11 +223,11 @@
                                 <td>
                                     @if (isSerialized?.ToLower() == "true")
                                     {
-                                        <label style="width: 100px" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
+                                        <label style="width: 100px; height: 30px" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
                                     }
                                     else
                                     {
-                                        <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+                                        <input name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px; height: 30px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
                                     }
 
                                 </td>
@@ -206,13 +236,17 @@
                                     {
                                         var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
                                         <a style="background: none; border: none;" data-toggle="modal" onclick="handleNotesModal('@controlId')" data-target="#noteModal">
-                                            <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                            <img src="Themes/SwiftPortal/Content/assets/note-add.svg" width="20" height="20" alt="">
                                         </a>
                                         <input type="hidden" id=@controlId name="@controlId" value="@noteAttr.DefaultValue" />
                                     }
                                 </td>
                                 <td class="remove-from-cart" style="text-align:center">
-                                    <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" aria-label="@T("ShoppingCart.Remove")" />
+                                    <label class="pure-material-checkbox">
+                                        <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" aria-label="@T("ShoppingCart.Remove")" />
+
+                                        <span class="checkmark"></span>
+                                    </label>
                                 </td>
                             </tr>
                         }
@@ -229,24 +263,7 @@
                     @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
                 </div>
             }
-            <div class="cart-options">
-                @if (Model.IsEditable)
-                {
-                    <div class="common-buttons">
-                        @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
-                            <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
-                        <input type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")" class="button-2 update-cart-button" />
-                        <input type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")" class="button-2 continue-shopping-button" />
-                        @*@await Component.InvokeAsync("ShoppingCartEstimateShipping")*@
-                    </div>
-                }
-                @*@if (Model.IsEditable)
-                    {
-                        @await Html.PartialAsync("_CheckoutAttributes", Model)
-                    }*@
-                @await Component.InvokeAsync("SelectedCheckoutAttributes")
-            </div>
-            <div class="cart-footer">
+            <div class="cart-footer row">
                 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
                 @if (Model.IsEditable)
                 {
@@ -312,8 +329,11 @@
                                 <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
                             </div>
                             <div class="terms-of-service">
-                                <input id="termsofservice" type="checkbox" name="termsofservice" />
-                                <label for="termsofservice" style="display: contents">@T("Checkout.TermsOfService.IAccept")</label>
+
+                                <label class="pure-material-checkbox">
+                                    <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                    <span class="checkmark"></span>@T("Checkout.TermsOfService.IAccept")
+                                </label>
                                 @if (Model.TermsOfServicePopup)
                                 {
                                     <a class="read" id="read-terms">@T("Checkout.TermsOfService.Read")</a>
