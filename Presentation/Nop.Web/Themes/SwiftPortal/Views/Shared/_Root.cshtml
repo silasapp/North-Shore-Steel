@@ -1,14 +1,33 @@
 ﻿@using Nop.Services.Customers
 @using Nop.Core
 @using Nop.Core.Infrastructure
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
+@using NSS.Plugin.Misc.SwiftCore.Services
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
 @{
     // check if user is guest
     var customer = EngineContext.Current.Resolve<IWorkContext>().CurrentCustomer;
     var isGuestCustomer = EngineContext.Current.Resolve<ICustomerService>().IsGuest(customer);
+    int customerId = customer.Id;
+    // get all companies assigned to customer
+    IEnumerable<CustomerCompany> customerCompanies = customerCompanyService.GetCustomerCompanies(customerId);
+
+    CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
+    selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
+    selectAccountModel.loggedInCustomerId = customerId;
 }
 
 @{
     Layout = "_Root.Head";
+}
+
+@{
+
+    // get cust company
+    var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
 }
 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.BodyStartHtmlTagAfter })
 @await Html.PartialAsync("_Notifications")
@@ -29,16 +48,21 @@
 
     @if (!isGuestCustomer)
     {
-        <div class="header-lower p-0">
-            <div class="header-menu bg-white py-3 mb-0">
-                <select id="accountSelect" class="account-select" data-role="accountSelect">
-                    <option>Accounts </option>
-                    <option>ACME Inc </option>
-                    <option>ACME Corporate </option>
-                </select>
-                @await Component.InvokeAsync("TopMenu")
+        @if (selectAccountModel.Companies != null)
+        {
+            <div class="header-lower p-0">
+                <div class="header-menu bg-white py-3 mb-0">
+                    <select id="accountSelect" name="options" class="account-select" data-role="accountSelect" onchange="SelectCompany(this)">
+                        <option disabled>Accounts </option>
+                        @foreach (var company in selectAccountModel.Companies)
+                        {
+                            <option value="@company.ErpCompanyId" id=@company.ErpCompanyId>@company.Name</option>
+                        }
+                    </select>
+                    @await Component.InvokeAsync("TopMenu")
+                </div>
             </div>
-        </div>
+        }
     }
 
     <div class="master-wrapper-content">
@@ -70,11 +94,46 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
         })();
     </script>
+
+    <script type='text/javascript'>
+        function SelectCompany(option) {
+            let ErpId = option.options[option.selectedIndex].id;
+            let cookieKey = `ERPCompanyId${@{@selectAccountModel.loggedInCustomerId}}=`
+            document.cookie = cookieKey + ErpId;
+            document.location.href = "/";
+        }
+
+
+        var erpCompId = @Html.Raw(erpCompId);
+        $(document).ready(function () {
+            $('select[name="options"]').find('option[value='+erpCompId+']').attr("selected", true);
+        });
+
+    </script>
     <noscript>
         <a href="https://www.livechatinc.com/chat-with/10903842/" rel="nofollow">Chat with us</a>,
         powered by <a href="https://www.livechatinc.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a>
     </noscript>
     <!-- End of LiveChat code -->
 </div>
+
 @await Component.InvokeAsync("EuCookieLaw")
 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.BodyEndHtmlTagBefore })
+
+
+@functions{
+
+    (int, CustomerCompany) GetCustomerCompanyDetails()
+    {
+        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+
+        int.TryParse(Context.Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+
+        CustomerCompany customerCompany = null;
+
+        if (eRPCompanyId > 0)
+            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(workContext.CurrentCustomer.Id, eRPCompanyId);
+
+        return (eRPCompanyId, customerCompany);
+    }
+}
