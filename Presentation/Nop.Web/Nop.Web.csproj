@@ -33,6 +33,7 @@
     <Content Remove="obj\**" />
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
+    <Content Remove="Themes\SwiftPortal\Views\Order\**" />
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
     <Compile Remove="bin\**" />
     <Compile Remove="obj\**" />
@@ -42,29 +43,25 @@
     <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
 
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
+
+    <Compile Remove="Themes\SwiftPortal\Views\Order\**" />
     <Content Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="obj\**" />
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
+    <EmbeddedResource Remove="Themes\SwiftPortal\Views\Order\**" />
     <None Remove="bin\**" />
     <None Remove="obj\**" />
     <None Remove="Plugins\**;Themes\**" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
+    <None Remove="Themes\SwiftPortal\Views\Order\**" />
 
     <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
 
     <Content Include="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
-
-    <Content Include="Themes\SwiftPortal\Views\Order\CustomerOrders.cshtml" />
-
-    <Content Include="Themes\SwiftPortal\Views\Order\CustomerRewardPoints.cshtml" />
-
-    <Content Include="Themes\SwiftPortal\Views\Order\Details.cshtml" />
-
-    <Content Include="Themes\SwiftPortal\Views\Order\ShipmentDetails.cshtml" />
 
     <Content Include="Themes\SwiftPortal\Views\Shared\Components\AdminHeaderLinks\Default.cshtml" />
 
@@ -213,10 +210,6 @@
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
     <None Remove="Themes\SwiftPortal\Content\assets\c-heart.svg" />
     <None Remove="Themes\SwiftPortal\Views\Shared\_ExternalAuthentication.Errors.cshtml" />
-    <None Remove="Themes\SwiftPortal\Views\Order\CustomerOrders.cshtml" />
-    <None Remove="Themes\SwiftPortal\Views\Order\CustomerRewardPoints.cshtml" />
-    <None Remove="Themes\SwiftPortal\Views\Order\Details.cshtml" />
-    <None Remove="Themes\SwiftPortal\Views\Order\ShipmentDetails.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\Components\AdminHeaderLinks\Default.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\Components\BlogRssHeaderLink\Default.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\Components\CategoryNavigation\Default.cshtml" />
@@ -278,22 +271,6 @@
 
   <ItemGroup>
     <Content Update="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Themes\SwiftPortal\Views\Order\CustomerOrders.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Themes\SwiftPortal\Views\Order\CustomerRewardPoints.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Themes\SwiftPortal\Views\Order\Details.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Themes\SwiftPortal\Views\Order\ShipmentDetails.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
