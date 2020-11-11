@@ -32,6 +32,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 
         public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
         {
+
+            //login
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Login", "login/",
+              new { controller = "CustomerOverride", action = "Login" },
+              new { },
+              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+              );
+
+
             // register
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Register", "register/",
                new { controller = "CustomerOverride", action = "Register" },

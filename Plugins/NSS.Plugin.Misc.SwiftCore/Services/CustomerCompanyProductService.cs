@@ -63,6 +63,20 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         }
 
+        public void UpdateCustomerCompanyProduct(CustomerCompanyProduct customerCompanyProduct)
+        {
+            var company = _customerCompanyProductRepository.Table.FirstOrDefault(c => c.CustomerCompanyId == customerCompanyProduct.CustomerCompanyId && c.ProductId == customerCompanyProduct.ProductId);
+            if (company == null)
+            {
+                _customerCompanyProductRepository.Insert(customerCompanyProduct);
+            }
+            else
+            {
+                company.CustomerPartNo = customerCompanyProduct.CustomerPartNo;
+                _customerCompanyProductRepository.Update(company);
+            }
+        }
+
         public void DeleteCustomerCompanyProduct(CustomerCompanyProduct customerCompanyProduct)
         {
             if (customerCompanyProduct == null)

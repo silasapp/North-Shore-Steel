@@ -4,86 +4,96 @@
 @inject IWorkContext workContext;
 @inject IThemeContext themeContext
 @using Nop.Web.Framework.Themes
+@inject Nop.Core.IWebHelper webHelper
 
-@{ var themeName = themeContext.WorkingThemeName; }
-    <div class="footer">
-        <div class="footer-upper">
-            <div class="footer-block information">
-                <div class="title"><strong>PRODUCTS</strong></div>
-                <ul class="list">
-                    <li><a href="">FOOTER LINK HOVER</a></li>
-                    <li><a href="">FITTINGS & FLANGES</a></li>
-                    <li><a href="">METAL PROCESSES</a></li>
-                    <li><a href="">INDUSTRIES SERVED</a></li>
-                </ul>
-                <img src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
-            </div>
-            <div class="footer-block customer-service">
-                <div class="title"><strong>INFO</strong></div>
-                <ul class="list">
-                    <li><a href="">RESOURCES</a></li>
-                    <li><a href="">SISTER COMPANIES</a></li>
-                    <li><a href="">SWIFT&#8482;</a></li>
-                    <li><a href="">CAREERS</a></li>
-                    <li><a href="">WHY NORTH SHORE STEEL?</a></li>
-                </ul>
-                <img src="~/Themes/@(themeName)/Content/assets/abma.png" alt="">
-            </div>
-            <div class="footer-block follow-us">
-                <div>
-                    <div class="title"><strong>FOLLOW US</strong></div>
-                    <ul class="networks">
-                        <a href="https://www.facebook.com/nopCommerce" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/facebook.svg" alt="">
-                        </a>
-                        <a href="https://linkedin.com/nopCommerce" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/linkedin.svg"
-                                 alt="">
-                        </a>
-
-
-                        <a href="https://www.youtube.com/user/nopCommerce" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/youtube.svg" alt="">
-                        </a>
-                        <a href="https://www.instagram.com/user/nopCommerce" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/instagram.svg" alt="">
-                        </a>
-                        <a href="https://www.twitter.com/user/nopCommerce" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/twitter.svg" alt="">
-                        </a>
-                    </ul>
-                </div>
-                <img src="~/Themes/@(themeName)/Content/assets/awmi.png" alt="">
-            </div>
-            <div class="footer-block sales-dept">
-                <div class="title"><strong>SALES DEPARTMENTS</strong></div>
-                <ul class="list">
-                    <li>Structural Steel </li>
-                    <li>713-980-5872 </li>
-                </ul>
-                <ul class="list">
-                    <li>Fittings & Flanges </li>
-                    <li>713-980-5873 </li>
-                </ul>
-                <ul class="list">
-                    <li>Plate Processing </li>
-                    <li>713-980-5874 </li>
-                </ul>
-                <ul class="list">
-                    <li>Beaumont </li>
-                    <li>713-980-5875 </li>
-                </ul>
-            </div>
-            <div class="footer-block footer-logo">
-                <img src="https://swift-test-web.azurewebsites.net/Themes/SwiftPortal/Content/images/logo.png"
-                     alt="">
-                <p>1566 MILES ST. </p>
-                <p>HOUSTON, TX 77015</p>
-                <p> 713-453-3533</p>
-            </div>
+@{
+    var themeName = themeContext.WorkingThemeName;
+    var routeUrl = webHelper.GetRawUrl(Context.Request);
+}
+@if (routeUrl.Contains("login") || routeUrl.Contains("register") || routeUrl.Contains("passwordrecovery"))
+{
+    <div class="linda-block">
+        [CUSTOMER EXPERIENCE / LINDA EXPERIENCE MARKETING COPY HERE]
+    </div>
+}
+<div class="footer">
+    <div class="footer-upper">
+        <div class="footer-block information">
+            <div class="title"><strong>PRODUCTS</strong></div>
+            <ul class="list">
+                <li><a href="">FOOTER LINK HOVER</a></li>
+                <li><a href="">FITTINGS & FLANGES</a></li>
+                <li><a href="">METAL PROCESSES</a></li>
+                <li><a href="">INDUSTRIES SERVED</a></li>
+            </ul>
+            <img src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
         </div>
-        <span class="footer-disclaimer">NORTH SHORE STEEL © 2020 ALL RIGHTS RESERVED</span>
-        @*<div class="footer-block information">
+        <div class="footer-block customer-service">
+            <div class="title"><strong>INFO</strong></div>
+            <ul class="list">
+                <li><a href="">RESOURCES</a></li>
+                <li><a href="">SISTER COMPANIES</a></li>
+                <li><a href="">SWIFT&#8482;</a></li>
+                <li><a href="">CAREERS</a></li>
+                <li><a href="">WHY NORTH SHORE STEEL?</a></li>
+            </ul>
+            <img src="~/Themes/@(themeName)/Content/assets/abma.png" alt="">
+        </div>
+        <div class="footer-block follow-us">
+            <div>
+                <div class="title"><strong>FOLLOW US</strong></div>
+                <ul class="networks">
+                    <a href="https://www.facebook.com/nopCommerce" target="_blank">
+                        <img src="~/Themes/@(themeName)/Content/assets/facebook.svg" alt="">
+                    </a>
+                    <a href="https://linkedin.com/nopCommerce" target="_blank">
+                        <img src="~/Themes/@(themeName)/Content/assets/linkedin.svg"
+                             alt="">
+                    </a>
+
+
+                    <a href="https://www.youtube.com/user/nopCommerce" target="_blank">
+                        <img src="~/Themes/@(themeName)/Content/assets/youtube.svg" alt="">
+                    </a>
+                    <a href="https://www.instagram.com/user/nopCommerce" target="_blank">
+                        <img src="~/Themes/@(themeName)/Content/assets/instagram.svg" alt="">
+                    </a>
+                    <a href="https://www.twitter.com/user/nopCommerce" target="_blank">
+                        <img src="~/Themes/@(themeName)/Content/assets/twitter.svg" alt="">
+                    </a>
+                </ul>
+            </div>
+            <img src="~/Themes/@(themeName)/Content/assets/awmi.png" alt="">
+        </div>
+        <div class="footer-block sales-dept">
+            <div class="title"><strong>SALES DEPARTMENTS</strong></div>
+            <ul class="list">
+                <li>Structural Steel </li>
+                <li>713-980-5872 </li>
+            </ul>
+            <ul class="list">
+                <li>Fittings & Flanges </li>
+                <li>713-980-5873 </li>
+            </ul>
+            <ul class="list">
+                <li>Plate Processing </li>
+                <li>713-980-5874 </li>
+            </ul>
+            <ul class="list">
+                <li>Beaumont </li>
+                <li>713-980-5875 </li>
+            </ul>
+        </div>
+        <div class="footer-block footer-logo">
+            <img src="https://swift-test-web.azurewebsites.net/Themes/SwiftPortal/Content/images/logo.png"
+                 alt="">
+            <p>1566 MILES ST. </p>
+            <p>HOUSTON, TX 77015</p>
+            <p> 713-453-3533</p>
+        </div>
+    </div>
+    <span class="footer-disclaimer">NORTH SHORE STEEL © 2020 ALL RIGHTS RESERVED</span>
+    @*<div class="footer-block information">
                 <div class="title">
                     <strong>@T("Footer.Information")</strong>
                 </div>
@@ -190,29 +200,29 @@
                 @await Component.InvokeAsync("NewsletterBox")
             </div>
         </div>*@
-        <div class="footer-lower">
-            <div class="footer-info">
-                <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
-                @if (Model.DisplayTaxShippingInfoFooter)
-                {
-                    var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
-                    <span class="footer-tax-shipping">
-                        @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
-                    </span>
-                }
-            </div>
-            @if (!Model.HidePoweredByNopCommerce)
+    <div class="footer-lower">
+        <div class="footer-info">
+            <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
+            @if (Model.DisplayTaxShippingInfoFooter)
             {
-                <div class="footer-powered-by">
-                    @*Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
-                    Please find more info at https://www.nopcommerce.com/nopcommerce-copyright-removal-key*@
-                    Powered by <a href="https://www.nopcommerce.com/">nopCommerce</a>
-                </div>
+                var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+                <span class="footer-tax-shipping">
+                    @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                </span>
             }
-            @await Component.InvokeAsync("StoreThemeSelector")
         </div>
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Footer })
+        @if (!Model.HidePoweredByNopCommerce)
+        {
+            <div class="footer-powered-by">
+                @*Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
+                    Please find more info at https://www.nopcommerce.com/nopcommerce-copyright-removal-key*@
+                Powered by <a href="https://www.nopcommerce.com/">nopCommerce</a>
+            </div>
+        }
+        @await Component.InvokeAsync("StoreThemeSelector")
     </div>
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Footer })
+</div>
 <script asp-location="Footer">
     $(document).ready(function () {
         $('.footer-block .title').on('click', function () {

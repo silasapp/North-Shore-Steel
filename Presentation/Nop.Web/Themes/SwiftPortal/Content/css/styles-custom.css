@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Teko:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Teko:wght@300;400;500;600;700&family=Open+Sans:wght@400;600;700;800&display=swap");
 /* CUSTOM STYLE */
 
 html,
@@ -283,9 +283,9 @@ a:not([href]):not([class]) {
 .checkout-card > .actions-1 > button,
 .order-search-btn > button,
 .buttons > .button-2 {
-  background-color: #f6f6f6 !important;
+  /*background-color: #f6f6f6 !important;*/
   text-transform: none !important;
-  color: #03175b;
+  color: #fff;
   border: none;
 }
 
@@ -1750,7 +1750,37 @@ table input {
     color: #03175b;
 }
 
-.h4-primary {
+.h2-primary-sans {
+    font: normal normal bold 26px/24px "Open Sans";
+    letter-spacing: 0px;
+    color: #03175b;
+}
+
+.h3-primary-sans {
+    font: normal normal bold 18px/24px "Open Sans";
+    letter-spacing: 0px;
+    color: #03175b;
+}
+
+.h3-primary-teko {
+    font: normal normal bold 18px/24px "Teko";
+    letter-spacing: 0px;
+    color: #03175b;
+}
+
+.h3-primary, .h3-primary-exo {
+    font: normal normal bold 18px/24px "Exo 2";
+    letter-spacing: 0px;
+    color: #03175b;
+}
+
+.h4-primary, .h4-primary-teko {
+    font: normal normal normal 16px/24px "Teko";
+    letter-spacing: 0px;
+    color: #03175b;
+}
+
+.h4-primary, .h4-primary-exo {
     font: normal normal normal 16px/24px "Exo 2";
     letter-spacing: 0px;
     color: #03175b;

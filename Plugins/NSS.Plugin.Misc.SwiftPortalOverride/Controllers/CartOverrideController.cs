@@ -137,7 +137,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
                 return RedirectToRoute("Homepage");
-            
+
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
             var model = new ShoppingCartModel();
             model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart);
@@ -152,17 +152,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
                 return RedirectToRoute("Homepage");
 
-            var customerId = _workContext.CurrentCustomer.Id;
-            string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-            ERPComId += customerId;
-            int.TryParse(Request.Cookies[ERPComId], out int ERPCompanyId);
-            Company company = new Company();
-            CustomerCompany customerCompany = new CustomerCompany();
-            if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
-                company = _companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
-            if (company != null)
-                customerCompany = _customerCompanyService.GetCustomerCompany(customerId, company.Id);
-
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
             //get identifiers of items to remove
@@ -173,15 +162,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var products = _productService.GetProductsByIds(cart.Select(item => item.ProductId).Distinct().ToArray())
                 .ToDictionary(item => item.Id, item => item);
-
-            var customerkey = new Dictionary<string, int>();
-            List<CustomerCompanyProduct> customerCompanyProduct = new List<CustomerCompanyProduct>();
-            foreach (var product in products)
-            {
-                var custpartNo = form[$"customerpartNo{product.Key}"];
-                customerCompanyProduct.Add(new CustomerCompanyProduct { CustomerCompanyId = customerCompany.CompanyId, ProductId = product.Key, CustomerPartNo = custpartNo });
-            }
-            _customerCompanyProductService.UpdateCustomerCompanyProducts(customerCompanyProduct);
 
             //get order items with changed quantity
             var itemsWithNewQuantity = cart.Select(item => new
@@ -206,13 +186,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                          .GetProductsRequiringProduct(cart, cartItem.Product).Any()))
                 .ToList();
 
+            if (orderedCart.Count == 0)
+            {
+                var cartItems = cart.Select(item => new
+                {
+                    Item = item,
+                    Product = products.ContainsKey(item.ProductId) ? products[item.ProductId] : null
+                });
+
+                foreach (var item in cartItems)
+                {
+                    UpdateShoppingCartItem(item, form, isNewQuantity: false);
+                }
+            }
+
             //try to update cart items with new quantities and get warnings
             var warnings = orderedCart.Select(cartItem => new
             {
                 ItemId = cartItem.Item.Id,
-                Warnings = _shoppingCartService.UpdateShoppingCartItem(_workContext.CurrentCustomer,
-                    cartItem.Item.Id, cartItem.Item.AttributesXml, cartItem.Item.CustomerEnteredPrice,
-                    cartItem.Item.RentalStartDateUtc, cartItem.Item.RentalEndDateUtc, cartItem.NewQuantity, true)
+                Warnings = UpdateShoppingCartItem(cartItem, form)
             }).ToList();
 
             //updated cart
@@ -236,6 +228,50 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             return View(model);
         }
+
+        private IList<string> UpdateShoppingCartItem(dynamic cartItem, IFormCollection form, bool isNewQuantity = true)
+        {
+            var attrsMapping = _productAttributeService.GetProductAttributeMappingsByProductId((int)cartItem.Product.Id);
+
+            foreach (var map in attrsMapping)
+            {
+                var formControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{map.Id}{cartItem.Item.Id}";
+                if (form.TryGetValue(formControlId, out var value))
+                {
+                    cartItem.Item.AttributesXml = _productAttributeParser.AddProductAttribute(cartItem.Item.AttributesXml, map, value);
+                }
+            }
+
+            var warnings = _shoppingCartService.UpdateShoppingCartItem(_workContext.CurrentCustomer,
+                                cartItem.Item.Id, cartItem.Item.AttributesXml, cartItem.Item.CustomerEnteredPrice,
+                                cartItem.Item.RentalStartDateUtc, cartItem.Item.RentalEndDateUtc, isNewQuantity ? cartItem.NewQuantity : cartItem.Item.Quantity, true);
+
+            // update cust part No
+            var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+
+            if(customerCompany != null)
+            {
+                var controlId = $"customerpartNo{cartItem.Product.Id}";
+                if (form.TryGetValue(controlId, out var value) && !string.IsNullOrEmpty(value.FirstOrDefault()))
+                    _customerCompanyProductService.UpdateCustomerCompanyProduct(new CustomerCompanyProduct { CustomerCompanyId = customerCompany.CompanyId, ProductId = cartItem.Product.Id, CustomerPartNo = value.FirstOrDefault() });
+            }
+
+            return warnings;
+        }
+
+        private (int, CustomerCompany) GetCustomerCompanyDetails()
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+
+            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+
+            CustomerCompany customerCompany = null;
+
+            if (eRPCompanyId > 0)
+                customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
+
+            return (eRPCompanyId, customerCompany);
+        } 
 
 
         //add product to cart using AJAX
