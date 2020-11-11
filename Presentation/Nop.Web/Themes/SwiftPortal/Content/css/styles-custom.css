@@ -1752,6 +1752,18 @@ table input {
 
 .h2-primary-sans {
     font: normal normal bold 26px/24px "Open Sans";
+    letter-spacing: 0.21px;
+    color: #03175b;
+}
+
+.h2-default-teko {
+    font: normal normal 500 26px/24px "Teko";
+    letter-spacing: 0.21px;
+    color: #242424;    
+}
+
+.h2-default-sans {
+    font: normal normal 500 26px/24px "Open Sans";
     letter-spacing: 0px;
     color: #03175b;
 }
@@ -1774,9 +1786,9 @@ table input {
     color: #03175b;
 }
 
-.h4-primary, .h4-primary-teko {
+.h4-primary-teko {
     font: normal normal normal 16px/24px "Teko";
-    letter-spacing: 0px;
+    letter-spacing: 0.13px;
     color: #03175b;
 }
 
@@ -1784,6 +1796,36 @@ table input {
     font: normal normal normal 16px/24px "Exo 2";
     letter-spacing: 0px;
     color: #03175b;
+}
+
+.h4-primary-500-teko {
+    font: normal normal 500 16px/24px "Teko";
+    letter-spacing: 0.13px;
+    color: #03175b;
+}
+
+.h4-primary-500, .h4-primary-500-exo {
+    font: normal normal 500 16px/24px "Exo 2";
+    letter-spacing: 0px;
+    color: #03175b;
+}
+
+.h5-default-sans {
+    font: normal normal normal 14px/24px "Open Sans";
+    letter-spacing: 0px;
+    color: #242424;
+}
+
+.h5-default-teko {
+    font: normal normal normal 14px/24px "Teko";
+    letter-spacing: 0px;
+    color: #242424;
+}
+
+.h5-default, .h5-default-exo {
+    font: normal normal normal 14px/24px "Exo 2";
+    letter-spacing: 0px;
+    color: #242424;
 }
 
 /* #endregion */
@@ -1798,6 +1840,23 @@ table input {
     background: #03175b;
 }
 
+.bg-white-shadow {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 1px 16px #0000001A;
+}
+
+.lh-md {
+    line-height: 1.5 !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
 /* #endregion */
 
 /* #region SYNCFUSION GRID */
@@ -1810,6 +1869,11 @@ table input {
     background: #03175b;
     color: #fff;
     opacity: 1;
+}
+
+.nss-table thead tr th {
+    vertical-align: middle !important;
+    padding: 0.25rem .75rem;
 }
 
 /* #endregion */
