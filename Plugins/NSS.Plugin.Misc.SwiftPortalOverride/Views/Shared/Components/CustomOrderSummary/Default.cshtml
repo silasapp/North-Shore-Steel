@@ -75,7 +75,7 @@
 </div>
 
 
-<div class="order-summary-content">
+<div class="cart-summary-content card">
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
     @await Html.PartialAsync("_OrderReviewData", Model.OrderReviewData)
     @if (Model.Items.Count > 0)
@@ -94,7 +94,7 @@
         @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
         <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
             <div style="display: flex; margin: 20px 0; justify-content: space-between;" class="col-lg-5">
-                <div class="filter-menu">
+                <div class="cart-filter-menu">
                     <label for="purchase-order">Purchase Order #</label>
                     @if (purchasechkattr != null)
                     {
@@ -107,7 +107,7 @@
                     }
 
                 </div>
-                <div class="filter-menu">
+                <div class="cart-filter-menu">
                     <label for="estimated-date">Delivery Date</label>
                     <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
                 </div>
@@ -280,7 +280,7 @@
                     }*@
                 @await Component.InvokeAsync("SelectedCheckoutAttributes")
             </div>
-            <div class="cart-footer">
+            <div class="cart-footer row">
                 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
                 @if (Model.IsEditable)
                 {
