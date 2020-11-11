@@ -1,19 +1,22 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @model TransactionModel
-
+@using Nop.Web.Framework.Themes
+@inject IThemeContext themeContext
 @{
     Layout = "_ColumnsOne";
 
     //page class
     Html.AppendPageCssClassParts("html-home-page");
-    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/homepageStyle.css");
 }
 
+@{
+    var themeName = themeContext.WorkingThemeName;
+}
 
 
 <div class="page home-page">
     <div class="page-body">
-        <div class="container">
+        <div>
             <div class="row">
                 <div class="col-md-9">
 
@@ -27,7 +30,7 @@
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
                         <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped w3-animate-left nss-table">
                                 <thead class="thead-default">
                                     <tr>
                                         <td scope="col">Order #</td>
@@ -64,7 +67,7 @@
                             </table>
                         </div>
                         <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped w3-animate-left nss-table">
                                 <thead class="thead-default">
                                     <tr>
                                         <td scope="col">Invoice #</td>
@@ -115,27 +118,36 @@
                     @if (Model.CompanyInfo != null)
                     {
                         <div class="card">
-                            @*<img class="card-img-top" alt="profile">*@
-                            <div class="card-body text-center">
-                                <img class="avatar rounded-circle" src="Themes/DefaultClean/Content/images/profile.png" alt="profile-default">
-                                <h6 class="card-title">@Model.CompanyInfo.SalesContact?.Name</h6>
-                                <p class="card-text">Got questions? I can help, message or call anytime... </p>
-                                <h6 class="card-subtitle mb-2 text-muted">Business Hours </h6>
+                            <div class="card-body text-center contact-card">
+                                <div class="avatar-block">
+                                    <div></div>
+                                    <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/assets/headset.svg" alt="profile-default">
+                                </div>
+                                <h6 class=card-title>Outstanding customer service is our promise</h6>
+                                <p class=card-text>Got questions? We've got fast answers.</p>
+                                <h6 class="card-subtitle mb-2 text-muted">Business Hours</h6>
+
+                                @*<h6 class="card-title">@Model.CompanyInfo.SalesContact?.Name</h6>*@
                                 <div class="contact-container">
                                     <a href=tel:@Model.CompanyInfo.SalesContact?.Phone class="btn contact-btn">
-                                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-telephone-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" d="M2.267.98a1.636 1.636 0 0 1 2.448.152l1.681 2.162c.309.396.418.913.296 1.4l-.513 2.053a.636.636 0 0 0 .167.604L8.65 9.654a.636.636 0 0 0 .604.167l2.052-.513a1.636 1.636 0 0 1 1.401.296l2.162 1.681c.777.604.849 1.753.153 2.448l-.97.97c-.693.693-1.73.998-2.697.658a17.47 17.47 0 0 1-6.571-4.144A17.47 17.47 0 0 1 .639 4.646c-.34-.967-.035-2.004.658-2.698l.97-.969z" />
-                                        </svg>
+                                        <img src="~/Themes/@(themeName)/Content/assets/phone.svg" alt="">
                                     </a>
                                     <a href=mailto:@Model.CompanyInfo.SalesContact?.Email class="btn contact-btn">
-                                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-envelope-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555zM0 4.697v7.104l5.803-3.558L0 4.697zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757zm3.436-.586L16 11.801V4.697l-5.803 3.546z" />
-                                        </svg>
+                                        <img src="~/Themes/@(themeName)/Content/assets/mail.svg" alt="">
                                     </a>
                                 </div>
                             </div>
                         </div>
                     }
+                </div>
+            </div>
+            <div class="discount-block" alt="">
+                <img src="~/Themes/@(themeName)/Content/assets/discount.PNG" alt="">
+                <div class="action">
+                    <button class="white-btn">
+                        <img src="~/Themes/@(themeName)/Content/assets/menu.svg" height="20"
+                             width="20" alt=""> SHOP SWIFT&#8482;
+                    </button>
                 </div>
             </div>
         </div>
