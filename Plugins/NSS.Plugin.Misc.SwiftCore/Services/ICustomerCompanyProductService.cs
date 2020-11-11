@@ -11,6 +11,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         void UpdateCustomerCompanyProducts(List<CustomerCompanyProduct> customerCompanyProducts);
 
+        void UpdateCustomerCompanyProduct(CustomerCompanyProduct customerCompanyProduct);
+
         CustomerCompanyProduct GetCustomerCompanyProductById(int customerCompanyId, int productId);
 
         void DeleteCustomerCompanyProduct(CustomerCompanyProduct customerCompanyProduct);
