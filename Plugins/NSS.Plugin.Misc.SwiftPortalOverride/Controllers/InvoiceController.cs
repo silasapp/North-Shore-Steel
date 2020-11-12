@@ -20,7 +20,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #region Ctor
 
-        public InvoiceController(IWorkContext workContext, ICustomerService customerService, InvoiceModelFactory invoiceModelFactory)
+        public InvoiceController(IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory)
         {
             _workContext = workContext;
             _customerService = customerService;
