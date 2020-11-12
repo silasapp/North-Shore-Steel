@@ -28,7 +28,7 @@ a:not([href]):not([class]) {
     position: relative;
 }
 
-    .nav-bar-search > input {
+    .nav-bar-search > form > .search-box-text {
         width: 100%;
         background-color: #3391c3;
         color: #ffffff;
@@ -37,11 +37,20 @@ a:not([href]):not([class]) {
         font-family: 'Exo 2';
     }
 
-    .nav-bar-search > img {
+    .nav-bar-search > form > .search-box-button {
         position: absolute;
-        right: 10px;
-        top: 11px;
+        right: 0;
+        top: 0px;
+        width: 38px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
+.search-box-button {
+    background: none;
+    border: none;
+}
 
 .header-links-wrapper,
 .header-logo {
