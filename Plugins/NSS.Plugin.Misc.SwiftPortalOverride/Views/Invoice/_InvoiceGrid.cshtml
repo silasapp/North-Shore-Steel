@@ -14,7 +14,7 @@
             <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" width="80" allowFiltering="false"></e-grid-column>
             <e-grid-column field="InvoiceDate" headerText="Invoice Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
             <e-grid-column field="InvoiceDueDate" headerText="Due Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
-            @if (Model.IsClosedInvoice)
+            @if (Model.IsClosed)
             {
                 <e-grid-column field="InvoicePaidDate" headerText="Paid Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
             }
