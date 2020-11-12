@@ -12,8 +12,11 @@
 
   <ItemGroup>
     <Compile Remove="Content\Images\**" />
+    <Compile Remove="Views\Shared\Components\CustomLogo\**" />
     <EmbeddedResource Remove="Content\Images\**" />
+    <EmbeddedResource Remove="Views\Shared\Components\CustomLogo\**" />
     <None Remove="Content\Images\**" />
+    <None Remove="Views\Shared\Components\CustomLogo\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -174,8 +177,7 @@
     <Folder Include="Areas\Admin\Extensions\" />
     <Folder Include="Areas\Admin\Factories\" />
     <Folder Include="Areas\Admin\Factories\" />
-    <Folder Include="Areas\Admin\Models\" />
-    <Folder Include="Views\Shared\Components\CustomLogo\" />  </ItemGroup>
+    <Folder Include="Areas\Admin\Models\" />  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="PayPal" Version="2.0.0-rc2" />
