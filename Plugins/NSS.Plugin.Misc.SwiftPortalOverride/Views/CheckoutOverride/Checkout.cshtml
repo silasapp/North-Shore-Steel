@@ -250,7 +250,7 @@
                                  'disabled': lineOfCreditDisabled
                                  }"
                                  v-on:click="lineOfCreditDisabled ? null : paymentMethodIndex = shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT"
-                                 v-if="!shared.accountCredit.canCredit">
+                                 v-if="shared.accountCredit.canCredit">
                                 <img src="Themes/@themeName/Content/assets/dollar.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
                                     <label class="fs-18 font-weight-bold mb-1">Line of Credit</label>
