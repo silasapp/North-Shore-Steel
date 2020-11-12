@@ -14,7 +14,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         }
 
         public IList<InvoiceDetailsModel> Invoices { get; set; }
-        public bool IsClosed { get; set; }
     
         public SearchFilter FilterContext { get; set; }
 
@@ -36,7 +35,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
         public partial class SearchFilter
         {
-            public int? invoiceId { get; set; }
+            public int? InvoiceId { get; set; }
             public int? OrderId { get; set; }
             public DateTimeOffset? FromDate { get; set; }
             public DateTimeOffset? ToDate { get; set; }
