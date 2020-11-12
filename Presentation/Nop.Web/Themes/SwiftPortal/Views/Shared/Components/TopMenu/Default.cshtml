@@ -1,24 +1,45 @@
 ﻿@model TopMenuModel
-    <ul class="top-menu notmobile mb-0">
+<ul class="top-menu notmobile mb-0">
 
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
-        <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")">SHOP</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a></li>
-        <li><a href="/open-invoices">INVOICES</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")">RESOURCES</a></li>
-    </ul>
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
+    <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")">SHOP</a></li>
+    <li class="nav-menu-with-sub">
+        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a>
+        <div class="nav-sub-menu">
+            <ul>
+                <li><a href="">OPEN ORDERS</a></li>
+                <li><a href="">CLOSE ORDERS</a></li>
+            </ul>
+        </div>
+    </li>
+    <li class="nav-menu-with-sub">
+        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">ORDERS</a>
+        <div class="nav-sub-menu">
+            <ul>
+                <li><a href="">OPEN INVOICES</a></li>
+                <li><a href="">CLOSE INVOICES</a></li>
+            </ul>
+        </div>
+    </li>
+    @*<li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">INVOICES</a></li*@>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")">RESOURCES</a></li>
+</ul>
 @{
     var rootCategoriesResponsive = Model.Categories.ToList();
     //name it "Categories" if we have only categories. Otherwise, "Menu"
     var responsiveMenuTitle = Model.HasOnlyCategories ? T("Categories") : T("Menu");
-    <div class="menu-toggle">@responsiveMenuTitle</div>
+    <div class="menu-toggle"></div>
     <ul class="top-menu mobile">
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
         <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
         <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")">SHOP</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">INVOICES</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">OPEN ORDERS</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">CLOSED ORDERS</a></li>
+
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">OPEN INVOICES</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">CLOSED INVOICES</a></li>
         <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")">RESOURCES</a></li>
     </ul>
 

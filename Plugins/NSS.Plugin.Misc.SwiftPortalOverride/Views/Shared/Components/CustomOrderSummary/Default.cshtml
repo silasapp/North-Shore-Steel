@@ -87,7 +87,7 @@
         <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
             <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
 
-                <div style="display: flex;">
+                <div style="display: flex;flex-wrap: wrap;">
                     <div class="cart-filter-menu">
                         <label for="purchase-order">Purchase Order #</label>
                         @if (purchasechkattr != null)
@@ -105,7 +105,7 @@
                 <div class="cart-options">
                     @if (Model.IsEditable)
                     {
-                        <div class="common-buttons" style="display: flex">
+                        <div class="common-buttons" style="display: flex;flex-wrap: wrap; ">
                             @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
                                 <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
                             <div style="position: relative;display: flex;align-items: center;">
@@ -280,8 +280,9 @@
                                     @foreach (var attributeValue in deliverychkattr.Values)
                                     {
                                         <div>
-                                            <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label">
+                                            <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label radio-button">
                                                 <input id="@(controlId)_@(attributeValue.Id)" type="radio" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected">
+                                                <span class="rad-checkmark"></span>
                                                 @attributeValue.Name
                                             </label>
                                         </div>
