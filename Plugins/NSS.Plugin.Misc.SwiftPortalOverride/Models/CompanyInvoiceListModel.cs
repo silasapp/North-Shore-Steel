@@ -10,7 +10,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public CompanyInvoiceListModel()
         {
             Invoices = new List<InvoiceDetailsModel>();
-            IsClosed = false;
+            FilterContext = new SearchFilter();
         }
 
         public IList<InvoiceDetailsModel> Invoices { get; set; }

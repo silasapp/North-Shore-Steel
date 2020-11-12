@@ -37,9 +37,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             };
 
             if (filter.IsClosed)
-                response = _nSSApiProvider.SearchClosedOrders(companyId, request);
+                response = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: true);
             else
-                response = _nSSApiProvider.SearchOpenOrders(companyId, request);
+                response = _nSSApiProvider.SearchOpenOrders(companyId, request, useMock: true);
 
             var orders = response.Select(order => new CompanyOrderListModel.OrderDetailsModel 
             {

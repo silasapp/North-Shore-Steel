@@ -126,6 +126,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Challenge();
 
             var model = new CompanyOrderListModel();
+            model.FilterContext.IsClosed = true;
 
             return View(model);
         }
