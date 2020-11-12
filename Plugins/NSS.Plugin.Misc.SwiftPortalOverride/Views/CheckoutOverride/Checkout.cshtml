@@ -106,7 +106,7 @@
     </div>
     <div class="page-body">
         <div class="row" style="justify-content: space-between;">
-            <div class="col-9">
+            <div class="col-md-9">
                 <div class="card card-mod">
                     <label class="h5 text-primary font-weight-bold mb-4">ORDER INFORMATION</label>
                     <div class="d-flex flex-row justify-content-between mt-2">
@@ -250,7 +250,7 @@
                                  'disabled': lineOfCreditDisabled
                                  }"
                                  v-on:click="lineOfCreditDisabled ? null : paymentMethodIndex = shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT"
-                                 v-if="shared.accountCredit.canCredit">
+                                 v-if="!shared.accountCredit.canCredit">
                                 <img src="Themes/@themeName/Content/assets/dollar.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
                                     <label class="fs-18 font-weight-bold mb-1">Line of Credit</label>
@@ -428,7 +428,7 @@
                     </table>
                 </div>
             </div>
-            <div class="col-3">
+            <div class="col-md-3">
                 <div class="card card-mod">
                     <label class="fs-14 text-primary font-weight-bold text-center">ORDER SUMMARY</label>
                     <div class="order-summary mt-2">
@@ -479,7 +479,7 @@
 <script>
     var shippingAddresses = @Html.Raw(shippingAddresses);
     var billingAddresses = @Html.Raw(billingAddresses);
-     var pickupPoints = @Html.Raw(pickupPoints);
+    var pickupPoints = @Html.Raw(pickupPoints);
     var accountCredit = @Html.Raw(accountCredit);
     var states = @Html.Raw(states);
     var cart = @Html.Raw(cart);
