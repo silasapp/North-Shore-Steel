@@ -345,18 +345,19 @@ a:not([href]):not([class]) {
     padding: 0 !important;
 }
 
-    .top-menu > li > a:hover {
-        text-decoration: none;
-        color: #0076b4 !important;
-    }
+.top-menu > li > a:hover, .nav-sub-menu a:hover {
+    text-decoration: none;
+    color: #0076b4 !important;
+}
 
-    .top-menu > li > a {
-        font: normal normal 500 20px/24px "Teko" !important;
-        letter-spacing: 0.16px;
-        color: #aaaaaa !important;
-        text-transform: uppercase;
-        opacity: 1;
-    }
+.top-menu > li > a, .nav-sub-menu a {
+    font: normal normal 500 20px/24px "Teko" !important;
+    letter-spacing: 0.16px;
+    color: #aaaaaa !important;
+    text-transform: uppercase;
+    opacity: 1;
+}
+
 
 .returning-wrapper > form > .title,
 .new-wrapper > .title,
@@ -1884,7 +1885,22 @@ table input {
 .cat-side-drawer, .cart-side-drawer-trigger {
     display: none;
 }
+.nav-sub-menu {
+    display: none;
+    left: -7px;
+    right: 0;
+    margin: auto;
+    z-index: 999;
+    position: absolute;
+    white-space: nowrap;
+}
 
+.nav-menu-with-sub:hover > .nav-sub-menu {
+    display: block;
+}
+.nav-menu-with-sub {
+    position: relative;
+}
 @media all and (min-width: 1001px) {
     /* CUSTOM STYLE */
     .customer-blocks {
