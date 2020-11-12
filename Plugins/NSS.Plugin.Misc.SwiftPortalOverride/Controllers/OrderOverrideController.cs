@@ -88,7 +88,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Challenge();
 
             var model = _orderModelFactory.PrepareCustomerOrderListModel();
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomOrder/CustomerOrders.cshtml", model);
+            return View(model);
         }
 
         //My account / Order details page

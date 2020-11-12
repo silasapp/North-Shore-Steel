@@ -10,9 +10,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public CompanyInvoiceListModel()
         {
             Invoices = new List<InvoiceDetailsModel>();
+            IsClosedInvoice = false;
         }
 
         public IList<InvoiceDetailsModel> Invoices { get; set; }
+        public bool IsClosedInvoice { get; set; }
     }
 
     #region Nested Classes
