@@ -168,6 +168,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\dollar.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\enter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\facebook.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\hamburger-menu.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\headset.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-add.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-cal-range.svg" />
@@ -185,6 +186,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-users.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\instagram.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\linkedin.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\list.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\logo-nasa.png" />
     <Content Remove="Themes\SwiftPortal\Content\assets\logo.PNG" />
     <Content Remove="Themes\SwiftPortal\Content\assets\logout.svg" />

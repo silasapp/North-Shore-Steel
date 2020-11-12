@@ -1262,6 +1262,7 @@ table input {
   color: #0076b4;
 }
 .footer-upper {
+    flex-wrap: wrap;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   border-bottom: none;
@@ -1632,9 +1633,105 @@ table input {
   margin-bottom: 0;
   margin-left: 10px;
 }
+
+.radio-button {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.radio-button input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    left: 2px;
+    top: 2px;
+    z-index: 1;
+}
+
+.rad-checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border-radius: 50%;
+}
+
+.radio-button:hover input ~ .rad-checkmark {
+    background-color: #ccc;
+}
+
+.radio-button input:checked ~ .rad-checkmark {
+    background-color: #0076b4;
+}
+
+.rad-checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.radio-button input:checked ~ .rad-checkmark:after {
+    display: block;
+}
+
+.radio-button .rad-checkmark:after {
+    top: 5px;
+    left: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+}
+
+.menu-toggle {
+    background: #fff url(../assets/hamburger-menu.svg) right center no-repeat;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #0076b4;
+    text-transform: uppercase;
+    cursor: pointer;
+    font: normal normal 500 20px/24px "Teko" !important;
+    letter-spacing: 0.16px;
+    text-transform: uppercase;
+    opacity: 1;
+}
+.footer img {
+    height: 53px;
+}
+
+.footer li > a:hover {
+    text-decoration: none;
+    color: #0076b4;
+}
+
+.footer-list-icon {
+    visibility: hidden;
+    height: 15px !important;
+    width: 15px;
+}
+
+.footer li:hover > .footer-list-icon {
+    visibility: visible;
+}
+
+.footer-upper:after {
+    content: none !important;
+}
+
 @media all and (min-width: 1001px) {
-  /* CUSTOM STYLE */
-  .customer-blocks {
+    /* CUSTOM STYLE */
+    .customer-blocks {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-column-gap: 30px;
@@ -1655,12 +1752,27 @@ table input {
     grid-template-columns: repeat(2, 1fr);
     grid-column-gap: 20px;
   }
+    .password-fieldset {
+        padding: 30px 15%;
+    }
+    
+}
+@media all and (max-width: 800px) {
+    .account-select {
+        position: relative;
+    }
+
+    .top-menu > li {
+        background-color: transparent;
+        border-bottom: 1px solid #f6f6f6 !important;
+    }
 }
 @media all and (max-width: 600px) {
-  .footer-upper {
-    grid-template-columns: repeat(1, 1fr);
-    grid-row-gap: 30px;
-  }
+    
+    .footer-upper {
+        grid-template-columns: repeat(1, 1fr);
+        grid-row-gap: 30px;
+    }
   #invoiceSearchField > div {
     display: grid;
     grid-template-columns: repeat(2, minmax(200px, 1fr));
