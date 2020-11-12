@@ -13,39 +13,46 @@
     .header-menu {
         display: none !important;
     }
-
 </style>
 
 @*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>*@
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>*@
 
 
-<div class="page home-page">
+<div class="page account-select-page">
     <div class="page-title">
         <h1>SELECT ACCOUNT</h1>
     </div>
     <div class="page-body">
-        <div class="fieldset">
+        <div class="account-block">
+            @if (Model.Companies != null)
+            {
+                foreach (var company in Model.Companies)
+                {
+                    <button onclick="SelectCompany(@company.ErpCompanyId);" class="btn account-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                             viewBox="0 0 24 24">
+                            <defs>
+                                <style>
+                                    .a {
+                                        fill: none;
+                                    }
 
-            <div class="form-fields">
-                <div class="container-fluid" style="margin: auto; padding: 0 18em;">
-                    <div class="row">
-                        @if (Model.Companies != null)
-                        {
-                            foreach (var company in Model.Companies)
-                            {
-                                <div class="col-md-12">
-                                    <a class="form-group account-name-container" onclick=SelectCompany(@company.ErpCompanyId);>
-                                        <div class="account-name">@company.Name</div>
-                                    </a>
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
-            </div>
+                                    .b {
+                                        fill: #03175b;
+                                    }
+                                </style>
+                            </defs>
+                            <path class="a" d="M0,0H24V24H0Z" />
+                            <path class="b"
+                                  d="M20,4H4V6H20Zm1,10V12L20,7H4L3,12v2H4v6H14V14h4v6h2V14Zm-9,4H6V14h6Z" />
+                        </svg>
+                        @company.Name
+                    </button>
+                }
+            }
         </div>
     </div>
 </div>

@@ -19,6 +19,7 @@ using NSS.Plugin.Misc.SwiftCore.Configuration;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using Newtonsoft.Json.Linq;
 using NSS.Plugin.Misc.SwiftPortalOverride.Extensions;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 {
@@ -537,6 +538,293 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             return retVal;
         }
+
+        public List<ERPSearchOrdersResponse> SearchOpenOrders(int companyId, ERPSearchOrdersRequest request, bool useMock = false)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            //initialize
+            var retVal = new List<ERPSearchOrdersResponse>();
+            var respContent = string.Empty;
+
+            if(!useMock)
+                if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+                {
+                    _logger.Warning("Swift Api provider - SearchOrders", new Exception("NSS API attributes not configured correctly."));
+                    return retVal;
+                }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    if (useMock)
+                        httpClient.BaseAddress = new Uri("https://private-anon-bd88ec445e-nssswift.apiary-mock.com");
+
+                    if (!useMock)
+                    {
+                        //get token
+                        var token = GetNSSToken(httpClient);
+
+                        if (string.IsNullOrEmpty(token))
+                        {
+                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            return retVal;
+                        }
+
+                        //httpClient.DefaultRequestHeaders.Authorization =
+                        //    new AuthenticationHeaderValue("Bearer", token);
+                    }
+
+                    // create user resource
+                    var resource = $"/companies/{companyId}/orders/open";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var content = new FormUrlEncodedContent(param);
+
+                    var response = httpClient.PostAsync(resource, content).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+
+                    retVal = ERPSearchOrdersResponse.FromJson(respContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.SearchOrders -> {companyId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchOrders details => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+
+            return retVal;
+        }
+
+        public List<ERPSearchOrdersResponse> SearchClosedOrders(int companyId, ERPSearchOrdersRequest request, bool useMock = false)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            //initialize
+            var retVal = new List<ERPSearchOrdersResponse>();
+            var respContent = string.Empty;
+
+            if (!useMock)
+                if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+                {
+                    _logger.Warning("Swift Api provider - SearchOrders", new Exception("NSS API attributes not configured correctly."));
+                    return retVal;
+                }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    if (useMock)
+                        httpClient.BaseAddress = new Uri("https://private-anon-bd88ec445e-nssswift.apiary-mock.com");
+
+                    if (!useMock)
+                    {
+                        //get token
+                        var token = GetNSSToken(httpClient);
+
+                        if (string.IsNullOrEmpty(token))
+                        {
+                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            return retVal;
+                        }
+
+                        //httpClient.DefaultRequestHeaders.Authorization =
+                        //    new AuthenticationHeaderValue("Bearer", token);
+                    }
+
+                    // create user resource
+                    var resource = $"/companies/{companyId}/orders/closed";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var response = httpClient.GetAsync(QueryHelpers.AddQueryString(resource, param)).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+
+                    retVal = ERPSearchOrdersResponse.FromJson(respContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.SearchOrders -> {companyId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchOrders details => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+
+            return retVal;
+        }
+
+        public List<ERPSearchInvoicesResponse> SearchOpenInvoices(int companyId, ERPSearchInvoicesRequest request, bool useMock = false)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            //initialize
+            var retVal = new List<ERPSearchInvoicesResponse>();
+            var respContent = string.Empty;
+
+            if (!useMock)
+                if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+                {
+                    _logger.Warning("Swift Api provider - SearchInvoices", new Exception("NSS API attributes not configured correctly."));
+                    return retVal;
+                }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    if (useMock)
+                        httpClient.BaseAddress = new Uri("https://private-anon-bd88ec445e-nssswift.apiary-mock.com");
+
+                    if (!useMock)
+                    {
+                        //get token
+                        var token = GetNSSToken(httpClient);
+
+                        if (string.IsNullOrEmpty(token))
+                        {
+                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            return retVal;
+                        }
+
+                        //httpClient.DefaultRequestHeaders.Authorization =
+                        //    new AuthenticationHeaderValue("Bearer", token);
+                    }
+
+                    // create user resource
+                    var resource = $"/companies/{companyId}/invoices/open";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var content = new FormUrlEncodedContent(param);
+
+                    var response = httpClient.PostAsync(resource, content).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+
+                    retVal = ERPSearchInvoicesResponse.FromJson(respContent);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.SearchInvoices -> {companyId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchInvoices details => email: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+
+            return retVal;
+        }
+
+        public List<ERPSearchInvoicesResponse> SearchClosedInvoices(int companyId, ERPSearchInvoicesRequest request, bool useMock = false)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+
+            //initialize
+            var retVal = new List<ERPSearchInvoicesResponse>();
+            var respContent = string.Empty;
+
+            if (!useMock)
+                if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+                {
+                    _logger.Warning("Swift Api provider - SearchInvoices", new Exception("NSS API attributes not configured correctly."));
+                    return retVal;
+                }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    if (useMock)
+                        httpClient.BaseAddress = new Uri("https://private-anon-bd88ec445e-nssswift.apiary-mock.com");
+                    else
+                        httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    if (!useMock)
+                    {
+                        //get token
+                        var token = GetNSSToken(httpClient);
+
+                        if (string.IsNullOrEmpty(token))
+                        {
+                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            return retVal;
+                        }
+
+                        //httpClient.DefaultRequestHeaders.Authorization =
+                        //    new AuthenticationHeaderValue("Bearer", token);
+                    }
+
+                    // create user resource
+                    var resource = $"/companies/{companyId}/invoices/closed";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var response = httpClient.GetAsync(QueryHelpers.AddQueryString(resource, param)).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = ERPSearchInvoicesResponse.FromJson(respContent);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.SearchInvoices -> {companyId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchInvoices details => email: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+
+            return retVal;
+        }
+
 
         private void ConfigureNSSApiSettings()
         {

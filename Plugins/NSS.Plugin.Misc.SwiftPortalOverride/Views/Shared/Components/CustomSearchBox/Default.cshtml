@@ -5,7 +5,9 @@
     {
         <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" name="q" placeholder="Search products" aria-label="@T("Search.SearchBox.Text.Label")" />
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBoxBeforeSearchButton })
-        <input type="submit" class="button-1 search-box-button" value="@T("Search.Button")" />
+        <button type="submit" class="button-1 search-box-button">
+            <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/search.svg" width="20" height="20" alt="">
+        </button>
         @if (Model.SearchTermMinimumLength > 0)
         {
             <script asp-location="Footer">

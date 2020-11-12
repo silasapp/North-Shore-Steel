@@ -26,13 +26,13 @@
 }
 @{ var themeName = themeContext.WorkingThemeName; }
 <div id="order-detail" class="page order-details-page">
-    <div class="d-flex flex-row justify-content-between bg-white-shadow p-5">
-        <div class="h4-primary d-flex flex-row" onclick="setLocation('@Url.Action("CustomOrders", "OrderOverride")')">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center align-items-md-start bg-white-shadow px-5 py-4">
+        <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('/orders')">
             <img src="~/Themes/@themeName/Content/assets/enter.svg" alt="" width="20" class="mr-2">
             Back to Orders
         </div>
-        <label class="h3-primary-sans mb-0">ORDER NUMBER: @Model.CustomOrderNumber</label>
-        <div class="h4-primary d-flex flex-row" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.Id })')">
+        <label class="h3-primary-sans my-3">ORDER NUMBER: @Model.CustomOrderNumber</label>
+        <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.Id })')">
             <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
             Order Again
         </div>
@@ -302,12 +302,12 @@ Model.BillingAddress.ZipPostalCodeEnabled && !string.IsNullOrEmpty(Model.Billing
         </div>
         <div class="col-md-4 col-sm-6 d-flex flex-column align-items-center align-items-md-start">
             <div class="d-flex flex-row mb-4 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
-                <img v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" width="20" />
+                <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
                 <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice</label>
             </div>
             <div class="d-flex flex-row cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
-                <img alt="Delivery Ticket"
-                     v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" width="20" />
+                <img alt="Ticket Icon"
+                     v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
                 <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket</label>
             </div>
         </div>

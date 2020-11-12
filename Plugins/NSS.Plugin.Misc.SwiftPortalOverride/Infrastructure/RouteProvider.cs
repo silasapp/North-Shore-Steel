@@ -48,42 +48,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
+            // dashboard
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/",
                new { controller = "HomeOverride", action = "Index" },
                new { },
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
+            // catalog
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Catalog", "catalog/",
                new { controller = "CatalogOverride", action = "Index" },
                new { },
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/",
-               new { controller = "OrderOverride", action = "CustomerOrders" },
-               new { },
-               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
-               );
-
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/{orderId:min(0)}/",
-              new { controller = "OrderOverride", action = "Details" },
-              new { },
-              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
-              );
-
+            // cart
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Catalog", "cart/",
                new { controller = "CartOverride", action = "Cart" },
                new { },
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
-
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Catalog", "updatecart/",
-            new { controller = "CartOverride", action = "UpdateCart" },
-            new { },
-            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
-            );
+                new { controller = "CartOverride", action = "UpdateCart" },
+              new { },
+              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+              );
 
 
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Catalog", "wishlist/{customerGuid?}/",
@@ -91,6 +81,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             new { },
             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
             );
+
+            // Checkout
+
 
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Catalog", "checkout/",
               new { controller = "CheckoutOverride", action = "Index" },
@@ -110,7 +103,43 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
              );
 
+            // orders
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/",
+            new { controller = "OrderOverride", action = "CustomerOrders" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
 
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/{orderId:min(0)}/",
+            new { controller = "OrderOverride", action = "Details" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "open-orders/",
+            new { controller = "OrderOverride", action = "OpenOrders" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "closed-orders/",
+            new { controller = "OrderOverride", action = "ClosedOrders" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
+
+            // invoices
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Invoices", "open-invoices/",
+            new { controller = "Invoice", action = "OpenInvoices" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Invoices", "closed-invoices/",
+            new { controller = "Invoice", action = "ClosedInvoices" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
         }
     }
 }

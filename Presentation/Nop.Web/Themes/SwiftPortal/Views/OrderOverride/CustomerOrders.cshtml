@@ -1,6 +1,9 @@
-﻿@model CustomerOrderListModel
+﻿@inject IThemeContext themeContext
+@using Nop.Web.Framework.Themes
+
+@model CustomerOrderListModel
 @{
-    Layout = "_ColumnsTwo";
+    Layout = "_ColumnsOne";
 
     //title
     Html.AddTitleParts(T("PageTitle.Account").Text);
@@ -8,157 +11,106 @@
     Html.AppendPageCssClassParts("html-account-page");
     Html.AppendPageCssClassParts("html-order-list-page");
 }
-@section left
-{
-    @await Component.InvokeAsync("CustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Orders })
-}
-<div class="page account-page order-list-page">
-    <div class="page-title">
-        <h1>@T("Account.MyAccount") - @T("Account.CustomerOrders")</h1>
-    </div>
-    <div class="page-body">
-        @if (Model.RecurringOrders.Count > 0)
-        {
-            <div class="section recurring-payments">
-                <div class="title">
-                    <strong>@T("Account.CustomerOrders.RecurringOrders")</strong>
+@{ var themeName = themeContext.WorkingThemeName; }
+<div id="orders" class="page orders-page">
+    <div class=page-body>
+        <div class="orders-search-block" id=ordersTableBlock role=tabpanel
+             aria-labelledby=ordersTableBlock>
+            <div>
+                <div class="orders-title">SEARCH ORDERS</div>
+                <div class="orders-export" v-on:click="isSearchOpen = !isSearchOpen;">
+                    <img class="collapse-icon" v-bind:class="{'down': isSearchOpen}" id="collapseIcon"
+                         src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
                 </div>
-                <form asp-route="CustomerOrders" method="post">
-                    @{
-                        var canRetryRecurringOrders = Model.RecurringOrders.Any(recurring => recurring.CanRetryLastPayment);
-                    }
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <colgroup>
-                                <col />
-                                <col />
-                                <col />
-                                <col />
-                                <col />
-                                <col />
-                                @if (canRetryRecurringOrders)
-                                {
-                                    <col /> }
-                                <col />
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th class="start-date">
-                                        @T("Account.CustomerOrders.RecurringOrders.StartDate")
-                                    </th>
-                                    <th class="cycle-info">
-                                        @T("Account.CustomerOrders.RecurringOrders.CycleInfo")
-                                    </th>
-                                    <th class="next-payment">
-                                        @T("Account.CustomerOrders.RecurringOrders.NextPayment")
-                                    </th>
-                                    <th class="total-cycles">
-                                        @T("Account.CustomerOrders.RecurringOrders.TotalCycles")
-                                    </th>
-                                    <th class="cycles-remaining">
-                                        @T("Account.CustomerOrders.RecurringOrders.CyclesRemaining")
-                                    </th>
-                                    <th class="initial-order">
-                                        @T("Account.CustomerOrders.RecurringOrders.InitialOrder")
-                                    </th>
-                                    @if (canRetryRecurringOrders)
-                                    {
-                                        <th class="retry">
-                                            @T("Account.CustomerOrders.RecurringOrders.RetryLastPayment")
-                                        </th>
-                                    }
-                                    <th class="cancel">
-                                        @T("Account.CustomerOrders.RecurringOrders.Cancel")
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.RecurringOrders)
-                                {
-                                    <tr>
-                                        <td class="start-date">
-                                            @item.StartDate
-                                        </td>
-                                        <td class="cycle-info">
-                                            @item.CycleInfo
-                                        </td>
-                                        <td class="next-payment">
-                                            @item.NextPayment
-                                        </td>
-                                        <td class="total-cycles">
-                                            @item.TotalCycles
-                                        </td>
-                                        <td class="cycles-remaining">
-                                            @item.CyclesRemaining
-                                        </td>
-                                        <td class="initial-order">
-                                            <a href="@Url.RouteUrl("OrderDetails", new { orderId = item.InitialOrderId })">@string.Format(T("Account.CustomerOrders.RecurringOrders.ViewInitialOrder").Text, item.InitialOrderNumber)</a>
-                                        </td>
-                                        @if (canRetryRecurringOrders)
-                                        {
-                                            <td class="retry">
-                                                @if (item.CanRetryLastPayment)
-                                                {
-                                                    <input type="submit" name="retryLastPayment_@(item.Id)" value="@T("Account.CustomerOrders.RecurringOrders.RetryLastPayment")" class="button-2 retry-recurring-order-button" />
-                                                }
-                                            </td>
-                                        }
-                                        <td class="cancel">
-                                            @if (item.CanCancel)
-                                            {
-                                                <input type="submit" name="cancelRecurringPayment@(item.Id)" value="@T("Account.CustomerOrders.RecurringOrders.Cancel")" class="button-2 cancel-recurring-order-button" />
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
             </div>
-                        if (Model.RecurringPaymentErrors.Any())
-                        {
-                            <div class="message-error">
-                                <ul>
-                                    @foreach (var error in Model.RecurringPaymentErrors)
-                                    {
-                                        <li>@error</li>
-                                    }
-                                </ul>
-                            </div>
-                            }
-                        }
 
-        @if (Model.Orders.Count > 0)
-        {
-            <div class="order-list">
-                @foreach (var order in Model.Orders)
-                {
-                    <div class="section order-item">
-                        <div class="title">
-                            <strong>@T("Account.CustomerOrders.OrderNumber"): @order.CustomOrderNumber</strong>
-                        </div>
-                        <ul class="info">
-                            <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
-                            <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
-                            <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
-                        </ul>
-                        <div class="buttons">
-                            @if (order.IsReturnRequestAllowed)
-                            {
-                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
-                            }
-                            <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
-                        </div>
+            <div v-show="isSearchOpen" class="row">
+                <div class="col-md-3 d-flex flex-column">
+                    <label for=orderFromDate>Order Dates</label>
+                    <div class="input-with-icon">
+                        <input class=nss-form-control type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
+                               data-val=true placeholder="From">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
-                }
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label for=orderToDate> &nbsp;</label>
+                    <div class="input-with-icon">
+                        <input class=nss-form-control type="date" data-val=true placeholder="To" />
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label for=purchaseOrder>Purchase Order #</label>
+                    <input class=nss-form-control type=text data-val=true placeholder="Enter...">
+                </div>
+                <div class="col-md-3 d-flex flex-row-reverse align-items-end">
+                    <button class="nss-btn-default">Search</button>
+                </div>
             </div>
-        }
-        else
-        {
-            <div class="no-data">
-                @T("Account.CustomerOrders.NoOrders")
+        </div>
+        <div class="d-flex flex-column p-4 bg-white">
+            <div class="d-flex flex-row justify-content-between mb-3">
+                <label class="h2-primary">ORDERS</label>
+                <label class="h4-primary"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</label>
             </div>
-        }
+            <ejs-grid id="Grid" dataSource="@Model.Orders" allowPaging="true" allowFiltering="true">
+                <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+                <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
+                <e-grid-columns>
+                    <e-grid-column headerText="Order #" template="#template" width="60" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="PO" headerText="PO#" width="60" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="TotalWeight" headerText="Tot. Weight (lbs)" width="70" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="OrderTotal" headerText="Order Amount" width="80" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="CreatedOn" headerText="Order Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="ShippingStatus" headerText="Shipped On" width="80" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="DeliveryDate" headerText="Est. Delivery Date" width="120" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="OrderStatus" headerText="Status" filter="@(new { type="CheckBox"})" width="70"></e-grid-column>
+                    <e-grid-column type="checkbox" width="30"></e-grid-column>
+                </e-grid-columns>
+            </ejs-grid>
+        </div>
     </div>
 </div>
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
+
+<script id="template" type="text/x-template">
+    <a href="/orders/${Id}">${Id}</a>
+</script>
+
+<script>
+    var model = @Html.Raw(Serialize(Model));
+
+    const store = {
+        state: {
+            orders: model.orders,
+        },
+    };
+
+    var vm = new Vue({
+        el: '#orders',
+        data: {
+            shared: store.state,
+            isSearchOpen: true,
+        },
+        mounted: function () {
+
+        },
+        methods: {
+
+        },
+    });
+</script>
+<ejs-scripts></ejs-scripts>

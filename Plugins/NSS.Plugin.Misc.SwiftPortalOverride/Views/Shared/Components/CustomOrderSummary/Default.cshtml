@@ -87,7 +87,7 @@
         <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
             <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
 
-                <div style="display: flex;">
+                <div style="display: flex;flex-wrap: wrap;">
                     <div class="cart-filter-menu">
                         <label for="purchase-order">Purchase Order #</label>
                         @if (purchasechkattr != null)
@@ -105,7 +105,7 @@
                 <div class="cart-options">
                     @if (Model.IsEditable)
                     {
-                        <div class="common-buttons" style="display: flex">
+                        <div class="common-buttons" style="display: flex;flex-wrap: wrap; ">
                             @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
                                 <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
                             <div style="position: relative;display: flex;align-items: center;">
@@ -267,8 +267,8 @@
                 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
                 @if (Model.IsEditable)
                 {
-                    <div class="cart-collaterals">
-                        <div class="deals">
+                    <div class="cart-collaterals col-md-4 col-xs-12">
+                        <div class="deals" style="width: 100%;max-width: 100%;">
                             @await Html.PartialAsync("_DiscountBox", Model.DiscountBox)
                             @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
 
@@ -280,8 +280,9 @@
                                     @foreach (var attributeValue in deliverychkattr.Values)
                                     {
                                         <div>
-                                            <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label">
+                                            <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label radio-button">
                                                 <input id="@(controlId)_@(attributeValue.Id)" type="radio" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected">
+                                                <span class="rad-checkmark"></span>
                                                 @attributeValue.Name
                                             </label>
                                         </div>
@@ -291,14 +292,16 @@
                                 else
                                 {
                                     <div>
-                                        <label for="pickup" class="radio control-label">
+                                        <label for="pickup" class="radio control-label radio-button">
                                             <input type="radio" id="customer" name="ship" value="customer">
+                                            <span class="rad-checkmark"></span>
                                             Ship to Customer
                                         </label>
                                     </div>
                                     <div>
-                                        <label for="pickup" class="radio control-label">
+                                        <label for="pickup" class="radio control-label radio-button">
                                             <input type="radio" id="pickup" name="ship" value="pickup">
+                                            <span class="rad-checkmark"></span>
                                             Pickup from North Shore Steel
                                         </label>
                                     </div>
@@ -309,7 +312,7 @@
                         </div>
                     </div>
                 }
-                <div class="totals">
+                <div class="totals col-md-7 col-xs-12" style="background: none; padding: 0;">
                     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
                     @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.IsEditable })
                     @if (Model.IsEditable)
@@ -328,7 +331,7 @@
                             <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
                                 <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
                             </div>
-                            <div class="terms-of-service">
+                            <div class="terms-of-service" style="display: flex;align-items: center;">
 
                                 <label class="pure-material-checkbox">
                                     <input id="termsofservice" type="checkbox" name="termsofservice" />
@@ -336,7 +339,7 @@
                                 </label>
                                 @if (Model.TermsOfServicePopup)
                                 {
-                                    <a class="read" id="read-terms">@T("Checkout.TermsOfService.Read")</a>
+                                    <a class="read" id="read-terms" style="margin-left: 5px !important;">@T("Checkout.TermsOfService.Read")</a>
                                     <script asp-location="Footer">
                                         $(document).ready(function() {
                                             $('#read-terms').on('click',
