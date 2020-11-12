@@ -39,6 +39,7 @@
     <None Remove="Views\CustomCustomer\Login.cshtml" />
     <None Remove="Views\CustomCustomer\_FilteredPartialView.cshtml" />
     <None Remove="Views\CustomShoppingCart\Checkout.cshtml" />
+    <None Remove="Views\Shared\Components\AccountSelector\Default.cshtml" />
     <None Remove="Views\Shared\Components\CustomOrderSummary\Default.cshtml" />
     <None Remove="Views\Configure.cshtml" />
     <None Remove="Views\Confirmation - Copy.cshtml" />
@@ -108,6 +109,9 @@
     <Content Include="Views\CustomCustomer\Login.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Shared\Components\AccountSelector\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Shared\Components\CustomOrderSummary\Default.cshtml">

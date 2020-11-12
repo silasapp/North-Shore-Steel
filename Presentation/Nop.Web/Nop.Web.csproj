@@ -35,6 +35,7 @@
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Remove="Themes\SwiftPortal\Views\Order\**" />
+    <Content Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
     <Compile Remove="bin\**" />
     <Compile Remove="obj\**" />
@@ -48,6 +49,8 @@
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
 
     <Compile Remove="Themes\SwiftPortal\Views\Order\**" />
+
+    <Compile Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
     <Content Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="obj\**" />
@@ -56,6 +59,7 @@
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <EmbeddedResource Remove="Themes\SwiftPortal\Views\Order\**" />
+    <EmbeddedResource Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
     <None Remove="bin\**" />
     <None Remove="obj\**" />
     <None Remove="Plugins\**;Themes\**" />
@@ -63,6 +67,7 @@
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <None Remove="Themes\SwiftPortal\Views\Order\**" />
+    <None Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
 
     <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
 
