@@ -10,6 +10,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public CompanyOrderListModel()
         {
             Orders = new List<OrderDetailsModel>();
+            FilterContext = new SearchFilter();
         }
 
         public IList<OrderDetailsModel> Orders { get; set; }

@@ -49,6 +49,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Challenge();
 
             var model = new CompanyInvoiceListModel();
+            model.FilterContext.IsClosed = true;
 
             return View(model);
         }
