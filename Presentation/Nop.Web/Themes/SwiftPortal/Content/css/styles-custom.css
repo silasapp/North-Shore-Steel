@@ -47,6 +47,9 @@ a:not([href]):not([class]) {
         align-items: center;
         justify-content: center;
     }
+.coupon-code {
+    display: flex;
+}
 .search-box-button {
     background: none;
     border: none;
