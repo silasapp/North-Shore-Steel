@@ -109,6 +109,7 @@ a:not([href]):not([class]) {
     padding-top: 0;
     background-color: #ffffff !important;
     margin-bottom: 50px;
+    z-index:1;
 }
 
 .catalog-page-wrapper .header-lower {
@@ -261,6 +262,7 @@ a:not([href]):not([class]) {
     letter-spacing: 0.21px;
     color: #03175b;
     opacity: 1;
+    margin:0 10px;
 }
 
     .account-btn:hover {
@@ -1893,6 +1895,11 @@ table input {
     z-index: 999;
     position: absolute;
     white-space: nowrap;
+    width: fit-content;
+    background: #fff;
+    padding: 3px 15px 10px;
+    text-align: left;
+    z-index: 9999;
 }
 
 .nav-menu-with-sub:hover > .nav-sub-menu {
@@ -1900,6 +1907,15 @@ table input {
 }
 .nav-menu-with-sub {
     position: relative;
+}
+.ui-dialog-titlebar {
+    background-color: #03175b;
+}
+.ui-dialog-title {
+    color: #ffffff!important;
+    font-size: 22px;
+    letter-spacing: 1;
+    font-family: "Teko";
 }
 @media all and (min-width: 1001px) {
     /* CUSTOM STYLE */
