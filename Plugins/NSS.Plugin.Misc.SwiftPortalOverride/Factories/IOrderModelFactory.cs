@@ -7,7 +7,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public interface IOrderModelFactory
     {
-        CompanyOrderListModel PrepareOrderListModel();
+        CompanyOrderListModel PrepareOrderListModel(int companyId, CompanyOrderListModel.SearchFilter filter);
         OrderDetailsModel PrepareOrderDetailsModel();
     }
 }

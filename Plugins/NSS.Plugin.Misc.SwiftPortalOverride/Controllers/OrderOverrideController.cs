@@ -28,8 +28,9 @@ using Nop.Services.Stores;
 using Nop.Services.Tax;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
-using Nop.Web.Factories;
+//using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
@@ -39,7 +40,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region Fields
 
         private readonly ICustomerService _customerService;
-        private readonly IOrderModelFactory _orderModelFactory;
+        private readonly Nop.Web.Factories.IOrderModelFactory _orderNopModelFactory;
         private readonly IOrderProcessingService _orderProcessingService;
         private readonly IOrderService _orderService;
         private readonly IPaymentService _paymentService;
@@ -48,13 +49,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWebHelper _webHelper;
         private readonly IWorkContext _workContext;
         private readonly RewardPointsSettings _rewardPointsSettings;
+        private readonly IOrderModelFactory _orderModelFactory;
 
         #endregion
 
         #region Ctor
 
         public OrderOverrideController(ICustomerService customerService,
-            IOrderModelFactory orderModelFactory,
+            Nop.Web.Factories.IOrderModelFactory orderNopModelFactory,
             IOrderProcessingService orderProcessingService,
             IOrderService orderService,
             IPaymentService paymentService,
@@ -62,10 +64,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IShipmentService shipmentService,
             IWebHelper webHelper,
             IWorkContext workContext,
-            RewardPointsSettings rewardPointsSettings) : base(customerService, orderModelFactory, orderProcessingService, orderService, paymentService, pdfService, shipmentService, webHelper, workContext, rewardPointsSettings)
+            RewardPointsSettings rewardPointsSettings,
+            IOrderModelFactory orderModelFactory) : base(customerService, orderNopModelFactory, orderProcessingService, orderService, paymentService, pdfService, shipmentService, webHelper, workContext, rewardPointsSettings)
         {
             _customerService = customerService;
-            _orderModelFactory = orderModelFactory;
+            _orderNopModelFactory = orderNopModelFactory;
             _orderProcessingService = orderProcessingService;
             _orderService = orderService;
             _paymentService = paymentService;
@@ -74,6 +77,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _webHelper = webHelper;
             _workContext = workContext;
             _rewardPointsSettings = rewardPointsSettings;
+            _orderModelFactory = orderModelFactory;
         }
 
         #endregion
@@ -87,7 +91,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
-            var model = _orderModelFactory.PrepareCustomerOrderListModel();
+            var model = _orderNopModelFactory.PrepareCustomerOrderListModel();
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomOrder/CustomerOrders.cshtml", model);
         }
 
@@ -99,7 +103,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
                 return Challenge();
 
-            var model = _orderModelFactory.PrepareOrderDetailsModel(order);
+            var model = _orderNopModelFactory.PrepareOrderDetailsModel(order);
             //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomOrder/Details.cshtml", model);
             return View(model);
         }
@@ -128,9 +132,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         [IgnoreAntiforgeryToken]
-        public PartialViewResult SearchCompanyOrders()
+        public PartialViewResult SearchCompanyOrders(CompanyOrderListModel.SearchFilter filter)
         {
-            return PartialView();
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+
+            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+
+            var model = new CompanyOrderListModel();
+
+            if(eRPCompanyId > 0)
+                model = _orderModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
+
+            return PartialView("_", model);
         }
 
         #endregion

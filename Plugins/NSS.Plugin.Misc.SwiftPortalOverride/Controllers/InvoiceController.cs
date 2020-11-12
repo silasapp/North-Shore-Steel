@@ -3,10 +3,8 @@ using Nop.Core;
 using Nop.Services.Customers;
 using Nop.Web.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -16,18 +14,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private readonly IWorkContext _workContext;
         private readonly ICustomerService _customerService;
+        private readonly IInvoiceModelFactory _invoiceModelFactory;
 
         #endregion
 
         #region Ctor
 
-        public InvoiceController(IWorkContext workContext, ICustomerService customerService)
+        public InvoiceController(IWorkContext workContext, ICustomerService customerService, InvoiceModelFactory invoiceModelFactory)
         {
             _workContext = workContext;
             _customerService = customerService;
+            _invoiceModelFactory = invoiceModelFactory;
         }
 
         #endregion
+
+        #region Methods
 
         [HttpsRequirement]
         public IActionResult OpenInvoices()
@@ -53,9 +55,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         [IgnoreAntiforgeryToken]
-        public PartialViewResult SearchCompanyInvoices()
+        public PartialViewResult SearchCompanyInvoices(CompanyInvoiceListModel.SearchFilter filter)
         {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+
+            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+
+            var model = new CompanyInvoiceListModel();
+
+            if (eRPCompanyId > 0)
+                model = _invoiceModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
+
             return PartialView();
         }
+
+        #endregion
     }
 }
