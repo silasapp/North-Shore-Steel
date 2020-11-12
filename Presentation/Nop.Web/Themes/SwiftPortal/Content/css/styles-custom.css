@@ -113,6 +113,7 @@ a:not([href]):not([class]) {
 }
 .catalog-page {
   margin-top: 50px;
+  position: relative;
 }
 
 .header-links > ul {
@@ -1728,6 +1729,9 @@ table input {
 .footer-upper:after {
     content: none !important;
 }
+.cat-side-drawer,.cart-side-drawer-trigger {
+    display: none;
+}
 
 @media all and (min-width: 1001px) {
     /* CUSTOM STYLE */
@@ -1738,23 +1742,66 @@ table input {
   }
 }
 @media all and (max-width: 1028px) {
-  .footer-upper {
-    grid-template-columns: repeat(3, 1fr);
-    grid-row-gap: 30px;
-  }
-  #invoiceSearchField > div {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(200px, 1fr));
-    grid-column-gap: 20px;
-  }
-  #orderSearchField > div {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-column-gap: 20px;
-  }
+    .footer-upper {
+        grid-template-columns: repeat(3, 1fr);
+        grid-row-gap: 30px;
+    }
+
+    #invoiceSearchField > div {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
+        grid-column-gap: 20px;
+    }
+
+    #orderSearchField > div {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-column-gap: 20px;
+    }
+
     .password-fieldset {
         padding: 30px 15%;
     }
+
+    .shapes-treeview {
+        display: none;
+    }
+
+    .cat-side-drawer {
+        display: block;
+        width: 0;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: -30px;
+        overflow-x: hidden;
+        transition: 0.5s;
+        background: #ffffff;
+        transform: translateX(-100%);
+        transition: transform .2s ease-in;
+    }
+        .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover {
+            /*width: 50%;*/
+            transform: translateX(0);
+        }
+    .cart-side-drawer-trigger {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: -20px;
+        bottom: 0;
+        margin: auto;
+        z-index: 1;
+        height: 50px;
+        width: 50px;
+        background: #ffffff;
+        border-radius: 50%;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     
 }
 @media all and (max-width: 800px) {
@@ -1783,6 +1830,10 @@ table input {
     grid-template-columns: repeat(1, 1fr);
     grid-column-gap: 20px;
   }
+
+    .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover {
+        width: 70%;
+    }
 }
 
 /* #region INPUTS */
