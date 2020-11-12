@@ -7,35 +7,32 @@
 
     //page class
     Html.AppendPageCssClassParts("html-home-page");
-    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
 }
 
 @{
     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
 
-<div id="app" class="page home-page">
+<div id="app" class="page catalog-page">
     <div class="page-body">
         <div class="row">
             <div class="col-sm-2"></div>
-            <div class="col-sm-10">
-                <div id="searchWord" style="float: left"></div>
-                <div id="specs" style="float:left"></div>
-                <div id="shapes" style="float:left"></div>
-                <div id="clearAllFilters" onclick=clearFilters() style="cursor:pointer"></div>
+            <div class="col-sm-10 filter-tags">
+                <div id="searchWord" style=float:left></div>
+                <div id=specs style=float:left></div>
+                <div id=shapes></div>
+                <button id="clearAllFilters" onclick="clearFilters()" class="clear-filter">Clear filters</button>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-2">
                 <div id="accordion">
                     <div class="card">
-                        <div class="card-header">
-                            <a class="card-link" data-toggle="collapse" href="#collapseOne">
-                                SHAPES
-                            </a>
-                        </div>
+                        <a class="card-link" data-toggle="collapse" href="#collapseOne">
+                            <div class="card-header">SHAPES</div>
+                        </a>
                         <div id="collapseOne" class="collapse show">
-                            <div class="">
+                            <div>
                                 <ejs-treeview id="treedata" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
                                     <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
                                 </ejs-treeview>
@@ -77,40 +74,36 @@
                             if (@key == "METAL" || @key == "COATING")
                             {
                                 <div class="card defaultSpecs" style="display: flex">
-                                    <div class="card-header">
-                                        <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                            @key
-                                        </a>
-                                    </div>
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                        <div class="card-header"> @key</div>
+                                    </a>
                                     @foreach (var item in group)
                                     {
-                                <div id="collapse-@index" class="collapse show">
-                                    <div class="card-body" style="padding-left: 2.6rem">
-                                        <label class="pure-material-checkbox">
-                                            <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                            <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;"><span class="nss-iSpec">@item.SpecificationAttributeOptionName</span></span>
-                                        </label>
-                                    </div>
-                                </div>
+                                        <div id="collapse-@index" class="collapse show">
+                                            <div class="card-body">
+                                                <label class="pure-material-checkbox">
+                                                    <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                    <span class="checkmark"></span>@item.SpecificationAttributeOptionName
+                                                </label>
+                                            </div>
+                                        </div>
                                     }
                                 </div>
                             }
                             <div class="card plateIndividualSpecs" style="display: none">
-                                <div class="card-header">
-                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                        @key
-                                    </a>
-                                </div>
+                                <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                    <div class=card-header> @key</div>
+                                </a>
                                 @foreach (var item in group)
                                 {
-                            <div id="collapse-@index" class="collapse show">
-                                <div class="card-body" style="padding-left: 2.6rem">
-                                    <label class="pure-material-checkbox">
-                                        <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                        <span style="color: rgba(0, 0, 0, 0.87); font-size: 13px;"><span class="nss-iSpec"> @item.SpecificationAttributeOptionName</span></span>
-                                    </label>
-                                </div>
-                            </div>
+                                    <div id="collapse-@index" class="collapse show">
+                                        <div class="card-body">
+                                            <label class="pure-material-checkbox">
+                                                <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                <span class="checkmark"></span>@item.SpecificationAttributeOptionName
+                                            </label>
+                                        </div>
+                                    </div>
                                 }
                             </div>
                         }
@@ -223,28 +216,28 @@
         var allFilterValue = "";
         var searchChipsValue = "";
 
+        specChipsValue = "<div style =\"display: flex; margin: 0 0 12px 0;\">";
         for (i = 0; i < specNames.length; i++) {
-            specChipsValue = "<div class =\"chipsStyle\">";
             var sChip = specNames[i].replace(/ /g, "_");
             specChipsValue += "<span class=\"filter-tag\">" + specNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
-            specChipsValue += "</div>";
         }
+        specChipsValue += "</div>";
         document.getElementById("specs").innerHTML = specChipsValue;
 
 
+        shapeChipsValue = "<div style =\"display: flex; margin: 0 0 12px 0;\">";
         for (i = 0; i < shapeNames.length; i++) {
-            shapeChipsValue = "<div class =\"chipsStyle\">";
             var sChip = shapeNames[i].replace(/ /g, "_");
             shapeChipsValue += "<span class=\"filter-tag\">" + shapeNames[i] + "<button><img alt= " + sChip + " src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeFiltered()></button></span>";
-            shapeChipsValue += "</div>";
         }
+        shapeChipsValue += "</div>";
         document.getElementById("shapes").innerHTML = shapeChipsValue;
 
+        searchChipsValue = "<div class =\"chipsStyle\" style=\"display: flex;margin: 0 0px 12px 0;\">";
         if (searchKeyword.length > 0) {
-            searchChipsValue = "<div class =\"chipsStyl\" style=\"display: flex;margin: 0 0px 12px 0;\">";
             searchChipsValue += "<span class=\"filter-tag\">\"" + searchKeyword + "\"<button><img src=\"Themes/SwiftPortal/Content/assets/close-filled.svg\" width=\"15\" height=\"15\" onclick=removeParam()></button></span>";
-            searchChipsValue += "</div>";
         }
+        searchChipsValue += "</div>";
         document.getElementById("searchWord").innerHTML = searchChipsValue;
 
         if (specNames.length > 0 || shapeNames.length > 0 || searchKeyword.length > 0) {

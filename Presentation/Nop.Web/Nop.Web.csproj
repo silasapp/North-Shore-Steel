@@ -32,6 +32,7 @@
     <Content Remove="bin\**" />
     <Content Remove="obj\**" />
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
+    <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Remove="Themes\SwiftPortal\Views\Order\**" />
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
@@ -42,6 +43,8 @@
 
     <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
 
+    <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
+
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
 
     <Compile Remove="Themes\SwiftPortal\Views\Order\**" />
@@ -50,12 +53,14 @@
     <EmbeddedResource Remove="obj\**" />
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
+    <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <EmbeddedResource Remove="Themes\SwiftPortal\Views\Order\**" />
     <None Remove="bin\**" />
     <None Remove="obj\**" />
     <None Remove="Plugins\**;Themes\**" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <None Remove="Themes\SwiftPortal\Views\Order\**" />
 
@@ -456,7 +461,7 @@
     <Folder Include="Plugins\Misc.SwiftApi\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Content\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\" />
-    <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\" />
+    <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\" />
   </ItemGroup>
 
   <!-- This target execute after "Build" target.
