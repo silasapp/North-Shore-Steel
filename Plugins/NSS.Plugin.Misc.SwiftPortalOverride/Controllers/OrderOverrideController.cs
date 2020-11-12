@@ -30,6 +30,7 @@ using Nop.Services.Vendors;
 using Nop.Web.Controllers;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -101,6 +102,35 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var model = _orderModelFactory.PrepareOrderDetailsModel(order);
             //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomOrder/Details.cshtml", model);
             return View(model);
+        }
+
+        [HttpsRequirement]
+        public virtual IActionResult OpenOrders()
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var model = new CompanyOrderListModel();
+
+            return View(model);
+        }
+
+        [HttpsRequirement]
+        public virtual IActionResult ClosedOrders()
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var model = new CompanyOrderListModel();
+
+            return View(model);
+        }
+
+
+        [IgnoreAntiforgeryToken]
+        public PartialViewResult SearchCompanyOrders()
+        {
+            return PartialView();
         }
 
         #endregion
