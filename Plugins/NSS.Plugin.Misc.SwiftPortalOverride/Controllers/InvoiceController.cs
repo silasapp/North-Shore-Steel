@@ -30,7 +30,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #endregion
 
         [HttpsRequirement]
-        public IActionResult CompanyOpenInvoices()
+        public IActionResult OpenInvoices()
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
@@ -41,7 +41,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpsRequirement]
-        public IActionResult CompanyClosedInvoices()
+        public IActionResult ClosedInvoices()
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();

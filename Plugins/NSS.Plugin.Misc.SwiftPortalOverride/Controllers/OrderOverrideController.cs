@@ -105,7 +105,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpsRequirement]
-        public virtual IActionResult CompanyOpenOrders()
+        public virtual IActionResult OpenOrders()
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
@@ -116,7 +116,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpsRequirement]
-        public virtual IActionResult CompanyClosedOrders()
+        public virtual IActionResult ClosedOrders()
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
