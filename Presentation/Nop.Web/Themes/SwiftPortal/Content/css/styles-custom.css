@@ -1021,7 +1021,9 @@ table input {
     .checkout-card .title {
         text-align: left !important;
     }
-
+..cart-collaterals .coupon-code {
+    display: flex;
+}
 .checkout-card-2 > .title {
     text-align: center !important;
 }
