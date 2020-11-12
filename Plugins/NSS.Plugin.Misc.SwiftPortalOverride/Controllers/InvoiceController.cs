@@ -66,7 +66,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (eRPCompanyId > 0)
                 model = _invoiceModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
 
-            return PartialView();
+            return PartialView("_InvoiceGrid", model);
         }
 
         #endregion

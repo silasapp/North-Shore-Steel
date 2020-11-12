@@ -1973,8 +1973,35 @@ table input {
 
 /* #region SYNCFUSION GRID */
 
-.e-grid .e-gridheader tr th:last-child {
-    /*background-color: white !important;*/
+#invoice-grid .e-grid .e-gridheader tr th:last-child {
+    background-color: white !important;
+    border: none !important;
+}
+
+#invoice-grid .e-grid .e-rowcell e-gridchkbox {
+    background: white !important;
+    border: none !important;
+}
+
+#invoice-grid .e-grid {
+    border: none !important;
+}
+
+#invoice-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox {
+    background: white !important;
+    border: none !important;
+}
+
+#invoice-grid .e-grid .e-gridheader {
+    border: none !important;
+}
+
+.e-grid .e-headercell, .e-grid .e-detailheadercell {
+    height: 32px !important;
+}
+
+.e-grid .e-rowcell {
+    padding: 3.5px 21px;
 }
 
 .e-pager .e-currentitem, .e-pager .e-currentitem:hover {
