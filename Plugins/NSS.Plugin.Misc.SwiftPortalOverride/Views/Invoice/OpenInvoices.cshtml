@@ -1,0 +1,99 @@
+﻿@inject IThemeContext themeContext
+@using Nop.Web.Framework.Themes
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+
+@model CompanyInvoiceListModel
+@{
+    Layout = "_ColumnsOne";
+}
+@{ var themeName = themeContext.WorkingThemeName; }
+<div id="invoices" class="page orders-page">
+    <div class=page-body>
+        <div class="orders-search-block" id=ordersTableBlock role=tabpanel
+             aria-labelledby=ordersTableBlock>
+            <div>
+                <div class="orders-title">SEARCH INVOICES</div>
+                <div class="orders-export cursor-pointer" v-on:click="isSearchOpen = !isSearchOpen;">
+                    <img class="collapse-icon" v-bind:class="{'down': isSearchOpen}" id="collapseIcon"
+                         src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
+                </div>
+            </div>
+
+            <div v-show="isSearchOpen" class="row m-0 py-0">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3">
+                    <label for=orderFromDate>Order Dates</label>
+                    <div class="input-with-icon">
+                        <input class=nss-form-control type="text" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="From">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=orderToDate> &nbsp;</label>
+                    <div class="input-with-icon">
+                        <input class=nss-form-control type="date" data-val=true placeholder="To" />
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=purchaseOrder>Invoice #</label>
+                    <input class="nss-form-control" type="text" placeholder="Enter...">
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=purchaseOrder>Order #</label>
+                    <input class=nss-form-control type="text" placeholder="Enter...">
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=purchaseOrder>Purchase Order #</label>
+                    <input class=nss-form-control type="text" placeholder="Enter...">
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
+                    <button class="nss-btn-default ml-lg-5 w-100 text-center">Search</button>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column p-4 bg-white">
+            <div class="d-flex flex-row justify-content-between mb-3">
+                <label class="h2-primary">INVOICES</label>
+                <label class="h4-primary"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</label>
+            </div>
+            <div id="invoice-grid"></div>
+
+        </div>
+    </div>
+</div>
+@functions{
+
+}
+
+<script>
+    var vm = new Vue({
+        el: '#invoices',
+        data: {
+            isSearchOpen: true,
+        },
+        mounted: function () {
+            this.searchInvoices();
+        },
+        methods: {
+            searchInvoices: function () {
+                $.ajax({
+                  url: "@Url.Action("SearchCompanyInvoices", "Invoice")",
+                  type: 'POST',
+                  contentType: 'application/json; charset=utf-8',
+                  data: 'false',
+                  success: function (data) {
+                      if(data != null) {
+                          console.log("searchInvoices: ", data);
+                          $('#invoice-grid').html(data);
+                      }
+                  },
+                  error: function (xhr, thrownError) {
+                      console.log(thrownError, 'datadata-error', xhr);
+                      $('#invoice-grid').html('an error has occured here');
+                  }
+              });
+            }
+        },
+    });
+</script>
+<ejs-scripts></ejs-scripts>
