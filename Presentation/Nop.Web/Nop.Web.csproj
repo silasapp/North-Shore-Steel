@@ -171,9 +171,13 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\headset.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-add.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-cal-range.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-delivery-ticket-dark.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-delivery-ticket.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-download.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-error.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-expand.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-invoice-dark.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-invoice.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-key.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-location.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-more-vert.svg" />
