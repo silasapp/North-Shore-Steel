@@ -20,6 +20,7 @@ a:not([href]):not([class]) {
 .nav-bar-content {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .nav-bar-search {
@@ -58,9 +59,6 @@ a:not([href]):not([class]) {
 .header-links-wrapper,
 .header-logo {
     padding: 0;
-    /*width: 166px;
-  height: 48px;*/
-    /* flex-basis: 11%; */
 }
 
 .nav-pills .nav-link {
@@ -958,6 +956,10 @@ table input {
     align-items: baseline;
     font-family: "Exo 2";
     margin-bottom: 20px;
+}
+
+.nav-bar-search > form > .search-box-text::placeholder {
+    color: #ffffff;
 }
 
 .cart-summary-content {
@@ -1984,7 +1986,7 @@ table input {
         width: 0;
         position: absolute;
         z-index: 1;
-        top: 0;
+        top: -50px;
         left: -30px;
         overflow-x: hidden;
         transition: 0.5s;
@@ -2047,7 +2049,9 @@ table input {
         grid-template-columns: repeat(1, 1fr);
         grid-column-gap: 20px;
     }
-
+    ..cat-side-drawer {
+        left:-20px;
+    }
     .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover {
         width: 70%;
     }
@@ -2063,6 +2067,18 @@ table input {
     }
     .cart-filter-menu {
         flex-basis: 100%;
+    }
+
+    .nav-bar-content > .header-logo {
+        order: 1;
+        flex-basis: 40%;
+    }
+    .nav-bar-content > .nav-bar-search {
+        order: 3;
+        margin-top: 5px;
+    }
+    .nav-bar-content > .header-links-wrapper {
+        order: 2;
     }
 }
 
