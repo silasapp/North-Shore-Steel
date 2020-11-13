@@ -6,6 +6,8 @@
 @using Nop.Services.Catalog
 @using Nop.Services.Common
 @using Nop.Core.Domain.Catalog
+@using Nop.Core.Domain.Orders
+@using NSS.Plugin.Misc.SwiftPortalOverride
 @inject IWebHelper webHelper
 @inject IWorkContext workContext
 @inject IThemeContext themeContext
@@ -22,6 +24,9 @@
 
 @{
     var themeName = themeContext.WorkingThemeName;
+    var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    var eRPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == compIdCookieKey);
 }
 <div class="page wishlist-page">
     <div class="page-title">
@@ -88,6 +93,7 @@
                                             var product = productService.GetProductById(item.ProductId);
                                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
 
+                                            var itemId = item.Id;
                                             var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                             var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
@@ -110,32 +116,32 @@
                                                 <td>@iNo</td>
                                                 <td class="product">
                                                     <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>
-                                                    @if (!string.IsNullOrEmpty(item.AttributeInfo))
-                                                    {
-                                                        <div class="attributes">
-                                                            @Html.Raw(item.AttributeInfo)
-                                                        </div>
-                                                    }
-                                                    @if (!string.IsNullOrEmpty(item.RecurringInfo))
-                                                    {
-                                                        <div class="recurring-info">
-                                                            @Html.Raw(item.RecurringInfo)
-                                                        </div>
-                                                    }
-                                                    @if (!string.IsNullOrEmpty(item.RentalInfo))
-                                                    {
-                                                        <div class="rental-info">
-                                                            @Html.Raw(item.RentalInfo)
-                                                        </div>
-                                                    }
-                                                    @if (Model.IsEditable && item.AllowItemEditing)
-                                                    {
-                                                        var editCartItemUrl = Url.RouteUrl("Product", new { SeName = item.ProductSeName }, webHelper.CurrentRequestProtocol);
-                                                        editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid", item.Id.ToString());
-                                                        <div class="edit-item">
-                                                            <a href="@editCartItemUrl">@T("Common.Edit")</a>
-                                                        </div>
-                                                    }
+                                                    @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                                        {
+                                                            <div class="attributes">
+                                                                @Html.Raw(item.AttributeInfo)
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.RecurringInfo))
+                                                        {
+                                                            <div class="recurring-info">
+                                                                @Html.Raw(item.RecurringInfo)
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.RentalInfo))
+                                                        {
+                                                            <div class="rental-info">
+                                                                @Html.Raw(item.RentalInfo)
+                                                            </div>
+                                                        }
+                                                        @if (Model.IsEditable && item.AllowItemEditing)
+                                                        {
+                                                            var editCartItemUrl = Url.RouteUrl("Product", new { SeName = item.ProductSeName }, webHelper.CurrentRequestProtocol);
+                                                            editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid", item.Id.ToString());
+                                                            <div class="edit-item">
+                                                                <a href="@editCartItemUrl">@T("Common.Edit")</a>
+                                                            </div>
+                                                        }*@
                                                     @if (item.Warnings.Count > 0)
                                                     {
                                                         <div class="message-error">
@@ -188,11 +194,14 @@
                                                         <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" width="20" height="20"
                                                              alt="">
                                                     </button>
-                                                    <button class="table-action-button">
-                                                        <img src="~/Themes/@themeName/Content/assets/shopping-cart.svg" width="20"
-                                                             height="20" alt="">
-                                                    </button>
-                                                    <button class="table-action-button">
+                                                    @if (eRPCompanyIdExist)
+                                                    {
+                                                        <button class="table-action-button" onclick="getInputQuantity(@itemId, @shoppingCartTypeId);">
+                                                            <img src="~/Themes/@themeName/Content/assets/shopping-cart.svg" width="20"
+                                                                 height="20" alt="">
+                                                        </button>
+                                                    }
+                                                    <button class="table-action-button" style="cursor:not-allowed" disabled>
                                                         <img src="~/Themes/@themeName/Content/assets/dislike.svg" width="20" height="20"
                                                              alt="">
                                                     </button>
@@ -214,7 +223,7 @@
                             }
                             @if (Model.IsEditable && Model.EmailWishlistEnabled)
                             {
-                                <input type="button" value="@T("Wishlist.EmailAFriend")" class="button-2 email-a-friend-wishlist-button" onclick="setLocation('@Url.RouteUrl("EmailWishlist")')" />
+                                <input type="button" value="@T("Wishlist.EmailAFriend")" class="button-2 email-a-friend-wishlist-button" onclick="@Url.RouteUrl("EmailWishlist")" />
                             }
                         </div>
                     </form>
@@ -245,3 +254,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    function getInputQuantity(itemId, cartId) {
+        event.preventDefault();
+        let qty = $('#qty' + itemId).val();
+        if (!qty)
+            qty = 1;
+        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
+        $('#qty' + itemId).val("");
+        console.log('itemId, cartId, qty', itemId, cartId, qty, link);
+        AjaxCart.addproducttocart_catalog(link);
+    }
+</script>
