@@ -46,16 +46,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             string ERPCId;
             int customerId = _workContext.CurrentCustomer.Id;
-            string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-            ERPComId += customerId;
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, customerId);
             TransactionModel model = new TransactionModel();
 
             // get all companies assigned to customer
             IEnumerable<CustomerCompany> customerCompanies = _customerCompanyService.GetCustomerCompanies(customerId);
 
-            if (Request.Cookies[ERPComId] != null && (!string.IsNullOrEmpty(Request.Cookies[ERPComId].ToString())))
+            if (Request.Cookies[compIdCookieKey] != null && (!string.IsNullOrEmpty(Request.Cookies[compIdCookieKey].ToString())))
             {
-                ERPCId = Request.Cookies[ERPComId].ToString();
+                ERPCId = Request.Cookies[compIdCookieKey].ToString();
 
                 // check if customer still has access to previously selected company
                 IEnumerable<CustomerCompany> cc = customerCompanies.Where(x => x.Company.ErpCompanyId.ToString() == ERPCId);
@@ -66,14 +65,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
 
                 // remove cookie
-                Response.Cookies.Delete(ERPComId);
+                Response.Cookies.Delete(compIdCookieKey);
 
             }
 
             if (customerCompanies.Count() == 1)
             {
                 ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
-                Response.Cookies.Append(ERPComId, ERPCId);
+                Response.Cookies.Append(compIdCookieKey, ERPCId);
                 model = GetTransactions(ERPCId);
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }

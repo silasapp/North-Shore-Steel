@@ -30,6 +30,7 @@
 	<None Remove="plugin.json" />
     <None Remove="Areas\Admin\Views\_ViewImports.cshtml" />
     <None Remove="Views\CartOverride\Cart.cshtml" />
+    <None Remove="Views\CartOverride\Wishlist.cshtml" />
     <None Remove="Views\CartOverride\_GiftCardBox.cshtml" />
     <None Remove="Views\CheckoutOverride\Completed.cshtml" />
     <None Remove="Views\CheckoutOverride\OpcPaymentInfo.cshtml" />
@@ -39,9 +40,7 @@
     <None Remove="Views\CustomCustomer\Login.cshtml" />
     <None Remove="Views\CustomCustomer\_FilteredPartialView.cshtml" />
     <None Remove="Views\CustomShoppingCart\Checkout.cshtml" />
-    <None Remove="Views\Invoice\ClosedInvoices.cshtml" />
-    <None Remove="Views\Invoice\OpenInvoices.cshtml" />
-    <None Remove="Views\Invoice\_InvoiceGrid.cshtml" />
+    <None Remove="Views\Shared\Components\AccountSelector\Default.cshtml" />
     <None Remove="Views\OrderOverride\ClosedOrders.cshtml" />
     <None Remove="Views\OrderOverride\Details.cshtml" />
     <None Remove="Views\OrderOverride\OpenOrders.cshtml" />
@@ -88,6 +87,11 @@
     <Content Include="Views\CartOverride\Cart.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\CartOverride\Wishlist.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\CartOverride\_GiftCardBox.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -117,16 +121,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Invoice\ClosedInvoices.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Invoice\OpenInvoices.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\Invoice\_InvoiceGrid.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    <Content Include="Views\Shared\Components\AccountSelector\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\OrderOverride\ClosedOrders.cshtml">
