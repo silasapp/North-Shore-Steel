@@ -1021,6 +1021,7 @@ table input {
 .cart-summary-content select {
     border-radius: 5px;
     border: 1px solid #b8b8b8;
+    padding: 0 5px;
 }
 
 .cart-summary-content select {
