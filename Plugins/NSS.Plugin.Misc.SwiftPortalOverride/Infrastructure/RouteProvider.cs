@@ -48,6 +48,26 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
+            // customer account
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Info", "customer/info/",
+               new { controller = "CustomerOverride", action = "Info" },
+               new { },
+               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.ChangePassword", "customer/changepassword/",
+               new { controller = "CustomerOverride", action = "ChangePassword" },
+               new { },
+               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Addresses", "customer/addresses/",
+               new { controller = "CustomerOverride", action = "Addresses" },
+               new { },
+               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
+
             // dashboard
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/",
                new { controller = "HomeOverride", action = "Index" },

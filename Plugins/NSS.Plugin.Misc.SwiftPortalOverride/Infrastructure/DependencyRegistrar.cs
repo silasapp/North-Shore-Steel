@@ -40,6 +40,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             builder.RegisterType<ProductModelFactory>().As<IProductModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<OrderModelFactory>().As<IOrderModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<InvoiceModelFactory>().As<IInvoiceModelFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomerModelFactory>().As<ICustomerModelFactory>().InstancePerLifetimeScope();
 
         }
 
