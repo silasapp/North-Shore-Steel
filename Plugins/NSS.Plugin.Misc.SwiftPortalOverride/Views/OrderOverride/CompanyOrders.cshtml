@@ -15,7 +15,7 @@
         <div class="orders-search-block" id=ordersTableBlock role=tabpanel
              aria-labelledby=ordersTableBlock>
             <div>
-                <div class="orders-title">SEARCH CLOSED ORDERS</div>
+                <div class="orders-title">SEARCH ORDERS</div>
                 <div class="orders-export cursor-pointer" v-on:click="isSearchOpen = !isSearchOpen;">
                     <img class="collapse-icon" v-bind:class="{'down': isSearchOpen}" id="collapseIcon"
                          src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
@@ -51,9 +51,20 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex flex-column p-4 bg-white">
+        <div class="d-flex flex-column p-4 bg-white-shadow">
             <div class="d-flex flex-row justify-content-between mb-3">
-                <label class="h2-primary">CLOSED ORDERS</label>
+                <div>
+                    <ul class="nav nav-pills mb-1" id=pills-tab role="tablist">
+                        <li class=nav-item role="presentation" style=margin-right:.3em>
+                            <a class="nav-link active" id=pills-home-tab data-toggle=pill
+                               href=#pills-home role=tab aria-controls=pills-home
+                               aria-selected=true v-on:click="isClosed = false; searchOrders();">Open Orders</a>
+                        <li class=nav-item role="presentation">
+                            <a class=nav-link id=pills-profile-tab
+                               data-toggle=pill href=#pills-profile role=tab
+                               aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchOrders();">Closed Orders</a>
+                    </ul>
+                </div>
                 <label class="h4-primary"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</label>
             </div>
             <div id="order-grid"></div>
@@ -66,6 +77,7 @@
         el: '#orders',
         data: {
             isSearchOpen: true,
+            isClosed: false,
             invoiceId: null,
             fromDate: null,
             toDate: null,
@@ -81,7 +93,7 @@
                     fromDate: this.fromDate,
                     toDate: this.toDate,
                     pONo: this.poNo,
-                    isClosed: true,
+                    isClosed: this.isClosed,
                 };
                 $.ajax({
                     url: "@Url.Action("SearchCompanyOrders", "OrderOverride")",

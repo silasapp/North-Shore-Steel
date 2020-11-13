@@ -182,6 +182,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\headset.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-add.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-cal-range.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-chevrons.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-delivery-ticket-dark.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-delivery-ticket.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-download.svg" />
