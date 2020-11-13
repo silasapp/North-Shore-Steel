@@ -87,7 +87,7 @@
         <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
             <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
 
-                <div style="display: flex;flex-wrap: wrap;">
+                <div class="col-md-4 cart-input-options">
                     <div class="cart-filter-menu">
                         <label for="purchase-order">Purchase Order #</label>
                         @if (purchasechkattr != null)
@@ -102,34 +102,34 @@
                         <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
                     </div>
                 </div>
-                <div class="cart-options">
-                    @if (Model.IsEditable)
-                    {
-                        <div class="common-buttons" style="display: flex;flex-wrap: wrap; ">
-                            @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
-                                <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
-                            <div style="position: relative;display: flex;align-items: center;">
-                                <input style="z-index: 1;" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")" class="button-2 update-cart-button" />
 
-                                <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/return.svg" width="20" height="20" alt="">
-                            </div>
-                            <div style="position: relative;display: flex;align-items: center;">
-                                <input style="z-index: 1;" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")" class="button-2 continue-shopping-button" />
+                @if (Model.IsEditable)
+                {
+                    <div class="common-buttons col-md-4 cart-action-options">
+                        @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
+                            <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
+                        <div class="cart-action-btn">
+                            <input style="z-index: 1;" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")" class="button-2 update-cart-button" />
 
-                                <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/reload.svg" width="20" height="20" alt="">
-                            </div>
-                            @*@await Component.InvokeAsync("ShoppingCartEstimateShipping")*@
+                            <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/return.svg" width="20" height="20" alt="">
                         </div>
-                    }
-                    @*@if (Model.IsEditable)
-                        {
-                            @await Html.PartialAsync("_CheckoutAttributes", Model)
-                        }*@
-                    @await Component.InvokeAsync("SelectedCheckoutAttributes")
-                </div>
+                        <div class="cart-action-btn">
+                            <input style="z-index: 1;" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")" class="button-2 continue-shopping-button" />
+
+                            <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/reload.svg" width="20" height="20" alt="">
+                        </div>
+                        @*@await Component.InvokeAsync("ShoppingCartEstimateShipping")*@
+                    </div>
+                }
+                @*@if (Model.IsEditable)
+                    {
+                        @await Html.PartialAsync("_CheckoutAttributes", Model)
+                    }*@
+
+
 
             </div>
-
+            @await Component.InvokeAsync("SelectedCheckoutAttributes")
             <div class="table-wrapper">
                 <table class="table table-bordered cart-table">
                     <thead>
@@ -336,11 +336,11 @@
                                 <label class="pure-material-checkbox">
                                     <input id="termsofservice" type="checkbox" name="termsofservice" />
                                     <span class="checkmark"></span>@T("Checkout.TermsOfService.IAccept")
-                                </label>
-                                @if (Model.TermsOfServicePopup)
-                                {
-                                    <a class="read" id="read-terms" style="margin-left: 5px !important;">@T("Checkout.TermsOfService.Read")</a>
-                                    <script asp-location="Footer">
+
+                                    @if (Model.TermsOfServicePopup)
+                                    {
+                                        <a class="read" id="read-terms" style="margin-left: 5px !important;">@T("Checkout.TermsOfService.Read")</a>
+                                        <script asp-location="Footer">
                                         $(document).ready(function() {
                                             $('#read-terms').on('click',
                                                 function(e) {
@@ -350,12 +350,13 @@
                                                         '@T("Checkout.TermsOfService")');
                                                 });
                                         });
-                                    </script>
-                                }
-                                else
-                                {
-                                    <a class="read" id="read-terms" href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("conditionsofuse") })">@T("Checkout.TermsOfService.Read")</a>
-                                }
+                                        </script>
+                                    }
+                                    else
+                                    {
+                                        <a class="read" id="read-terms" href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("conditionsofuse") })">@T("Checkout.TermsOfService.Read")</a>
+                                    }
+                                </label>
                             </div>
                         }
                         <div class="checkout-buttons">
