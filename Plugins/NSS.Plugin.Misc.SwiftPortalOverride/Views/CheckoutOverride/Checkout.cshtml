@@ -82,16 +82,11 @@
 
 @{
     var customer = workContext.CurrentCustomer;
-    var customerId = customer.Id;
-    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-    ERPComId += customerId;
-    int.TryParse(Context.Request.Cookies[ERPComId], out int ERPCompanyId);
-    Company company = new Company();
-    CustomerCompany customerCompany = new CustomerCompany();
-    if (!String.IsNullOrEmpty(ERPCompanyId.ToString()))
-        company = companyService.GetCompanyEntityByErpEntityId(ERPCompanyId);
-    if (company != null)
-        customerCompany = customerCompanyService.GetCustomerCompany(customerId, company.Id);
+    // get cust company
+    var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+
+    if(customerCompany == null)
+        customerCompany = new CustomerCompany();
 }
 
 @Html.Raw(Model.PaypalScript);
@@ -474,6 +469,20 @@
         var s = string.Format("{0:0.00}", myNumber);
 
         return s;
+    }
+
+    (int, CustomerCompany) GetCustomerCompanyDetails()
+    {
+        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+
+        int.TryParse(Context.Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+
+        CustomerCompany customerCompany = null;
+
+        if (eRPCompanyId > 0)
+            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(workContext.CurrentCustomer.Id, eRPCompanyId);
+
+        return (eRPCompanyId, customerCompany);
     }
 }
 <script>

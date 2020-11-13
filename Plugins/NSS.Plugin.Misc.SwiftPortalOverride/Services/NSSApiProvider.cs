@@ -562,10 +562,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 {
                     httpClient.DefaultRequestHeaders.Clear();
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
-
                     if (useMock)
                         httpClient.BaseAddress = new Uri("https://private-anon-bd88ec445e-nssswift.apiary-mock.com");
+                    else
+                        httpClient.BaseAddress = new Uri(_baseUrl);
 
                     if (!useMock)
                     {
@@ -590,7 +590,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     var content = new FormUrlEncodedContent(param);
 
-                    var response = httpClient.PostAsync(resource, content).Result;
+                    var response = httpClient.GetAsync(QueryHelpers.AddQueryString(resource, param)).Result;
 
                     // throw error if not successful
                     response.EnsureSuccessStatusCode();
@@ -634,10 +634,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 {
                     httpClient.DefaultRequestHeaders.Clear();
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
-
                     if (useMock)
                         httpClient.BaseAddress = new Uri("https://private-anon-bd88ec445e-nssswift.apiary-mock.com");
+                    else
+                        httpClient.BaseAddress = new Uri(_baseUrl);
 
                     if (!useMock)
                     {
@@ -704,10 +704,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 {
                     httpClient.DefaultRequestHeaders.Clear();
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
-
                     if (useMock)
                         httpClient.BaseAddress = new Uri("https://private-anon-bd88ec445e-nssswift.apiary-mock.com");
+                    else
+                        httpClient.BaseAddress = new Uri(_baseUrl);
 
                     if (!useMock)
                     {
@@ -730,9 +730,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     //body params
                     var param = request.ToKeyValue();
 
-                    var content = new FormUrlEncodedContent(param);
-
-                    var response = httpClient.PostAsync(resource, content).Result;
+                    var response = httpClient.GetAsync(QueryHelpers.AddQueryString(resource, param)).Result;
 
                     // throw error if not successful
                     response.EnsureSuccessStatusCode();
@@ -820,7 +818,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchInvoices details => email: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchInvoices => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }

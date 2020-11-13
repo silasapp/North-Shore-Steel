@@ -24,7 +24,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             var request = new ERPSearchInvoicesRequest()
             {
-                InvoiceId = filter.invoiceId?.ToString(),
+                InvoiceId = filter.InvoiceId?.ToString(),
                 FromDate = filter?.FromDate?.ToString("yyyyMMdd"),
                 ToDate = filter?.ToDate?.ToString("yyyyMMdd"),
                 OrderId = filter?.OrderId?.ToString(),
