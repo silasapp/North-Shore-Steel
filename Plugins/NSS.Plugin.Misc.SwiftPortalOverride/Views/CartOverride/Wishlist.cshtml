@@ -92,12 +92,12 @@
                                         {
                                             var product = productService.GetProductById(item.ProductId);
                                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-
+                                            var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
                                             var itemId = item.Id;
                                             var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                             var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                                            var iNo = isSerialized == "True" ? itemTagNo : itemNo;
+                                            var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
                                             var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
 
                                             <tr>
@@ -172,11 +172,11 @@
                                                         {
                                                             @if (isSerialized?.ToLower() == "true")
                                                             {
-                                                                <label style="width: 100px; height: 30px" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
+                                                                <label style="width: 100px; height: 30px" name="itemquantity@(item.Id)" id="itemquantity@(item.ProductId)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
                                                             }
                                                             else
                                                             {
-                                                                <input name="itemquantity@(item.Id)" type="text" width="20" value="@(item.Quantity)" min="1" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
+                                                                <input name="itemquantity@(item.Id)" type="text" width="20" id="itemquantity@(item.ProductId)" value="@(item.Quantity)" min="1" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
                                                             }
 
                                                         }
@@ -187,17 +187,19 @@
                                                     }
                                                 </td>
                                                 <td style="text-align:left">
-                                                    <button class="table-action-button">
-                                                        <img src="~/Themes/@themeName/Content/assets/invoice.svg" width="20" height="20"
-                                                             alt="">
-                                                    </button>
+                                                    @if (!string.IsNullOrEmpty(mtr))
+                                                    {
+                                                        <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
+                                                            <img src="~/Themes/@themeName/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                                        </a>
+                                                    }
                                                     <button class="table-action-button">
                                                         <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" width="20" height="20"
                                                              alt="">
                                                     </button>
                                                     @if (eRPCompanyIdExist)
                                                     {
-                                                        <button class="table-action-button" onclick="getInputQuantity(@itemId, @shoppingCartTypeId);">
+                                                        <button class="table-action-button" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);">
                                                             <img src="~/Themes/@themeName/Content/assets/shopping-cart.svg" width="20"
                                                                  height="20" alt="">
                                                         </button>
@@ -259,7 +261,7 @@
 <script>
     function getInputQuantity(itemId, cartId) {
         event.preventDefault();
-        let qty = $('#qty' + itemId).val();
+        let qty = $('#itemquantity' + itemId).val();
         if (!qty)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
