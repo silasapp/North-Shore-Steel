@@ -15,6 +15,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
         public IList<OrderDetailsModel> Orders { get; set; }
         public SearchFilter FilterContext { get; set; }
+        public bool IsClosed { get; set; }
 
 
         #region Nested Classes

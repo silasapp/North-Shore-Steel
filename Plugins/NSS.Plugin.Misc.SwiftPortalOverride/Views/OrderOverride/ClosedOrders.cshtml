@@ -2,87 +2,81 @@
 @using Nop.Web.Framework.Themes
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 
-@model CompanyInvoiceListModel
+@model CompanyOrderListModel
 @{
     Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
 }
 @{ var themeName = themeContext.WorkingThemeName; }
-<div id="invoices" class="page orders-page">
+<div id="orders" class="page orders-page">
     <div class=page-body>
         <div class="orders-search-block" id=ordersTableBlock role=tabpanel
              aria-labelledby=ordersTableBlock>
             <div>
-                <div class="orders-title">SEARCH CLOSED INVOICES</div>
+                <div class="orders-title">SEARCH CLOSED ORDERS</div>
                 <div class="orders-export cursor-pointer" v-on:click="isSearchOpen = !isSearchOpen;">
                     <img class="collapse-icon" v-bind:class="{'down': isSearchOpen}" id="collapseIcon"
                          src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
                 </div>
             </div>
 
-            <div v-show="isSearchOpen" class="row m-0 py-0">
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3">
+            <div v-show="isSearchOpen" class="row">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="text" v-model="fromDate" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="From">
+                        <input class=nss-form-control type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
+                               v-model="fromDate" placeholder="From">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 col-sm-6 d-flex flex-column my-3 py-0">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="date" v-model="toDate" data-val=true placeholder="To" />
+                        <input class=nss-form-control type="date" v-model="toDate" placeholder="To" />
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label for=purchaseOrder>Invoice #</label>
+                <div class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label>Invoice #</label>
                     <input class="nss-form-control" type="text" v-model="invoiceId" placeholder="Enter...">
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label for=purchaseOrder>Order #</label>
-                    <input class=nss-form-control type="text" v-model="orderId" placeholder="Enter...">
+                <div class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label>Purchase Order #</label>
+                    <input class=nss-form-control type=text v-model="poNo" placeholder="Enter...">
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label for=purchaseOrder>Purchase Order #</label>
-                    <input class=nss-form-control type="text" v-model="poNo" placeholder="Enter...">
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
-                    <button class="nss-btn-default ml-lg-5 w-100 text-center" v-on:click="searchInvoices">Search</button>
+                <div class="col-lg-2 col-md-12 col-sm-12 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
+                    <button class="nss-btn-default ml-lg-5 w-100 text-center" v-on:click="searchOrders">Search</button>
                 </div>
             </div>
         </div>
         <div class="d-flex flex-column p-4 bg-white">
             <div class="d-flex flex-row justify-content-between mb-3">
-                <label class="h2-primary">INVOICES</label>
+                <label class="h2-primary">CLOSED ORDERS</label>
                 <label class="h4-primary"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</label>
             </div>
-            <div id="invoice-grid"></div>
-
+            <div id="order-grid"></div>
         </div>
     </div>
 </div>
-@functions{
-
-}
 
 <script>
     var vm = new Vue({
-        el: '#invoices',
+        el: '#orders',
         data: {
             isSearchOpen: true,
             invoiceId: null,
-            orderId: null,
-            poNo: null,
             fromDate: null,
             toDate: null,
+            poNo: null,
         },
         mounted: function () {
-            this.searchInvoices();
+            this.searchOrders();
         },
         methods: {
-            searchInvoices: function () {
+            searchOrders: function () {
                 const request = {
-                    invoiceId: this.invoiceId,
                     orderId: this.orderId,
                     fromDate: this.fromDate,
                     toDate: this.toDate,
@@ -90,18 +84,18 @@
                     isClosed: true,
                 };
                 $.ajax({
-                    url: "@Url.Action("SearchCompanyInvoices", "Invoice")",
+                    url: "@Url.Action("SearchCompanyOrders", "OrderOverride")",
                     type: 'POST',
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data) {
                         if(data != null) {
-                            $('#invoice-grid').html(data);
+                            $('#order-grid').html(data);
                         }
                     },
                     error: function (xhr, thrownError) {
                         console.log(thrownError, 'datadata-error', xhr);
-                        $('#invoice-grid').html('an error has occured here');
+                        $('#order-grid').html('an error has occured here');
                     }
                 });
             }

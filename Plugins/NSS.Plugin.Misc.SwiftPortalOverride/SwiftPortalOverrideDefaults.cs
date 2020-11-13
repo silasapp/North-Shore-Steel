@@ -13,7 +13,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
 
         public static string ApprovalMessageTemplateName => "NewCustomer.Notification";
 
-        public static string ERPCompanyId => "ERPCompanyId";
         public static string ERPCompanyCookieKey => "ERPCompanyId{0}";
     }
 }
