@@ -38,6 +38,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Challenge();
 
             var model = new CompanyInvoiceListModel();
+            model.IsClosed = false;
 
             return View(model);
         }
@@ -50,13 +51,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var model = new CompanyInvoiceListModel();
             model.FilterContext.IsClosed = true;
+            model.IsClosed = true;
 
             return View(model);
         }
 
 
         [IgnoreAntiforgeryToken]
-        public PartialViewResult SearchCompanyInvoices(CompanyInvoiceListModel.SearchFilter filter)
+        public PartialViewResult SearchCompanyInvoices([FromBody]CompanyInvoiceListModel.SearchFilter filter)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
 
@@ -66,6 +68,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (eRPCompanyId > 0)
                 model = _invoiceModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
+
+            model.IsClosed = filter.IsClosed;
 
             return PartialView("_InvoiceGrid", model);
         }
