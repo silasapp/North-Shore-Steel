@@ -2227,25 +2227,30 @@ table input {
 
 /* #region SYNCFUSION GRID */
 
+#order-grid .e-grid .e-gridheader tr th:last-child,
 #invoice-grid .e-grid .e-gridheader tr th:last-child {
     background-color: white !important;
     border: none !important;
 }
 
+#order-grid .e-grid .e-rowcell e-gridchkbox,
 #invoice-grid .e-grid .e-rowcell e-gridchkbox {
     background: white !important;
     border: none !important;
 }
 
+#order-grid .e-grid,
 #invoice-grid .e-grid {
     border: none !important;
 }
 
+#order-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox,
 #invoice-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox {
     background: white !important;
     border: none !important;
 }
 
+#order-grid .e-grid .e-gridheader,
 #invoice-grid .e-grid .e-gridheader {
     border: none !important;
 }

@@ -12,7 +12,7 @@
         <div class="orders-search-block" id=ordersTableBlock role=tabpanel
              aria-labelledby=ordersTableBlock>
             <div>
-                <div class="orders-title">SEARCH INVOICES</div>
+                <div class="orders-title">SEARCH OPEN INVOICES</div>
                 <div class="orders-export cursor-pointer" v-on:click="isSearchOpen = !isSearchOpen;">
                     <img class="collapse-icon" v-bind:class="{'down': isSearchOpen}" id="collapseIcon"
                          src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
@@ -23,31 +23,31 @@
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="text" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="From">
+                        <input class=nss-form-control type="text" v-model="fromDate" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="From">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 col-sm-6 d-flex flex-column my-3 py-0">
+                <div class="col-lg-2 col-md-6 col-sm-6d-flex flex-column my-3 py-0">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="date" data-val=true placeholder="To" />
+                        <input class=nss-form-control type="date" v-model="toDate" data-val=true placeholder="To" />
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=purchaseOrder>Invoice #</label>
-                    <input class="nss-form-control" type="text" placeholder="Enter...">
+                    <input class="nss-form-control" type="text" v-model="invoiceId" placeholder="Enter...">
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=purchaseOrder>Order #</label>
-                    <input class=nss-form-control type="text" placeholder="Enter...">
+                    <input class=nss-form-control type="text" v-model="orderId" placeholder="Enter...">
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=purchaseOrder>Purchase Order #</label>
-                    <input class=nss-form-control type="text" placeholder="Enter...">
+                    <input class=nss-form-control type="text" v-model="poNo" placeholder="Enter...">
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
-                    <button class="nss-btn-default ml-lg-5 w-100 text-center">Search</button>
+                    <button class="nss-btn-default ml-lg-5 w-100 text-center" v-on:click="searchInvoices">Search</button>
                 </div>
             </div>
         </div>
@@ -57,7 +57,6 @@
                 <label class="h4-primary"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</label>
             </div>
             <div id="invoice-grid"></div>
-
         </div>
     </div>
 </div>
@@ -70,28 +69,40 @@
         el: '#invoices',
         data: {
             isSearchOpen: true,
+            invoiceId: null,
+            orderId: null,
+            poNo: null,
+            fromDate: null,
+            toDate: null,
         },
         mounted: function () {
             this.searchInvoices();
         },
         methods: {
             searchInvoices: function () {
+                const request = {
+                    invoiceId: this.invoiceId,
+                    orderId: this.orderId,
+                    fromDate: this.fromDate,
+                    toDate: this.toDate,
+                    pONo: this.poNo,
+                    isClosed: false,
+                };
                 $.ajax({
-                  url: "@Url.Action("SearchCompanyInvoices", "Invoice")",
-                  type: 'POST',
-                  contentType: 'application/json; charset=utf-8',
-                  data: 'false',
-                  success: function (data) {
-                      if(data != null) {
-                          console.log("searchInvoices: ", data);
-                          $('#invoice-grid').html(data);
-                      }
-                  },
-                  error: function (xhr, thrownError) {
-                      console.log(thrownError, 'datadata-error', xhr);
-                      $('#invoice-grid').html('an error has occured here');
-                  }
-              });
+                    url: "@Url.Action("SearchCompanyInvoices", "Invoice")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data) {
+                        if(data != null) {
+                            $('#invoice-grid').html(data);
+                        }
+                    },
+                    error: function (xhr, thrownError) {
+                        console.log(thrownError, 'datadata-error', xhr);
+                        $('#invoice-grid').html('an error has occured here');
+                    }
+                });
             }
         },
     });
