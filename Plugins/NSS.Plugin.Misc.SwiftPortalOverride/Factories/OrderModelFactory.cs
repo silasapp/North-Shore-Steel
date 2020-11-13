@@ -28,18 +28,36 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             // search nss api
             var response = new List<ERPSearchOrdersResponse>();
 
+            if (filter.FromDate == null || filter.ToDate == null)
+            {
+                // set 1 year range
+                if (!filter.FromDate.HasValue && !filter.ToDate.HasValue)
+                {
+                    filter.FromDate = DateTimeOffset.UtcNow.AddYears(-1);
+                    filter.ToDate = DateTimeOffset.UtcNow;
+                }
+                else if (!filter.FromDate.HasValue && filter.ToDate.HasValue)
+                {
+                    filter.FromDate = filter.ToDate.Value.AddYears(-1);
+                }
+                else if (filter.FromDate.HasValue && !filter.ToDate.HasValue)
+                {
+                    filter.ToDate = filter.FromDate.Value.AddYears(1);
+                }
+            }
+
             var request = new ERPSearchOrdersRequest()
             {
-                FromDate = filter?.FromDate?.ToString("yyyyMMdd"),
-                ToDate = filter?.ToDate?.ToString("yyyyMMdd"),
-                OrderId = filter?.OrderId?.ToString(),
-                PONo = filter?.PONo,
+                FromDate = filter.FromDate?.ToString("yyyyMMdd"),
+                ToDate = filter.ToDate?.ToString("yyyyMMdd"),
+                OrderId = filter.OrderId?.ToString(),
+                PONo = filter.PONo,
             };
 
             if (filter.IsClosed)
-                response = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: true);
+                response = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: false);
             else
-                response = _nSSApiProvider.SearchOpenOrders(companyId, request, useMock: true);
+                response = _nSSApiProvider.SearchOpenOrders(companyId, request, useMock: false);
 
             var orders = response.Select(order => new CompanyOrderListModel.OrderDetailsModel 
             {

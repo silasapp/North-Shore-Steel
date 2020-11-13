@@ -13,13 +13,13 @@
             <e-grid-column field="PoNo" headerText="Purchase Order #" width="80" allowFiltering="false"></e-grid-column>
             <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" width="80" allowFiltering="false"></e-grid-column>
             <e-grid-column field="InvoiceDate" headerText="Invoice Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="InvoiceDueDate" headerText="Due Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
             @if (Model.IsClosed)
             {
                 <e-grid-column field="InvoicePaidDate" headerText="Paid Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
             }
             else
             {
+                <e-grid-column field="InvoiceDueDate" headerText="Due Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
                 <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" width="70"></e-grid-column>
             }
             <e-grid-column type="checkbox" width="30"></e-grid-column>

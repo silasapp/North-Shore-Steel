@@ -24,33 +24,35 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             if (filter.FromDate == null || filter.ToDate == null)
             {
-                if (filter.FromDate == null && filter.ToDate == null)
+                // set 1 year range
+                if (!filter.FromDate.HasValue && !filter.ToDate.HasValue)
                 {
-
+                    filter.FromDate = DateTimeOffset.UtcNow.AddYears(-1);
+                    filter.ToDate = DateTimeOffset.UtcNow;
                 }
-                else if (filter.FromDate == null && filter.ToDate != null)
+                else if (!filter.FromDate.HasValue && filter.ToDate.HasValue)
                 {
-
+                    filter.FromDate = filter.ToDate.Value.AddYears(-1);
                 }
-                else if(filter.FromDate != null && filter.ToDate == null)
+                else if(filter.FromDate.HasValue && !filter.ToDate.HasValue)
                 {
-
+                    filter.ToDate = filter.FromDate.Value.AddYears(1);
                 }
             }
 
             var request = new ERPSearchInvoicesRequest()
             {
                 InvoiceId = filter.InvoiceId?.ToString(),
-                FromDate = filter.FromDate?.ToString("yyyyMMdd") ?? DateTimeOffset.UtcNow.AddYears(-1).ToString("yyyyMMdd"),
-                ToDate = filter.ToDate?.ToString("yyyyMMdd") ?? DateTimeOffset.UtcNow.ToString("yyyyMMdd"),
+                FromDate = filter.FromDate?.ToString("yyyyMMdd"),
+                ToDate = filter.ToDate?.ToString("yyyyMMdd"),
                 OrderId = filter.OrderId?.ToString(),
                 PONo = filter.PONo
             };
 
             if (filter.IsClosed)
-                response = _nSSApiProvider.SearchClosedInvoices(companyId, request, useMock: false);
+                response = _nSSApiProvider.SearchClosedInvoices(companyId, request, useMock: true);
             else
-                response = _nSSApiProvider.SearchOpenInvoices(companyId, request, useMock: false);
+                response = _nSSApiProvider.SearchOpenInvoices(companyId, request, useMock: true);
 
             // map response
             var invoices = response.Select(invoice => new CompanyInvoiceListModel.InvoiceDetailsModel

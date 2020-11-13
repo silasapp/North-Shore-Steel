@@ -109,7 +109,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpsRequirement]
-        public virtual IActionResult OpenOrders()
+        public virtual IActionResult CompanyOrders()
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
@@ -118,19 +118,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             return View(model);
         }
-
-        [HttpsRequirement]
-        public virtual IActionResult ClosedOrders()
-        {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
-                return Challenge();
-
-            var model = new CompanyOrderListModel();
-            model.FilterContext.IsClosed = true;
-
-            return View(model);
-        }
-
 
         [IgnoreAntiforgeryToken]
         public PartialViewResult SearchCompanyOrders([FromBody]CompanyOrderListModel.SearchFilter filter)
@@ -143,7 +130,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if(eRPCompanyId > 0)
                 model = _orderModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
-
             model.IsClosed = filter.IsClosed;
 
             return PartialView("_OrderGrid", model);

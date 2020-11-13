@@ -40,10 +40,12 @@
     <None Remove="Views\CustomCustomer\Login.cshtml" />
     <None Remove="Views\CustomCustomer\_FilteredPartialView.cshtml" />
     <None Remove="Views\CustomShoppingCart\Checkout.cshtml" />
+    <None Remove="Views\Invoice\CompanyInvoices.cshtml" />
+    <None Remove="Views\Invoice\_InvoiceGrid.cshtml" />
+    <None Remove="Views\OrderOverride\CompanyOrders.cshtml" />
     <None Remove="Views\Shared\Components\AccountSelector\Default.cshtml" />
     <None Remove="Views\OrderOverride\ClosedOrders.cshtml" />
     <None Remove="Views\OrderOverride\Details.cshtml" />
-    <None Remove="Views\OrderOverride\OpenOrders.cshtml" />
     <None Remove="Views\OrderOverride\_OrderGrid.cshtml" />
     <None Remove="Views\Shared\Components\CustomOrderSummary\Default.cshtml" />
     <None Remove="Views\Configure.cshtml" />
@@ -121,18 +123,20 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Shared\Components\AccountSelector\Default.cshtml">
+    <Content Include="Views\Invoice\CompanyInvoices.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\OrderOverride\ClosedOrders.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    <Content Include="Views\Invoice\_InvoiceGrid.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Shared\Components\AccountSelector\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\OrderOverride\Details.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\OrderOverride\OpenOrders.cshtml">
+    <Content Include="Views\OrderOverride\CompanyOrders.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -220,12 +224,6 @@
     <Compile Update="Models\CustomerSelectAccountModel.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Views\OrderOverride\CustomerOrders.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
   </ItemGroup>
 
   <!-- This target execute after "Build" target -->

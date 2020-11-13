@@ -32,24 +32,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region Methods
 
         [HttpsRequirement]
-        public IActionResult OpenInvoices()
+        public IActionResult CompanyInvoices()
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
             var model = new CompanyInvoiceListModel();
-
-            return View(model);
-        }
-
-        [HttpsRequirement]
-        public IActionResult ClosedInvoices()
-        {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
-                return Challenge();
-
-            var model = new CompanyInvoiceListModel();
-            model.FilterContext.IsClosed = true;
 
             return View(model);
         }
@@ -66,7 +54,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (eRPCompanyId > 0)
                 model = _invoiceModelFactory.PrepareInvoiceListModel(eRPCompanyId, filter);
-
             return PartialView("_InvoiceGrid", model);
         }
 
