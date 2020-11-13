@@ -28,7 +28,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             // search nss api
             var response = new List<ERPSearchOrdersResponse>();
 
-            if (filter.FromDate == null || filter.ToDate == null)
+            if ((filter.OrderId == null && filter.PONo == null) && (filter.FromDate == null || filter.ToDate == null))
             {
                 // set 1 year range
                 if (!filter.FromDate.HasValue && !filter.ToDate.HasValue)
@@ -48,8 +48,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             var request = new ERPSearchOrdersRequest()
             {
-                FromDate = filter.FromDate?.ToString("yyyyMMdd"),
-                ToDate = filter.ToDate?.ToString("yyyyMMdd"),
+                FromDate = filter.FromDate?.ToString("yyyy-MM-dd"),
+                ToDate = filter.ToDate?.ToString("yyyy-MM-dd"),
                 OrderId = filter.OrderId?.ToString(),
                 PONo = filter.PONo,
             };
