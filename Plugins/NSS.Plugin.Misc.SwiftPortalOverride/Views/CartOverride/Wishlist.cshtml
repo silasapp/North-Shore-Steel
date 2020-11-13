@@ -3,9 +3,14 @@
 @using Nop.Core
 @using Nop.Core.Domain.Tax
 @using Nop.Web.Framework.Themes
+@using Nop.Services.Catalog
+@using Nop.Services.Common
+@using Nop.Core.Domain.Catalog
 @inject IWebHelper webHelper
 @inject IWorkContext workContext
 @inject IThemeContext themeContext
+@inject IProductService productService
+@inject IGenericAttributeService genericAttributeService
 @{
     Layout = "_ColumnsOne";
 
@@ -80,6 +85,15 @@
                                     <tbody>
                                         @foreach (var item in Model.Items)
                                         {
+                                            var product = productService.GetProductById(item.ProductId);
+                                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                            string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                            var iNo = isSerialized == "True" ? itemTagNo : itemNo;
+                                            var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
+
                                             <tr>
                                                 @if (Model.IsEditable)
                                                 {
@@ -93,7 +107,7 @@
                                                         <input type="checkbox" name="addtocart" value="@(item.Id)" />
                                                     </td>
                                                 }
-                                                <td>123456789-10-1</td>
+                                                <td>@iNo</td>
                                                 <td class="product">
                                                     <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>
                                                     @if (!string.IsNullOrEmpty(item.AttributeInfo))
@@ -134,13 +148,7 @@
                                                         </div>
                                                     }
                                                 </td>
-                                                <td>
-                                                    <ul>
-                                                        <li>Leg 1: 3/5"</li>
-                                                        <li>Leg 2: 1/2"</li>
-                                                        <li>Weight: 10 lbs.</li>
-                                                    </ul>
-                                                </td>
+                                                <td>@dimensions</td>
                                                 <td class="quantity">
                                                     @if (Model.IsEditable)
                                                     {
@@ -155,7 +163,15 @@
                                                         }
                                                         else
                                                         {
-                                                            <input name="itemquantity@(item.Id)" type="text" width="20" value="@(item.Quantity)" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" />
+                                                            @if (isSerialized?.ToLower() == "true")
+                                                            {
+                                                                <label style="width: 100px; height: 30px" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input name="itemquantity@(item.Id)" type="text" width="20" value="@(item.Quantity)" min="1" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
+                                                            }
+
                                                         }
                                                     }
                                                     else

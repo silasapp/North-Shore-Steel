@@ -159,12 +159,9 @@
     @Html.Hidden("selectedProductId", 0);
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var wishListShoppingCartId = (int)ShoppingCartType.Wishlist;
-    var quantity = 1;
-    int customerId = workContext.CurrentCustomer.Id;
-    string ERPComId = SwiftPortalOverrideDefaults.ERPCompanyId;
-    ERPComId += customerId;
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
     var headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>();
-    var ERPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == ERPComId);
+    var ERPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == compIdCookieKey);
 }
 
 @{List<object> ObjectData = new List<object>(); }
