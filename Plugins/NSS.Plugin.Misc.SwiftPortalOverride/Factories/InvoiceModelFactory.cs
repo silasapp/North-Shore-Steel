@@ -17,18 +17,36 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             _nSSApiProvider = nSSApiProvider;
         }
 
-        public CompanyInvoiceListModel PrepareOrderListModel(int companyId, CompanyInvoiceListModel.SearchFilter filter)
+        public CompanyInvoiceListModel PrepareInvoiceListModel(int companyId, CompanyInvoiceListModel.SearchFilter filter)
         {
             // search nss api
             var response = new List<ERPSearchInvoicesResponse>();
 
+            if ((!filter.InvoiceId.HasValue && !filter.OrderId.HasValue && filter.PONo == null) && (filter.FromDate == null || filter.ToDate == null))
+            {
+                // set 1 year range
+                if (!filter.FromDate.HasValue && !filter.ToDate.HasValue)
+                {
+                    filter.FromDate = DateTimeOffset.UtcNow.AddYears(-1);
+                    filter.ToDate = DateTimeOffset.UtcNow;
+                }
+                else if (!filter.FromDate.HasValue && filter.ToDate.HasValue)
+                {
+                    filter.FromDate = filter.ToDate.Value.AddYears(-1);
+                }
+                else if(filter.FromDate.HasValue && !filter.ToDate.HasValue)
+                {
+                    filter.ToDate = filter.FromDate.Value.AddYears(1);
+                }
+            }
+
             var request = new ERPSearchInvoicesRequest()
             {
-                InvoiceId = filter.invoiceId?.ToString(),
-                FromDate = filter?.FromDate?.ToString("yyyyMMdd"),
-                ToDate = filter?.ToDate?.ToString("yyyyMMdd"),
-                OrderId = filter?.OrderId?.ToString(),
-                PONo = filter?.PONo
+                InvoiceId = filter.InvoiceId?.ToString(),
+                FromDate = filter.FromDate?.ToString("yyyy-MM-dd"),
+                ToDate = filter.ToDate?.ToString("yyyy-MM-dd"),
+                OrderId = filter.OrderId?.ToString(),
+                PONo = filter.PONo
             };
 
             if (filter.IsClosed)

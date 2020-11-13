@@ -125,7 +125,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 
             // orders
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/",
-            new { controller = "OrderOverride", action = "CustomerOrders" },
+            new { controller = "OrderOverride", action = "CompanyOrders" },
             new { },
             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
             );
@@ -136,27 +136,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
             );
 
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "open-orders/",
-            new { controller = "OrderOverride", action = "OpenOrders" },
-            new { },
-            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
-            );
-
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "closed-orders/",
-            new { controller = "OrderOverride", action = "ClosedOrders" },
-            new { },
-            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
-            );
-
             // invoices
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Invoices", "open-invoices/",
-            new { controller = "Invoice", action = "OpenInvoices" },
-            new { },
-            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
-            );
-
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Invoices", "closed-invoices/",
-            new { controller = "Invoice", action = "ClosedInvoices" },
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Invoices", "invoices/",
+            new { controller = "Invoice", action = "CompanyInvoices" },
             new { },
             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
             );

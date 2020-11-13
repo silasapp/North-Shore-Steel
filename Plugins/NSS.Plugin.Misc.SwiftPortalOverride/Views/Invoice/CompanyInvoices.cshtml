@@ -9,17 +9,40 @@
 @{ var themeName = themeContext.WorkingThemeName; }
 <div id="invoices" class="page orders-page">
     <div class=page-body>
-        <div class="orders-search-block" id=ordersTableBlock role=tabpanel
-             aria-labelledby=ordersTableBlock>
+        <div class="bg-white-shadow d-flex flex-row flex-wrap align-items-center mb-3 p-4">
+            <label class="h2-primary my-4">CREDIT SUMMARY</label>
+
+            <div class="d-flex flex-row flex-wrap flex-fill justify-content-around">
+                <div class="d-flex flex-column mx-3 my-1">
+                    <label class="fs12-default mb-2">Credit Limit</label>
+                    <label class="h5-default mb-0 ml-2">$10,000</label>
+                </div>
+                <div class="d-flex flex-column mx-3 my-1">
+                    <label class="fs12-default mb-2">Total Open Invoices</label>
+                    <label class="h5-default mb-0 ml-2">$3,024.50</label>
+                </div>
+                <div class="d-flex flex-column mx-3 my-1">
+                    <label class="fs12-default mb-2">Total Past Due</label>
+                    <label class="h5-danger mb-0 ml-2">$1,334.87</label>
+                </div>
+                <div class="d-flex flex-column mx-3 my-1">
+                    <label class="fs12-default mb-2">Open Credit</label>
+                    <label class="h5-default mb-0 ml-2">$2,000.00</label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="orders-search-block bg-white-shadow" id=ordersTableBlock role="tabpanel" aria-labelledby="ordersTableBlock">
             <div>
-                <div class="orders-title">SEARCH CLOSED INVOICES</div>
-                <div class="orders-export cursor-pointer" v-on:click="isSearchOpen = !isSearchOpen;">
-                    <img class="collapse-icon" v-bind:class="{'down': isSearchOpen}" id="collapseIcon"
+                <div class="orders-title">SEARCH INVOICES</div>
+                <div class="orders-export cursor-pointer" v-on:click="isSearchExpanded = !isSearchExpanded;">
+                    <img class="collapse-icon" v-bind:class="{'down': isSearchExpanded}" id="collapseIcon"
                          src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
                 </div>
             </div>
 
-            <div v-show="isSearchOpen" class="row m-0 py-0">
+            <div v-show="isSearchExpanded" class="row m-0 py-0">
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
@@ -27,7 +50,7 @@
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 col-sm-6 d-flex flex-column my-3 py-0">
+                <div class="col-lg-2 col-md-6 col-sm-6d-flex flex-column my-3 py-0">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
                         <input class=nss-form-control type="date" v-model="toDate" data-val=true placeholder="To" />
@@ -51,13 +74,23 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex flex-column p-4 bg-white">
+        <div class="d-flex flex-column p-4 bg-white-shadow">
             <div class="d-flex flex-row justify-content-between mb-3">
-                <label class="h2-primary">INVOICES</label>
+                <div>
+                    <ul class="nav nav-pills mb-1" id=pills-tab role="tablist">
+                        <li class=nav-item role="presentation" style=margin-right:.3em>
+                            <a class="nav-link active" id=pills-home-tab data-toggle=pill
+                               href=#pills-home role=tab aria-controls=pills-home
+                               aria-selected=true v-on:click="isClosed = false; searchInvoices();">Open Invoices</a>
+                        <li class=nav-item role="presentation">
+                            <a class=nav-link id=pills-profile-tab
+                               data-toggle=pill href=#pills-profile role=tab
+                               aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchInvoices();">Closed Invoices</a>
+                    </ul>
+                </div>
                 <label class="h4-primary"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</label>
             </div>
-            <div id="invoice-grid"></div>
-
+            <div id="invoice-grid" class="ml-4"></div>
         </div>
     </div>
 </div>
@@ -69,17 +102,23 @@
     var vm = new Vue({
         el: '#invoices',
         data: {
-            isSearchOpen: true,
+            isLoading: false,
+            isSearchExpanded: true,
+            isClosed: false,
+            fromDate: null,
+            toDate: null,
             invoiceId: null,
             orderId: null,
             poNo: null,
-            fromDate: null,
-            toDate: null,
         },
         mounted: function () {
             this.searchInvoices();
         },
         methods: {
+            showLoading: function () {
+            },
+            hideLoading: function () {
+            },
             searchInvoices: function () {
                 const request = {
                     invoiceId: this.invoiceId,
@@ -87,19 +126,21 @@
                     fromDate: this.fromDate,
                     toDate: this.toDate,
                     pONo: this.poNo,
-                    isClosed: true,
+                    isClosed: this.isClosed,
                 };
+                this.showLoading();
+                const self = this;
                 $.ajax({
                     url: "@Url.Action("SearchCompanyInvoices", "Invoice")",
                     type: 'POST',
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data) {
-                        if(data != null) {
-                            $('#invoice-grid').html(data);
-                        }
+                        self.hideLoading();
+                        $('#invoice-grid').html(data);
                     },
                     error: function (xhr, thrownError) {
+                        self.hideLoading();
                         console.log(thrownError, 'datadata-error', xhr);
                         $('#invoice-grid').html('an error has occured here');
                     }

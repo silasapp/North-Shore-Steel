@@ -4,7 +4,7 @@
 @using Syncfusion.EJ2
 
 <div>
-    <ejs-grid id="Grid" dataSource="@Model.Orders" allowPaging="true" allowFiltering="true">
+    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
         <e-grid-columns>
@@ -13,14 +13,15 @@
             <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" width="70" allowFiltering="false"></e-grid-column>
             <e-grid-column template="#orderTotal" headerText="Order Amount" width="80" allowFiltering="false"></e-grid-column>
             <e-grid-column field="OrderDate" headerText="Order Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="ScheduledDate" headerText="Shipped On" width="80" format="yMd" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="PromiseDate" headerText="Est. Delivery Date" width="120" format="yMd" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="PromiseDate" headerText="Promise Date" width="100" format="yMd" allowFiltering="false"></e-grid-column>
             @if (Model.IsClosed)
             {
                 <e-grid-column field="DeliveryDate" headerText="Delivery Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#viewTicket" headerText="Delivery Ticket" width="70" allowFiltering="false"></e-grid-column>
             }
             else
             {
+                <e-grid-column field="ScheduledDate" headerText="Scheduled Date" width="100" format="yMd" allowFiltering="false"></e-grid-column>
                 <e-grid-column field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" width="70"></e-grid-column>
             }
             <e-grid-column type="checkbox" width="30"></e-grid-column>
@@ -33,5 +34,8 @@
 </script>
 <script id="orderTotal" type="text/x-template">
     $${OrderTotal}
+</script>
+<script id="viewTicket" type="text/x-template">
+    <a href="">View Ticket</a>
 </script>
 <ejs-scripts></ejs-scripts>
