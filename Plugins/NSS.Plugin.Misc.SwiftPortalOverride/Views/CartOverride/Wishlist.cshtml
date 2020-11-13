@@ -92,12 +92,12 @@
                                         {
                                             var product = productService.GetProductById(item.ProductId);
                                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-
+                                            var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
                                             var itemId = item.Id;
                                             var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                             var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                                            var iNo = isSerialized == "True" ? itemTagNo : itemNo;
+                                            var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
                                             var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
 
                                             <tr>
@@ -187,10 +187,12 @@
                                                     }
                                                 </td>
                                                 <td style="text-align:left">
-                                                    <button class="table-action-button">
-                                                        <img src="~/Themes/@themeName/Content/assets/invoice.svg" width="20" height="20"
-                                                             alt="">
-                                                    </button>
+                                                    @if (!string.IsNullOrEmpty(mtr))
+                                                    {
+                                                        <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
+                                                            <img src="~/Themes/@themeName/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                                        </a>
+                                                    }
                                                     <button class="table-action-button">
                                                         <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" width="20" height="20"
                                                              alt="">
