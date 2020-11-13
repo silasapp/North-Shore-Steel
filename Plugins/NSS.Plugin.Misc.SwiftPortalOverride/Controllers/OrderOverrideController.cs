@@ -133,7 +133,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         [IgnoreAntiforgeryToken]
-        public PartialViewResult SearchCompanyOrders(CompanyOrderListModel.SearchFilter filter)
+        public PartialViewResult SearchCompanyOrders([FromBody]CompanyOrderListModel.SearchFilter filter)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
 
@@ -144,7 +144,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if(eRPCompanyId > 0)
                 model = _orderModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
 
-            return PartialView("_", model);
+            model.IsClosed = filter.IsClosed;
+
+            return PartialView("_OrderGrid", model);
         }
 
         #endregion

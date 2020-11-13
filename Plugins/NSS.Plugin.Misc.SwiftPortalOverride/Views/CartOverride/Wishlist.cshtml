@@ -1,0 +1,270 @@
+@using Nop.Web.Models.ShoppingCart
+@model WishlistModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Web.Framework.Themes
+@using Nop.Services.Catalog
+@using Nop.Services.Common
+@using Nop.Core.Domain.Catalog
+@using Nop.Core.Domain.Orders
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@inject IWebHelper webHelper
+@inject IWorkContext workContext
+@inject IThemeContext themeContext
+@inject IProductService productService
+@inject IGenericAttributeService genericAttributeService
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Wishlist").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-wishlist-page");
+}
+
+@{
+    var themeName = themeContext.WorkingThemeName;
+    var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    var eRPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == compIdCookieKey);
+}
+<div class="page wishlist-page">
+    <div class="page-title">
+
+        @if (Model.IsEditable)
+        {
+            <h1>FAVORITE ITEMS</h1>
+        }
+        else
+        {
+            <h1>Favorite Items of @Model.CustomerFullname</h1>
+        }
+
+    </div>
+    <div class="page-body">
+        <div>
+            @if (Model.Items.Count > 0)
+            {
+                <div class="wishlist-content">
+                    @if (Model.Warnings.Count > 0)
+                    {
+                        <div class="message-error">
+                            <ul>
+                                @foreach (var warning in Model.Warnings)
+                                {
+                                    <li>@warning</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <form asp-route="Wishlist" method="post">
+                        <div class="tab-content mb-5" id=pills-tabContent>
+                            <div class="tab-pane fade show active" id=pills-home role=tabpanel aria-labelledby=pills-home-tab>
+                                <table class="table table-striped w3-animate-left nss-table">
+                                    <thead class=thead-default>
+
+                                        <tr>
+                                            @if (Model.IsEditable)
+                                            {
+                                                <td class="remove-from-cart" scope=col>
+                                                    @T("ShoppingCart.Remove")
+                                                </td>
+                                            }
+                                            @if (Model.DisplayAddToCart)
+                                            {
+                                                <td class="add-to-cart" scope=col>
+                                                    @T("ShoppingCart.AddToCart")
+                                                </td>
+                                            }
+                                            <td scope=col>Item #</td>
+                                            <td scope=col class="product">
+                                                @T("ShoppingCart.Product(s)")
+                                            </td>
+                                            <td scope=col>Dimensions</td>
+                                            <td scope=col class="quantity">
+                                                @T("ShoppingCart.Quantity")
+                                            </td>
+                                            <td scope=col>Actions</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Items)
+                                        {
+                                            var product = productService.GetProductById(item.ProductId);
+                                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                                            var itemId = item.Id;
+                                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                            string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                            var iNo = isSerialized == "True" ? itemTagNo : itemNo;
+                                            var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
+
+                                            <tr>
+                                                @if (Model.IsEditable)
+                                                {
+                                                    <td class="remove-from-cart">
+                                                        <input type="checkbox" name="removefromcart" value="@(item.Id)" aria-label="@T("ShoppingCart.Remove")" />
+                                                    </td>
+                                                }
+                                                @if (Model.DisplayAddToCart)
+                                                {
+                                                    <td class="add-to-cart">
+                                                        <input type="checkbox" name="addtocart" value="@(item.Id)" />
+                                                    </td>
+                                                }
+                                                <td>@iNo</td>
+                                                <td class="product">
+                                                    @item.ProductName
+                                                    @*<a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>*@
+                                                    @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                                        {
+                                                            <div class="attributes">
+                                                                @Html.Raw(item.AttributeInfo)
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.RecurringInfo))
+                                                        {
+                                                            <div class="recurring-info">
+                                                                @Html.Raw(item.RecurringInfo)
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.RentalInfo))
+                                                        {
+                                                            <div class="rental-info">
+                                                                @Html.Raw(item.RentalInfo)
+                                                            </div>
+                                                        }
+                                                        @if (Model.IsEditable && item.AllowItemEditing)
+                                                        {
+                                                            var editCartItemUrl = Url.RouteUrl("Product", new { SeName = item.ProductSeName }, webHelper.CurrentRequestProtocol);
+                                                            editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid", item.Id.ToString());
+                                                            <div class="edit-item">
+                                                                <a href="@editCartItemUrl">@T("Common.Edit")</a>
+                                                            </div>
+                                                        }*@
+                                                    @if (item.Warnings.Count > 0)
+                                                    {
+                                                        <div class="message-error">
+                                                            <ul>
+                                                                @foreach (var warning in item.Warnings)
+                                                                {
+                                                                    <li>@warning</li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                </td>
+                                                <td>@dimensions</td>
+                                                <td class="quantity">
+                                                    @if (Model.IsEditable)
+                                                    {
+                                                        if (item.AllowedQuantities.Count > 0)
+                                                        {
+                                                            <select name="itemquantity@(item.Id)" class="qty-dropdown">
+                                                                @foreach (var qty in item.AllowedQuantities)
+                                                                {
+                                                                    <option selected="@qty.Selected" value="@qty.Value">@qty.Value</option>
+                                                                }
+                                                            </select>
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (isSerialized?.ToLower() == "true")
+                                                            {
+                                                                <label style="width: 100px; height: 30px" name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input name="itemquantity@(item.Id)" type="text" width="20" value="@(item.Quantity)" min="1" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="product-quantity">@item.Quantity</span>
+                                                    }
+                                                </td>
+                                                <td style="text-align:left">
+                                                    <button class="table-action-button">
+                                                        <img src="~/Themes/@themeName/Content/assets/invoice.svg" width="20" height="20"
+                                                             alt="">
+                                                    </button>
+                                                    <button class="table-action-button">
+                                                        <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" width="20" height="20"
+                                                             alt="">
+                                                    </button>
+                                                    @if (eRPCompanyIdExist)
+                                                    {
+                                                        <button class="table-action-button" onclick="getInputQuantity(@itemId, @shoppingCartTypeId);">
+                                                            <img src="~/Themes/@themeName/Content/assets/shopping-cart.svg" width="20"
+                                                                 height="20" alt="">
+                                                        </button>
+                                                    }
+                                                    <button class="table-action-button" style="cursor:not-allowed" disabled>
+                                                        <img src="~/Themes/@themeName/Content/assets/dislike.svg" width="20" height="20"
+                                                             alt="">
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="buttons">
+                            @if (Model.IsEditable)
+                            {
+                                <input type="submit" name="updatecart" value="@T("Wishlist.UpdateCart")" class="button-2 update-wishlist-button" />
+                            }
+                            @if (Model.DisplayAddToCart)
+                            {
+                                <input type="submit" name="addtocartbutton" value="@T("ShoppingCart.AddToCart")" class="button-2 wishlist-add-to-cart-button" />
+                            }
+                            @if (Model.IsEditable && Model.EmailWishlistEnabled)
+                            {
+                                <input type="button" value="@T("Wishlist.EmailAFriend")" class="button-2 email-a-friend-wishlist-button" onclick="@Url.RouteUrl("EmailWishlist")" />
+                            }
+                        </div>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="no-data">
+                    @T("Wishlist.CartIsEmpty")
+                </div>
+            }
+            @if (Model.IsEditable && Model.Items.Count > 0)
+            {
+                var wishlistUrl = Url.RouteUrl("Wishlist", new { customerGuid = Model.CustomerGuid }, webHelper.CurrentRequestProtocol);
+                <div class="share-info">
+                    <span class="share-label">@T("Wishlist.YourWishlistURL"):</span>
+                    <a href="@wishlistUrl" class="share-link">@wishlistUrl</a>
+                </div>
+            }
+            <div class="discount-block" alt="">
+                <img src="~/Themes/@themeName/Content/assets/discount.PNG" alt="">
+                <div class="action">
+                    <button class="white-btn">
+                        <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getInputQuantity(itemId, cartId) {
+        event.preventDefault();
+        let qty = $('#qty' + itemId).val();
+        if (!qty)
+            qty = 1;
+        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
+        $('#qty' + itemId).val("");
+        console.log('itemId, cartId, qty', itemId, cartId, qty, link);
+        AjaxCart.addproducttocart_catalog(link);
+    }
+</script>

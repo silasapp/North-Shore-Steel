@@ -681,5 +681,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
+
+
+        [HttpsRequirement]
+        public override IActionResult Wishlist(Guid? customerGuid)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.EnableWishlist))
+                return RedirectToRoute("Homepage");
+
+            var customer = customerGuid.HasValue ?
+                _customerService.GetCustomerByGuid(customerGuid.Value)
+                : _workContext.CurrentCustomer;
+            if (customer == null)
+                return RedirectToRoute("Homepage");
+
+            var cart = _shoppingCartService.GetShoppingCart(customer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+
+            var model = new WishlistModel();
+            model = _shoppingCartModelFactory.PrepareWishlistModel(model, cart, !customerGuid.HasValue);
+            return View(model);
+        }
     }
 }

@@ -29,16 +29,7 @@
 
     @if (!isGuestCustomer)
     {
-        <div class="header-lower p-0">
-            <div class="header-menu bg-white py-3 mb-0">
-                <select id="accountSelect" class="account-select" data-role="accountSelect">
-                    <option>Accounts </option>
-                    <option>ACME Inc </option>
-                    <option>ACME Corporate </option>
-                </select>
-                @await Component.InvokeAsync("TopMenu")
-            </div>
-        </div>
+        @await Component.InvokeAsync("AccountSelector")
     }
 
     <div class="master-wrapper-content">
