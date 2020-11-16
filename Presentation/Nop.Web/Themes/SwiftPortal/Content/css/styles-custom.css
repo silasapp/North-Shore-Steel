@@ -237,15 +237,19 @@ a:not([href]):not([class]) {
     width: auto !important;
     box-shadow: 0px 1px 16px #0000001a;
 }
+
 .login-page .fieldset {
     padding: 24px 87px;
 }
+
 .registration-page .fieldset {
     padding: 24px 172px;
 }
+
 .login-page .new-wrapper .text {
     padding: 30px 0;
 }
+
 .account-page-card {
     background-color: #ffffff !important;
     box-shadow: 0px 1px 16px #0000001a;
@@ -522,27 +526,29 @@ a:not([href]):not([class]) {
 }
 
     .header-logo > a > img {
-        /*width: 209px;
-    height: 60px;*/
         width: 166px;
         opacity: 1;
     }
 
 .page-title {
-    border-bottom: 1.5px solid #03175b;
+    border-bottom: 2px solid #03175b;
+    margin: 0 0 30px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
 }
 
     .page-title > h1 {
-        /* color: #03175b;
-  font-family: "Teko";
-  letter-spacing: 1px;
-  font-size: 28px;
-  font-weight: 600; */
         text-align: center;
         font: normal normal 500 34px/24px "Teko";
         letter-spacing: 0.27px;
         color: #03175b;
         opacity: 1;
+    }
+
+    .page-title:after {
+        content: none;
     }
 
 .linda-block {
@@ -563,9 +569,9 @@ a:not([href]):not([class]) {
     display: none;
 }
 
-.center-1,
-.page-title {
-    margin: 0 0 30px;
+
+.center-1 {
+    margin: 0 !important;
 }
 
 .card-body {
@@ -650,7 +656,7 @@ a:not([href]):not([class]) {
     }
 
     .discount-block > .action {
-        bottom: 50px;
+        bottom: 12%;
         margin: auto;
         position: absolute;
         left: 0;
@@ -659,6 +665,10 @@ a:not([href]):not([class]) {
         margin-right: auto;
         width: fit-content;
     }
+
+        .discount-block > .action > button {
+            padding: 10px 16px;
+        }
 
 .white-btn {
     padding: 5px 10px;
@@ -1509,16 +1519,18 @@ table input {
             width: 100%;
             height: 100%;
         }
+
 .sales-dept {
     padding-left: 25px !important;
 }
-.sales-dept li {
-    text-align: left;
-    font: normal normal 500 12px/16px "Exo 2";
-    letter-spacing: 0px;
-    color: #aaaaaa;
-    opacity: 1;
-}
+
+    .sales-dept li {
+        text-align: left;
+        font: normal normal 500 12px/16px "Exo 2";
+        letter-spacing: 0px;
+        color: #aaaaaa;
+        opacity: 1;
+    }
 
 .orders-title {
     float: left;
@@ -1985,6 +1997,7 @@ table input {
 .nss-container {
     padding: 30px 136px;
 }
+
 .custom-input {
     width: 100% !important;
     font-style: italic !important;
@@ -1996,15 +2009,31 @@ table input {
     color: #aaa;
     opacity: 1;
 }
+
 .responsive-table-container {
-    overflow-x: scroll;
+    overflow-x: auto;
 }
-nss-table tr > td {
+
+.nss-table tr > td {
     white-space: nowrap;
+}
+.block .listbox {
+    display: block;
+}
+.address-edit-page .edit-address {
+    background-color: #ffffff !important;
+    box-shadow: 0px 1px 16px #0000001a;
+    padding: 24px;
+    margin-bottom: 70px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 32px;
+}
+.required {
+    text-align: left;
 }
 
 @media all and (max-width: 1028px) {
-
     #invoiceSearchField > div {
         display: grid;
         grid-template-columns: repeat(3, minmax(200px, 1fr));
@@ -2098,6 +2127,7 @@ nss-table tr > td {
     .nss-container {
         padding: 30px 36px;
     }
+
     .footer-main > .footer-content {
         flex-basis: 30%;
         margin-bottom: 30px;
@@ -2127,7 +2157,7 @@ nss-table tr > td {
         grid-column-gap: 20px;
     }
 
-    ..cat-side-drawer {
+    .cat-side-drawer {
         left: -20px;
     }
 
@@ -2169,9 +2199,11 @@ nss-table tr > td {
     .footer-main > .footer-content {
         flex-basis: 48%;
     }
+
     .footer-logo {
         flex-basis: 100% !important;
     }
+
     .nss-container {
         padding: 30px 20px;
     }
@@ -2183,12 +2215,25 @@ nss-table tr > td {
     .registration-page .fieldset {
         padding: 24px 40px;
     }
+
     .account-block {
         display: grid;
         grid-row-gap: 20px;
     }
+
     .account-btn {
-        margin:  0;
+        margin: 0;
+    }
+
+    .contact-block {
+        margin-top: 20px;
+    }
+    .account-page-card > .form-fields, .address-block {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .address-edit-page .edit-address {
+        grid-template-columns: repeat(1, 1fr);
+        grid-row-gap: 20px;
     }
 }
 
