@@ -157,6 +157,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     // pickup address
                     if (order.PickupAddressId.HasValue && _addressService.GetAddressById(order.PickupAddressId.Value) is Address pickupAddress)
                     {
+                        model.IsPickup = true;
                         model.PickupAddress = new AddressModel
                         {
                             Address1 = pickupAddress.Address1,

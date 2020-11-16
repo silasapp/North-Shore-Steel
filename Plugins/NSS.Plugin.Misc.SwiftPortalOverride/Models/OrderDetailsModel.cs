@@ -32,6 +32,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public AddressModel ShippingAddress { get; set; }
         public AddressModel BillingAddress { get; set; }
         public AddressModel PickupAddress { get; set; }
+        public bool IsPickup { get; set; }
 
         public decimal LineItemTotal { get; set; }
         public decimal TaxTotal { get; set; }
