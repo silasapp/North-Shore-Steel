@@ -823,6 +823,66 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
+        public ERPGetOrderDetailsResponse GetOrderDetails(int companyId, int erpOrderId)
+        {
+            //initialize
+            var retVal = new ERPGetOrderDetailsResponse();
+            var respContent = string.Empty;
+
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - GetOrderDetails", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetOrderDetails companyId -> {companyId}, orderId -> {erpOrderId}", new Exception("NSS token returned empty"));
+                        return retVal;
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+
+                    // create user resource
+                    var resource = $"/companies/{companyId}/orders/{erpOrderId}";
+
+                    var response = httpClient.GetAsync(resource).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = ERPGetOrderDetailsResponse.FromJson(respContent) ?? new ERPGetOrderDetailsResponse();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.GetOrderDetails companyId -> {companyId}, orderId -> {erpOrderId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetOrderDetails => companyId: {companyId}, orderId: {erpOrderId}", $"resp content ==> {respContent ?? "empty"}");
+
+            return retVal;
+        }
+
 
         private void ConfigureNSSApiSettings()
         {

@@ -68,10 +68,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
         }
 
-
-
-
-
         /// <summary>
         /// Authorize a previously created order
         /// </summary>
