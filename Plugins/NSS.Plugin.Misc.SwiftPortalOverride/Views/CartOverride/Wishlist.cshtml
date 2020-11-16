@@ -8,11 +8,16 @@
 @using Nop.Core.Domain.Catalog
 @using Nop.Core.Domain.Orders
 @using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
 @inject IWebHelper webHelper
 @inject IWorkContext workContext
 @inject IThemeContext themeContext
 @inject IProductService productService
 @inject IGenericAttributeService genericAttributeService
+@inject IProductAttributeService productAttributeService
+@inject IShapeService shapeService
+@using Syncfusion.EJ2
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @{
     Layout = "_ColumnsOne";
 
@@ -28,7 +33,63 @@
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
     var eRPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == compIdCookieKey);
 }
-<div class="page wishlist-page">
+
+@{
+    Func<object, object>
+    Content1 =
+    @<form id="sawOptionModal">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <label class="nss-modal-title">SAW OPTIONS</label>
+                <div class="d-flex flex-row">
+                    <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
+                           class="mr-3 d-flex align-items-center cursor-pointer">
+                        <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
+                               v-bind:value="option.id" v-model="sawOption">
+                        {{ option.name }}
+                    </label>
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex flex-column">
+                <label class="nss-modal-title">WORK ORDER INSTRUCTIONS</label>
+                <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
+            </div>
+            <hr />
+            <div class="d-flex flex-row justify-content-between mb-3">
+                <div class="d-flex flex-column">
+                    <label class="nss-modal-title">LENGTH TOLERANCE CUT</label>
+                    <div class="d-flex flex-row">
+                        <button type="button" class="nss-btn-box"
+                                v-on:click="decrementToleranceCut">
+                            -
+                        </button>
+                        <input type="text" class="nss-input" v-model="lengthToleranceCut" />
+                        <button type="button" class="nss-btn-box"
+                                v-on:click="incrementToleranceCut">
+                            +
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex flex-column">
+                    <label class="nss-modal-title">ITEM QUANTITY</label>
+                    <div class="d-flex flex-row">
+                        <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
+                        <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
+                        <button type="button" class="nss-btn-box" v-on:click="incrementQuantity">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-row-reverse mt-4">
+                <button type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
+                        v-on:click="addToCart">
+                    ADD TO CART
+                </button>
+            </div>
+        </div>
+    </form>;
+}
+<div id="wishlist" class="page wishlist-page">
     <div class="page-title">
 
         @if (Model.IsEditable)
@@ -93,12 +154,42 @@
                                             var product = productService.GetProductById(item.ProductId);
                                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
                                             var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
+                                            var hasSawOption = false;
+                                            if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
+                                            {
+                                                var shape = shapeService.GetShapeById(shapeId);
+                                                hasSawOption = shape != null ? shape.SawOption :  false;
+                                            }
                                             var itemId = item.Id;
                                             var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
                                             var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
                                             var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
                                             var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
+
+                                            var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
+
+                                            var mappingIds = mappings.Select(x => x.Id).ToArray();
+
+                                            var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
+                                            var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
+                                            var _productAttributes = GetJson(attrs);
+                                            var prodAttrs = new List<SawOptionsAttribute>();
+
+
+                                            foreach (var it in attrs)
+                                            {
+                                                var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
+                                                var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
+                                                var obj = new SawOptionsAttribute
+                                                {
+                                                    Name = it.Name,
+                                                    Values = xValues,
+                                                    Id = xMapping.Id,
+                                                };
+
+                                                prodAttrs.Add(obj);
+                                            }
 
                                             <tr>
                                                 @if (Model.IsEditable)
@@ -186,17 +277,19 @@
                                                         <span class="product-quantity">@item.Quantity</span>
                                                     }
                                                 </td>
-                                                <td style="text-align:left">
+                                                <td style="text-align:left" class="d-flex flex-row justify-content-around">
                                                     @if (!string.IsNullOrEmpty(mtr))
                                                     {
                                                         <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
                                                             <img src="~/Themes/@themeName/Content/assets/invoice.svg" width="20" height="20" alt="">
                                                         </a>
                                                     }
-                                                    <button class="table-action-button">
-                                                        <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" width="20" height="20"
-                                                             alt="">
-                                                    </button>
+                                                    @if (hasSawOption)
+                                                    {
+                                                        <button type="button" class="table-action-button" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
+                                                            <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+                                                        </button>
+                                                    }
                                                     @if (eRPCompanyIdExist)
                                                     {
                                                         <button class="table-action-button" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);">
@@ -204,10 +297,16 @@
                                                                  height="20" alt="">
                                                         </button>
                                                     }
-                                                    <button class="table-action-button" style="cursor:not-allowed" disabled>
+                                                    <button class="table-action-button">
                                                         <img src="~/Themes/@themeName/Content/assets/dislike.svg" width="20" height="20"
                                                              alt="">
                                                     </button>
+                                                    @if (string.IsNullOrEmpty(mtr))
+                                                    {<div class=""></div>}
+                                                    @if (!eRPCompanyIdExist)
+                                                    {<div class=""></div>}
+                                                    @if (!hasSawOption)
+                                                    {<div></div>}
                                                 </td>
                                             </tr>
                                         }
@@ -215,20 +314,20 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="buttons">
-                            @if (Model.IsEditable)
-                            {
-                                <input type="submit" name="updatecart" value="@T("Wishlist.UpdateCart")" class="button-2 update-wishlist-button" />
-                            }
-                            @if (Model.DisplayAddToCart)
-                            {
-                                <input type="submit" name="addtocartbutton" value="@T("ShoppingCart.AddToCart")" class="button-2 wishlist-add-to-cart-button" />
-                            }
-                            @if (Model.IsEditable && Model.EmailWishlistEnabled)
-                            {
-                                <input type="button" value="@T("Wishlist.EmailAFriend")" class="button-2 email-a-friend-wishlist-button" onclick="@Url.RouteUrl("EmailWishlist")" />
-                            }
-                        </div>
+                        @*<div class="buttons">
+                                @if (Model.IsEditable)
+                                {
+                                    <input type="submit" name="updatecart" value="@T("Wishlist.UpdateCart")" class="button-2 update-wishlist-button" />
+                                }
+                                @if (Model.DisplayAddToCart)
+                                {
+                                    <input type="submit" name="addtocartbutton" value="@T("ShoppingCart.AddToCart")" class="button-2 wishlist-add-to-cart-button" />
+                                }
+                                @if (Model.IsEditable && Model.EmailWishlistEnabled)
+                                {
+                                    <input type="button" value="@T("Wishlist.EmailAFriend")" class="button-2 email-a-friend-wishlist-button" onclick="@Url.RouteUrl("EmailWishlist")" />
+                                }
+                            </div>*@
                     </form>
                 </div>
             }
@@ -256,9 +355,91 @@
             </div>
         </div>
     </div>
+
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>SAW OPTIONS FOR PRODUCT</span>").ContentTemplate(
+@Content1).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
 </div>
 
 <script>
+    var sawOptionModal, toleranceLength;
+
+    var modalVm = new Vue({
+        el: '#wishlist',
+        data: {
+            sawOptionControlId: null,
+            sawOptions: [],
+            sawOption: null,
+            workOrderInstructions: null,
+            workOrderInstructionsId: null,
+            lengthToleranceCut: null,
+            lengthToleranceCutControlId: null,
+            quantity: 0,
+            quantityId: 0,
+            productId: null,
+        },
+        mounted: function () {
+
+        },
+        methods: {
+            addToCart: function () {
+                let request = {
+                    [this.sawOptionControlId]: this.sawOption,
+                    [this.workOrderInstructionsId]: this.workOrderInstructions,
+                    [this.lengthToleranceCutControlId]: this.lengthToleranceCut,
+                    [`addtocart_${this.productId}.EnteredQuantity`]: this.quantity,
+                };
+                sawOptionModal.hide();
+                AjaxCart.setLoadWaiting(true);
+                $.ajax({
+                    cache: false,
+                    url: `/addproducttocart/details/${this.productId}/@Html.Raw((int)ShoppingCartType.ShoppingCart)`,
+                    type: 'POST',
+                    data: request,
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        AjaxCart.setLoadWaiting(false);
+                        if (data != null) {
+                            AjaxCart.success_process(data);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        AjaxCart.setLoadWaiting(false);
+                        console.log(thrownError, 'addToCart datadata-error', xhr);
+                    }
+                });
+            },
+
+            handleSawOption: function (productId, attributes) {
+                const _attributes = attributes;
+                const cutOptions = _attributes.find(x => x.name === "Cut Options");
+                const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
+                console.log("handleSawOption: ", _attributes);
+                this.quantity = 1;
+                this.productId = productId;
+                this.sawOptionControlId = prefix + cutOptions.id;
+                this.sawOptions = cutOptions.values;
+                this.sawOption = cutOptions.values.find(x => x.isPreSelected).id;
+                this.workOrderInstructions = null;
+                this.workOrderInstructionsId = prefix + _attributes.find(x => x.name === "Work Order Instructions").id;
+                this.lengthToleranceCutControlId = prefix + _attributes.find(x => x.name === "Length Tolerance Cut").id;
+                this.lengthToleranceCut = 0;
+                sawOptionModal.show();
+            },
+
+            incrementToleranceCut: function () {
+                this.lengthToleranceCut = Number(this.lengthToleranceCut) + 1;
+            },
+            decrementToleranceCut: function () {
+                this.lengthToleranceCut = this.lengthToleranceCut > 0 ? Number(this.lengthToleranceCut) - 1 : 0;
+            },
+
+            incrementQuantity: function () {
+                this.quantity = Number(this.quantity) + 1;
+            },
+            decrementQuantity: function () {
+                this.quantity = this.quantity > 1 ? Number(this.quantity) - 1 : 1;
+            },
+        },
+    });
     function getInputQuantity(itemId, cartId) {
         event.preventDefault();
         let qty = $('#itemquantity' + itemId).val();
@@ -269,4 +450,24 @@
         console.log('itemId, cartId, qty', itemId, cartId, qty, link);
         AjaxCart.addproducttocart_catalog(link);
     }
+
+    function onDialogCreated() {
+        sawOptionModal = this;
+    }
 </script>
+<ejs-scripts></ejs-scripts>
+
+@functions {
+    String GetJson(object input)
+    {
+        @using Newtonsoft.Json.Serialization;
+        @using Newtonsoft.Json;
+
+        var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = contractResolver,
+            Formatting = Formatting.None
+        });
+    }
+}
