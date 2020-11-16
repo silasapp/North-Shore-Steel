@@ -7,6 +7,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public interface IInvoiceModelFactory
     {
-        CompanyInvoiceListModel PrepareOrderListModel(int companyId, CompanyInvoiceListModel.SearchFilter searchFilter);
+        CompanyInvoiceListModel PrepareInvoiceListModel(int companyId, CompanyInvoiceListModel.SearchFilter searchFilter);
     }
 }

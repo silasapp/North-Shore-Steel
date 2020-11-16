@@ -53,7 +53,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var model = new CompanyInvoiceListModel();
 
             if (eRPCompanyId > 0)
-                model = _invoiceModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
+                model = _invoiceModelFactory.PrepareInvoiceListModel(eRPCompanyId, filter);
+            model.IsClosed = filter.IsClosed;
             return PartialView("_InvoiceGrid", model);
         }
 

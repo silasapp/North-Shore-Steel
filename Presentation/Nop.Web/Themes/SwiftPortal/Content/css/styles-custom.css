@@ -20,6 +20,7 @@ a:not([href]):not([class]) {
 .nav-bar-content {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .nav-bar-search {
@@ -58,9 +59,6 @@ a:not([href]):not([class]) {
 .header-links-wrapper,
 .header-logo {
     padding: 0;
-    /*width: 166px;
-  height: 48px;*/
-    /* flex-basis: 11%; */
 }
 
 .nav-pills .nav-link {
@@ -960,6 +958,10 @@ table input {
     margin-bottom: 20px;
 }
 
+.nav-bar-search > form > .search-box-text::placeholder {
+    color: #ffffff;
+}
+
 .cart-summary-content {
     padding: 20px;
     border-radius: 0;
@@ -971,31 +973,44 @@ table input {
     font-family: "Exo 2";
     font-size: 14px;
     padding: 5px;
-    width: 200px;
     border: none;
     color: #b8b8b8;
 }
-
+.cart-input-options{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.cart-action-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
 .cart-filter-menu {
     display: flex;
     flex-direction: column;
-    margin-right: 20px;
+   flex-basis: 48%;
 }
 
-    .cart-filter-menu > label {
-        font-size: 12px;
-        margin-bottom: 3px;
-    }
-
-.shopping-cart-page .common-buttons {
+.cart-filter-menu > label {
+    font-size: 12px;
+    margin-bottom: 3px;
+}
+.shopping-cart-page .cart-action-options > .cart-action-btn > input {
+    padding-left: 25px;
+    margin: 0;
+    background: none !important;
+    color: #03175b;
+    font-weight: 500;
+}
+.shopping-cart-page .cart-action-options {
     background: none;
 }
-
-    .shopping-cart-page .common-buttons input {
-        background: none !important;
-        color: #03175b;
-        font-weight: 500;
-    }
+.cart-action-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
 .remove-from-cart {
     display: flex;
@@ -1006,6 +1021,7 @@ table input {
 .cart-summary-content select {
     border-radius: 5px;
     border: 1px solid #b8b8b8;
+    padding: 0 5px;
 }
 
 .cart-summary-content select {
@@ -1971,13 +1987,14 @@ table input {
         width: 0;
         position: absolute;
         z-index: 1;
-        top: 0;
+        top: -50px;
         left: -30px;
         overflow-x: hidden;
         transition: 0.5s;
         background: #ffffff;
         transform: translateX(-100%);
         transition: transform .2s ease-in;
+        text-align:left;
     }
 
     .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover {
@@ -2033,9 +2050,36 @@ table input {
         grid-template-columns: repeat(1, 1fr);
         grid-column-gap: 20px;
     }
-
+    ..cat-side-drawer {
+        left:-20px;
+    }
     .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover {
         width: 70%;
+    }
+    .cart-filter-menu {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+    .cart-action-options {
+        justify-content: space-between;
+    }
+    .cart-input-options {
+        padding: 0;
+    }
+    .cart-filter-menu {
+        flex-basis: 100%;
+    }
+
+    .nav-bar-content > .header-logo {
+        order: 1;
+        flex-basis: 40%;
+    }
+    .nav-bar-content > .nav-bar-search {
+        order: 3;
+        margin-top: 5px;
+    }
+    .nav-bar-content > .header-links-wrapper {
+        order: 2;
     }
 }
 
