@@ -74,6 +74,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly TaxSettings _taxSettings;
         private readonly NSSApiProvider _nSSApiProvider;
         private readonly WorkFlowMessageServiceOverride _workFlowMessageServiceOverride;
+        private readonly ICountryService _countryService;
 
         #endregion
 
@@ -109,6 +110,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _taxSettings = taxSettings;
             _nSSApiProvider = nSSApiProvider;
             _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
+            _countryService = countryService;
         }
 
         #endregion
@@ -222,7 +224,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public override IActionResult Login(bool? checkoutAsGuest)
         {
             var model = _customerModelFactory.PrepareLoginModel(checkoutAsGuest);
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCustomer/Login.cshtml", model);
+            return View(model);
         }
 
         #endregion
@@ -241,7 +243,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model = _customerModelFactory.PrepareRegisterModel(model, false, setDefaultValues: true);
 
             //For view give full path of your published plugin
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCustomer/Register.cshtml", model);
+            return View(model);
 
         }
 
@@ -524,7 +526,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                 //raise event       
                                 _eventPublisher.Publish(new CustomerActivatedEvent(customer));
 
-                                return View("~/Plugins/Misc.SwiftPortalOverride/Views/Confirmation.cshtml");
+                                return View();
                                 //var redirectUrl = Url.RouteUrl("RegisterResult",
                                 //    new { resultId = (int)UserRegistrationType.Standard, returnUrl }, _webHelper.CurrentRequestProtocol);
                                 //return Redirect(redirectUrl);
@@ -543,10 +545,61 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             //If we got this far, something failed, redisplay form
             model = _customerModelFactory.PrepareRegisterModel(model, true, customerAttributesXml);
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCustomer/Register.cshtml", model);
+            return View(model);
         }
 
-        
+        // my account/info
+        [HttpsRequirement]
+        public override IActionResult Info()
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var model = new CustomerInfoModel();
+            model = _customerModelFactory.PrepareCustomerInfoModel(model, _workContext.CurrentCustomer, false);
+
+            return View(model);
+        }
+
+        [HttpsRequirement]
+        public override IActionResult AddressEdit(int addressId)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var customer = _workContext.CurrentCustomer;
+            //find address (ensure that it belongs to the current customer)
+            var address = _customerService.GetCustomerAddress(customer.Id, addressId);
+            if (address == null)
+                //address is not found
+                return RedirectToRoute("CustomerAddresses");
+
+            var model = new CustomerAddressEditModel();
+            _addressModelFactory.PrepareAddressModel(model.Address,
+                address: address,
+                excludeProperties: false,
+                addressSettings: _addressSettings,
+                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+
+            return View(model);
+        }
+
+        [HttpsRequirement]
+        public override IActionResult AddressAdd()
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var model = new CustomerAddressEditModel();
+            _addressModelFactory.PrepareAddressModel(model.Address,
+                address: null,
+                excludeProperties: false,
+                addressSettings: _addressSettings,
+                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+
+            return View(model);
+        }
+
         void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
         {
             try

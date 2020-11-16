@@ -1,0 +1,105 @@
+﻿@using Nop.Web.Models.Customer
+@using Nop.Web.Framework.Themes
+@inject IThemeContext themeContext
+@model CustomerAddressListModel
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-address-list-page");
+}
+@section left
+{
+    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses })
+}
+
+@{
+    var themeName = themeContext.WorkingThemeName;
+}
+<div class="page account-page address-list-page">
+    <div class="page-body">
+        <nop-antiforgery-token />
+        @if (Model.Addresses.Count > 0)
+        {
+            <div class=account-page-card>
+                <div class="title"><strong>ADDRESSES</strong></div>
+                <div class="address-block">
+                    @for (var i = 0; i < Model.Addresses.Count; i++)
+                    {
+                        var count = i + 1;
+                        var address = Model.Addresses[i];
+                        <a href="" class="address-info">
+                            <ul>
+                                <button><img src="~/Themes/@themeName/Content/assets/icn-more-vert.svg" alt=""></button>
+                                <li class="title">ADDRESS @count</li>
+                                <li class="name">@address.FirstName @address.LastName</li>
+                                @if (address.CompanyEnabled && !string.IsNullOrEmpty(address.Company))
+                                {
+                                    <li class="company">@address.Company</li>
+                                }
+                                @if (address.StreetAddressEnabled)
+                                {
+                                    <li class="address1">
+                                        @address.Address1
+                                    </li>
+                                }
+
+                                @if (!string.IsNullOrEmpty(address.City) || !string.IsNullOrEmpty(address.StateProvinceName) || !string.IsNullOrEmpty(address.ZipPostalCode))
+                                {
+                                    <li class="city-state-zip">@address.City, @address.StateProvinceName, @address.ZipPostalCode</li>
+                                }
+                                @*@if (address.CityEnabled && !string.IsNullOrEmpty(address.City) ||
+                                    address.CountyEnabled && !string.IsNullOrEmpty(address.County) ||
+                                    address.StateProvinceEnabled && !string.IsNullOrEmpty(address.StateProvinceName) ||
+                                    address.ZipPostalCodeEnabled && !string.IsNullOrEmpty(address.ZipPostalCode))
+                                            {
+                                                <li class="city-state-zip">@address.City, @address.StateProvinceName, @address.ZipPostalCode</li>
+                                            }*@
+                            </ul>
+                        </a>
+                    }
+                    <a onclick="location.href='@Url.RouteUrl("CustomerAddressAdd")'" class="address-info">
+                        <ul>
+                            <img src="~/Themes/@themeName/Content/assets/icn-add.svg" alt="" />
+                            <li class="title">NEW ADDRESS</li>
+                        </ul>
+                    </a>
+                </div>
+            </div>
+
+            <script asp-location="Footer">
+                    function deletecustomeraddress(addressId) {
+                        if (confirm('@T("Common.AreYouSure")')) {
+                            var postData = {
+                                addressId: addressId
+                            };
+                            addAntiForgeryToken(postData);
+
+                            $.ajax({
+                                cache: false,
+                                type: "POST",
+                                url: "@Url.Action("AddressDelete", "Customer")",
+                                data: postData,
+                                dataType: "json",
+                                success: function (data, textStatus, jqXHR) {
+                                    location.href = data.redirect;
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    alert('Failed to delete');
+                                }
+                            });
+                        }
+                    }
+            </script>
+        }
+        else
+        {
+            <div class="no-data">
+                @T("Account.CustomerAddresses.NoAddresses")
+            </div>
+        }
+    </div>
+</div>

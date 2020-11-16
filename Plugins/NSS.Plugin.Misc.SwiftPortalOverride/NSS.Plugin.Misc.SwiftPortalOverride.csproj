@@ -34,11 +34,13 @@
     <None Remove="Views\CartOverride\_GiftCardBox.cshtml" />
     <None Remove="Views\CheckoutOverride\Completed.cshtml" />
     <None Remove="Views\CheckoutOverride\OpcPaymentInfo.cshtml" />
+    <None Remove="Views\CustomerOverride\AddressAdd.cshtml" />
+    <None Remove="Views\CustomerOverride\AddressEdit.cshtml" />
+    <None Remove="Views\CustomerOverride\Addresses.cshtml" />
+    <None Remove="Views\CustomerOverride\ChangePassword.cshtml" />
+    <None Remove="Views\CustomerOverride\Register.cshtml" />
     <None Remove="Views\CustomOrder\CustomerOrders.cshtml" />
     <None Remove="Views\CustomOrder\Details.cshtml" />
-    <None Remove="Views\CustomCustomer\CustomCatalogIndex.cshtml" />
-    <None Remove="Views\CustomCustomer\Login.cshtml" />
-    <None Remove="Views\CustomCustomer\_FilteredPartialView.cshtml" />
     <None Remove="Views\CustomShoppingCart\Checkout.cshtml" />
     <None Remove="Views\Invoice\CompanyInvoices.cshtml" />
     <None Remove="Views\Invoice\_InvoiceGrid.cshtml" />
@@ -47,6 +49,7 @@
     <None Remove="Views\OrderOverride\ClosedOrders.cshtml" />
     <None Remove="Views\OrderOverride\Details.cshtml" />
     <None Remove="Views\OrderOverride\_OrderGrid.cshtml" />
+    <None Remove="Views\Shared\Components\CustomCustomerNavigation\Default.cshtml" />
     <None Remove="Views\Shared\Components\CustomOrderSummary\Default.cshtml" />
     <None Remove="Views\Configure.cshtml" />
     <None Remove="Views\Confirmation - Copy.cshtml" />
@@ -109,6 +112,34 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="Views\CustomerOverride\AddressAdd.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomerOverride\AddressEdit.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomerOverride\Addresses.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomerOverride\ChangePassword.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomerOverride\Info.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomerOverride\Register.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\CustomOrder\CustomerOrders.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -118,7 +149,7 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Views\CustomCustomer\Login.cshtml">
+    <Content Include="Views\CustomerOverride\Login.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -130,10 +161,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Shared\Components\AccountSelector\Default.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\OrderOverride\ClosedOrders.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\OrderOverride\Details.cshtml">
@@ -148,10 +175,13 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\Shared\Components\CustomCustomerNavigation\Default.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Shared\Components\CustomOrderSummary\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Confirmation.cshtml">
+    <Content Include="Views\CustomerOverride\Confirmation.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\CustomShoppingCart\Cart.cshtml">
@@ -170,9 +200,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\HomeIndex.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\CustomCustomer\Register.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\Configure.cshtml">

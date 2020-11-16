@@ -597,7 +597,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     respContent = response.Content.ReadAsStringAsync().Result;
 
-                    retVal = ERPSearchOrdersResponse.FromJson(respContent);
+                    retVal = ERPSearchOrdersResponse.FromJson(respContent) ?? new List<ERPSearchOrdersResponse>();
                 }
             }
             catch (Exception ex)
@@ -667,7 +667,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     respContent = response.Content.ReadAsStringAsync().Result;
 
-                    retVal = ERPSearchOrdersResponse.FromJson(respContent);
+                    retVal = ERPSearchOrdersResponse.FromJson(respContent) ?? new List<ERPSearchOrdersResponse>();
                 }
             }
             catch (Exception ex)
@@ -737,7 +737,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     respContent = response.Content.ReadAsStringAsync().Result;
 
-                    retVal = ERPSearchInvoicesResponse.FromJson(respContent);
+                    retVal = ERPSearchInvoicesResponse.FromJson(respContent) ?? new List<ERPSearchInvoicesResponse>();
                 }
 
             }
@@ -808,7 +808,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     response.EnsureSuccessStatusCode();
 
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = ERPSearchInvoicesResponse.FromJson(respContent);
+                    retVal = ERPSearchInvoicesResponse.FromJson(respContent) ?? new List<ERPSearchInvoicesResponse>();
                 }
 
             }
