@@ -20,7 +20,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
     {
         #region Fields
 
-        private readonly NSSApiProvider _nSSApiProvider;
+        private readonly ERPApiProvider _nSSApiProvider;
         private readonly IAddressModelFactory _addressModelFactory;
         private readonly IAddressService _addressService;
         private readonly AddressSettings _addressSettings;
@@ -32,7 +32,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
         #region Ctor
 
-        public OrderModelFactory(CustomGenericAttributeService genericAttributeService, IOrderService orderService, NSSApiProvider nSSApiProvider, IAddressModelFactory addressModelFactory, AddressSettings addressSettings, ICountryService countryService, IAddressService addressService)
+        public OrderModelFactory(CustomGenericAttributeService genericAttributeService, IOrderService orderService, ERPApiProvider nSSApiProvider, IAddressModelFactory addressModelFactory, AddressSettings addressSettings, ICountryService countryService, IAddressService addressService)
         {
             _nSSApiProvider = nSSApiProvider;
             _addressModelFactory = addressModelFactory;

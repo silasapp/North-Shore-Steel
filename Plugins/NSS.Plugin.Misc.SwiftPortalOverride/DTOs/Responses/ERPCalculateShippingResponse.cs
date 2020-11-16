@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
 {
-    public partial class NSSCalculateShippingResponse
+    public partial class ERPCalculateShippingResponse
     {
         [JsonProperty("shippingCost")]
         public decimal ShippingCost { get; set; }

@@ -23,7 +23,7 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 {
-    public class NSSApiProvider
+    public class ERPApiProvider
     {
         #region Fields
 
@@ -40,7 +40,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
         #region Ctor
 
-        public NSSApiProvider(IHttpClientFactory httpClientFactory,
+        public ERPApiProvider(IHttpClientFactory httpClientFactory,
             ILocalizationService localizationService,
             ILogger logger,
             ISettingService settingService,
@@ -66,13 +66,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// </summary>
         /// <param name="request">User request object</param>
         /// <returns>Exchange rates</returns>
-        public NSSCreateUserResponse CreateNSSUser(NSSCreateUserRequest request)
+        public ERPCreateUserResponse CreateNSSUser(ERPCreateUserRequest request)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
             //initialize
-            var retVal = new NSSCreateUserResponse();
+            var retVal = new ERPCreateUserResponse();
             var respContent = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -129,7 +129,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     response.EnsureSuccessStatusCode();
 
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<NSSCreateUserResponse>(respContent);
+                    retVal = JsonConvert.DeserializeObject<ERPCreateUserResponse>(respContent);
                 }
 
             }
@@ -143,6 +143,65 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             return retVal;
         }
+
+
+        public void UpdateNSSUser(int erpId, ERPUpdateUserRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            //initialize
+            var respContent = string.Empty;
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - Update user", new Exception("NSS API attributes not configured correctly."));
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.UpdateNSSUser erpId -> {erpId}", new Exception("NSS token returned empty"));
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+                    // create user resource
+                    var resource = $"/users/{erpId}";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var content = new FormUrlEncodedContent(param);
+
+                    var response = httpClient.PutAsync(resource, content).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.UpdateUser erpId-> {erpId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => erpId: {erpId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request.ToKeyValue())}");
+        }
+
 
         /// <summary>
         /// Get Request Token
@@ -323,14 +382,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public NSSCalculateShippingResponse GetShippingRate(NSSCalculateShippingRequest request, bool useMock = false)
+        public ERPCalculateShippingResponse GetShippingRate(ERPCalculateShippingRequest request, bool useMock = false)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
             if (useMock)
             {
-                var resp = new NSSCalculateShippingResponse
+                var resp = new ERPCalculateShippingResponse
                 {
                     Allowed = true,
                     DeliveryDate = "2020-10-20",
@@ -344,7 +403,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
 
             //initialize
-            var retVal = new NSSCalculateShippingResponse();
+            var retVal = new ERPCalculateShippingResponse();
             var respContent = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -388,7 +447,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     response.EnsureSuccessStatusCode();
 
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<NSSCalculateShippingResponse>(respContent);
+                    retVal = JsonConvert.DeserializeObject<ERPCalculateShippingResponse>(respContent);
                 }
 
             }
@@ -403,15 +462,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public NSSGetCompanyCreditBalance GetCompanyCreditBalance(int companyId, bool useMock = false)
+        public ERPGetCompanyCreditBalance GetCompanyCreditBalance(int companyId, bool useMock = false)
         {
             //initialize
-            var retVal = new NSSGetCompanyCreditBalance();
+            var retVal = new ERPGetCompanyCreditBalance();
             var respContent = string.Empty;
 
             if (useMock)
             {
-                var resp = new NSSGetCompanyCreditBalance
+                var resp = new ERPGetCompanyCreditBalance
                 {
                     CreditAmount = (decimal)1500.00
                 };
@@ -455,7 +514,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     response.EnsureSuccessStatusCode();
 
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<NSSGetCompanyCreditBalance>(respContent);
+                    retVal = JsonConvert.DeserializeObject<ERPGetCompanyCreditBalance>(respContent);
                 }
 
             }
@@ -470,18 +529,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public NSSCreateOrderResponse CreateNSSOrder(int companyId, NSSCreateOrderRequest request, bool useMock = false)
+        public ERPCreateOrderResponse CreateNSSOrder(int companyId, ERPCreateOrderRequest request, bool useMock = false)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
             if (useMock)
             {
-                return new NSSCreateOrderResponse { NSSOrderNo = 1462176 };
+                return new ERPCreateOrderResponse { NSSOrderNo = 1462176 };
             }
 
             //initialize
-            var retVal = new NSSCreateOrderResponse();
+            var retVal = new ERPCreateOrderResponse();
             var respContent = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -524,7 +583,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     response.EnsureSuccessStatusCode();
 
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<NSSCreateOrderResponse>(respContent);
+                    retVal = JsonConvert.DeserializeObject<ERPCreateOrderResponse>(respContent);
                 }
 
             }
@@ -585,10 +644,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     // create user resource
                     var resource = $"/companies/{companyId}/orders/open";
 
-                    //body params
+                    //query params
                     var param = request.ToKeyValue();
-
-                    var content = new FormUrlEncodedContent(param);
 
                     var response = httpClient.GetAsync(QueryHelpers.AddQueryString(resource, param)).Result;
 

@@ -11,8 +11,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public class InvoiceModelFactory : IInvoiceModelFactory
     {
-        private readonly NSSApiProvider _nSSApiProvider;
-        public InvoiceModelFactory(NSSApiProvider nSSApiProvider)
+        private readonly ERPApiProvider _nSSApiProvider;
+        public InvoiceModelFactory(ERPApiProvider nSSApiProvider)
         {
             _nSSApiProvider = nSSApiProvider;
         }

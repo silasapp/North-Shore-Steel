@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
 {
-    public class NSSCreateUserResponse
+    public class ERPCreateUserResponse
     {
         public int? WitnrixId { get; set; }
     }

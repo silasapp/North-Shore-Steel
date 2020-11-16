@@ -163,7 +163,7 @@
                             var customerCompanyProduct = new CustomerCompanyProduct();
                             if (customerCompany != null)
                             {
-                                customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
                             }
 
                             // get attribute

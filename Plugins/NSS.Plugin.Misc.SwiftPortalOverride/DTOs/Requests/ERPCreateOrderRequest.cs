@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
 {
-    public partial class NSSCreateOrderRequest
+    public partial class ERPCreateOrderRequest
     {
         [JsonProperty("orderId")]
         public int OrderId { get; set; }
@@ -99,6 +99,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
 
         [JsonProperty("description")]
         public string Description { get; set; }
+
+        [JsonProperty("customerPartNo")]
+        public string CustomerPartNo { get; set; }
 
         [JsonProperty("quantity")]
         public int Quantity { get; set; }
