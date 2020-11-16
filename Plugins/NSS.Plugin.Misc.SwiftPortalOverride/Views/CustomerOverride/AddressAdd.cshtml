@@ -23,6 +23,7 @@
                 @await Html.PartialAsync("_CreateOrUpdateAddress", Model.Address, dataDictAddress)
             }
             <div class="buttons">
+                <input type="submit" class="cancel-button" style="background-color: transparent !important;" value="Cancel" />
                 <input type="submit" class="button-1 save-address-button" value="@T("Common.Save")" />
             </div>
         </div>
