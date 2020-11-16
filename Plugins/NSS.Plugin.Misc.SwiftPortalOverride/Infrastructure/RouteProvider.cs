@@ -67,6 +67,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
+            endpointRouteBuilder.MapControllerRoute("CustomerAddressEdit", "customer/addressedit/{addressId:min(0)}/",
+                new { controller = "CustomerOverride", action = "AddressEdit" },
+               new { },
+               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
+            endpointRouteBuilder.MapControllerRoute("CustomerAddressAdd", $"customer/addressadd/",
+                new { controller = "CustomerOverride", action = "AddressAdd" },
+               new { },
+               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
 
             // dashboard
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/",

@@ -74,6 +74,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly TaxSettings _taxSettings;
         private readonly NSSApiProvider _nSSApiProvider;
         private readonly WorkFlowMessageServiceOverride _workFlowMessageServiceOverride;
+        private readonly ICountryService _countryService;
 
         #endregion
 
@@ -109,6 +110,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _taxSettings = taxSettings;
             _nSSApiProvider = nSSApiProvider;
             _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
+            _countryService = countryService;
         }
 
         #endregion
@@ -555,6 +557,45 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var model = new CustomerInfoModel();
             model = _customerModelFactory.PrepareCustomerInfoModel(model, _workContext.CurrentCustomer, false);
+
+            return View(model);
+        }
+
+        [HttpsRequirement]
+        public override IActionResult AddressEdit(int addressId)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var customer = _workContext.CurrentCustomer;
+            //find address (ensure that it belongs to the current customer)
+            var address = _customerService.GetCustomerAddress(customer.Id, addressId);
+            if (address == null)
+                //address is not found
+                return RedirectToRoute("CustomerAddresses");
+
+            var model = new CustomerAddressEditModel();
+            _addressModelFactory.PrepareAddressModel(model.Address,
+                address: address,
+                excludeProperties: false,
+                addressSettings: _addressSettings,
+                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+
+            return View(model);
+        }
+
+        [HttpsRequirement]
+        public override IActionResult AddressAdd()
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var model = new CustomerAddressEditModel();
+            _addressModelFactory.PrepareAddressModel(model.Address,
+                address: null,
+                excludeProperties: false,
+                addressSettings: _addressSettings,
+                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
 
             return View(model);
         }
