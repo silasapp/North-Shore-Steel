@@ -46,7 +46,6 @@
     <None Remove="Views\Invoice\_InvoiceGrid.cshtml" />
     <None Remove="Views\OrderOverride\CompanyOrders.cshtml" />
     <None Remove="Views\Shared\Components\AccountSelector\Default.cshtml" />
-    <None Remove="Views\OrderOverride\ClosedOrders.cshtml" />
     <None Remove="Views\OrderOverride\Details.cshtml" />
     <None Remove="Views\OrderOverride\_OrderGrid.cshtml" />
     <None Remove="Views\Shared\Components\CustomCustomerNavigation\Default.cshtml" />

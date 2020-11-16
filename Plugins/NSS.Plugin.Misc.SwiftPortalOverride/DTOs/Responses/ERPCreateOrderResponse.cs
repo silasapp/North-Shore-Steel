@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
 {
-    public class NSSCreateOrderResponse
+    public class ERPCreateOrderResponse
     {
         [JsonProperty("NSSOrderNo")]
         public long NSSOrderNo { get; set; }

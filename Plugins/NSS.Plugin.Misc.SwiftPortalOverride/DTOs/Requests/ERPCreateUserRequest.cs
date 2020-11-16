@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Requests
 {
-    public class NSSCreateUserRequest
+    public class ERPCreateUserRequest
     {
         public string SwiftUserId { get; set; }
         public string Firstname { get; set; }

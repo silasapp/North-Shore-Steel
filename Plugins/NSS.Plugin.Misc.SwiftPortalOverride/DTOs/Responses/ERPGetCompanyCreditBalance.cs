@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
 {
-    public partial class NSSGetCompanyCreditBalance
+    public partial class ERPGetCompanyCreditBalance
     {
         [JsonProperty("creditAmount")]
         public decimal? CreditAmount { get; set; }

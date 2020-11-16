@@ -396,7 +396,7 @@
                                 var customerPathNo = "";
                                 if (customerCompany != null)
                                 {
-                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
                                     customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
                                 }
 

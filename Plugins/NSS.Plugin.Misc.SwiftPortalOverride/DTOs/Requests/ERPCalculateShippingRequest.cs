@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
 {
-    public partial class NSSCalculateShippingRequest
+    public partial class ERPCalculateShippingRequest
     {
         [JsonProperty("deliveryMethod")]
         public string DeliveryMethod { get; set; }
