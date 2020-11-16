@@ -89,24 +89,14 @@
 
                     @if (Model.CustomerAttributes.Count > 0)
                     {
-                        @*@foreach (var attribute in Model.CustomerAttributes)
-                            {
-                                if (attribute.Name == Constants.PreferredLocationIdAttribute)
-                                {*@
                         @await Html.PartialAsync("_CustomerAttributes", Model.CustomerAttributes);
-                        @*}
-                            }*@
-
-                        @*var preferredLocation = Model.CustomerAttributes.FirstOrDefault(x => x.Name == Constants.PreferredLocationIdAttribute);
-                            @if (preferredLocation.Id > 0)
-                            {
-
-                            }*@
                     }
 
-                    <div class="buttons">
-                        <input type="submit" id="save-info-button" value="@T("Common.Save")" name="save-info-button" class="button-1 save-customer-info-button" />
-                    </div>
+                </div>
+                <div class="buttons save-customer-info-button">
+                    <input type=submit id=save-info-button value='Save Changes' name=save-info-button class="button-2 ">
+                </div>
+            </div>
         </form>
     </div>
 </div>
