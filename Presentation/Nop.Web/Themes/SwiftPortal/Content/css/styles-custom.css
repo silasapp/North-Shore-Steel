@@ -120,7 +120,7 @@ a:not([href]):not([class]) {
     padding-bottom: 0;
     padding-top: 0;
     background-color: #ffffff !important;
-    margin-bottom: 50px;
+    /*margin-bottom: 50px;*/
     z-index: 1;
 }
 
@@ -236,9 +236,16 @@ a:not([href]):not([class]) {
     background-color: #ffffff !important;
     width: auto !important;
     box-shadow: 0px 1px 16px #0000001a;
+}
+.login-page .fieldset {
     padding: 24px 87px;
 }
-
+.registration-page .fieldset {
+    padding: 24px 172px;
+}
+.login-page .new-wrapper .text {
+    padding: 30px 0;
+}
 .account-page-card {
     background-color: #ffffff !important;
     box-shadow: 0px 1px 16px #0000001a;
@@ -549,7 +556,6 @@ a:not([href]):not([class]) {
     font-family: "Teko";
     letter-spacing: 1px;
     font-size: 28px;
-    padding: 0 30%;
     text-align: center;
 }
 
@@ -1977,9 +1983,25 @@ table input {
 }
 /*custom container*/
 .nss-container {
-    padding: 0 136px;
+    padding: 30px 136px;
 }
-
+.custom-input {
+    width: 100% !important;
+    font-style: italic !important;
+    font-size: 14px;
+    background: #f6f6f6 0% 0% no-repeat padding-box !important;
+    opacity: 1;
+    font: italic normal normal 14px/24px "Exo 2";
+    letter-spacing: 0;
+    color: #aaa;
+    opacity: 1;
+}
+.responsive-table-container {
+    overflow-x: scroll;
+}
+nss-table tr > td {
+    white-space: nowrap;
+}
 
 @media all and (max-width: 1028px) {
 
@@ -2042,7 +2064,15 @@ table input {
     }
     /*custom container*/
     .nss-container {
-        padding: 0 80px;
+        padding: 30px 80px;
+    }
+
+    .login-page .fieldset {
+        padding: 24px 40px;
+    }
+
+    .registration-page .fieldset {
+        padding: 24px 100px;
     }
 }
 
@@ -2066,11 +2096,19 @@ table input {
     }
     /*custom container*/
     .nss-container {
-        padding: 0 36px;
+        padding: 30px 36px;
     }
     .footer-main > .footer-content {
         flex-basis: 30%;
         margin-bottom: 30px;
+    }
+
+    .login-page .fieldset {
+        padding: 24px 40px;
+    }
+
+    .registration-page .fieldset {
+        padding: 24px 70px;
     }
 }
 
@@ -2121,7 +2159,7 @@ table input {
 
     .nav-bar-content > .nav-bar-search {
         order: 3;
-        margin-top: 5px;
+        margin-top: 10px;
     }
 
     .nav-bar-content > .header-links-wrapper {
@@ -2135,7 +2173,22 @@ table input {
         flex-basis: 100% !important;
     }
     .nss-container {
-        padding: 0 20px;
+        padding: 30px 20px;
+    }
+
+    .login-page .fieldset {
+        padding: 24px 20px;
+    }
+
+    .registration-page .fieldset {
+        padding: 24px 40px;
+    }
+    .account-block {
+        display: grid;
+        grid-row-gap: 20px;
+    }
+    .account-btn {
+        margin:  0;
     }
 }
 

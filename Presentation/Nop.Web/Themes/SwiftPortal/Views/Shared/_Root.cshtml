@@ -34,7 +34,7 @@
         @await Component.InvokeAsync("AccountSelector")
     }
 
-    <div class="master-wrapper-content">
+    <div class="nss-container">
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContentBefore })
 
         @if (IsSectionDefined("Breadcrumb"))
