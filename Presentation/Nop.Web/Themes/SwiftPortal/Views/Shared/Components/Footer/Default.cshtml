@@ -23,8 +23,8 @@
     </div>
 }
 <div class="footer">
-    <div class="footer-upper d-flex justify-content-between">
-        <div class="col-md-2 col-xs-12 col-sm-4 d-flex align-items-start flex-column justify-content-between text-left information">
+    <div class="nss-container d-flex justify-content-between footer-main">
+        <div class="footer-content">
             <ul class="list">
                 <div class="title pl-4"><strong>PRODUCTS</strong></div>
                 <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="">FOOTER LINK HOVER</a></li>
@@ -32,9 +32,9 @@
                 <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="">METAL PROCESSES</a></li>
                 <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="">INDUSTRIES SERVED</a></li>
             </ul>
-            <img class="ml-4" src="./assets/logo-nasa.png" alt="">
+            <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
         </div>
-        <div class="col-md-2 col-xs-12 col-sm-4 d-flex align-items-start flex-column justify-content-between text-left customer-service">
+        <div class="footer-content">
             <ul class="list">
                 <div class="title pl-4"><strong>INFO</strong></div>
                 <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="">RESOURCES</a></li>
@@ -43,9 +43,9 @@
                 <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="">CAREERS</a></li>
                 <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="">WHY NORTH SHORE STEEL?</a></li>
             </ul>
-            <img class="ml-4" src="./assets/abma.png" alt="">
+            <img class="" src="~/Themes/@(themeName)/Content/assets/abma.png" alt="">
         </div>
-        <div class="col-md-2 col-xs-12 col-sm-4 d-flex align-items-start flex-column justify-content-between text-left follow-us">
+        <div class="follow-us footer-content">
             <div>
                 <div class="title"><strong>FOLLOW US</strong></div>
                 <ul class="networks">
@@ -70,9 +70,9 @@
                     </a>
                 </ul>
             </div>
-            <img src="./assets/awmi.png" alt="">
+            <img src="~/Themes/@(themeName)/Content/assets/awmi.png" alt="">
         </div>
-        <div class="col-md-2 col-xs-12  col-sm-4 d-flex align-items-start flex-column justify-content-between text-left sales-dept">
+        <div class="sales-dept footer-content">
             <div class="title"><strong>SALES DEPARTMENTS</strong></div>
             <ul class="list">
                 <li>Structural Steel </li>
@@ -91,7 +91,7 @@
                 <li>713-980-5875 </li>
             </ul>
         </div>
-        <div class="col-md-2 col-xs-12 col-sm-4 d-flex align-items-end flex-column justify-content-center footer-logo">
+        <div class="footer-content footer-logo">
             <div>
                 <img src="https://swift-test-web.azurewebsites.net/Themes/SwiftPortal/Content/images/logo.png" alt="">
                 <p style="font-size:12px">1566 MILES ST. </p>
@@ -208,7 +208,7 @@
                 @await Component.InvokeAsync("NewsletterBox")
             </div>
         </div>*@
-    <div class="footer-lower">
+    @*<div class="footer-lower">
         <div class="footer-info">
             <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
             @if (Model.DisplayTaxShippingInfoFooter)
@@ -222,13 +222,13 @@
         @if (!Model.HidePoweredByNopCommerce)
         {
             <div class="footer-powered-by">
-                @*Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
-                    Please find more info at https://www.nopcommerce.com/nopcommerce-copyright-removal-key*@
+               *Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
+                    Please find more info at https://www.nopcommerce.com/nopcommerce-copyright-removal-key
                 Powered by <a href="https://www.nopcommerce.com/">nopCommerce</a>
             </div>
         }
         @await Component.InvokeAsync("StoreThemeSelector")
-    </div>
+    </div>*@
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Footer })
 </div>
 <script asp-location="Footer">
