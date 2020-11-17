@@ -186,6 +186,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-delivery-ticket-dark.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-delivery-ticket.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-download.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-error-red.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-error.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-expand.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-invoice-dark.svg" />

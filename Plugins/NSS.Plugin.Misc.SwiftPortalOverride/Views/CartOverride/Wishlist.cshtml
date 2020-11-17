@@ -40,10 +40,10 @@
     @<form id="sawOptionModal">
         <div class="d-flex flex-column">
             <div class="d-flex flex-column mt-4 mb-2">
-                <label class="nss-modal-title">SAW OPTIONS</label>
+                <label class="h4-default-500-teko mb-1">SAW OPTIONS</label>
                 <div class="d-flex flex-row">
                     <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
-                           class="mr-3 d-flex align-items-center cursor-pointer">
+                           class="mr-3 d-flex align-items-center cursor-pointer mb-0">
                         <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
                                v-bind:value="option.id" v-model="sawOption">
                         {{ option.name }}
@@ -52,13 +52,13 @@
             </div>
             <hr />
             <div class="d-flex flex-column">
-                <label class="nss-modal-title">WORK ORDER INSTRUCTIONS</label>
+                <label class="h4-primary-500-teko mb-1">WORK ORDER INSTRUCTIONS</label>
                 <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
             </div>
             <hr />
             <div class="d-flex flex-row justify-content-between mb-3">
                 <div class="d-flex flex-column">
-                    <label class="nss-modal-title">LENGTH TOLERANCE CUT</label>
+                    <label class="h4-primary-500-teko mb-1">LENGTH TOLERANCE CUT</label>
                     <div class="d-flex flex-row">
                         <button type="button" class="nss-btn-box"
                                 v-on:click="decrementToleranceCut">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="d-flex flex-column">
-                    <label class="nss-modal-title">ITEM QUANTITY</label>
+                    <label class="h4-primary-500-teko mb-1">ITEM QUANTITY</label>
                     <div class="d-flex flex-row">
                         <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
                         <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
@@ -158,7 +158,7 @@
                                             if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
                                             {
                                                 var shape = shapeService.GetShapeById(shapeId);
-                                                hasSawOption = shape != null ? shape.SawOption :  false;
+                                                hasSawOption = shape != null ? shape.SawOption : false;
                                             }
                                             var itemId = item.Id;
                                             var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
@@ -356,12 +356,16 @@
         </div>
     </div>
 
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>SAW OPTIONS FOR PRODUCT</span>").ContentTemplate(
+    @{ var title = "<span class='dialog-header'>SAW OPTIONS FOR PRODUCT</span>"; }
+
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header(title).ContentTemplate(
 @Content1).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
 </div>
 
 <script>
     var sawOptionModal, toleranceLength;
+
+    var title = 'TESTING...';
 
     var modalVm = new Vue({
         el: '#wishlist',
