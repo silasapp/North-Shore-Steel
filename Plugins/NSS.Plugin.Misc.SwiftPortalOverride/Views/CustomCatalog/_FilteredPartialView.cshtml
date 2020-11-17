@@ -358,23 +358,23 @@
 <script id="optionsTemplate" type="text/x-template">
     ${if(_mtr)}
     <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
-        <img src="Themes/SwiftPortal/Content/assets/invoice.svg" width="20" height="20" alt="">
+        <img src="Themes/SwiftPortal/Content/assets/invoice.svg" title="mtr report" width="20" height="20" alt="">
     </a>
     ${/if}
 
     ${if(_sawOption == "true")}
     <button class="table-action-button"
             onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_product}`); return false;">
-        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" title="saw options" width="20" height="20" alt="">
     </button>
     ${/if}
     ${if(_eRPCompanyIdExist == "true")}
     <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" width="20" height="20" alt="">
+        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" title="add to cart" width="20" height="20" alt="">
     </button>
     ${/if}
     <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" width="20" height="20" alt="">
+        <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" title="add to wishlist" width="20" height="20" alt="">
     </button>
 </script>
 
