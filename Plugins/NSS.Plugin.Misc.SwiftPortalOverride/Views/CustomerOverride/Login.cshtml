@@ -50,7 +50,7 @@
                         else
                         {
                             <div class="inputs">
-                                <label asp-for="Email" asp-postfix=":" class="text-left"></label>
+                                <label asp-for="Email" class="text-left">Email Address:</label>
                                 <input asp-for="Email" class="email user-input-field" autofocus="autofocus" />
                                 <span asp-validation-for="Email"></span>
                             </div>
@@ -83,7 +83,7 @@
 
             @if (Model.RegistrationType == UserRegistrationType.Disabled)
             {
-                <div class="new-wrapper">
+                <div class="new-wrapper fieldset">
                     <div class="title">
                         @T("Account.Register")
                     </div>
@@ -94,7 +94,7 @@
             }
             else if (Model.CheckoutAsGuest)
             {
-                <div class="new-wrapper checkout-as-guest-or-register-block">
+                <div class="new-wrapper fieldset checkout-as-guest-or-register-block">
                     <div class="title">
                         <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
                     </div>
@@ -109,7 +109,7 @@
             }
             else
             {
-                <div class="new-wrapper register-block">
+                <div class="new-wrapper fieldset register-block">
                     <div class="title"><strong style="font-weight: 500;">NEW CUSTOMER</strong></div>
                     <div class="text">
                         Don’t have an online account with us? No problem, we’ll get you

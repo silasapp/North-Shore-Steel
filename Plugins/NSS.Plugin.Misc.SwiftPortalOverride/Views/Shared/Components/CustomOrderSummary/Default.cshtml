@@ -139,9 +139,9 @@
                             <th style="background-color: transparent !important; border: none !important" scope="col">Customer Part #</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Unit Price</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Total Price</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Weight</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Length</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Order Qty</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Weight (lb)</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Length (ft)</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Quantity</th>
                             <th style="background-color: transparent !important; border: none !important;" scope="col">Notes</th>
                             <th style="background-color: transparent !important; border: none !important;" scope="col">Remove</th>
                         </tr>
@@ -163,7 +163,7 @@
                             var customerCompanyProduct = new CustomerCompanyProduct();
                             if (customerCompany != null)
                             {
-                                customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
                             }
 
                             // get attribute

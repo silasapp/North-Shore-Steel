@@ -84,30 +84,23 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #region Methods
 
-        //My account / Orders
-        [HttpsRequirement]
-        public override IActionResult CustomerOrders()
-        {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
-                return Challenge();
-
-            var model = _orderNopModelFactory.PrepareCustomerOrderListModel();
-            return View(model);
-        }
-
         //My account / Order details page
         [HttpsRequirement]
         public override IActionResult Details(int orderId)
         {
-            var order = _orderService.GetOrderById(orderId);
-            if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
-                return Challenge();
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
 
-            var model = _orderNopModelFactory.PrepareOrderDetailsModel(order);
-            //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomOrder/Details.cshtml", model);
+            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+
+            var model = new OrderDetailsModel();
+
+            if (eRPCompanyId > 0 && orderId > 0)
+                model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId);
+
             return View(model);
         }
 
+        //My account / Orders
         [HttpsRequirement]
         public virtual IActionResult CompanyOrders()
         {

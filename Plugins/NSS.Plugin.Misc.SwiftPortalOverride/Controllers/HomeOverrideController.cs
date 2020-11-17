@@ -15,7 +15,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
     public class HomeOverrideController : HomeController
     {
         #region Fields
-        private readonly NSSApiProvider _nSSApiProvider;
+        private readonly ERPApiProvider _nSSApiProvider;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
@@ -27,7 +27,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public HomeOverrideController(
             ISettingService settingService,
             IStoreContext storeContext,
-            NSSApiProvider nSSApiProvider,
+            ERPApiProvider nSSApiProvider,
             IWorkContext workContext,
             ICustomerCompanyService customerCompanyService
 

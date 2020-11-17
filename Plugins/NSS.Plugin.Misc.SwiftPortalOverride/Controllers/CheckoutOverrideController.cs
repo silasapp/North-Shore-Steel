@@ -68,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
         private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
-        private readonly NSSApiProvider _nSSApiProvider;
+        private readonly ERPApiProvider _nSSApiProvider;
         private readonly IShapeService _shapeService;
         private readonly ICountryModelFactory _countryModelFactory;
         private readonly PayPalServiceManager _payPalServiceManager;
@@ -78,11 +78,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IDiscountService _discountService;
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly ICustomerCompanyProductService _customerCompanyProductService;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, NSSApiProvider nSSApiProvider, AddressSettings addressSettings,
+        public CheckoutOverrideController(ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -128,6 +129,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _discountService = discountService;
             _orderTotalCalculationService = orderTotalCalculationService;
             _customerCompanyService = customerCompanyService;
+            _customerCompanyProductService = customerCompanyProductService;
         }
         #endregion
 
@@ -244,12 +246,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // account credit
             var creditModel = new AccountCreditModel();
-            var (erpCompId, canCredit) = GetCustomerCompanyDetails();
+            var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
 
-            if (canCredit)
+            if (customerCompany != null && customerCompany.CanCredit)
             {
                 var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
-                creditModel = new AccountCreditModel { CanCredit = canCredit, CreditAmount = creditResult.CreditAmount ?? (decimal)0.00 };
+                creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount ?? (decimal)0.00 };
             }
 
             model.AccountCreditModel = creditModel;
@@ -309,7 +311,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 // get shipping cost
                 // shipping
-                NSSCalculateShippingRequest request = BuildShippingCostRequest(model);
+                ERPCalculateShippingRequest request = BuildShippingCostRequest(model);
 
                 var shipObj = GetShippingCost(requestOverride: request);
 
@@ -394,7 +396,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [IgnoreAntiforgeryToken]
         public JsonResult GetShippingRate([FromBody] ShippingCostRequest address)
         {
-            NSSCalculateShippingResponse response = GetShippingCost(address);
+            ERPCalculateShippingResponse response = GetShippingCost(address);
 
             var shoppingCart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
@@ -413,7 +415,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             });
         }
 
-        private NSSCalculateShippingRequest BuildShippingCostRequest(ErpCheckoutModel model)
+        private ERPCalculateShippingRequest BuildShippingCostRequest(ErpCheckoutModel model)
         {
             var shippingAddress = _addressService.GetAddressById(model.ShippingAddress.ShippingAddressId);
             var shippingAddressNew = model.ShippingAddress.ShippingNewAddress;
@@ -427,7 +429,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var shippingZipPostalCode = shippingAddress != null ? shippingAddress.ZipPostalCode : shippingAddressNew.ZipPostalCode;
             var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute);
 
-            var request = new NSSCalculateShippingRequest
+            var request = new ERPCalculateShippingRequest
             {
                 DeliveryMethod = model.ShippingAddress.IsPickupInStore ? "Pickup" : "Shipping",
                 DestinationAddressLine1 = shippingAddress1,
@@ -440,17 +442,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return request;
         }
 
-        private NSSCalculateShippingResponse GetShippingCost(ShippingCostRequest address = null, NSSCalculateShippingRequest requestOverride = null)
+        private ERPCalculateShippingResponse GetShippingCost(ShippingCostRequest address = null, ERPCalculateShippingRequest requestOverride = null)
         {
             if (address == null && requestOverride == null)
                 throw new ArgumentNullException(nameof(address));
 
-            NSSCalculateShippingRequest request;
+            ERPCalculateShippingRequest request;
 
             if (requestOverride != null)
                 request = requestOverride;
             else
-                request = new NSSCalculateShippingRequest
+                request = new ERPCalculateShippingRequest
                 {
                     DeliveryMethod = address.IsPickup ? "pickup" : "shipping",
                     DestinationAddressLine1 = address.Address1,
@@ -751,6 +753,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var poAttr = chkAttr.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CheckoutPONoAttribute);
                 var poValues = poAttr != null ? _checkoutAttributeParser.ParseValues(order.CheckoutAttributesXml, poAttr.Id) : new List<string>();
 
+                var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+
                 // discounts
                 var discounts = new List<Discount>();
                 var discounUsagetList = _discountService.GetAllDiscountUsageHistory(customerId: _workContext.CurrentCustomer.Id, orderId: order.Id);
@@ -771,11 +775,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     orderItems.Add(new DTOs.Requests.OrderItem
                     {
                         Description = attrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
-                        ItemId = (int.TryParse(attrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId: 0),
+                        ItemId = (int.TryParse(attrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
+                        CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? null) : null,
                         Quantity = item.Quantity,
                         TotalPrice = item.PriceExclTax,
                         UnitPrice = item.UnitPriceExclTax,
-                        TotalWeight = (decimal.TryParse(attrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? weight * item.Quantity :  (decimal)0.00),
+                        TotalWeight = (decimal.TryParse(attrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? weight * item.Quantity : (decimal)0.00),
                         // product attr
                         Notes = "",
                         SawOptions = "",
@@ -784,7 +789,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     });
                 }
 
-                var request = new NSSCreateOrderRequest()
+                var request = new ERPCreateOrderRequest()
                 {
                     OrderId = order.Id,
                     OrderTotal = order.OrderTotal,
@@ -821,8 +826,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     OrderItems = JsonConvert.SerializeObject(orderItems.ToArray())
                 };
 
-                var (erpCompId, _) = GetCustomerCompanyDetails();
-
+                // api call
                 var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
 
                 if (resp.NSSOrderNo > 0)
@@ -836,7 +840,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         }
 
-        private (int companyId, bool canCredit) GetCustomerCompanyDetails()
+        private (int companyId, CustomerCompany customerCompany) GetCustomerCompanyDetails()
         {
             string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int.TryParse(Request.Cookies[erpCompIdCookieKey], out int ERPCompanyId);
@@ -846,7 +850,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (ERPCompanyId > 0)
                 customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, ERPCompanyId);
 
-            return (ERPCompanyId, customerCompany?.CanCredit ?? false);
+            return (ERPCompanyId, customerCompany);
         }
 
 
