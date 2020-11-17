@@ -55,6 +55,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 
         public static string MTRBlobName => "Product-MTR.{0}.pdf";
 
-        public static string ThemeName => "SwiftPortal";
+		public static string ThemeName => "SwiftPortal";
+        public static string LocationHouston => "houston";
+        public static string LocationBeaumont => "beaumont";
     }
 }

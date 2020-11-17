@@ -40,6 +40,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
+
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
 
@@ -50,6 +52,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly CustomerSettings _customerSettings;
         private readonly ICustomerModelFactory _customerModelFactory;
         private readonly ICustomerService _customerService;
+        private readonly ForumSettings _forumSettings;
         private readonly IWorkContext _workContext;
         private readonly IAuthenticationService _authenticationService;
         private readonly AddressSettings _addressSettings;
@@ -111,6 +114,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _nSSApiProvider = nSSApiProvider;
             _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
             _countryService = countryService;
+            _forumSettings = forumSettings;
         }
 
         #endregion
@@ -600,6 +604,249 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View(model);
         }
 
+
+        [HttpPost]
+        public override IActionResult Info(CustomerInfoModel model, IFormCollection form)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var oldCustomerModel = new CustomerInfoModel();
+
+            var customer = _workContext.CurrentCustomer;
+
+            //get customer info model before changes for gdpr log
+            if (_gdprSettings.GdprEnabled & _gdprSettings.LogUserProfileChanges)
+                oldCustomerModel = _customerModelFactory.PrepareCustomerInfoModel(oldCustomerModel, customer, false);
+
+            //custom customer attributes
+            var customerAttributesXml = ParseCustomCustomerAttributes(form);
+            var customerAttributeWarnings = _customerAttributeParser.GetAttributeWarnings(customerAttributesXml);
+            //foreach (var error in customerAttributeWarnings)
+            //{
+            //    ModelState.AddModelError("", error);
+            //}
+
+            //GDPR
+            if (_gdprSettings.GdprEnabled)
+            {
+                var consents = _gdprService
+                    .GetAllConsents().Where(consent => consent.DisplayOnCustomerInfoPage && consent.IsRequired).ToList();
+
+                ValidateRequiredConsents(consents, form);
+            }
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    int ErpId = _genericAttributeService.GetAttribute<int>(customer, Constants.ErpKeyAttribute);
+
+                    //username 
+                    if (_customerSettings.UsernamesEnabled && _customerSettings.AllowUsersToChangeUsernames)
+                    {
+                        if (!customer.Username.Equals(model.Username.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            //change username
+                            _customerRegistrationService.SetUsername(customer, model.Username.Trim());
+
+                            //re-authenticate
+                            //do not authenticate users in impersonation mode
+                            if (_workContext.OriginalCustomerIfImpersonated == null)
+                                _authenticationService.SignIn(customer, true);
+                        }
+                    }
+                    //email
+                    if (!customer.Email.Equals(model.Email.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        //change email
+                        var requireValidation = _customerSettings.UserRegistrationType == UserRegistrationType.EmailValidation;
+                        _customerRegistrationService.SetEmail(customer, model.Email.Trim(), requireValidation);
+
+                        //do not authenticate users in impersonation mode
+                        if (_workContext.OriginalCustomerIfImpersonated == null)
+                        {
+                            //re-authenticate (if usernames are disabled)
+                            if (!_customerSettings.UsernamesEnabled && !requireValidation)
+                                _authenticationService.SignIn(customer, true);
+                        }
+                    }
+
+                    //properties
+                    if (_dateTimeSettings.AllowCustomersToSetTimeZone)
+                    {
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.TimeZoneIdAttribute,
+                            model.TimeZoneId);
+                    }
+                    //VAT number
+                    if (_taxSettings.EuVatEnabled)
+                    {
+                        var prevVatNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.VatNumberAttribute);
+
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberAttribute,
+                            model.VatNumber);
+                        if (prevVatNumber != model.VatNumber)
+                        {
+                            var vatNumberStatus = _taxService.GetVatNumberStatus(model.VatNumber, out _, out var vatAddress);
+                            _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberStatusIdAttribute, (int)vatNumberStatus);
+                            //send VAT number admin notification
+                            if (!string.IsNullOrEmpty(model.VatNumber) && _taxSettings.EuVatEmailAdminWhenNewVatSubmitted)
+                                _workflowMessageService.SendNewVatSubmittedStoreOwnerNotification(customer,
+                                    model.VatNumber, vatAddress, _localizationSettings.DefaultAdminLanguageId);
+                        }
+                    }
+
+                    //form fields
+                    if (_customerSettings.GenderEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.GenderAttribute, model.Gender);
+                    if (_customerSettings.FirstNameEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FirstNameAttribute, model.FirstName);
+                    if (_customerSettings.LastNameEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.LastNameAttribute, model.LastName);
+                    if (_customerSettings.DateOfBirthEnabled)
+                    {
+                        var dateOfBirth = model.ParseDateOfBirth();
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.DateOfBirthAttribute, dateOfBirth);
+                    }
+                    if (_customerSettings.CompanyEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CompanyAttribute, model.Company);
+                    if (_customerSettings.StreetAddressEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StreetAddressAttribute, model.StreetAddress);
+                    if (_customerSettings.StreetAddress2Enabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StreetAddress2Attribute, model.StreetAddress2);
+                    if (_customerSettings.ZipPostalCodeEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.ZipPostalCodeAttribute, model.ZipPostalCode);
+                    if (_customerSettings.CityEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CityAttribute, model.City);
+                    if (_customerSettings.CountyEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CountyAttribute, model.County);
+                    if (_customerSettings.CountryEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CountryIdAttribute, model.CountryId);
+                    if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StateProvinceIdAttribute, model.StateProvinceId);
+                    if (_customerSettings.PhoneEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.PhoneAttribute, model.Phone);
+                    if (_customerSettings.FaxEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FaxAttribute, model.Fax);
+
+                    //newsletter
+                    if (_customerSettings.NewsletterEnabled)
+                    {
+                        //save newsletter value
+                        var newsletter = _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, _storeContext.CurrentStore.Id);
+                        if (newsletter != null)
+                        {
+                            if (model.Newsletter)
+                            {
+                                var wasActive = newsletter.Active;
+                                newsletter.Active = true;
+                                _newsLetterSubscriptionService.UpdateNewsLetterSubscription(newsletter);
+                            }
+                            else
+                            {
+                                _newsLetterSubscriptionService.DeleteNewsLetterSubscription(newsletter);
+                            }
+                        }
+                        else
+                        {
+                            if (model.Newsletter)
+                            {
+                                _newsLetterSubscriptionService.InsertNewsLetterSubscription(new NewsLetterSubscription
+                                {
+                                    NewsLetterSubscriptionGuid = Guid.NewGuid(),
+                                    Email = customer.Email,
+                                    Active = true,
+                                    StoreId = _storeContext.CurrentStore.Id,
+                                    CreatedOnUtc = DateTime.UtcNow
+                                });
+                            }
+                        }
+                    }
+
+                    if (_forumSettings.ForumsEnabled && _forumSettings.SignaturesEnabled)
+                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.SignatureAttribute, model.Signature);
+
+                    //save customer attributes
+                    _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+                        NopCustomerDefaults.CustomCustomerAttributes, customerAttributesXml);
+
+                    //GDPR
+                    if (_gdprSettings.GdprEnabled)
+                        LogGdpr(customer, oldCustomerModel, model, form);
+
+
+                    var request = new ERPUpdateUserRequest
+                    {
+
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Phone = model.Phone,
+                        PreferredLocationId = model.CountryId
+                    };
+
+                    #region BuildCustomAttributes
+                    var attributes = _customerAttributeService.GetAllCustomerAttributes();
+                    foreach (var attribute in attributes)
+                    {
+                        var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                        switch (attribute.AttributeControlType)
+                        {
+                            case AttributeControlType.DropdownList:
+                            case AttributeControlType.RadioList:
+                                {
+                                    var ctrlAttributes = form[controlId];
+                                    if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                                    {
+                                        var selectedAttributeId = int.Parse(ctrlAttributes);
+                                        if (selectedAttributeId > 0)
+                                        {
+                                            var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
+                                            var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                            if (val != null)
+                                            {
+                                                if (attribute.Name == Constants.PreferredLocationIdAttribute)
+                                                {
+                                                    if (val.Name.ToLower() == "houston")
+                                                    {
+                                                        val.Id = 1;
+                                                    }
+                                                    else if (val.Name.ToLower() == "beaumont")
+                                                    {
+                                                        val.Id = 2;
+                                                    }
+                                                    request.PreferredLocationId = val.Id;
+                                                }
+
+                                            }
+                                        }
+                                    }
+
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    #endregion
+                    
+                    _nSSApiProvider.UpdateNSSUser(ErpId, request);
+
+
+                    return RedirectToRoute("CustomerInfo");
+                }
+            }
+            catch (Exception exc)
+            {
+                ModelState.AddModelError("", exc.Message);
+            }
+
+            //If we got this far, something failed, redisplay form
+            model = _customerModelFactory.PrepareCustomerInfoModel(model, customer, true, customerAttributesXml);
+            return View(model);
+        }
+
+
         void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
         {
             try
@@ -622,84 +869,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 #region BuildCustomAttributes
                 var attributes = _customerAttributeService.GetAllCustomerAttributes();
-                foreach (var attribute in attributes)
-                {
-                    var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                    switch (attribute.AttributeControlType)
-                    {
-                        case AttributeControlType.DropdownList:
-                        case AttributeControlType.RadioList:
-                            {
-                                var ctrlAttributes = form[controlId];
-                                if (!StringValues.IsNullOrEmpty(ctrlAttributes))
-                                {
-                                    var selectedAttributeId = int.Parse(ctrlAttributes);
-                                    if (selectedAttributeId > 0)
-                                    {
-                                        //var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
-                                        var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
-                                        var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
-                                        if (val != null)
-                                        {
-                                            if (attribute.Name == Constants.HearAboutUsAttribute)
-                                                request.HearAboutUs = val.Name;
-                                            if (attribute.Name == Constants.PreferredLocationIdAttribute)
-                                            {
-                                                if (val.Name.ToLower() == "houston")
-                                                {
-                                                    val.Id = 1;
-                                                }
-                                                else if (val.Name.ToLower() == "beaumont")
-                                                {
-                                                    val.Id = 2;
-                                                }
-                                                request.PreferredLocationid = val.Id.ToString();
-                                            }
-
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case AttributeControlType.Checkboxes:
-                            {
-                                var cblAttributes = form[controlId];
-                                if (!StringValues.IsNullOrEmpty(cblAttributes))
-                                {
-                                    var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    if (items.Length > 0)
-                                    {
-                                        if (attribute.Name == Constants.IsExistingCustomerAttribute)
-                                            request.IsExistingCustomer = "1";
-                                    }
-                                    else
-                                    {
-                                        request.IsExistingCustomer = "0";
-                                    }
-                                }
-                            }
-                            break;
-                        case AttributeControlType.TextBox:
-                        case AttributeControlType.MultilineTextbox:
-                            {
-                                var ctrlAttributes = form[controlId];
-                                if (!StringValues.IsNullOrEmpty(ctrlAttributes))
-                                {
-                                    var enteredText = ctrlAttributes.ToString().Trim();
-
-                                    if (attribute.Name == Constants.ItemsForNextProjectAttribute)
-                                        request.ItemsForNextProject = enteredText;
-
-                                    if (attribute.Name == Constants.OtherAttribute)
-                                        request.Other = enteredText;
-                                }
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                buildCustomAttributes(form, request, attributes);
 
                 #endregion
 
@@ -720,6 +890,87 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 // silent NSS error
             }
 
+        }
+        void buildCustomAttributes(IFormCollection form, ERPCreateUserRequest request, IList<CustomerAttribute> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                switch (attribute.AttributeControlType)
+                {
+                    case AttributeControlType.DropdownList:
+                    case AttributeControlType.RadioList:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var selectedAttributeId = int.Parse(ctrlAttributes);
+                                if (selectedAttributeId > 0)
+                                {
+                                    //var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                    var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
+                                    var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                    if (val != null)
+                                    {
+                                        if (attribute.Name == Constants.HearAboutUsAttribute)
+                                            request.HearAboutUs = val.Name;
+                                        if (attribute.Name == Constants.PreferredLocationIdAttribute)
+                                        {
+                                            if (val.Name.ToLower() == "houston")
+                                            {
+                                                val.Id = 1;
+                                            }
+                                            else if (val.Name.ToLower() == "beaumont")
+                                            {
+                                                val.Id = 2;
+                                            }
+                                            request.PreferredLocationid = val.Id.ToString();
+                                        }
+
+                                    }
+                                }
+                            }
+
+                        }
+                        break;
+                    case AttributeControlType.Checkboxes:
+                        {
+                            var cblAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(cblAttributes))
+                            {
+                                var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                if (items.Length > 0)
+                                {
+                                    if (attribute.Name == Constants.IsExistingCustomerAttribute)
+                                        request.IsExistingCustomer = "1";
+                                }
+                                else
+                                {
+                                    request.IsExistingCustomer = "0";
+                                }
+                            }
+                        }
+                        break;
+                    case AttributeControlType.TextBox:
+                    case AttributeControlType.MultilineTextbox:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var enteredText = ctrlAttributes.ToString().Trim();
+
+                                if (attribute.Name == Constants.ItemsForNextProjectAttribute)
+                                    request.ItemsForNextProject = enteredText;
+
+                                if (attribute.Name == Constants.OtherAttribute)
+                                    request.Other = enteredText;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
         #endregion
 

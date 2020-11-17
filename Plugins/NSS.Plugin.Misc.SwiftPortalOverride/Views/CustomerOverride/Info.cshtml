@@ -1,8 +1,11 @@
 ﻿@using Nop.Core
 @using Nop.Web.Models.Customer
 @using NSS.Plugin.Misc.SwiftCore.Helpers;
+@using Nop.Services.Common
 @model CustomerInfoModel
 @inject Nop.Core.IWebHelper webHelper
+@inject IWorkContext workContext
+@inject IGenericAttributeService genericAttributeService
 @{
     Layout = "_ColumnsTwo";
 
@@ -18,6 +21,10 @@
     @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Info })
 }
 
+@{
+    var customer = workContext.CurrentCustomer;
+    int ErpId = genericAttributeService.GetAttribute<int>(customer, Constants.ErpKeyAttribute);
+}
 
 <div class="page account-page customer-info-page">
     <div class="page-body">
@@ -41,7 +48,7 @@
 
                     <div class="inputs">
                         <label asp-for="Email" asp-postfix=":"></label>
-                        <input asp-for="Email" readonly disabled />
+                        <input asp-for="Email" readonly style="cursor: unset" />
                         <nop-required />
                         <span asp-validation-for="Email"></span>
                     </div>
@@ -77,12 +84,20 @@
                     {
                         <div class="inputs">
                             <label asp-for="Company" asp-postfix=":"></label>
-                            <input asp-for="Company" />
+                            <input asp-for="Company" readonly style="cursor: unset" />
                             @if (Model.CompanyRequired)
                             {
                                 <nop-required />
                             }
                             <span asp-validation-for="Company"></span>
+                        </div>
+                    }
+
+                    @if (!String.IsNullOrEmpty(ErpId.ToString()))
+                    {
+                        <div class="inputs">
+                            <label>Customer Number</label>
+                            <label>@ErpId</label>
                         </div>
                     }
 
