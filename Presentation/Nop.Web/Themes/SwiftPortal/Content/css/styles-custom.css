@@ -550,7 +550,115 @@ a:not([href]):not([class]) {
     .page-title:after {
         content: none;
     }
+/*date picker*/
 
+input:focus {
+    outline: none;
+}
+
+#ui-datepicker-div {
+    display: none;
+    background-color: #fff;
+    box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);
+    margin-top: 0.25rem;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+.ui-datepicker-calendar thead th {
+    padding: 0.25rem 0;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #78909C;
+}
+
+.ui-datepicker-calendar tbody td {
+    width: 2.5rem;
+    text-align: center;
+    padding: 0;
+}
+.ui-datepicker-header {
+    position: relative;
+    height: auto;
+    background-color: #03175b;
+}
+    .ui-datepicker-calendar tbody td a {
+        display: block;
+        border-radius: 0.25rem;
+        line-height: 2rem;
+        transition: 0.3s all;
+        color: #546E7A;
+        font-size: 0.875rem;
+        text-decoration: none;
+    }
+
+        .ui-datepicker-calendar tbody td a:hover {
+            background-color: #E0F2F1;
+        }
+
+        .ui-datepicker-calendar tbody td a.ui-state-active {
+            background-color: #0076b4 !important;
+            border-color: #0076b4 !important;
+            color: white !important;
+            outline: none !important;
+        }
+
+.ui-datepicker-header a.ui-corner-all {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    margin: 0.5rem;
+    border-radius: 0.25rem;
+    transition: 0.3s all;
+}
+
+    /*.ui-datepicker-header a.ui-corner-all:hover {
+        background-color: #ECEFF1;
+    }*/
+
+.ui-datepicker-header a.ui-datepicker-prev {
+    left: 0;
+    background: url("../assets/icn-arrow-down-white.svg");
+    background-repeat: no-repeat;
+    /*background-size: 0.5rem;*/
+    background-position: 50%;
+    transform: rotate(270deg);
+    margin: 0;
+}
+
+.ui-datepicker-header a.ui-datepicker-next {
+    right: 0;
+    background: url('../assets/icn-arrow-down-white.svg');
+    background-repeat: no-repeat;
+    /*background-size: 10px;*/
+    background-position: 50%;
+    transform: rotate(90deg);
+    margin: 0;
+}
+
+.ui-datepicker-header a > span {
+    display: none;
+}
+
+.ui-datepicker-title {
+    text-align: center;
+    line-height: 2rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding-bottom: 0.25rem;
+}
+
+.ui-datepicker-week-col {
+    color: #78909C;
+    font-weight: 400;
+    font-size: 0.75rem;
+}
+
+/*date picker end*/
 .linda-block {
     height: 400px;
     background-image: url(./../assets/no-photo.png);
