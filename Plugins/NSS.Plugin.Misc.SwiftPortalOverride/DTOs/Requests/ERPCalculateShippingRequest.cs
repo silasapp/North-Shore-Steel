@@ -29,10 +29,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string PostalCode { get; set; }
 
         [JsonProperty("orderWeight")]
-        public decimal OrderWeight { get; set; }
+        public int OrderWeight { get; set; }
 
         [JsonProperty("maxLength")]
-        public decimal MaxLength { get; set; }
+        public int MaxLength { get; set; }
 
         [JsonProperty("items")]
         public string Items { get; set; }
