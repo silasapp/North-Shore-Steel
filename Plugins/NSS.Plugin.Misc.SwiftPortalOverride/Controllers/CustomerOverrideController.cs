@@ -526,7 +526,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                 //raise event       
                                 _eventPublisher.Publish(new CustomerActivatedEvent(customer));
 
-                                return View();
+                                return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Confirmation.cshtml");
                                 //var redirectUrl = Url.RouteUrl("RegisterResult",
                                 //    new { resultId = (int)UserRegistrationType.Standard, returnUrl }, _webHelper.CurrentRequestProtocol);
                                 //return Redirect(redirectUrl);

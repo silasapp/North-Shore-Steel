@@ -7,20 +7,17 @@
     var isGuestCustomer = EngineContext.Current.Resolve<ICustomerService>().IsGuest(customer);
 }
 
-<div class="header-upper nss-nav-bar">
-    <div class="master-wrapper-content nav-bar-content d-flex flex-row align-items-center">
-        <div class="header-logo">
-            @await Component.InvokeAsync("Logo")
-        </div>
-        @if (!isGuestCustomer)
-        {
+@if (!isGuestCustomer)
+{
+    <div class="header-upper nss-nav-bar">
+        <div class="master-wrapper-content nav-bar-content d-flex flex-row align-items-center">
+            <div class="header-logo">
+                @await Component.InvokeAsync("Logo")
+            </div>
             <div class="nav-bar-search">
                 @await Component.InvokeAsync("CustomSearchBox")
             </div>
-        }
-        @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })*@
-        @if (!isGuestCustomer)
-        {
+            @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })*@
             @*<div class="header-selectors-wrapper">
                     @await Component.InvokeAsync("TaxTypeSelector")
                     @await Component.InvokeAsync("CurrencySelector")
@@ -31,6 +28,16 @@
                 @await Component.InvokeAsync("HeaderLinks")
                 @await Component.InvokeAsync("FlyoutShoppingCart")
             </div>
-        }
+        </div>
     </div>
-</div>
+}
+else
+{
+    <div class="header-upper nss-nav-bar" style="background-color: transparent!important; border-bottom: none!important">
+        <div class="master-wrapper-content align-items-center">
+            <div class="header-logo">
+                @await Component.InvokeAsync("Logo")
+            </div>
+        </div>
+    </div>
+}

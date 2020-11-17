@@ -398,7 +398,7 @@ a:not([href]):not([class]) {
 }
 
 .welcome-fieldset {
-    /*padding: 26px 180px;*/
+    padding: 2rem 4rem;
     margin-bottom: 100px;
 }
 
