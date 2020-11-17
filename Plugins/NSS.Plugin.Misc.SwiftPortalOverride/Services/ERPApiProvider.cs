@@ -433,7 +433,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     //httpClient.DefaultRequestHeaders.Authorization =
                     //    new AuthenticationHeaderValue("Bearer", token);
 
-                    // create user resource
+                    //  resource
                     var resource = "/shipping-charges";
 
                     //body params
@@ -443,17 +443,23 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     var response = httpClient.PostAsync(resource, content).Result;
 
-                    // throw error if not successful
-                    response.EnsureSuccessStatusCode();
-
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<ERPCalculateShippingResponse>(respContent);
+
+                    // throw error if not successful
+                    if (response.IsSuccessStatusCode)
+                        retVal = JsonConvert.DeserializeObject<ERPCalculateShippingResponse>(respContent);
+
+                    else
+                        throw new NopException($"An error occured when getting shipping rate : {respContent}", respContent);
+                    
                 }
 
             }
             catch (Exception ex)
             {
                 _logger.Error($"NSS.CalculateShipping -> {request.DestinationAddressLine1}", ex);
+
+                throw;
             }
 
             // log request & resp
@@ -579,17 +585,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     var response = httpClient.PostAsync(resource, content).Result;
 
-                    // throw error if not successful
-                    response.EnsureSuccessStatusCode();
-
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<ERPCreateOrderResponse>(respContent);
-                }
 
+                    if (response.IsSuccessStatusCode)
+                        retVal = JsonConvert.DeserializeObject<ERPCreateOrderResponse>(respContent);
+                    else
+                        throw new NopException("An error ocurred while placing order", respContent);
+                }
             }
             catch (Exception ex)
             {
                 _logger.Error($"NSS.CreateOrder -> {request.OrderId}", ex);
+                throw;
             }
 
             // log request & resp
