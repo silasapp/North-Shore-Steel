@@ -50,9 +50,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             };
 
             if (filter.IsClosed)
-                response = _nSSApiProvider.SearchClosedInvoices(companyId, request, useMock: true);
+                response = _nSSApiProvider.SearchClosedInvoices(companyId, request, useMock: false);
             else
-                response = _nSSApiProvider.SearchOpenInvoices(companyId, request, useMock: true);
+                response = _nSSApiProvider.SearchOpenInvoices(companyId, request, useMock: false);
 
             // map response
             var invoices = response.Select(invoice => new CompanyInvoiceListModel.InvoiceDetailsModel
