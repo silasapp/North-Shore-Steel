@@ -319,6 +319,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 ERPCalculateShippingRequest request = BuildShippingCostRequest(model);
 
                 var shipObj = GetShippingCost(requestOverride: request);
+                if (!shipObj.Allowed)
+                    shipObj.ShippingCost = decimal.Zero;
 
                 //try to create an order
                 var (order, errorMessage) = _payPalServiceManager.CreateOrder(_settings, paymentRequest.OrderGuid, model, shipObj.ShippingCost);
@@ -342,7 +344,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
             catch (Exception exc)
             {
-
                 return Json(new { error = 1, message = exc.Message });
             }
         }
@@ -352,10 +353,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Checkout Model is null");
-
-            if (model.HasError)
-                return Json(new { error = 1, message = "Something went wrong while placing order" });
-
 
             //validation
             if (_orderSettings.CheckoutDisabled)
@@ -393,7 +390,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
             catch (Exception exc)
             {
-                _logger.Warning(exc.Message, exc, _workContext.CurrentCustomer);
+                _logger.Error(exc.Message, exc, _workContext.CurrentCustomer);
                 return Json(new { error = 1, message = exc.Message });
             }
         }
@@ -401,23 +398,38 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [IgnoreAntiforgeryToken]
         public JsonResult GetShippingRate([FromBody] ShippingCostRequest address)
         {
-            ERPCalculateShippingResponse response = GetShippingCost(address);
-
-            var shoppingCart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
-
-            var orderTotal = _orderTotalCalculationService.GetShoppingCartTotal(shoppingCart, out var orderDiscountAmount, out var orderAppliedDiscounts, out var appliedGiftCards, out var redeemedRewardPoints, out var redeemedRewardPointsAmount);
-            orderTotal += response.ShippingCost;
-
-            return Json(new
+            try
             {
-                shippingCalculatorResponse = response,
-                orderTotal,
-                orderDiscountAmount,
-                orderAppliedDiscounts,
-                appliedGiftCards,
-                redeemedRewardPoints,
-                redeemedRewardPointsAmount
-            });
+                ERPCalculateShippingResponse response = GetShippingCost(address);
+
+                if (!response.Allowed)
+                    response.ShippingCost = decimal.Zero;
+
+                //if (response.Allowed)
+                //    return Json(new { error = 2, message = "We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select \"Pickup\"" });
+
+                var shoppingCart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
+                var orderTotal = _orderTotalCalculationService.GetShoppingCartTotal(shoppingCart, out var orderDiscountAmount, out var orderAppliedDiscounts, out var appliedGiftCards, out var redeemedRewardPoints, out var redeemedRewardPointsAmount);
+                orderTotal += response.ShippingCost;
+
+                return Json(new
+                {
+                    shippingCalculatorResponse = response,
+                    orderTotal,
+                    orderDiscountAmount,
+                    orderAppliedDiscounts,
+                    appliedGiftCards,
+                    redeemedRewardPoints,
+                    redeemedRewardPointsAmount
+                });
+            }
+            catch (Exception exc)
+            {
+
+                return Json(new { error = 2, message =  exc.Message});
+            }
+
         }
 
         private ERPCalculateShippingRequest BuildShippingCostRequest(ErpCheckoutModel model)
@@ -459,7 +471,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             else
                 request = new ERPCalculateShippingRequest
                 {
-                    DeliveryMethod = address.IsPickup ? "pickup" : "shipping",
+                    DeliveryMethod = address.IsPickup ? "Pickup" : "Shipping",
                     DestinationAddressLine1 = address.Address1,
                     DestinationAddressLine2 = address.Address2,
                     State = _stateProvinceService.GetStateProvinceById(address.StateProvinceId ?? 0)?.Abbreviation,
@@ -469,7 +481,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 };
 
             var orderItems = new List<Item>();
-            request.OrderWeight = decimal.Zero;
+            request.OrderWeight = 0;
 
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
@@ -482,10 +494,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 isNum = int.TryParse(attr.FirstOrDefault(x => x.Key == "itemId")?.Value, out int itemId);
                 isNum = decimal.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out decimal length);
 
-                request.OrderWeight += (weight * item.Quantity);
+                request.OrderWeight += (int) Math.Round(weight * item.Quantity, 0);
 
                 if (length > request.MaxLength)
-                    request.MaxLength = length;
+                    request.MaxLength = (int) Math.Round(length);
 
                 var shape = _shapeService.GetShapeById(shapeId);
 
@@ -669,6 +681,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var request = BuildShippingCostRequest(model);
                 var shipObj = GetShippingCost(requestOverride: request);
 
+                if (!shipObj.Allowed)
+                    shipObj.ShippingCost = decimal.Zero;
+
                 processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingCostKey, shipObj.ShippingCost);
                 processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingDeliveryDateKey, shipObj.DeliveryDate);
             }  
@@ -677,7 +692,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var checkoutPaymentMethod = (CheckoutPaymentMethodType)paymentMethodtype;
             string paymentMethod = "";
-            var result = Json(new { error = 1, message = "payment method selected was not found" });
 
             switch (checkoutPaymentMethod)
             {
@@ -700,7 +714,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             processPaymentRequest.PaymentMethodSystemName = paymentMethod;
             HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
 
-            result = ProcessPaymentType(processPaymentRequest, paymentMethod);
+            var result = ProcessPaymentType(processPaymentRequest, paymentMethod);
 
             return result;
         }
@@ -709,12 +723,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             //add custom values
             processPaymentRequest.CustomValues.Add(PaypalDefaults.PaymentMethodTypeKey, paymentMethod);
-            if(paymentMethod == "CREDIT")
+            if (paymentMethod == "CREDIT")
             {
                 //nss get credit amount
                 var (erpCompId, _) = GetCustomerCompanyDetails();
                 var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
-                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult.CreditAmount ?? (decimal)0.00);
+                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult.CreditAmount ?? decimal.Zero);
             }
 
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
@@ -729,7 +743,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 // call nss place Order
                 processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.ShippingDeliveryDateKey, out var deliveryDate);
-                NSSPlaceOrderRequest(placeOrderResult.PlacedOrder, paymentMethod, deliveryDate?.ToString());
+
+                try
+                {
+                    NSSPlaceOrderRequest(placeOrderResult.PlacedOrder, paymentMethod, deliveryDate?.ToString());
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex.Message, ex, _workContext.CurrentCustomer);
+
+                    return Json(new { error = 3, message = "Order was not placed successfully" });
+                }
+
 
                 if (paymentMethod == "CREDIT")
                 {
@@ -743,105 +768,97 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Json(new { success = 1, orderId = placeOrderResult.PlacedOrder.Id });
             }
 
-            // error
-            return Json(new { error = 1, message = "Order was not placed. Line of credit payment error" });
+            return Json(new { error = 1, message = "Order was not placed successfuly" });
         }
 
         private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod, string deliveryDate)
         {
-            try
+
+            var shippingAddress = _addressService.GetAddressById(order.ShippingAddressId ?? 0);
+            var pickupAddress = _addressService.GetAddressById(order.PickupAddressId ?? 0);
+
+            var chkAttr = _checkoutAttributeParser.ParseCheckoutAttributes(order.CheckoutAttributesXml);
+            var poAttr = chkAttr.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CheckoutPONoAttribute);
+            var poValues = poAttr != null ? _checkoutAttributeParser.ParseValues(order.CheckoutAttributesXml, poAttr.Id) : new List<string>();
+
+            var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+
+            // discounts
+            var discounts = new List<Discount>();
+            var discounUsagetList = _discountService.GetAllDiscountUsageHistory(customerId: _workContext.CurrentCustomer.Id, orderId: order.Id);
+            foreach (var item in discounUsagetList)
             {
-                var shippingAddress = _addressService.GetAddressById(order.ShippingAddressId ?? 0);
-                var pickupAddress = _addressService.GetAddressById(order.PickupAddressId ?? 0);
+                var discount = _discountService.GetDiscountById(item.Id);
+                if (discount != null)
+                    discounts.Add(new Discount { Amount = discount.DiscountAmount, Code = discount.CouponCode, Description = discount.Name });
+            }
 
-                var chkAttr = _checkoutAttributeParser.ParseCheckoutAttributes(order.CheckoutAttributesXml);
-                var poAttr = chkAttr.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CheckoutPONoAttribute);
-                var poValues = poAttr != null ? _checkoutAttributeParser.ParseValues(order.CheckoutAttributesXml, poAttr.Id) : new List<string>();
+            // order items
+            var orderItemList = _orderService.GetOrderItems(order.Id);
+            var orderItems = new List<DTOs.Requests.OrderItem>();
+            foreach (var item in orderItemList)
+            {
+                var attrs = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
 
-                var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+                orderItems.Add(new DTOs.Requests.OrderItem
+                {
+                    Description = attrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
+                    ItemId = (int.TryParse(attrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
+                    CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? null) : null,
+                    Quantity = item.Quantity,
+                    TotalPrice = item.PriceExclTax,
+                    UnitPrice = item.UnitPriceExclTax,
+                    TotalWeight = (decimal.TryParse(attrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int) Math.Round(weight * item.Quantity) : 0),
+                    // product attr
+                    Notes = "",
+                    SawOptions = "",
+                    SawTolerance = "",
+                    Uom = "EA"
+                });
+            }
+
+            var request = new ERPCreateOrderRequest()
+            {
+                OrderId = order.Id,
+                OrderTotal = order.OrderTotal,
+                PaymentMethodReferenceNo = order.AuthorizationTransactionId,
+                PaymentMethodType = paymentMethod,
+                ContactEmail = _workContext.CurrentCustomer.Email,
+                ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute),
+                ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute),
+                ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute),
+
+                ShippingAddressLine1 = shippingAddress?.Address1,
+                ShippingAddressLine2 = shippingAddress?.Address2,
+                ShippingAddressState = _stateProvinceService.GetStateProvinceById(shippingAddress?.StateProvinceId ?? 0)?.Abbreviation,
+                ShippingAddressCity = shippingAddress?.City,
+                ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
+
+                PickupInStore = order.PickupInStore,
+                PickupLocationId = pickupAddress?.City?.ToLower() == "houston" ? 1 : (pickupAddress?.City?.ToLower() == "beaumont" ? 2 : 0),
+                UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
+
+                PoNo = poValues.FirstOrDefault(),
+
+                DeliveryDate = deliveryDate ?? string.Empty,
+                ShippingTotal = order.OrderShippingExclTax,
+
+                TaxTotal = order.OrderTax,
 
                 // discounts
-                var discounts = new List<Discount>();
-                var discounUsagetList = _discountService.GetAllDiscountUsageHistory(customerId: _workContext.CurrentCustomer.Id, orderId: order.Id);
-                foreach (var item in discounUsagetList)
-                {
-                    var discount = _discountService.GetDiscountById(item.Id);
-                    if (discount != null)
-                        discounts.Add(new Discount { Amount = discount.DiscountAmount, Code = discount.CouponCode, Description = discount.Name });
-                }
+                DiscountTotal = order.OrderDiscount,
+                Discounts = JsonConvert.SerializeObject(discounts.ToArray()),
 
                 // order items
-                var orderItemList = _orderService.GetOrderItems(order.Id);
-                var orderItems = new List<DTOs.Requests.OrderItem>();
-                foreach (var item in orderItemList)
-                {
-                    var attrs = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                LineItemTotal = order.OrderSubtotalExclTax,
+                OrderItems = JsonConvert.SerializeObject(orderItems.ToArray())
+            };
 
-                    orderItems.Add(new DTOs.Requests.OrderItem
-                    {
-                        Description = attrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
-                        ItemId = (int.TryParse(attrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
-                        CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? null) : null,
-                        Quantity = item.Quantity,
-                        TotalPrice = item.PriceExclTax,
-                        UnitPrice = item.UnitPriceExclTax,
-                        TotalWeight = (decimal.TryParse(attrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? weight * item.Quantity : (decimal)0.00),
-                        // product attr
-                        Notes = "",
-                        SawOptions = "",
-                        SawTolerance = "",
-                        Uom = "EA"
-                    });
-                }
+            // api call
+            var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
 
-                var request = new ERPCreateOrderRequest()
-                {
-                    OrderId = order.Id,
-                    OrderTotal = order.OrderTotal,
-                    PaymentMethodReferenceNo = order.AuthorizationTransactionId,
-                    PaymentMethodType = paymentMethod,
-                    ContactEmail = _workContext.CurrentCustomer.Email,
-                    ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute),
-                    ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute),
-                    ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute),
-
-                    ShippingAddressLine1 = shippingAddress?.Address1,
-                    ShippingAddressLine2 = shippingAddress?.Address2,
-                    ShippingAddressState = _stateProvinceService.GetStateProvinceById(shippingAddress?.StateProvinceId ?? 0)?.Abbreviation,
-                    ShippingAddressCity = shippingAddress?.City,
-                    ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
-
-                    PickupInStore = order.PickupInStore,
-                    PickupLocationId = pickupAddress?.City?.ToLower() == "houston" ? 1 : (pickupAddress?.City?.ToLower() == "beaumont" ? 2 : 0),
-                    UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
-
-                    PoNo = poValues.FirstOrDefault(),
-
-                    DeliveryDate = deliveryDate ?? string.Empty,
-                    ShippingTotal = order.OrderShippingExclTax,
-
-                    TaxTotal = order.OrderTax,
-
-                    // discounts
-                    DiscountTotal = order.OrderDiscount,
-                    Discounts = JsonConvert.SerializeObject(discounts.ToArray()),
-
-                    // order items
-                    LineItemTotal = order.OrderSubtotalExclTax,
-                    OrderItems = JsonConvert.SerializeObject(orderItems.ToArray())
-                };
-
-                // api call
-                var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
-
-                if (resp.NSSOrderNo > 0)
-                    _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex.Message, ex, _workContext.CurrentCustomer);
-                // silent;
-            }
+            if (resp.NSSOrderNo > 0)
+                _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo);
 
         }
 

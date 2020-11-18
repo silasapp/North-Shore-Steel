@@ -1,8 +1,8 @@
 ﻿@using Nop.Web.Models.Customer
+@using NSS.Plugin.Misc.SwiftCore.Helpers
 @model LoginModel
 @using Nop.Core
 @using Nop.Core.Domain.Customers
-
 @inject IWebHelper webHelper
 @{
     Layout = "_ColumnsOne";
@@ -112,8 +112,7 @@
                 <div class="new-wrapper fieldset register-block">
                     <div class="title"><strong style="font-weight: 500;">NEW CUSTOMER</strong></div>
                     <div class="text">
-                        Don’t have an online account with us? No problem, we’ll get you
-                        taken care of, just register by clicking the button below.
+                        Don’t have an online account? No problem, register now by clicking the button below.
                     </div>
                     <div class="buttons">
                         <input type="button" class="button-1 register-button" onclick="location.href='@registerUrl'" value="@T("Account.Register")" />

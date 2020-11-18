@@ -113,7 +113,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string Uom { get; set; }
 
         [JsonProperty("totalWeight")]
-        public decimal TotalWeight { get; set; }
+        public int TotalWeight { get; set; }
 
         [JsonProperty("totalPrice")]
         public decimal TotalPrice { get; set; }
