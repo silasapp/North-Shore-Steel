@@ -14,175 +14,61 @@
 }
 
 <div id="app" class="page catalog-page">
-    <div class="cart-side-drawer-trigger">
-        <img src="Themes/SwiftPortal/Content/assets/settings-adjust.svg" alt="">
-    </div>
-    <div class="cat-side-drawer">
+    @*<div class="cart-side-drawer-trigger">
+            <img src="Themes/SwiftPortal/Content/assets/settings-adjust.svg" alt="">
+        </div>
+        <div class="cat-side-drawer">
 
-        <div id="accordion">
-            <div class="card">
-                <a class="card-link" data-toggle="collapse" href="#collapseOne">
-                    <div class="card-header">SHAPES</div>
-                </a>
-                <div id="collapseOne" class="collapse show">
-                    <div>
-                        <ejs-treeview id="treedata1" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
-                            <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
-                        </ejs-treeview>
+            <div id="accordion">
+                <div class="card">
+                    <a class="card-link" data-toggle="collapse" href="#collapseOne">
+                        <div class="card-header">SHAPES</div>
+                    </a>
+                    <div id="collapseOne" class="collapse show">
+                        <div>
+                            <ejs-treeview id="treedata" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
+                                <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
+                            </ejs-treeview>
+                        </div>
                     </div>
                 </div>
-            </div>
-            @if (groupedSpecificationAttributes != null)
-            {
-                var key = "";
-                @foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
+                @if (groupedSpecificationAttributes != null)
                 {
-                    switch (@group.Key)
+                    var key = "";
+                    @foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
                     {
-                        case "coating":
-                            key = "COATING";
-                            break;
-                        case "condition":
-                            key = "CONDITION";
-                            break;
-                        case "countryOfOrigin":
-                            key = "COUNTRY OF ORIGIN";
-                            break;
-                        case "displayThickness":
-                            key = "THICKNESS (in)";
-                            break;
-                        case "displayWidth":
-                            key = "MINIMUM WIDTH (in)";
-                            break;
-                        case "grade":
-                            key = "GRADES";
-                            break;
-                        case "metal":
-                            key = "METAL";
-                            break;
-                        default:
-                            key = group.Key;
-                            break;
-                    }
-                    if (@key == "METAL" || @key == "COATING")
-                    {
-                        <div class="card defaultSpecs" style="display: flex">
-                            <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                <div class="card-header"> @key</div>
-                            </a>
-                            @foreach (var item in group)
-                            {
-                                <div id="collapse-@index" class="collapse show">
-                                    <div class="card-body">
-                                        <label class="pure-material-checkbox">
-                                            <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                            <span class="checkmark"></span>@item.SpecificationAttributeOptionName
-                                        </label>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    <div class="card plateIndividualSpecs" style="display: none">
-                        <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                            <div class=card-header> @key</div>
-                        </a>
-                        @foreach (var item in group)
+                        switch (@group.Key)
                         {
-                            <div id="collapse-@index" class="collapse show">
-                                <div class="card-body">
-                                    <label class="pure-material-checkbox">
-                                        <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                        <span class="checkmark"></span>@item.SpecificationAttributeOptionName
-                                    </label>
-                                </div>
-                            </div>
+                            case "coating":
+                                key = "COATING";
+                                break;
+                            case "condition":
+                                key = "CONDITION";
+                                break;
+                            case "countryOfOrigin":
+                                key = "COUNTRY OF ORIGIN";
+                                break;
+                            case "displayThickness":
+                                key = "THICKNESS (in)";
+                                break;
+                            case "displayWidth":
+                                key = "MINIMUM WIDTH (in)";
+                                break;
+                            case "grade":
+                                key = "GRADES";
+                                break;
+                            case "metal":
+                                key = "METAL";
+                                break;
+                            default:
+                                key = group.Key;
+                                break;
                         }
-                    </div>
-                }
-            }
-        </div>
-
-    </div>
-    <div class="page-body">
-        <div class="row">
-            <div class="col-md-4 col-lg-3 col-xl-3"></div>
-            <div class="col-md-8 col-lg-9 col-xl-9 filter-tags">
-                <div id="searchWord" style=float:left></div>
-                <div id=specs style=float:left></div>
-                <div id=shapes></div>
-                <button id="clearAllFilters" onclick="clearFilters()" class="clear-filter">Clear filters</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4 col-lg-3 col-xl-3 shapes-treeview">
-                <div id="accordion">
-                    <div class="card">
-                        <a class="card-link" data-toggle="collapse" href="#collapseOne">
-                            <div class="card-header">SHAPES</div>
-                        </a>
-                        <div id="collapseOne" class="collapse show">
-                            <div>
-                                <ejs-treeview id="treedata" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
-                                    <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
-                                </ejs-treeview>
-                            </div>
-                        </div>
-                    </div>
-                    @if (groupedSpecificationAttributes != null)
-                    {
-                        var key = "";
-                        @foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
+                        if (@key == "METAL" || @key == "COATING")
                         {
-                            switch (@group.Key)
-                            {
-                                case "coating":
-                                    key = "COATING";
-                                    break;
-                                case "condition":
-                                    key = "CONDITION";
-                                    break;
-                                case "countryOfOrigin":
-                                    key = "COUNTRY OF ORIGIN";
-                                    break;
-                                case "displayThickness":
-                                    key = "THICKNESS (in)";
-                                    break;
-                                case "displayWidth":
-                                    key = "MINIMUM WIDTH (in)";
-                                    break;
-                                case "grade":
-                                    key = "GRADES";
-                                    break;
-                                case "metal":
-                                    key = "METAL";
-                                    break;
-                                default:
-                                    key = group.Key;
-                                    break;
-                            }
-                            if (@key == "METAL" || @key == "COATING")
-                            {
-                                <div class="card defaultSpecs" style="display: flex">
-                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                        <div class="card-header"> @key</div>
-                                    </a>
-                                    @foreach (var item in group)
-                                    {
-                                        <div id="collapse-@index" class="collapse show">
-                                            <div class="card-body">
-                                                <label class="pure-material-checkbox">
-                                                    <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
-                                                    <span class="checkmark"></span>@item.SpecificationAttributeOptionName
-                                                </label>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            }
-                            <div class="card plateIndividualSpecs" style="display: none">
+                            <div class="card defaultSpecs" style="display: flex">
                                 <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
-                                    <div class=card-header> @key</div>
+                                    <div class="card-header"> @key</div>
                                 </a>
                                 @foreach (var item in group)
                                 {
@@ -197,7 +83,129 @@
                                 }
                             </div>
                         }
+                        <div class="card plateIndividualSpecs" style="display: none">
+                            <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                <div class=card-header> @key</div>
+                            </a>
+                            @foreach (var item in group)
+                            {
+                                <div id="collapse-@index" class="collapse show">
+                                    <div class="card-body">
+                                        <label class="pure-material-checkbox">
+                                            <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                            <span class="checkmark"></span>@item.SpecificationAttributeOptionName
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
+                }
+            </div>
+
+        </div>*@
+    <div class="page-body">
+        <div class="row">
+            <div class="col-md-4 col-lg-3 col-xl-3"></div>
+            <div class="col-md-8 col-lg-9 col-xl-9 filter-tags">
+                <div id="searchWord" style=float:left></div>
+                <div id=specs style=float:left></div>
+                <div id=shapes></div>
+                <button id="clearAllFilters" onclick="clearFilters()" class="clear-filter">Clear filters</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-lg-3 col-xl-3 shapes-treeview">
+                <div class="cart-side-drawer-trigger">
+                    <img src="Themes/SwiftPortal/Content/assets/settings-adjust.svg" alt="">
+                </div>
+
+                <div class="cat-side-drawer">
+
+                    <div id="accordion">
+                        <div class="card">
+                            <a class="card-link" data-toggle="collapse" href="#collapseOne">
+                                <div class="card-header">SHAPES</div>
+                            </a>
+                            <div id="collapseOne" class="collapse show">
+                                <div>
+                                    <ejs-treeview id="treedata" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
+                                        <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
+                                    </ejs-treeview>
+                                </div>
+                            </div>
+                        </div>
+                        @if (groupedSpecificationAttributes != null)
+                        {
+                            var key = "";
+                            @foreach (var (group, index) in groupedSpecificationAttributes.Select((value, i) => (value, i)))
+                            {
+                                switch (@group.Key)
+                                {
+                                    case "coating":
+                                        key = "COATING";
+                                        break;
+                                    case "condition":
+                                        key = "CONDITION";
+                                        break;
+                                    case "countryOfOrigin":
+                                        key = "COUNTRY OF ORIGIN";
+                                        break;
+                                    case "displayThickness":
+                                        key = "THICKNESS (in)";
+                                        break;
+                                    case "displayWidth":
+                                        key = "MINIMUM WIDTH (in)";
+                                        break;
+                                    case "grade":
+                                        key = "GRADES";
+                                        break;
+                                    case "metal":
+                                        key = "METAL";
+                                        break;
+                                    default:
+                                        key = group.Key;
+                                        break;
+                                }
+                                if (@key == "METAL" || @key == "COATING")
+                                {
+                                    <div class="card defaultSpecs" style="display: flex">
+                                        <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                            <div class="card-header"> @key</div>
+                                        </a>
+                                        @foreach (var item in group)
+                                        {
+                                            <div id="collapse-@index" class="collapse show">
+                                                <div class="card-body">
+                                                    <label class="pure-material-checkbox">
+                                                        <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                        <span class="checkmark"></span>@item.SpecificationAttributeOptionName
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                <div class="card plateIndividualSpecs" style="display: none">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                        <div class=card-header> @key</div>
+                                    </a>
+                                    @foreach (var item in group)
+                                    {
+                                        <div id="collapse-@index" class="collapse show">
+                                            <div class="card-body">
+                                                <label class="pure-material-checkbox">
+                                                    <input id="checkbox-@item.SpecificationAttributeOptionId" value="@item.SpecificationAttributeOptionName" type="checkbox" name="Specs">
+                                                    <span class="checkmark"></span>@item.SpecificationAttributeOptionName
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+
                 </div>
             </div>
             <div class="col-md-8 col-lg-9 col-xl-9">
@@ -500,11 +508,11 @@
         var results = regex.exec(location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     };
-    $(window).resize(sliderheight);
-    function sliderheight() {
-        divHeight = $('.catalog-page').height();
-        $('.cat-side-drawer').css({ 'height': divHeight+140 });
-    }
-    sliderheight();
+    //$(window).resize(sliderheight);
+    //function sliderheight() {
+    //    divHeight = $('.catalog-page').height();
+    //    $('.cat-side-drawer').css({ 'height': divHeight+140 });
+    //}
+    //sliderheight();
 </script>
 <ejs-scripts></ejs-scripts>
