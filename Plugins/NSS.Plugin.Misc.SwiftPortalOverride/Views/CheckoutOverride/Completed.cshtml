@@ -49,8 +49,7 @@
             <label class="text-primary h6 font-weight-bold text-center">ORDER NUMBER: @(erpOrderNo?.ToString() ?? "Np_"+@Model.OrderId.ToString())</label>
         </div>
         <div class="details-link">
-            <a href="@Url.RouteUrl("OrderDetails")" class="text-primary"><u>CLICK HERE TO VIEW ORDER DETAILS</u></a>
-            @*<a href="@Url.RouteUrl("OrderDetails", new { orderID = Model.OrderId })">CLICK HERE TO VIEW ORDER DETAILS </a>*@
+            <a href="/orders/@Model.OrderId" class="text-primary"><u>CLICK HERE TO VIEW ORDER DETAILS</u></a>
         </div>
     </div>
 </div>

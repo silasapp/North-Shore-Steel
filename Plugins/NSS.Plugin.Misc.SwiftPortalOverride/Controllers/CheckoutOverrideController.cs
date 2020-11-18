@@ -298,6 +298,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Completed.cshtml", model);
         }
 
+        public virtual IActionResult Rejected()
+        {            
+            return View();
+        }
+
 
         [IgnoreAntiforgeryToken]
         public virtual JsonResult CreatePayPalOrder([FromBody] ErpCheckoutModel model)
