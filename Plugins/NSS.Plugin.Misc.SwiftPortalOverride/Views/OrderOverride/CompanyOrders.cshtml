@@ -26,15 +26,14 @@
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
-                               v-model="fromDate" placeholder="From">
+                        <input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="date" v-model="toDate" placeholder="To" />
+                        <input class=nss-form-control type="text" v-model="fromDate" id="datepicker2" autocomplete="off" placeholder="To">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
@@ -112,6 +111,19 @@
                 });
             }
         },
+    });
+</script>
+<script>
+    $(function () {
+        $("#datepicker").datepicker({
+            dateFormat: "dd-mm-yy"
+            , duration: "fast"
+        });
+    }); $(function () {
+        $("#datepicker2").datepicker({
+            dateFormat: "dd-mm-yy"
+            , duration: "fast"
+        });
     });
 </script>
 <ejs-scripts></ejs-scripts>
