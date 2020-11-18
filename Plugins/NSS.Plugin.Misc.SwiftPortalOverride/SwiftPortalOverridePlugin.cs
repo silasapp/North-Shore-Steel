@@ -29,6 +29,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         private readonly IStoreService _storeService;
         private readonly IWebHelper _webHelper;
         private readonly IMessageTemplateService _messageTemplateService;
+        private readonly EmailAccountSettings _emailAccountSettings;
 
         #endregion
 
@@ -39,7 +40,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             ISettingService settingService,
             IStoreService storeService,
             IWebHelper webHelper,
-            IMessageTemplateService messageTemplateService)
+            IMessageTemplateService messageTemplateService,
+            EmailAccountSettings emailAccountSettings)
         {
             _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
@@ -47,6 +49,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             _storeService = storeService;
             _webHelper = webHelper;
             _messageTemplateService = messageTemplateService;
+            _emailAccountSettings = emailAccountSettings;
         }
 
         #endregion
@@ -103,9 +106,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey.Hint"] = "Enter PayPal Secret Key.",
             });
 
-            // email template
-            //ConfigureMessageTemplates();
-
             // create proc
             var settings = DataSettingsManager.LoadSettings();
             var dataProvider = DataProviderManager.GetDataProvider(settings.DataProvider);
@@ -120,6 +120,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
 
             var sql = GetSQL("ProductLoadAllPagedSwiftPortal");
             dataProvider.ExecuteNonQuery(sql);
+
+
+            // email template
+            ConfigureMessageTemplates();
 
             base.Install();
         }
@@ -136,28 +140,31 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             _localizationService.DeletePluginLocaleResources("Plugins.Misc.SwiftPortalOverride");
 
             //// email template
-            //var approvalMail = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
-            //if (approvalMail != null)
-            //    _messageTemplateService.DeleteMessageTemplate(approvalMail);
+            var changePasswordTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName)?.FirstOrDefault();
+            if (changePasswordTemplate != null)
+                _messageTemplateService.DeleteMessageTemplate(changePasswordTemplate);
 
             base.Uninstall();
         }
 
-        //void ConfigureMessageTemplates()
-        //{
-        //    // approval email
-        //    var approvalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName).FirstOrDefault();
-        //    if (approvalTemplate == null)
-        //    {
-        //        var newCustomerMail = _messageTemplateService.GetMessageTemplatesByName("NewCustomer.Notification").FirstOrDefault();
-        //        approvalTemplate = _messageTemplateService.CopyMessageTemplate(newCustomerMail);
-        //    }
-        //    // change body
-        //    //approvalMail.Body =
-        //    approvalTemplate.Name = SwiftPortalOverrideDefaults.ApprovalMessageTemplateName;
-        //    approvalTemplate.Body = $@"<p>  <a href='%Store.URL%'>%Store.Name%</a>  <br />  <br />  A new customer registered with your store. Below are the customer's details:  <br />  Full name: %Customer.FullName%  <br />  Email: %Customer.Email% <br />  Erp Id: %Customer.ErpId%  </p>  ";
-        //    _messageTemplateService.UpdateMessageTemplate(approvalTemplate);
-        //}
+        void ConfigureMessageTemplates()
+        {
+            // change password email
+            var changePasswordTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName)?.FirstOrDefault();
+            if (changePasswordTemplate == null)
+            {
+                changePasswordTemplate = new MessageTemplate
+                {
+                    Name = SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName,
+                    Subject = "%Store.Name%. Change Password",
+                    EmailAccountId = _emailAccountSettings.DefaultEmailAccountId,
+                    Body = $"<a href={"\"%Store.URL%\""}>%Store.Name%</a>  <br />  <br />   Your Password was changed successfully.  <br />  <br />  %Store.Name%  ",
+                    IsActive = true,
+                };
+
+                _messageTemplateService.InsertMessageTemplate(changePasswordTemplate);
+            }
+        }
 
         static string GetSQL(string file)
         {

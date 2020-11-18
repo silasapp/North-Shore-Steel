@@ -972,6 +972,41 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
             }
         }
+
+        #region My account / Change password
+
+        public override IActionResult ChangePassword(ChangePasswordModel model)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var customer = _workContext.CurrentCustomer;
+
+            if (ModelState.IsValid)
+            {
+                var changePasswordRequest = new ChangePasswordRequest(customer.Email,
+                    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
+                var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
+                if (changePasswordResult.Success)
+                {
+                    // send change password email
+                    _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+
+                    model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
+                    return View(model);
+                }
+
+                //errors
+                foreach (var error in changePasswordResult.Errors)
+                    ModelState.AddModelError("", error);
+            }
+
+            //If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        #endregion
+
         #endregion
 
     }

@@ -26,6 +26,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         private readonly IMessageTokenProvider _messageTokenProvider;
         private readonly IStoreContext _storeContext;
         private readonly ISettingService _settingService;
+        private readonly ICustomerService _customerService;
 
         #endregion
 
@@ -71,6 +72,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             _messageTokenProvider = messageTokenProvider;
             _storeContext = storeContext;
             _settingService = settingService;
+            _customerService = customerService;
         }
 
         #endregion
@@ -120,6 +122,49 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                 var toEmail = string.IsNullOrEmpty(swiftPortalOverrideSettings.ApproverMailBox) ? emailAccount.Email : swiftPortalOverrideSettings.ApproverMailBox;
                 var toName = emailAccount.DisplayName;
+
+                return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
+            }).ToList();
+        }
+
+
+        public IList<int> SendChangePasswordEmailNotificationMessage(Nop.Core.Domain.Customers.Customer customer, int languageId)
+        {
+            if (customer == null)
+                throw new ArgumentNullException(nameof(customer));
+
+            var store = _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            // config
+            //load settings for a chosen store scope
+            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
+            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
+
+            var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName, store.Id);
+            if (!messageTemplates.Any())
+                return new List<int>();
+
+            //tokens
+            var commonTokens = new List<Token>();
+            _messageTokenProvider.AddCustomerTokens(commonTokens, customer);
+
+            return messageTemplates.Select(messageTemplate =>
+            {
+                //email account
+                var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+                var tokens = new List<Token>(commonTokens);
+                _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+
+                // include erp id as token
+                //tokens.Add(new Token("Customer.ErpId", erpId?.ToString()));
+
+                //event notification
+                _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+                var toEmail = customer.Email;
+                var toName = _customerService.GetCustomerFullName(customer);
 
                 return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToList();
