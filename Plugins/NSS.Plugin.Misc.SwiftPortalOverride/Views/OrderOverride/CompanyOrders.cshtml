@@ -38,8 +38,8 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label>Invoice #</label>
-                    <input class="nss-form-control" type="text" v-model="invoiceId" placeholder="Enter...">
+                    <label>Order #</label>
+                    <input class="nss-form-control" type="text" v-model="orderId" placeholder="Enter...">
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label>Purchase Order #</label>
@@ -77,7 +77,7 @@
         data: {
             isSearchOpen: true,
             isClosed: false,
-            invoiceId: null,
+            orderId: null,
             fromDate: null,
             toDate: null,
             poNo: null,
