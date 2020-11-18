@@ -459,10 +459,11 @@
 
     function handleSawOption(productId, attributes) {
         const at = JSON.parse(attributes);
+        console.log("handleSawOption: ", at);
+        let qty = $('#qty' + productId).val();
         const cutOptions = at.find(x => x.name === "Cut Options");
         const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
-        console.log("handleSawOption: ", at);
-        modalVm.quantity = 1;
+        modalVm.quantity = qty ? qty : 1;
         modalVm.productId = productId;
         modalVm.sawOptionControlId = prefix + cutOptions.id;
         modalVm.sawOptions = cutOptions.values;

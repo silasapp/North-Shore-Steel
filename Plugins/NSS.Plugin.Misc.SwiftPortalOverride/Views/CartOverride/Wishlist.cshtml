@@ -125,18 +125,6 @@
                                     <thead class=thead-default>
 
                                         <tr>
-                                            @if (Model.IsEditable)
-                                            {
-                                                <td class="remove-from-cart" scope=col>
-                                                    @T("ShoppingCart.Remove")
-                                                </td>
-                                            }
-                                            @if (Model.DisplayAddToCart)
-                                            {
-                                                <td class="add-to-cart" scope=col>
-                                                    @T("ShoppingCart.AddToCart")
-                                                </td>
-                                            }
                                             <td scope=col>Item #</td>
                                             <td scope=col class="product">
                                                 @T("ShoppingCart.Product(s)")
@@ -192,18 +180,6 @@
                                             }
 
                                             <tr>
-                                                @if (Model.IsEditable)
-                                                {
-                                                    <td class="remove-from-cart">
-                                                        <input type="checkbox" name="removefromcart" value="@(item.Id)" aria-label="@T("ShoppingCart.Remove")" />
-                                                    </td>
-                                                }
-                                                @if (Model.DisplayAddToCart)
-                                                {
-                                                    <td class="add-to-cart">
-                                                        <input type="checkbox" name="addtocart" value="@(item.Id)" />
-                                                    </td>
-                                                }
                                                 <td>@iNo</td>
                                                 <td class="product">
                                                     @item.ProductName
@@ -297,16 +273,27 @@
                                                                  height="20" alt="">
                                                         </button>
                                                     }
-                                                    <button class="table-action-button">
-                                                        <img src="~/Themes/@themeName/Content/assets/dislike.svg" title="remove from wishlist" width="20" height="20"
-                                                             alt="">
-                                                    </button>
+                                                    <div class="table-action-button">
+                                                        <label class="mb-0">
+                                                            <span style="cursor:pointer"><img src="~/Themes/@themeName/Content/assets/dislike.svg" width="20" height="20" alt=""></span>
+                                                            <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
+                                                        </label>
+                                                    </div>
+                                                    @*<button class="table-action-button">
+                                                            <img src="~/Themes/@themeName/Content/assets/dislike.svg" width="20" height="20" alt="">
+                                                        </button>*@
                                                     @if (string.IsNullOrEmpty(mtr))
-                                                    {<div class=""></div>}
+                                                    {
+                                                        <div class=""></div>
+                                                    }
                                                     @if (!eRPCompanyIdExist)
-                                                    {<div class=""></div>}
+                                                    {
+                                                        <div class=""></div>
+                                                    }
                                                     @if (!hasSawOption)
-                                                    {<div></div>}
+                                                    {
+                                                        <div></div>
+                                                    }
                                                 </td>
                                             </tr>
                                         }
@@ -314,20 +301,12 @@
                                 </table>
                             </div>
                         </div>
-                        @*<div class="buttons">
-                                @if (Model.IsEditable)
-                                {
-                                    <input type="submit" name="updatecart" value="@T("Wishlist.UpdateCart")" class="button-2 update-wishlist-button" />
-                                }
-                                @if (Model.DisplayAddToCart)
-                                {
-                                    <input type="submit" name="addtocartbutton" value="@T("ShoppingCart.AddToCart")" class="button-2 wishlist-add-to-cart-button" />
-                                }
-                                @if (Model.IsEditable && Model.EmailWishlistEnabled)
-                                {
-                                    <input type="button" value="@T("Wishlist.EmailAFriend")" class="button-2 email-a-friend-wishlist-button" onclick="@Url.RouteUrl("EmailWishlist")" />
-                                }
-                            </div>*@
+                        <div class="buttons">
+                            @if (Model.IsEditable)
+                            {
+                                <input type="submit" hidden name="updatecart" id="updatecart" value="@T("Wishlist.UpdateCart")" style="opacity: 0" class="button-2 update-wishlist-button invisible" />
+                            }
+                        </div>
                     </form>
                 </div>
             }
@@ -337,14 +316,14 @@
                     @T("Wishlist.CartIsEmpty")
                 </div>
             }
-            @if (Model.IsEditable && Model.Items.Count > 0)
-            {
-                var wishlistUrl = Url.RouteUrl("Wishlist", new { customerGuid = Model.CustomerGuid }, webHelper.CurrentRequestProtocol);
-                <div class="share-info">
-                    <span class="share-label">@T("Wishlist.YourWishlistURL"):</span>
-                    <a href="@wishlistUrl" class="share-link">@wishlistUrl</a>
-                </div>
-            }
+            @*@if (Model.IsEditable && Model.Items.Count > 0)
+                {
+                    var wishlistUrl = Url.RouteUrl("Wishlist", new { customerGuid = Model.CustomerGuid }, webHelper.CurrentRequestProtocol);
+                    <div class="share-info">
+                        <span class="share-label">@T("Wishlist.YourWishlistURL"):</span>
+                        <a href="@wishlistUrl" class="share-link">@wishlistUrl</a>
+                    </div>
+                }*@
             <div class="discount-block" alt="">
                 <img src="~/Themes/@themeName/Content/assets/discount.PNG" alt="">
                 <div class="action">
@@ -362,6 +341,11 @@
 @Content1).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
 </div>
 
+<script>
+    function removeFromFavorites() {
+        $("#updatecart").click();
+    }
+</script>
 <script>
     var sawOptionModal, toleranceLength;
 

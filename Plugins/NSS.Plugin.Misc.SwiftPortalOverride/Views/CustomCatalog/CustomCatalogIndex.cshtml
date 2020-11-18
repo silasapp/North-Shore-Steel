@@ -106,8 +106,8 @@
     </div>
     <div class="page-body">
         <div class="row">
-            <div class="col-sm-2"></div>
-            <div class="col-sm-10 filter-tags">
+            <div class="col-md-4 col-lg-3 col-xl-3"></div>
+            <div class="col-md-8 col-lg-9 col-xl-9 filter-tags">
                 <div id="searchWord" style=float:left></div>
                 <div id=specs style=float:left></div>
                 <div id=shapes></div>
@@ -200,7 +200,7 @@
                     }
                 </div>
             </div>
-            <div class="col-md-12 col-lg-9 col-xl-9">
+            <div class="col-md-8 col-lg-9 col-xl-9">
                 <div id="partialview"></div>
             </div>
         </div>
@@ -290,7 +290,7 @@
     }
 
     $(document).on("change", "[type=checkbox]", function () {
-        var shapeIDs = [];
+        //var shapeIDs = [];
         var specId = event.target.id.split('-')[1]
         var checkedValue = event.target.defaultValue;
         specIDs.indexOf(specId) === -1 ? specIDs.push(specId) : specIDs.splice(specIDs.indexOf(specId), 1);
