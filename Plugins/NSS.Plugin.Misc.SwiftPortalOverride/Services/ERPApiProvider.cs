@@ -947,6 +947,71 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
+        public List<ERPGetOrderMTRResponse> GetOrderMTRs(int companyId, int erpOrderId, int? lineItemId = null)
+        {
+            //initialize
+            var retVal = new List<ERPGetOrderMTRResponse>();
+            var respContent = string.Empty;
+
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - GetOrderMTRs", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetOrderMTRs companyId -> {companyId}, orderId -> {erpOrderId}", new Exception("NSS token returned empty"));
+                        return retVal;
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+
+                    // create user resource
+                    var resource = $"/companies/{companyId}/orders/{erpOrderId}/mtrs";
+
+                    HttpResponseMessage response;
+
+                    if (lineItemId != null)
+                        response = httpClient.GetAsync($"{resource}?lineItemId={lineItemId}").Result;
+                    else
+                        response = httpClient.GetAsync(resource).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = ERPGetOrderMTRResponse.FromJson(respContent) ?? new List<ERPGetOrderMTRResponse>();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.GetOrderMTRs companyId -> {companyId}, orderId -> {erpOrderId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetOrderMTRs => companyId: {companyId}, orderId: {erpOrderId}", $"resp content ==> {respContent ?? "empty"}");
+
+            return retVal;
+        }
+
 
         private void ConfigureNSSApiSettings()
         {

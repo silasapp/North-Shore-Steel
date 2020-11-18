@@ -13,6 +13,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             BillingAddress = new AddressModel();
             PickupAddress = new AddressModel();
             OrderItems = new List<OrderItemModel>();
+            MTRs = new List<OrderMTRModel>();
         }
 
         public int OrderId { get; set; }
@@ -27,7 +28,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string DeliveryMethodName { get; set; }
         public string DeliveryTicketFile { get; set; }
         public string InvoiceFile { get; set; }
-        public string MtrCount { get; set; }
+        public int MtrCount { get; set; }
 
         public AddressModel ShippingAddress { get; set; }
         public AddressModel BillingAddress { get; set; }
@@ -38,12 +39,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public decimal TaxTotal { get; set; }
         public decimal OrderTotal { get; set; }
         public IList<OrderItemModel> OrderItems { get; set; }
+        public IList<OrderMTRModel> MTRs { get; set; }
 
 
         #region Nested Classes
 
         public partial class OrderItemModel
         {
+            public OrderItemModel()
+            {
+                MTR = new OrderMTRModel();
+            }
             public int LineNo { get; set; }
             public string CustomerPartNo { get; set; }
             public string Description { get; set; }
@@ -53,6 +59,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public int WeightPerPiece { get; set; }
             public int TotalWeight { get; set; }
             public int Quantity { get; set; }
+            public OrderMTRModel MTR { get; set; }
+        }
+
+        public partial class OrderMTRModel
+        {
+            public int MtrId { get; set; }
+            public string HeatNo { get; set; }
+            public int LineNo { get; set; }
+            public string Description { get; set; }
         }
 
         public static class OrderSource
