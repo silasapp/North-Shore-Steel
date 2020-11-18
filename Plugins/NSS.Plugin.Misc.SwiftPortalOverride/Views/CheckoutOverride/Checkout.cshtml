@@ -85,7 +85,7 @@
     // get cust company
     var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
 
-    if(customerCompany == null)
+    if (customerCompany == null)
         customerCompany = new CustomerCompany();
 }
 
@@ -100,8 +100,32 @@
         <h1>CHECKOUT</h1>
     </div>
     <div class="page-body">
-        <div class="row" style="justify-content: space-between;">
+        <div class="row m-0" style="justify-content: space-between;">
             <div class="col-md-9">
+                <div v-show="errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE">
+                    <div class="d-flex flex-row align-items-center mb-3 nss-alert-danger">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
+                        <span class="ml-2">We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select “Pickup”</span>
+                    </div>
+                </div>
+                <div v-show="errorType === shared.constants.ERROR_TYPE_REGULAR">
+                    <div class="d-flex flex-row mb-3 nss-alert-danger">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
+                        <span class="ml-2">{{ errorMessage }}</span>
+                    </div>
+                </div>
+                <div v-show="errorType === shared.constants.ERROR_TYPE_CREDIT_CARD">
+                    <div class="d-flex flex-row align-items-start mb-3 nss-alert-danger">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
+                        <div class="ml-2">
+                            <span>The following error(s) occured:</span>
+                            <ul class="ml-3">
+                                <li v-for="error in errorMessages" style="list-style: disc">{{ error }}</li>
+                            </ul>
+                            <span class="ml-2">{{ errorMessage }}</span>
+                        </div>
+                    </div>
+                </div>
                 <div class="card card-mod">
                     <label class="h5 text-primary font-weight-bold mb-4">ORDER INFORMATION</label>
                     <div class="d-flex flex-row justify-content-between mt-2">
@@ -384,7 +408,7 @@
                                 <th scope="col">Unit Price</th>
                                 <th scope="col">Total Price</th>
                                 <th scope="col">Total Weight (lbs)</th>
-                                <th scope="col">Quantity</th>
+                                <th scope="col">Qty.</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -396,7 +420,7 @@
                                 var customerPathNo = "";
                                 if (customerCompany != null)
                                 {
-                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
+                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
                                     customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
                                 }
 
@@ -453,7 +477,7 @@
                 </div>
                 <div style="display:flex;justify-content: center;">
                     <button id="place-order" v-show="paymentMethodIndex !== shared.constants.PAYMENT_METHOD_PAYPAL"
-                            v-on:click="placeOrder" v-bind:disabled="disableSubmit">
+                            v-on:click="placeOrder" v-bind:disabled="disableSubmit || errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE">
                         PLACE ORDER
                     </button>
                     <div id="paypal-button-container" v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL"></div>
@@ -512,6 +536,12 @@
                 PAYMENT_METHOD_CREDIT_CARD: 1,
                 PAYMENT_METHOD_PAYPAL: 2,
                 PAYMENT_METHOD_LINE_OF_CREDIT: 3,
+
+                ERROR_TYPE_NONE: 0,
+                ERROR_TYPE_REGULAR: 1,
+                ERROR_TYPE_SHIPPING_RATE: 2,
+                ERROR_TYPE_ERP_PLACE_ORDER: 3,
+                ERROR_TYPE_CREDIT_CARD: 4,
             },
         },
     };
@@ -519,6 +549,9 @@
     new Vue({
         el: '#checkout',
         data: {
+            errorType: 0,
+            errorMessage: null,
+            errorMessages: [],
             shared: store.state,
             deliveryDate: null,
             purchaseOrder,
@@ -612,7 +645,6 @@
                     address = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
                     address.address1 = address.address;
                 }
-                console.log("address: ", address);
 
                 const request = {
                     isPickup: !this.isDelivery,
@@ -622,9 +654,13 @@
                     city: address.city,
                     zipPostalCode: address.zipPostalCode,
                 };
-                const self = this;
+                const self = this;                
                 if (!disableSpinner)
                     this.showLoading();
+
+                if (self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
+                    self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+
                 $.ajax({
                     url: "@Url.Action("GetShippingRate", "CheckoutOverride")",
                     type: 'POST',
@@ -633,17 +669,20 @@
                     success: function (data, _, _) {
                         console.log("GetShippingRate success: ", data);
                         self.disableSubmit = false;
-                        if (data != null) {
-                            self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
-                            self.discountAmount = data.orderDiscountAmount;
-                            self.orderTotal = data.orderTotal;
-                            self.deliveryDate = data.shippingCalculatorResponse.date ? data.shippingCalculatorResponse.date : 'N/A';
-                        }
+                        self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
+                        self.discountAmount = data.orderDiscountAmount;
+                        self.orderTotal = data.orderTotal;
+                        self.deliveryDate = data.shippingCalculatorResponse.date ? data.shippingCalculatorResponse.date : 'N/A';
+
+                        if (!data.shippingCalculatorResponse.allowed)
+                            self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
+
                         if (!disableSpinner)
                             self.hideLoading();
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         self.disableSubmit = false;
+                        self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
                         if (!disableSpinner)
                             self.hideLoading();
                         console.log(thrownError, 'GetShippingRate datadata-error', xhr);
@@ -653,9 +692,10 @@
 
             placeOrder: function () {
                 this.dirty = true;
-                if (this.paymentMethodIndex !== this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT) return;
+                if (this.paymentMethodIndex !== this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT ||
+                    this.errorType === this.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
 
-                console.log("isValid: ", this.validate());
+                this.errorType = this.shared.constants.ERROR_TYPE_NONE;
                 if (!this.validate()) return;
                 this.showLoading();
                 this.finalizeOrder();
@@ -700,9 +740,16 @@
                     success: function (data, textStatus, XMLHttpRequest) {
                         console.log('success - created order...', data);
                         //if (data?.error === 1) return;
+                        if (data.error === self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR) {
+                            self.errorType = self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR;
+                            self.errorMessage = data.message;
+                        }
+
                         orderId = data.orderId;
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
+                        self.errorType = self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR;
+                        self.errorMessage = 'An error occured.';
                         console.log("createOrder error: ", thrownError, xhr);
                     }
                 });
@@ -738,6 +785,7 @@
                     hasError: false,
                 };
                 console.log("request: ", request);
+                const self = this;
                 $.ajax({
                     url: "@Url.Action("PlaceOrder", "CheckoutOverride")",
                     type: 'POST',
@@ -749,9 +797,11 @@
                             alert(data.message);
                             return;
                         }
-                        if (data != null) {
-                            window.location.href = '/Completed';
+                        if (data.error === self.shared.constants.ERROR_TYPE_ERP_PLACE_ORDER) {
+                            window.location.href = '/Rejected';
+                            return;
                         }
+                        window.location.href = '/Completed';
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         self.hideLoading();
@@ -814,8 +864,10 @@
                     }).then(function (hf) {
                         $('#place-order').click(function (event) {
                             event.preventDefault();
-                            if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD || !self.validate()) return;
+                            if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD || !self.validate() ||
+                                self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
 
+                            self.errorType = self.shared.constants.ERROR_TYPE_NONE;
                             self.showLoading();
 
                             hf.submit({
@@ -826,10 +878,9 @@
                                 .catch(function (err) {
                                     console.log('error: ', JSON.stringify(err));
                                     self.hideLoading();
-                                    const title = 'The following error(s) occured: \n\n';
-                                    const errors = err.details.map(x => '•  ' + x.description).join('\n');
-                                    const footer = '\n\n' + err.message;
-                                    alert(title + errors + footer);
+                                    self.errorMessage = err.message;
+                                    self.errorMessages = err.details.map(x => x.description);
+                                    self.errorType = self.shared.constants.ERROR_TYPE_CREDIT_CARD;
                                 });
                         });
                     });
@@ -848,30 +899,15 @@
                             color: 'blue',
                             shape: 'rect',
                         },
-                        //onInit: function (data, actions) {
-
-                        //    // Disable the buttons
-                        //    actions.disable();
-
-                        //    // Listen for changes to the checkbox
-                        //    //document.querySelector('#check')
-                        //    //    .addEventListener('change', function (event) {
-
-                        //    //        // Enable or disable the button when it is checked or unchecked
-                        //    //        if (event.target.checked) {
-                        //    //            actions.enable();
-                        //    //        } else {
-                        //    //            actions.disable();
-                        //    //        }
-                        //    //    });
-                        //},
                         onClick: function (e, actions) {
                             self.dirty = true;
-                            if (!self.validate() || self.disableSubmit) return actions.reject();
+                            if (!self.validate() || self.disableSubmit || self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
+                                return actions.reject();
                             else return actions.resolve();
                         },
                         createOrder: async function (data, actions) {
                             // This function sets up the details of the transaction, including the amount and line item details
+                            self.errorType = self.shared.constants.ERROR_TYPE_NONE;
                             return await self.initializeOrder();
                         },
                         onCancel: function (data) {

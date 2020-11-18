@@ -257,25 +257,25 @@
                                                     @if (!string.IsNullOrEmpty(mtr))
                                                     {
                                                         <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
-                                                            <img src="~/Themes/@themeName/Content/assets/invoice.svg" width="20" height="20" alt="">
+                                                            <img src="~/Themes/@themeName/Content/assets/invoice.svg" title="mtr report" width="20" height="20" alt="">
                                                         </a>
                                                     }
                                                     @if (hasSawOption)
                                                     {
                                                         <button type="button" class="table-action-button" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
-                                                            <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" width="20" height="20" alt="">
+                                                            <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" title="saw options" width="20" height="20" alt="">
                                                         </button>
                                                     }
                                                     @if (eRPCompanyIdExist)
                                                     {
                                                         <button class="table-action-button" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);">
-                                                            <img src="~/Themes/@themeName/Content/assets/shopping-cart.svg" width="20"
+                                                            <img src="~/Themes/@themeName/Content/assets/shopping-cart.svg" title="add to cart" width="20"
                                                                  height="20" alt="">
                                                         </button>
                                                     }
                                                     <div class="table-action-button">
                                                         <label class="mb-0">
-                                                            <span style="cursor:pointer"><img src="~/Themes/@themeName/Content/assets/dislike.svg" width="20" height="20" alt=""></span>
+                                                            <span style="cursor:pointer"><img src="~/Themes/@themeName/Content/assets/dislike.svg" title="remove from wishlist" width="20" height="20" alt=""></span>
                                                             <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
                                                         </label>
                                                     </div>

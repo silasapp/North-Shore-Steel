@@ -12,7 +12,7 @@
         <div class="bg-white-shadow d-flex flex-row flex-wrap align-items-center mb-3 p-4">
             <label class="h2-primary my-4">CREDIT SUMMARY</label>
 
-            <div class="d-flex flex-row flex-wrap flex-fill justify-content-around">
+            <div class="d-flex flex-row flex-wrap flex-fill justify-content-around invoice-summary-content">
                 <div class="d-flex flex-column mx-3 my-1">
                     <label class="fs12-default mb-2">Credit Limit</label>
                     <label class="h5-default mb-0 ml-2">$10,000</label>
@@ -46,14 +46,15 @@
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="text" v-model="fromDate" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="From">
+                        <input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6d-flex flex-column my-3 py-0">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
-                        <input class=nss-form-control type="date" v-model="toDate" data-val=true placeholder="To" />
+                        <input class=nss-form-control type="text" v-model="toDate" id="datepicker2" autocomplete="off" placeholder="To">
+                        @*<input class=nss-form-control type="date" v-model="toDate" data-val=true placeholder="To" />*@
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
                 </div>
@@ -70,7 +71,7 @@
                     <input class=nss-form-control type="text" v-model="poNo" placeholder="Enter...">
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
-                    <button class="nss-btn-default ml-lg-5 w-100 text-center" v-on:click="searchInvoices">Search</button>
+                    <button class="nss-btn-default ml-lg-5 w-100 text-center" style=" padding: 10px 16px;" v-on:click="searchInvoices">Search</button>
                 </div>
             </div>
         </div>
@@ -147,6 +148,19 @@
                 });
             }
         },
+    });
+</script>
+<script>
+    $(function () {
+        $("#datepicker").datepicker({
+            dateFormat: "dd-mm-yy"
+            , duration: "fast"
+        });
+    }); $(function () {
+        $("#datepicker2").datepicker({
+            dateFormat: "dd-mm-yy"
+            , duration: "fast"
+        });
     });
 </script>
 <ejs-scripts></ejs-scripts>
