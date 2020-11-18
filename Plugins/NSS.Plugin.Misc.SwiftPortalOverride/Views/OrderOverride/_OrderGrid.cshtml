@@ -8,21 +8,21 @@
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="50" pageSizes="true"></e-grid-pagesettings>
         <e-grid-columns>
-            <e-grid-column headerText="Order #" template="#orderNo" minWidth="40" width="50" maxWidth="60" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="PoNo" headerText="PO#" minWidth="30" width="40" maxWidth="50" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" minWidth="60" width="80" maxWidth="100" allowFiltering="false"></e-grid-column>
-            <e-grid-column template="#orderTotal" headerText="Order Amount" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="OrderDate" headerText="Order Date" minWidth="40" width="60" maxWidth="80" format="yMd" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="60" width="70" maxWidth="80" format="yMd" allowFiltering="false"></e-grid-column>
+            <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="PoNo" headerText="PO#" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" minWidth="120" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
+            <e-grid-column template="#orderTotal" headerText="Order Amount" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="OrderDate" headerText="Order Date" minWidth="110" width="120" maxWidth="130" format="yMd" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="110" width="120" maxWidth="130" format="yMd" allowFiltering="false"></e-grid-column>
             @if (Model.IsClosed)
             {
-                <e-grid-column field="DeliveryDate" headerText="Delivery Date" minWidth="60" width="80" maxWidth="100" format="yMd" allowFiltering="false"></e-grid-column>
-                <e-grid-column template="#viewTicket" headerText="Delivery Ticket" minWidth="60" width="80" maxWidth="100" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="DeliveryDate" headerText="Delivery Date" minWidth="110" width="120" maxWidth="130" format="yMd" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#viewTicket" headerText="Delivery Ticket" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
             }
             else
             {
-                <e-grid-column field="ScheduledDate" headerText="Scheduled Date" minWidth="60" width="80" maxWidth="100" format="yMd" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="40" width="50" maxWidth="60"></e-grid-column>
+                <e-grid-column field="ScheduledDate" headerText="Scheduled Date" minWidth="120" width="130" maxWidth="140" format="yMd" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="110" width="120" maxWidth="130"></e-grid-column>
             }
             <e-grid-column type="checkbox" width="30"></e-grid-column>
         </e-grid-columns>
