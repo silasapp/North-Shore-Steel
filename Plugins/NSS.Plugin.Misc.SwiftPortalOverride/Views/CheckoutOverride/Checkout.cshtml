@@ -654,9 +654,13 @@
                     city: address.city,
                     zipPostalCode: address.zipPostalCode,
                 };
-                const self = this;
+                const self = this;                
                 if (!disableSpinner)
                     this.showLoading();
+
+                if (self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
+                    self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+
                 $.ajax({
                     url: "@Url.Action("GetShippingRate", "CheckoutOverride")",
                     type: 'POST',
@@ -897,7 +901,8 @@
                         },
                         onClick: function (e, actions) {
                             self.dirty = true;
-                            if (!self.validate() || self.disableSubmit) return actions.reject();
+                            if (!self.validate() || self.disableSubmit || self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
+                                return actions.reject();
                             else return actions.resolve();
                         },
                         createOrder: async function (data, actions) {
