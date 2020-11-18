@@ -19,6 +19,40 @@
 @{
     var themeName = themeContext.WorkingThemeName;
 }
+
+<style>
+    /*.popup {
+        position: relative;
+    }
+
+    .popup-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+        .popup-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+            .popup-content a:hover {
+                background-color: #ddd;
+            }
+
+    .popup:hover .popup-content {
+        display: block;
+    }*/
+
+    .action-btn {
+        background-color: #f6f6f6 !important;
+    }
+</style>
 <div class="page account-page address-list-page">
     <div class="page-body">
         <nop-antiforgery-token />
@@ -31,9 +65,9 @@
                     {
                         var count = i + 1;
                         var address = Model.Addresses[i];
-                        <a href="" class="address-info">
+                        <div class="address-info">
                             <ul>
-                                <button><img src="~/Themes/@themeName/Content/assets/icn-more-vert.svg" alt=""></button>
+                                @*<button><img src="~/Themes/@themeName/Content/assets/icn-more-vert.svg" alt=""></button>*@
                                 <li class="title">ADDRESS @count</li>
                                 <li class="name">@address.FirstName @address.LastName</li>
                                 @if (address.CompanyEnabled && !string.IsNullOrEmpty(address.Company))
@@ -59,7 +93,11 @@
                                                 <li class="city-state-zip">@address.City, @address.StateProvinceName, @address.ZipPostalCode</li>
                                             }*@
                             </ul>
-                        </a>
+                            <div class="buttons">
+                                <input type="button" class="button-2 edit-address-button action-btn" style="background-color:#f6f6f6 !important; padding: 1px 9px !important" onclick="location.href = '@(Url.RouteUrl("CustomerAddressEdit", new {addressId = address.Id}))'" value="" />
+                                <input type="button" class="button-2 delete-address-button action-btn" style="background-color:#f6f6f6 !important; padding: 1px 9px !important" onclick="deletecustomeraddress(@(address.Id))" value="" />
+                            </div>
+                        </div>
                     }
                     <a onclick="location.href='@Url.RouteUrl("CustomerAddressAdd")'" class="address-info">
                         <ul>
