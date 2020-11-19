@@ -213,6 +213,134 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return attributesXml;
         }
 
+
+        protected void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
+        {
+            try
+            {
+                // save customer as no NSSApproved by default
+                _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, false);
+
+                // prepare request for create api call
+
+                var request = new ERPCreateUserRequest
+                {
+                    SwiftUserId = customer.Id.ToString(),
+                    Firstname = model.FirstName,
+                    LastName = model.LastName,
+                    WorkEmail = model.Email,
+                    Phone = model.Phone,
+                    CompanyName = model.Company,
+                    IsExistingCustomer = "0"
+                };
+
+                #region BuildCustomAttributes
+                var attributes = _customerAttributeService.GetAllCustomerAttributes();
+                buildCustomAttributes(form, request, attributes);
+
+                #endregion
+
+                var response = _nSSApiProvider.CreateNSSUser(request);
+
+                if (response != null && response.WitnrixId != null)
+                {
+                    // save wintrix id
+                    _genericAttributeService.SaveAttribute(customer, Constants.ErpKeyAttribute, response.WitnrixId);
+                }
+
+                // send nss an email
+                _workFlowMessageServiceOverride.SendNSSCustomerRegisteredNotificationMessage(customer, _workContext.WorkingLanguage.Id, response?.WitnrixId);
+            }
+            catch (Exception)
+            {
+
+                // silent NSS error
+            }
+
+        }
+
+        protected void buildCustomAttributes(IFormCollection form, ERPCreateUserRequest request, IList<CustomerAttribute> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+                switch (attribute.AttributeControlType)
+                {
+                    case AttributeControlType.DropdownList:
+                    case AttributeControlType.RadioList:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var selectedAttributeId = int.Parse(ctrlAttributes);
+                                if (selectedAttributeId > 0)
+                                {
+                                    //var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                    var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
+                                    var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
+                                    if (val != null)
+                                    {
+                                        if (attribute.Name == Constants.HearAboutUsAttribute)
+                                            request.HearAboutUs = val.Name;
+                                        if (attribute.Name == Constants.PreferredLocationIdAttribute)
+                                        {
+                                            if (val.Name.ToLower() == "houston")
+                                            {
+                                                val.Id = 1;
+                                            }
+                                            else if (val.Name.ToLower() == "beaumont")
+                                            {
+                                                val.Id = 2;
+                                            }
+                                            request.PreferredLocationid = val.Id.ToString();
+                                        }
+
+                                    }
+                                }
+                            }
+
+                        }
+                        break;
+                    case AttributeControlType.Checkboxes:
+                        {
+                            var cblAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(cblAttributes))
+                            {
+                                var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                if (items.Length > 0)
+                                {
+                                    if (attribute.Name == Constants.IsExistingCustomerAttribute)
+                                        request.IsExistingCustomer = "1";
+                                }
+                                else
+                                {
+                                    request.IsExistingCustomer = "0";
+                                }
+                            }
+                        }
+                        break;
+                    case AttributeControlType.TextBox:
+                    case AttributeControlType.MultilineTextbox:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var enteredText = ctrlAttributes.ToString().Trim();
+
+                                if (attribute.Name == Constants.ItemsForNextProjectAttribute)
+                                    request.ItemsForNextProject = enteredText;
+
+                                if (attribute.Name == Constants.OtherAttribute)
+                                    request.Other = enteredText;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -552,7 +680,39 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View(model);
         }
 
-        // my account/info
+        #region My account / Change password
+
+        public override IActionResult ChangePassword(ChangePasswordModel model)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var customer = _workContext.CurrentCustomer;
+
+            if (ModelState.IsValid)
+            {
+                var changePasswordRequest = new ChangePasswordRequest(customer.Email,
+                    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
+                var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
+                if (changePasswordResult.Success)
+                {
+                    // send change password email
+                    _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+
+                    model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
+                    return View(model);
+                }
+
+                //errors
+                foreach (var error in changePasswordResult.Errors)
+                    ModelState.AddModelError("", error);
+            }
+
+            //If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+       
         [HttpsRequirement]
         public override IActionResult Info()
         {
@@ -845,169 +1005,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model = _customerModelFactory.PrepareCustomerInfoModel(model, customer, true, customerAttributesXml);
             return View(model);
         }
-
-
-        void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
-        {
-            try
-            {
-                // save customer as no NSSApproved by default
-                _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, false);
-
-                // prepare request for create api call
-
-                var request = new ERPCreateUserRequest
-                {
-                    SwiftUserId = customer.Id.ToString(),
-                    Firstname = model.FirstName,
-                    LastName = model.LastName,
-                    WorkEmail = model.Email,
-                    Phone = model.Phone,
-                    CompanyName = model.Company,
-                    IsExistingCustomer = "0"
-                };
-
-                #region BuildCustomAttributes
-                var attributes = _customerAttributeService.GetAllCustomerAttributes();
-                buildCustomAttributes(form, request, attributes);
-
-                #endregion
-
-                var response = _nSSApiProvider.CreateNSSUser(request);
-
-                if (response != null && response.WitnrixId != null)
-                {
-                    // save wintrix id
-                    _genericAttributeService.SaveAttribute(customer, Constants.ErpKeyAttribute, response.WitnrixId);
-                }
-
-                // send nss an email
-                _workFlowMessageServiceOverride.SendNSSCustomerRegisteredNotificationMessage(customer, _workContext.WorkingLanguage.Id, response?.WitnrixId);
-            }
-            catch (Exception)
-            {
-
-                // silent NSS error
-            }
-
-        }
-        void buildCustomAttributes(IFormCollection form, ERPCreateUserRequest request, IList<CustomerAttribute> attributes)
-        {
-            foreach (var attribute in attributes)
-            {
-                var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                switch (attribute.AttributeControlType)
-                {
-                    case AttributeControlType.DropdownList:
-                    case AttributeControlType.RadioList:
-                        {
-                            var ctrlAttributes = form[controlId];
-                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
-                            {
-                                var selectedAttributeId = int.Parse(ctrlAttributes);
-                                if (selectedAttributeId > 0)
-                                {
-                                    //var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
-                                    var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
-                                    var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
-                                    if (val != null)
-                                    {
-                                        if (attribute.Name == Constants.HearAboutUsAttribute)
-                                            request.HearAboutUs = val.Name;
-                                        if (attribute.Name == Constants.PreferredLocationIdAttribute)
-                                        {
-                                            if (val.Name.ToLower() == "houston")
-                                            {
-                                                val.Id = 1;
-                                            }
-                                            else if (val.Name.ToLower() == "beaumont")
-                                            {
-                                                val.Id = 2;
-                                            }
-                                            request.PreferredLocationid = val.Id.ToString();
-                                        }
-
-                                    }
-                                }
-                            }
-
-                        }
-                        break;
-                    case AttributeControlType.Checkboxes:
-                        {
-                            var cblAttributes = form[controlId];
-                            if (!StringValues.IsNullOrEmpty(cblAttributes))
-                            {
-                                var items = cblAttributes.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                if (items.Length > 0)
-                                {
-                                    if (attribute.Name == Constants.IsExistingCustomerAttribute)
-                                        request.IsExistingCustomer = "1";
-                                }
-                                else
-                                {
-                                    request.IsExistingCustomer = "0";
-                                }
-                            }
-                        }
-                        break;
-                    case AttributeControlType.TextBox:
-                    case AttributeControlType.MultilineTextbox:
-                        {
-                            var ctrlAttributes = form[controlId];
-                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
-                            {
-                                var enteredText = ctrlAttributes.ToString().Trim();
-
-                                if (attribute.Name == Constants.ItemsForNextProjectAttribute)
-                                    request.ItemsForNextProject = enteredText;
-
-                                if (attribute.Name == Constants.OtherAttribute)
-                                    request.Other = enteredText;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        #region My account / Change password
-
-        public override IActionResult ChangePassword(ChangePasswordModel model)
-        {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
-                return Challenge();
-
-            var customer = _workContext.CurrentCustomer;
-
-            if (ModelState.IsValid)
-            {
-                var changePasswordRequest = new ChangePasswordRequest(customer.Email,
-                    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
-                var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
-                if (changePasswordResult.Success)
-                {
-                    // send change password email
-                    _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
-
-                    model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
-                    return View(model);
-                }
-
-                //errors
-                foreach (var error in changePasswordResult.Errors)
-                    ModelState.AddModelError("", error);
-            }
-
-            //If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
+        
         #endregion
 
         #endregion
+        
+       
 
     }
 }
