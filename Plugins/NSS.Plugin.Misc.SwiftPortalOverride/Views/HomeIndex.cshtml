@@ -47,7 +47,7 @@
                                         foreach (Order order in Model.RecentOrders)
                                         {
                                             <tr>
-                                                <th class="underline" scope="row">@order.OrderId</th>
+                                                <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                 <td>@(string.Format("{0:N2}", order.Weight))</td>
                                                 <td>$@(string.Format("{0:N2}", order.OrderTotal))</td>
                                                 <td>@order.PONo</td>
@@ -84,7 +84,7 @@
                                         foreach (Invoice invoice in Model.RecentInvoices)
                                         {
                                             <tr>
-                                                <th class="underline" scope="row">@invoice.InvoiceId</th>
+                                                <td><a href="/invoices/@invoice.InvoiceId" scope="row">@invoice.InvoiceId</a></td>
                                                 <td>@invoice.OrderNo</td>
                                                 <td>$@(string.Format("{0:N2}", invoice.InvoiceAmount))</td>
                                                 <td>@invoice.InvoiceDate.ToString("MM/dd/yyyy")</td>
