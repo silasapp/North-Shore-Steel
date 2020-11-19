@@ -83,21 +83,21 @@
                                     {
                                         foreach (Invoice invoice in Model.RecentInvoices)
                                         {
-                                            <tr>
-                                                <td><a href="/invoices/@invoice.InvoiceId" scope="row">@invoice.InvoiceId</a></td>
-                                                <td>@invoice.OrderNo</td>
-                                                <td>$@(string.Format("{0:N2}", invoice.InvoiceAmount))</td>
-                                                <td>@invoice.InvoiceDate.ToString("MM/dd/yyyy")</td>
-                                                <td>@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</td>
-                                                @if (@invoice.InvoiceStatusName.IndexOf("Past") > -1)
-                                                {
-                                                    <td style="color: red;">@invoice.InvoiceStatusName</td>
-                                                }
-                                                else
-                                                {
-                                                    <td>@invoice.InvoiceStatusName</td>
-                                                }
-                                            </tr>
+                                    <tr>
+                                        <th scope="row">@invoice.InvoiceId</th>
+                                        <td><a href="/orders/@invoice.OrderNo" scope="row">@invoice.OrderNo</a></td>
+                                        <td>$@(string.Format("{0:N2}", invoice.InvoiceAmount))</td>
+                                        <td>@invoice.InvoiceDate.ToString("MM/dd/yyyy")</td>
+                                        <td>@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</td>
+                                        @if (@invoice.InvoiceStatusName.IndexOf("Past") > -1)
+                                        {
+                                            <td style="color: red;">@invoice.InvoiceStatusName</td>
+                                        }
+                                        else
+                                        {
+                                            <td>@invoice.InvoiceStatusName</td>
+                                        }
+                                    </tr>
 
                                         }
                                     }
