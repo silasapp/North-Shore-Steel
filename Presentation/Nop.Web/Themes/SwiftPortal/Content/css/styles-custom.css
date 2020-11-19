@@ -2070,6 +2070,9 @@ table input {
     display: none;
 }
 
+.orders-search-block label {
+    text-align: left;
+}
 .nav-sub-menu {
     display: none;
     left: -7px;
@@ -2259,7 +2262,6 @@ table input {
 }
 
 @media all and (max-width: 600px) {
-
 
     #invoiceSearchField > div {
         display: grid;
