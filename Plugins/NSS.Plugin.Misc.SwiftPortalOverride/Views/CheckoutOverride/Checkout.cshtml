@@ -403,11 +403,11 @@
                         <thead>
                             <tr>
                                 <th scope="col">Item #</th>
-                                <th scope="col">Description</th>
+                                <th style="width: 10rem;" scope="col">Description</th>
                                 <th scope="col">Customer Part #</th>
                                 <th scope="col">Unit Price</th>
                                 <th scope="col">Total Price</th>
-                                <th scope="col">Total Weight (lbs)</th>
+                                <th scope="col">Total Weight (lb)</th>
                                 <th scope="col">Qty.</th>
                             </tr>
                         </thead>
@@ -434,7 +434,15 @@
 
                                 <tr>
                                     <td>@iNo</td>
-                                    <td>@item.ProductName</td>
+                                    <td>
+                                        @item.ProductName
+                                        @if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                        {
+                                            <div class="attributes">
+                                                @Html.Raw(item.AttributeInfo)
+                                            </div>
+                                        }
+                                    </td>
                                     <td>@customerPathNo</td>
                                     <td>@item.UnitPrice / CW</td>
                                     <td>@item.SubTotal</td>
@@ -445,6 +453,8 @@
 
                         </tbody>
                     </table>
+
+
                 </div>
             </div>
             <div class="col-md-3">
