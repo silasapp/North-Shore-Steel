@@ -129,7 +129,7 @@
                             </a>
                             <div id="collapseOne" class="collapse show">
                                 <div>
-                                    <ejs-treeview id="treedata" showCheckBox="true" autoCheck="false" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
+                                    <ejs-treeview id="treedata" showCheckBox="true" nodeChecking="nodeChecking" nodeClicked="nodeCheck">
                                         <e-treeview-fields dataSource="ViewBag.dataSource" id="id" parentId="pid" text="name" hasChildren="hasChild" expanded="expanded"></e-treeview-fields>
                                     </ejs-treeview>
                                 </div>
@@ -247,15 +247,15 @@
             var defaultSpecs = document.getElementsByClassName("defaultSpecs");
             var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
             var inputs = document.querySelectorAll("input[type='checkbox']");
-            if (selectedShape.isChecked == 'true') {
+            if (selectedShape.isChecked == 'true' ) {
                 treeObj.uncheckAll();
                 shapeIDs = [];
                 shapeNames = [];
                 treeObj.checkAll(checkedNode);
-                if (selectedShape.hasChildren) {
-                    treeObj.uncheckAll();
-                    $(args.node.children[1].childNodes[1]).find('span:nth-child(2)').addClass("e-check");
-                }
+                //if (selectedShape.hasChildren) {
+                //    treeObj.uncheckAll();
+                //    $(args.node.children[1].childNodes[1]).find('span:nth-child(2)').addClass("e-check");
+                //}
                 shapeIDs.indexOf(selectedShapeId) === -1 ? shapeIDs.push(selectedShapeId) : shapeIDs.splice(shapeIDs.indexOf(selectedShapeId), 1);
                 shapeNames.indexOf(selectedShapeText) === -1 ? shapeNames.push(selectedShapeText) : shapeNames.splice(shapeNames.indexOf(selectedShapeText), 1);
             }
