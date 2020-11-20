@@ -44,7 +44,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (Model.RecentOrders != null)
+                                    @if (Model.RecentOrders != null && Model.RecentOrders.Count > 0)
                                     {
                                         foreach (Order order in Model.RecentOrders)
                                         {
@@ -61,7 +61,7 @@
                                     else
                                     {
                                         <tr>
-                                            <td class="underline" scope="row">No Recent Order</td>
+                                            <td class="underline" scope="row">No Records to display</td>
                                         </tr>
                                     }
 
@@ -81,32 +81,32 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (Model.RecentInvoices != null)
+                                    @if (Model.RecentInvoices != null && Model.RecentInvoices.Count > 0)
                                     {
                                         foreach (Invoice invoice in Model.RecentInvoices)
                                         {
-                                    <tr>
-                                        <th scope="row">@invoice.InvoiceId</th>
-                                        <td><a href="/orders/@invoice.OrderNo" scope="row">@invoice.OrderNo</a></td>
-                                        <td>$@(string.Format("{0:N2}", invoice.InvoiceAmount))</td>
-                                        <td>@invoice.InvoiceDate.ToString("MM/dd/yyyy")</td>
-                                        <td>@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</td>
-                                        @if (@invoice.InvoiceStatusName.IndexOf("Past") > -1)
-                                        {
-                                            <td style="color: red;">@invoice.InvoiceStatusName</td>
-                                        }
-                                        else
-                                        {
-                                            <td>@invoice.InvoiceStatusName</td>
-                                        }
-                                    </tr>
+                                            <tr>
+                                                <th scope="row">@invoice.InvoiceId</th>
+                                                <td><a href="/orders/@invoice.OrderNo" scope="row">@invoice.OrderNo</a></td>
+                                                <td>$@(string.Format("{0:N2}", invoice.InvoiceAmount))</td>
+                                                <td>@invoice.InvoiceDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</td>
+                                                @if (@invoice.InvoiceStatusName.IndexOf("Past") > -1)
+                                                {
+                                                    <td style="color: red;">@invoice.InvoiceStatusName</td>
+                                                }
+                                                else
+                                                {
+                                                    <td>@invoice.InvoiceStatusName</td>
+                                                }
+                                            </tr>
 
                                         }
                                     }
                                     else
                                     {
                                         <tr>
-                                            <td class="underline" scope="row">No Recent Invoice</td>
+                                            <td class="underline" scope="row">No Records to display</td>
                                         </tr>
                                     }
 
