@@ -1,18 +1,26 @@
-﻿@model TopMenuModel
+﻿
+@model TopMenuModel
+
+<style>
+    .active-tab {
+        text-decoration: underline;
+        color: #03175b !important;
+    }
+</style>
 <ul class="top-menu notmobile mb-0">
 
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
-    <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
-    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")">SHOP</a></li>
+    <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
     @*<li>
-        <a href="/orders">ORDERS</a>
-    </li>
-    <li>
-        <a href="/invoices">INVOICES</a>
-    </li>*@
-    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">INVOICES</a></li>
-    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")">RESOURCES</a></li>
+            <a href="/orders">ORDERS</a>
+        </li>
+        <li>
+            <a href="/invoices">INVOICES</a>
+        </li>*@
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
 </ul>
 @{
     var rootCategoriesResponsive = Model.Categories.ToList();
@@ -21,11 +29,11 @@
     <div class="menu-toggle"></div>
     <ul class="top-menu mobile">
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
-        <li><a href="@Url.RouteUrl("Homepage")">DASHBOARD</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")">SHOP</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")">ORDERS</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")">INVOICES</a></li>
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")">RESOURCES</a></li>
+        <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
     </ul>
 
     @if (Model.UseAjaxMenu)
@@ -61,3 +69,24 @@
     }
 
 }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        switch (window.location.pathname) {
+            case '/':
+                $('.dashboard').addClass('active-tab');
+                break;
+            case '/catalog':
+                $('.catalog').addClass('active-tab');
+                break;
+            case '/orders':
+                $('.orders').addClass('active-tab');
+                break;
+            case '/invoices':
+                $('.invoices').addClass('active-tab');
+                break;
+            default:
+            // code block
+        }
+    });
+</script>

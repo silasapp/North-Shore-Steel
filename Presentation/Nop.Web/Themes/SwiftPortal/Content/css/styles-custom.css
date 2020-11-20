@@ -379,7 +379,7 @@ a:not([href]):not([class]) {
     .top-menu > li > a, .nav-sub-menu a {
         font: normal normal 500 20px/24px "Teko" !important;
         letter-spacing: 0.16px;
-        color: #aaaaaa !important;
+        /*color: #aaaaaa !important;*/
         text-transform: uppercase;
         opacity: 1;
     }
