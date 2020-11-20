@@ -140,7 +140,6 @@ a:not([href]):not([class]) {
 }
 
 
-
 /* #region SEARCH BOX */
 
 .nav-bar-search > input {
@@ -416,7 +415,7 @@ a:not([href]):not([class]) {
     }
 
 .form-fields,
-.new-wrapper > .text {
+.new-wrapper  .text {
     background-color: #ffffff !important;
     border: none !important;
 }
@@ -430,7 +429,7 @@ a:not([href]):not([class]) {
     opacity: 1;
 }
 
-.new-wrapper > .text,
+.new-wrapper  .text,
 .fieldset > .text {
     margin: 0 !important;
     text-align: center;
@@ -2070,6 +2069,9 @@ table input {
     display: none;
 }
 
+.orders-search-block label {
+    text-align: left;
+}
 .nav-sub-menu {
     display: none;
     left: -7px;
@@ -2184,7 +2186,15 @@ table input {
 .custom-scroll::-webkit-scrollbar-thumb {
     background-color: #000000;
 }
-
+.login-page .new-wrapper .text {
+    padding: 0;
+    line-height: 1.5;
+}
+.new-wrapper.fieldset.register-block {
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+}
 
 @media all and (min-width: 1001px) {
     /* CUSTOM STYLE */
@@ -2196,6 +2206,9 @@ table input {
 
     .cat-side-drawer {
         display: block;
+    }
+    .login-page .new-wrapper .text {
+        min-height: auto;
     }
 }
 
@@ -2259,7 +2272,6 @@ table input {
 }
 
 @media all and (max-width: 600px) {
-
 
     #invoiceSearchField > div {
         display: grid;
