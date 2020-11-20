@@ -21,16 +21,19 @@
     Func<object, object>
     Content1 =
     @<div id="viewMtrModal">
-        <div class="d-flex flex-column">
-            <div class="d-flex flex-column mt-4 mb-2">
-                @foreach (var item in Model.MTRs)
-                {
-                    <div class="d-flex flex-row mt-4 cursor-pointer">
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
-                    </div>
-                }
+        @if (Model.MtrCount > 1)
+        {
+            <div class="d-flex flex-column">
+                <div class="d-flex flex-column mt-4 mb-2">
+                    @foreach (var item in Model.MTRs)
+                    {
+                        <div class="d-flex flex-row mt-4 cursor-pointer">
+                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
+                        </div>
+                    }
+                </div>
             </div>
-        </div>
+        }
     </div>;
 }
 
@@ -298,7 +301,7 @@
 
                 @if (Model.MtrCount == 1)
                 {
-                    <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs[0].MtrId</label>
+                    <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault().MtrId</label>
                 }
                 else if (Model.MtrCount > 1)
                 {
