@@ -94,10 +94,10 @@
     .paypal-button.paypal-button-color-blue, .paypal-button-row.paypal-button-color-blue .menu-button {
         background: red !important;
     }
-
+/*
     .nss-table tr > td {
         white-space: inherit;
-    }
+    }*/
 </style>
 <div id="checkout" class="page home-page" v-cloak>
     <div class=page-title>
@@ -407,7 +407,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">Item #</th>
-                                <th style="width: 10rem;" scope="col">Description</th>
+                                <th scope="col">Description</th>
                                 <th scope="col">Customer Part #</th>
                                 <th scope="col">Unit Price</th>
                                 <th scope="col">Total Price</th>
@@ -440,12 +440,12 @@
                                     <td>@iNo</td>
                                     <td>
                                         @item.ProductName
-                                        @if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                        @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
                                         {
                                             <div class="attributes">
                                                 @Html.Raw(item.AttributeInfo)
                                             </div>
-                                        }
+                                        }*@
                                     </td>
                                     <td>@customerPathNo</td>
                                     <td>@item.UnitPrice / CW</td>

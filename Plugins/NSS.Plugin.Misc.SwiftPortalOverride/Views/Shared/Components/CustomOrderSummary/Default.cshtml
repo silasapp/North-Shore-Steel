@@ -142,7 +142,7 @@
                     <thead>
                         <tr>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Item #</th>
-                            <th style="width: 19rem; background-color: transparent !important; border: none !important" scope="col">Description</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col">Description</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Customer Part #</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Unit Price</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Total Price</th>
@@ -190,12 +190,12 @@
                                 <td>@(iNo)</td>
                                 <td>
                                     @item.ProductName
-                                    @if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                    @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
                                     {
                                         <div class="attributes">
                                             @Html.Raw(item.AttributeInfo)
                                         </div>
-                                    }
+                                    }*@
                                     @if (item.Warnings.Count > 0)
                                     {
                                         <div class="message-error">
