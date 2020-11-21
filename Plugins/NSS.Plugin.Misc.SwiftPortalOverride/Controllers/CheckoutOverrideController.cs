@@ -806,28 +806,29 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var mappings = _productAttributeParser.ParseProductAttributeMappings(item.AttributesXml);
                 var attrs = _productAttributeService.GetAllProductAttributes();
 
+                var noteAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.WorkOrderInstructionsAttribute);
+                var sawOptionAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CutOptionsAttribute);
+                var sawToleranceAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.LengthToleranceCutAttribute);
+                var uomAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.PurchaseUnitAttribute);
+
                 string uom = null, notes = null, sawoptions = null, sawTolerance = null;
 
-                foreach (var attribute in attrs)
+                foreach (var mapping in mappings)
                 {
-                    if (attribute.Name == SwiftCore.Helpers.Constants.WorkOrderInstructionsAttribute)
+                    if(mapping.ProductAttributeId == noteAttr?.Id)
                     {
-                        var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
                         notes = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
                     }
-                    else if (attribute.Name == SwiftCore.Helpers.Constants.CutOptionsAttribute)
+                    else if (mapping.ProductAttributeId == sawOptionAttr?.Id)
                     {
-                        var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
-                        sawoptions = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
+                        sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
                     }
-                    else if (attribute.Name == SwiftCore.Helpers.Constants.LengthToleranceCutAttribute)
+                    else if (mapping.ProductAttributeId == sawToleranceAttr?.Id)
                     {
-                        var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
                         sawTolerance = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
                     }
-                    else if (attribute.Name == SwiftCore.Helpers.Constants.PurchaseUnitAttribute)
+                    else if (mapping.ProductAttributeId == uomAttr?.Id)
                     {
-                        var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
                         uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
                     }
                 }
