@@ -380,10 +380,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 {
                     var product = _productService.GetProductById(item.ProductId);
 
-                    itemTotal = _shoppingCartService.GetSubTotal(item, false);
+                    var subtotal = _shoppingCartService.GetSubTotal(item, false);
 
                     var itemPrice = Math.Round(_taxService.GetProductPrice(product,
-                        (itemTotal != decimal.Zero ? itemTotal / item.Quantity : decimal.Zero), false, _workContext.CurrentCustomer, out _), 2);
+                        (subtotal != decimal.Zero ? subtotal / item.Quantity : decimal.Zero), false, _workContext.CurrentCustomer, out _), 2);
+
+                    itemTotal += subtotal;
 
                     return new Item
                     {
