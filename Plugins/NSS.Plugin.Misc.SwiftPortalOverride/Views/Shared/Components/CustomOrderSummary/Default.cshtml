@@ -60,14 +60,12 @@
 <div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="background-color:#03175B; color: #fff">
+                <span class="modal-title">Notes</span>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
-                </div>
+                <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
             </div>
         </div>
     </div>
@@ -191,11 +189,11 @@
                                 <td>
                                     @item.ProductName
                                     @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
-                                    {
-                                        <div class="attributes">
-                                            @Html.Raw(item.AttributeInfo)
-                                        </div>
-                                    }*@
+                                        {
+                                            <div class="attributes">
+                                                @Html.Raw(item.AttributeInfo)
+                                            </div>
+                                        }*@
                                     @if (item.Warnings.Count > 0)
                                     {
                                         <div class="message-error">
