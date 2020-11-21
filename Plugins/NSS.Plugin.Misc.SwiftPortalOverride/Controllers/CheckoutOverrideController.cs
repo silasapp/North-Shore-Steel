@@ -851,39 +851,38 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var request = new ERPCreateOrderRequest()
             {
-                OrderId = order.Id,
-                OrderTotal = order.OrderTotal,
-                PaymentMethodReferenceNo = order.AuthorizationTransactionId,
-                PaymentMethodType = paymentMethod,
                 ContactEmail = _workContext.CurrentCustomer.Email,
                 ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute),
                 ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute),
                 ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute),
+                UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
 
                 ShippingAddressLine1 = shippingAddress?.Address1,
                 ShippingAddressLine2 = shippingAddress?.Address2,
                 ShippingAddressState = _stateProvinceService.GetStateProvinceById(shippingAddress?.StateProvinceId ?? 0)?.Abbreviation,
                 ShippingAddressCity = shippingAddress?.City,
                 ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
-
                 PickupInStore = order.PickupInStore,
                 PickupLocationId = order.PickupInStore && pickupAddress?.City?.ToLower() == "houston" ? 1 : order.PickupInStore && pickupAddress?.City?.ToLower() == "beaumont" ? 2 : (order.PickupInStore ? 1 : 0),
-                UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
-
-                PoNo = poValues.FirstOrDefault(),
 
                 DeliveryDate = deliveryDate ?? string.Empty,
-                ShippingTotal = order.OrderShippingExclTax,
+                ShippingTotal = Math.Round(order.OrderShippingExclTax, 2),
 
-                TaxTotal = order.OrderTax,
+                TaxTotal = Math.Round(order.OrderTax, 2),
 
                 // discounts
-                DiscountTotal = order.OrderDiscount,
+                DiscountTotal = Math.Round(order.OrderDiscount, 2),
                 Discounts = JsonConvert.SerializeObject(discounts.ToArray()),
 
                 // order items
-                LineItemTotal = order.OrderSubtotalExclTax,
-                OrderItems = JsonConvert.SerializeObject(orderItems.ToArray())
+                LineItemTotal = Math.Round(order.OrderSubtotalExclTax, 2),
+                OrderItems = JsonConvert.SerializeObject(orderItems.ToArray()),
+
+                OrderId = order.Id,
+                OrderTotal = Math.Round(order.OrderTotal, 2),
+                PaymentMethodReferenceNo = order.AuthorizationTransactionId,
+                PaymentMethodType = paymentMethod,
+                PoNo = poValues.FirstOrDefault()
             };
 
             // api call
