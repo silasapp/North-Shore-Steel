@@ -432,9 +432,8 @@
                                 var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                 string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
                                 var iNo = serialized == "True" ? itemTagNo : itemNo;
-                                var weight = Decimal.ToDouble(product.Weight);
-                                weight = (weight * item.Quantity);
-                                var totalWeight = DoFormat(weight);
+
+                                var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
 
                                 <tr>
                                     <td>@iNo</td>

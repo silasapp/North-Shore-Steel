@@ -238,7 +238,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var formControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{map.Id}{cartItem.Item.Id}";
                 if (form.TryGetValue(formControlId, out var value))
                 {
-                    cartItem.Item.AttributesXml = _productAttributeParser.AddProductAttribute(cartItem.Item.AttributesXml, map, value);
+                    cartItem.Item.AttributesXml = _productAttributeParser.RemoveProductAttribute(cartItem.Item.AttributesXml, map);
+                    cartItem.Item.AttributesXml =  _productAttributeParser.AddProductAttribute(cartItem.Item.AttributesXml, map, value);
                 }
             }
 
