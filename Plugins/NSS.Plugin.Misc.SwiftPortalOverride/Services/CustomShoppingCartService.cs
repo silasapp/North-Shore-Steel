@@ -223,10 +223,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             var mappings = _productAttributeParser.ParseProductAttributeMappings(item.AttributesXml);
             var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
 
-            var values = _productAttributeService.GetProductAttributeValues(mapping?.Id ?? 0);
-
             var uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
-            var uomList = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0);
 
             uom = uom == Constants.UnitPerPieceField && pricePerPiece == decimal.Zero ? pricePerCWT != decimal.Zero ? Constants.UnitPerWeightField : pricePerFt != decimal.Zero ? Constants.UnitPerFtField  : Constants.UnitPerPieceField : uom;
 

@@ -380,9 +380,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 {
                     var product = _productService.GetProductById(item.ProductId);
 
+                    itemTotal = _shoppingCartService.GetSubTotal(item, false);
+
                     var itemPrice = Math.Round(_taxService.GetProductPrice(product,
-                        _shoppingCartService.GetUnitPrice(item), false, _workContext.CurrentCustomer, out _), 2);
-                    itemTotal += itemPrice * item.Quantity;
+                        (itemTotal != decimal.Zero ? itemTotal / item.Quantity : decimal.Zero), false, _workContext.CurrentCustomer, out _), 2);
+
                     return new Item
                     {
                         Name = CommonHelper.EnsureMaximumLength(product.Name, 127),

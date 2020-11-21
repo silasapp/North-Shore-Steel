@@ -1,11 +1,13 @@
 ﻿@using NSS.Plugin.Misc.SwiftCore.Helpers
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Nop.Core.Domain.Catalog
+@using Nop.Core.Domain.Orders
 @using Nop.Services.Common
 @using Nop.Core
 @using NSS.Plugin.Misc.SwiftCore.Services
 @using NSS.Plugin.Misc.SwiftPortalOverride
 @using Nop.Services.Catalog
+@using Nop.Services.Orders
 @using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 
 @inject IGenericAttributeService genericAttributeService
@@ -14,6 +16,9 @@
 @inject ICustomerCompanyService customerCompanyService
 @inject ICompanyService companyService
 @inject ICustomerCompanyProductService customerCompanyProductService
+@inject IProductAttributeParser productAttributeParser
+@inject IProductAttributeService productAttributeService
+@inject IShoppingCartService shoppingCartService
 @using Nop.Web.Framework.Themes
 @inject IThemeContext themeContext
 @model CheckoutCompleteOverrideModel
@@ -85,6 +90,8 @@
     // get cust company
     var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
 
+    var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
+
     if (customerCompany == null)
         customerCompany = new CustomerCompany();
 }
@@ -94,7 +101,7 @@
     .paypal-button.paypal-button-color-blue, .paypal-button-row.paypal-button-color-blue .menu-button {
         background: red !important;
     }
-/*
+    /*
     .nss-table tr > td {
         white-space: inherit;
     }*/
@@ -418,8 +425,15 @@
                         <tbody>
                             @foreach (var item in Model.ShoppingCartModel.Items)
                             {
+                                var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
+
                                 var product = productService.GetProductById(item.ProductId);
                                 var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                                var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                                var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
+                                var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
+                                var uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
 
                                 var customerPathNo = "";
                                 if (customerCompany != null)
@@ -447,7 +461,7 @@
                                         }*@
                                     </td>
                                     <td>@customerPathNo</td>
-                                    <td>@item.UnitPrice / CW</td>
+                                    <td>@item.UnitPrice / @uom</td>
                                     <td>@item.SubTotal</td>
                                     <td>@totalWeight</td>
                                     <td>@item.Quantity</td>
@@ -667,7 +681,7 @@
                     city: address.city,
                     zipPostalCode: address.zipPostalCode,
                 };
-                const self = this;                
+                const self = this;
                 if (!disableSpinner)
                     this.showLoading();
 

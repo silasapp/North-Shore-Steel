@@ -182,7 +182,7 @@
 
                             var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}{item.Id}" : $"itemuom{item.Id}";
 
-                            var unitPrice = "0.00";
+                            //var unitPrice = "0.00";
 
                             <tr>
                                 <td>@(iNo)</td>
@@ -211,13 +211,13 @@
                                     <input style="width: 100px;height: 30px;" type="text" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" />
                                 </td>
                                 <td>
-                                    @{unitPrice = !string.IsNullOrEmpty(pricePerPiece) ? pricePerPiece : !string.IsNullOrEmpty(pricePerCWT) ? pricePerCWT : !string.IsNullOrEmpty(pricePerFt) ? pricePerFt : unitPrice; }
-                                    @{ string uom = purchaseUnitAttr.Values.FirstOrDefault(x => x.IsPreSelected)?.Name;
-                                        uom = uom == Constants.UnitPerPieceField && !string.IsNullOrEmpty(pricePerPiece) ? !string.IsNullOrEmpty(pricePerCWT) ? Constants.UnitPerWeightField : !string.IsNullOrEmpty(pricePerFt) ? Constants.UnitPerFtField  : Constants.UnitPerPieceField : uom;
+                                    @*@{ 
+                                        string uom = purchaseUnitAttr.Values.FirstOrDefault(x => x.IsPreSelected)?.Name;
+                                        uom = uom == Constants.UnitPerPieceField && !string.IsNullOrEmpty(pricePerPiece) ? !string.IsNullOrEmpty(pricePerCWT) ? Constants.UnitPerWeightField : !string.IsNullOrEmpty(pricePerFt) ? Constants.UnitPerFtField : Constants.UnitPerPieceField : uom;
                                         unitPrice = uom == Constants.UnitPerPieceField ? pricePerPiece : uom == Constants.UnitPerWeightField ? pricePerCWT : uom == Constants.UnitPerFtField ? pricePerFt : "0.00";
-                                    }
+                                    }*@
 
-                                    <input style="width: 100px;height: 30px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="$@(DoFormat(Convert.ToDouble(unitPrice)))">
+                                    <input style="width: 100px;height: 30px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="@(item.UnitPrice)">
 
                                     @if (purchaseUnitAttr != null)
                                     {
@@ -604,10 +604,10 @@
 
         switch (itemUnit) {
             case 'FT':
-                totalPrice = Math.round(qty * length) * unitPrice;
+                totalPrice = evenRound(qty * length) * unitPrice;
                 break;
             case 'CWT':
-                totalPrice = (Math.round(weight * qty) / 100) * unitPrice;
+                totalPrice = (evenRound(weight * qty) / 100) * unitPrice;
                 break;
             case 'EA':
             default:
@@ -649,5 +649,16 @@
         unitPriceCtrl.value = `$${unitPrice}`;
 
         calculateItemTotalPrice(attrId, itemId);
+    }
+
+    function evenRound(num, decimalPlaces) {
+        var d = decimalPlaces || 0;
+        var m = Math.pow(10, d);
+        var n = +(d ? num * m : num).toFixed(8); // Avoid rounding errors
+        var i = Math.floor(n), f = n - i;
+        var e = 1e-8; // Allow for rounding errors in f
+        var r = (f > 0.5 - e && f < 0.5 + e) ?
+            ((i % 2 == 0) ? i : i + 1) : Math.round(n);
+        return d ? r / m : r;
     }
 </script>

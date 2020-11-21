@@ -579,41 +579,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         protected override ProcessPaymentResult GetProcessPaymentResult(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
         {
             //process payment
-            ProcessPaymentResult processPaymentResult = processPaymentResult = new ProcessPaymentResult();
-            //skip payment workflow if order total equals zero
-            //var skipPaymentWorkflow = details.OrderTotal == decimal.Zero;
-            //if (!skipPaymentWorkflow)
-            //{
-            //    var customer = _customerService.GetCustomerById(processPaymentRequest.CustomerId);
-            //    var paymentMethod = _paymentPluginManager
-            //        .LoadPluginBySystemName(processPaymentRequest.PaymentMethodSystemName, customer, processPaymentRequest.StoreId)
-            //        ?? throw new NopException("Payment method couldn't be loaded");
-
-            //    //ensure that payment method is active
-            //    if (!_paymentPluginManager.IsPluginActive(paymentMethod))
-            //        throw new NopException("Payment method is not active");
-
-            //    if (details.IsRecurringShoppingCart)
-            //    {
-            //        //recurring cart
-            //        switch (_paymentService.GetRecurringPaymentType(processPaymentRequest.PaymentMethodSystemName))
-            //        {
-            //            case RecurringPaymentType.NotSupported:
-            //                throw new NopException("Recurring payments are not supported by selected payment method");
-            //            case RecurringPaymentType.Manual:
-            //            case RecurringPaymentType.Automatic:
-            //                processPaymentResult = _paymentService.ProcessRecurringPayment(processPaymentRequest);
-            //                break;
-            //            default:
-            //                throw new NopException("Not supported recurring payment type");
-            //        }
-            //    }
-            //    else
-            //        //standard cart
-            //        processPaymentResult = _paymentService.ProcessPayment(processPaymentRequest);
-            //}
-            //else
-            //payment is not required
+            ProcessPaymentResult processPaymentResult = new ProcessPaymentResult();
 
             processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.PaymentMethodTypeKey, out var paymentMethodType);
 
@@ -647,17 +613,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return processPaymentResult;
         }
 
-        //private ProcessPaymentResult ProcessCreditCardPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
-        //{
-        //    var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
-        //    return processPaymentResult;
-        //}
-
-        //private ProcessPaymentResult ProcessPayPalPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
-        //{
-        //    var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
-        //    return processPaymentResult;
-        //}
 
         /// <summary>
         /// Process a payment
@@ -697,18 +652,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             return result;
-        }
-
-        private ProcessPaymentResult ProcessLineOfCreditPayment(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details, decimal creditAmount)
-        {
-            var isElligible = creditAmount >= details.OrderTotal;
-
-            if (!isElligible)
-                throw new Exception("Credit Amount is less than the Order Total");
-
-            var processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
-
-            return processPaymentResult;
         }
     }
 }

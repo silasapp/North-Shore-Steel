@@ -161,9 +161,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var product = _productService.GetProductById(sci.ProductId);
 
             // override product price based on selected/default unit price
-            var price = GetPrice(product);
-            if (price != null)
-                product.Price = price.GetValueOrDefault();
+            //var price = GetPrice(product);
+            //if (price != null)
+            //    product.Price = price.GetValueOrDefault();
 
             var cartItemModel = new ShoppingCartModel.ShoppingCartItemModel
             {
@@ -289,37 +289,37 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return cartItemModel;
         }
 
-        private decimal? GetPrice(Product product)
-        {
-            var attr = _genericAttributeService.GetAttributesForEntity(product.Id, nameof(Product));
-            var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
-            var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
-            var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
-            var length = attr.FirstOrDefault(x => x.Key == "length")?.Value;
-            var weight = attr.FirstOrDefault(x => x.Key == "weight")?.Value;
+        //private decimal? GetPrice(Product product)
+        //{
+        //    var attr = _genericAttributeService.GetAttributesForEntity(product.Id, nameof(Product));
+        //    var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
+        //    var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
+        //    var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
+        //    var length = attr.FirstOrDefault(x => x.Key == "length")?.Value;
+        //    var weight = attr.FirstOrDefault(x => x.Key == "weight")?.Value;
 
-            string price = !string.IsNullOrEmpty(pricePerPiece) ? pricePerPiece : !string.IsNullOrEmpty(pricePerCWT) ? pricePerCWT : !string.IsNullOrEmpty(pricePerFt) ? pricePerFt : "0.00";
+        //    string price = !string.IsNullOrEmpty(pricePerPiece) ? pricePerPiece : !string.IsNullOrEmpty(pricePerCWT) ? pricePerCWT : !string.IsNullOrEmpty(pricePerFt) ? pricePerFt : "0.00";
 
-            string defaultUnit = !string.IsNullOrEmpty(pricePerPiece) ? Constants.UnitPerPieceField : !string.IsNullOrEmpty(pricePerCWT) ? Constants.UnitPerWeightField : !string.IsNullOrEmpty(pricePerFt) ? Constants.UnitPerFtField : "0.00";
+        //    string defaultUnit = !string.IsNullOrEmpty(pricePerPiece) ? Constants.UnitPerPieceField : !string.IsNullOrEmpty(pricePerCWT) ? Constants.UnitPerWeightField : !string.IsNullOrEmpty(pricePerFt) ? Constants.UnitPerFtField : "0.00";
 
-            var isnum = decimal.TryParse(price, out decimal priceDecimal);
-            decimal weightDecimal = (decimal)0.00;
-            decimal lengthDecimal = (decimal)0.00;
-            isnum = isnum && decimal.TryParse(length, out lengthDecimal);
-            isnum = isnum && decimal.TryParse(weight, out weightDecimal);
-            decimal? unitPrice = null;
+        //    var isnum = decimal.TryParse(price, out decimal priceDecimal);
+        //    decimal weightDecimal = (decimal)0.00;
+        //    decimal lengthDecimal = (decimal)0.00;
+        //    isnum = isnum && decimal.TryParse(length, out lengthDecimal);
+        //    isnum = isnum && decimal.TryParse(weight, out weightDecimal);
+        //    decimal? unitPrice = null;
 
-            if (isnum)
-            {
-                if (defaultUnit == Constants.UnitPerWeightField)
-                    unitPrice = (weightDecimal / 100) * priceDecimal;                
-                else if (defaultUnit == Constants.UnitPerFtField)
-                    unitPrice = lengthDecimal * unitPrice;
-                else 
-                    unitPrice = priceDecimal;
-            }
+        //    if (isnum)
+        //    {
+        //        if (defaultUnit == Constants.UnitPerWeightField)
+        //            unitPrice = (weightDecimal / 100) * priceDecimal;                
+        //        else if (defaultUnit == Constants.UnitPerFtField)
+        //            unitPrice = lengthDecimal * unitPrice;
+        //        else 
+        //            unitPrice = priceDecimal;
+        //    }
 
-            return unitPrice;
-        }
+        //    return unitPrice;
+        //}
     }
 }

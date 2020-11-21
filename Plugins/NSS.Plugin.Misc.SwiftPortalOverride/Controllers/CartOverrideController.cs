@@ -236,7 +236,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             foreach (var map in attrsMapping)
             {
                 var formControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{map.Id}{cartItem.Item.Id}";
-                if (form.TryGetValue(formControlId, out var value))
+                if (form.TryGetValue(formControlId, out var value) && !string.IsNullOrEmpty(value))
                 {
                     cartItem.Item.AttributesXml = _productAttributeParser.RemoveProductAttribute(cartItem.Item.AttributesXml, map);
                     cartItem.Item.AttributesXml =  _productAttributeParser.AddProductAttribute(cartItem.Item.AttributesXml, map, value);
@@ -248,7 +248,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                 cartItem.Item.RentalStartDateUtc, cartItem.Item.RentalEndDateUtc, isNewQuantity ? cartItem.NewQuantity : cartItem.Item.Quantity, true);
 
             // update cust part No
-            var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+            var (_, customerCompany) = GetCustomerCompanyDetails();
 
             if(customerCompany != null)
             {
