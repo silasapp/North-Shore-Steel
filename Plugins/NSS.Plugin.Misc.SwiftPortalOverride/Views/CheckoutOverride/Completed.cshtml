@@ -45,10 +45,10 @@
     </div>
     <div class="details mt-2" style="text-align: center">
         <div class="order-number">
-            <label class="text-primary h6 font-weight-bold text-center">ORDER NUMBER: @(erpOrderNo?.ToString() ?? "Np_"+@Model.OrderId.ToString())</label>
+            <label class="text-primary h6 font-weight-bold text-center">ORDER NUMBER: @(erpOrderNo)</label>
         </div>
         <div class="details-link">
-            <a href="/orders/@Model.OrderId" class="text-primary"><u>CLICK HERE TO VIEW ORDER DETAILS</u></a>
+            <a href="/orders/@erpOrderNo" class="text-primary"><u>CLICK HERE TO VIEW ORDER DETAILS</u></a>
         </div>
     </div>
 </div>
