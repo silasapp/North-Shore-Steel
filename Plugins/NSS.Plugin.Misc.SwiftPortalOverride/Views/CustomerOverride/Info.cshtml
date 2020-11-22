@@ -84,7 +84,7 @@
                     {
                         <div class="inputs">
                             <label asp-for="Company" asp-postfix=":"></label>
-                            <input asp-for="Company" readonly style="cursor: unset" />
+                            <input asp-for="Company" />
                             @if (Model.CompanyRequired)
                             {
                                 <nop-required />
