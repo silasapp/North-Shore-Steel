@@ -3,6 +3,11 @@
 @model CompanyInvoiceListModel
 @using Syncfusion.EJ2
 
+<style>
+    .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
+        padding-left: 0.6rem
+    }
+</style>
 <div>
     <ejs-grid id="Grid" dataSource="@Model.Invoices" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
