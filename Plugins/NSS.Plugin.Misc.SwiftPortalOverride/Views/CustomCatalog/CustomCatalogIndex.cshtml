@@ -237,19 +237,28 @@
     $(document).ready(function () {
         populateFilteredProductsTable(specIDs, specNames, shapeIDs, shapeNames);
     });
-
+    var pId = 0;
     function nodeCheck(args) {
         if (isChecked) {
             var checkedNode = [args.node];
             var treeObj = document.getElementById('treedata').ej2_instances[0];
             var selectedShape = treeObj.getNodeData(args.node);
             var selectedShapeId = selectedShape.id;
-            var selectedShapeText = selectedShape.text
+            var selectedShapeText = selectedShape.text;
+            var parentId = selectedShape.parentID;
             var defaultSpecs = document.getElementsByClassName("defaultSpecs");
             var plateIndividualSpecs = document.getElementsByClassName("plateIndividualSpecs");
             var inputs = document.querySelectorAll("input[type='checkbox']");
-            if (selectedShape.isChecked == 'true' ) {
+            console.log('selectedShape', selectedShape);
+            if (selectedShape.isChecked == 'true') {
+                if (parentId != null) {
+                    if (parentId == pId) {
+                        return;
+                    }
+                    pId = parentId;
+                }
                 treeObj.uncheckAll();
+                pId = parentId == null ? 0 : pId;
                 shapeIDs = [];
                 shapeNames = [];
                 treeObj.checkAll(checkedNode);
@@ -261,6 +270,7 @@
                 shapeNames.indexOf(selectedShapeText) === -1 ? shapeNames.push(selectedShapeText) : shapeNames.splice(shapeNames.indexOf(selectedShapeText), 1);
             }
             else {
+                pId = parentId;
                 var shapeButtons = $('.e-frame.e-icons.e-check');
                 if (shapeButtons.length == 0) {
                     shapeIDs = [];
