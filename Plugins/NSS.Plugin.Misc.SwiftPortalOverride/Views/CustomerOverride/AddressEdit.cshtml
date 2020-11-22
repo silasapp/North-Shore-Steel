@@ -14,17 +14,20 @@
     @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses })
 }
 <form asp-route="CustomerAddressEdit" method="post">
-    <div class="page account-page address-edit-page">
+    <div class="page account-page">
         <div class="page-body">
-            <div asp-validation-summary="ModelOnly" class="message-error"></div>
-            @{
-                var dataDictAddress = new ViewDataDictionary(ViewData);
-                dataDictAddress.TemplateInfo.HtmlFieldPrefix = "Address";
-                @await Html.PartialAsync("_CreateOrUpdateAddress", Model.Address, dataDictAddress)
-            }
-            <div class="buttons">
-                <input type="submit" class="cancel-button" style="background-color: transparent !important;" value="Cancel" />
-                <input type="submit" class="button-1 save-address-button" value="@T("Common.Save")" />
+            <div class="account-page-card address-edit-page">
+                <div class="title"><strong>ADDRESS DETAILS</strong></div>
+                <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                @{
+                    var dataDictAddress = new ViewDataDictionary(ViewData);
+                    dataDictAddress.TemplateInfo.HtmlFieldPrefix = "Address";
+                    @await Html.PartialAsync("_CreateOrUpdateAddress", Model.Address, dataDictAddress)
+                }
+                <div class="buttons">
+                    <input type="submit" class="cancel-button" style="background-color: transparent !important;" value="Cancel" />
+                    <input type="submit" class="button-1 save-address-button" value="@T("Common.Save")" />
+                </div>
             </div>
         </div>
     </div>
