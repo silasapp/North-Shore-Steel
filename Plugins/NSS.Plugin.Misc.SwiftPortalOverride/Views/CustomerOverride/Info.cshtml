@@ -36,7 +36,7 @@
                     @if (Model.FirstNameEnabled)
                     {
                         <div class="inputs">
-                            <label asp-for="FirstName" asp-postfix=":"></label>
+                            <label asp-for="FirstName" asp-postfix=":">First Name</label>
                             <input asp-for="FirstName" />
                             @if (Model.FirstNameRequired)
                             {
@@ -47,7 +47,7 @@
                     }
 
                     <div class="inputs">
-                        <label asp-for="Email" asp-postfix=":"></label>
+                        <label asp-for="Email" asp-postfix=":">Work Email</label>
                         <input asp-for="Email" readonly style="cursor: unset" />
                         <nop-required />
                         <span asp-validation-for="Email"></span>
@@ -56,7 +56,7 @@
                     @if (Model.LastNameEnabled)
                     {
                         <div class="inputs">
-                            <label asp-for="LastName" asp-postfix=":"></label>
+                            <label asp-for="LastName" asp-postfix=":">Last Name</label>
                             <input asp-for="LastName" />
                             @if (Model.LastNameRequired)
                             {
@@ -69,7 +69,7 @@
                     @if (Model.PhoneEnabled)
                     {
                         <div class="inputs">
-                            <label asp-for="Phone" asp-postfix=":"></label>
+                            <label asp-for="Phone" asp-postfix=":">Phone Number</label>
                             <input asp-for="Phone" />
                             @if (Model.PhoneRequired)
                             {
@@ -83,7 +83,7 @@
                     @if (Model.CompanyEnabled)
                     {
                         <div class="inputs">
-                            <label asp-for="Company" asp-postfix=":"></label>
+                            <label asp-for="Company" asp-postfix=":">Company Name</label>
                             <input asp-for="Company" />
                             @if (Model.CompanyRequired)
                             {
