@@ -199,7 +199,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => erpId: {erpId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request.ToKeyValue())}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateNSSUser details => erpId: {erpId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request.ToKeyValue())}");
         }
 
 
@@ -408,7 +408,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
-                _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+                _logger.Warning("Swift Api provider - GetShippingRate", new Exception("NSS API attributes not configured correctly."));
                 return retVal;
             }
 
@@ -463,7 +463,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUser details => email: {request.DestinationAddressLine1}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetShippingRate => email: {request.DestinationAddressLine1}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }
@@ -486,7 +486,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
-                _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+                _logger.Warning("Swift Api provider - GetCompanyCreditBalance", new Exception("NSS API attributes not configured correctly."));
                 return retVal;
             }
 
@@ -504,7 +504,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     if (string.IsNullOrEmpty(token))
                     {
-                        _logger.Warning($"NSS.GetCompanyAccountCreditBal -> {companyId}", new Exception("NSS token returned empty"));
+                        _logger.Warning($"NSS.GetCompanyCreditBalance -> {companyId}", new Exception("NSS token returned empty"));
                         return retVal;
                     }
 
@@ -526,11 +526,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.GetCompanyAccountCredBal -> {companyId}", ex);
+                _logger.Error($"NSS.GetCompanyCreditBalance -> {companyId}", ex);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetAccountCreditBal details => companyid: {companyId}", $"resp content ==> {respContent ?? "empty"}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetCompanyCreditBalance details => companyid: {companyId}", $"resp content ==> {respContent ?? "empty"}");
 
             return retVal;
         }
@@ -551,7 +551,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
-                _logger.Warning("Swift Api provider - Create user", new Exception("NSS API attributes not configured correctly."));
+                _logger.Warning("Swift Api provider - CreateNSSOrder", new Exception("NSS API attributes not configured correctly."));
                 return retVal;
             }
 
@@ -569,7 +569,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     if (string.IsNullOrEmpty(token))
                     {
-                        _logger.Warning($"NSS.CreateOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
+                        _logger.Warning($"NSS.CreateNSSOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
                     }
 
                     //httpClient.DefaultRequestHeaders.Authorization =
@@ -590,7 +590,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (response.IsSuccessStatusCode)
                         retVal = JsonConvert.DeserializeObject<ERPCreateOrderResponse>(respContent);
                     else
-                        throw new NopException("An error ocurred while placing order", respContent);
+                        throw new NopException($"An error ocurred while placing order: {respContent}", respContent);
                 }
             }
             catch (Exception ex)
@@ -617,7 +617,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             if(!useMock)
                 if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
                 {
-                    _logger.Warning("Swift Api provider - SearchOrders", new Exception("NSS API attributes not configured correctly."));
+                    _logger.Warning("Swift Api provider - SearchOpenOrders", new Exception("NSS API attributes not configured correctly."));
                     return retVal;
                 }
 
@@ -640,7 +640,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                         if (string.IsNullOrEmpty(token))
                         {
-                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            _logger.Warning($"NSS.SearchOpenOrders -> {companyId}", new Exception("NSS token returned empty"));
                             return retVal;
                         }
 
@@ -666,11 +666,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.SearchOrders -> {companyId}", ex);
+                _logger.Error($"NSS.SearchOpenOrders -> {companyId}", ex);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchOrders details => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchOpenOrders details => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }
@@ -687,7 +687,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             if (!useMock)
                 if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
                 {
-                    _logger.Warning("Swift Api provider - SearchOrders", new Exception("NSS API attributes not configured correctly."));
+                    _logger.Warning("Swift Api provider - SearchClosedOrders", new Exception("NSS API attributes not configured correctly."));
                     return retVal;
                 }
 
@@ -710,7 +710,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                         if (string.IsNullOrEmpty(token))
                         {
-                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            _logger.Warning($"NSS.SearchClosedOrders -> {companyId}", new Exception("NSS token returned empty"));
                             return retVal;
                         }
 
@@ -736,11 +736,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.SearchOrders -> {companyId}", ex);
+                _logger.Error($"NSS.SearchClosedOrders -> {companyId}", ex);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchOrders details => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchClosedOrders details => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }
@@ -757,7 +757,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             if (!useMock)
                 if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
                 {
-                    _logger.Warning("Swift Api provider - SearchInvoices", new Exception("NSS API attributes not configured correctly."));
+                    _logger.Warning("Swift Api provider - SearchOpenInvoices", new Exception("NSS API attributes not configured correctly."));
                     return retVal;
                 }
 
@@ -780,7 +780,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                         if (string.IsNullOrEmpty(token))
                         {
-                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            _logger.Warning($"NSS.SearchOpenInvoices -> {companyId}", new Exception("NSS token returned empty"));
                             return retVal;
                         }
 
@@ -807,11 +807,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.SearchInvoices -> {companyId}", ex);
+                _logger.Error($"NSS.SearchOpenInvoices -> {companyId}", ex);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchInvoices details => email: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchOpenInvoices details => email: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }
@@ -829,7 +829,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             if (!useMock)
                 if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
                 {
-                    _logger.Warning("Swift Api provider - SearchInvoices", new Exception("NSS API attributes not configured correctly."));
+                    _logger.Warning("Swift Api provider - SearchClosedInvoices", new Exception("NSS API attributes not configured correctly."));
                     return retVal;
                 }
 
@@ -852,7 +852,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                         if (string.IsNullOrEmpty(token))
                         {
-                            _logger.Warning($"NSS.SearchOrders -> {companyId}", new Exception("NSS token returned empty"));
+                            _logger.Warning($"NSS.SearchClosedInvoices -> {companyId}", new Exception("NSS token returned empty"));
                             return retVal;
                         }
 
@@ -878,11 +878,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.SearchInvoices -> {companyId}", ex);
+                _logger.Error($"NSS.SearchClosedInvoices -> {companyId}", ex);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchInvoices => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchClosedInvoices => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }

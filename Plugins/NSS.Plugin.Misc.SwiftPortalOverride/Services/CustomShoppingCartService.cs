@@ -109,9 +109,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             var product = _productService.GetProductById(shoppingCartItem.ProductId);
 
             // override product price based on selected/default unit price
-            var price = GetPrice(product);
-            if (price != null)
-                product.Price = price.GetValueOrDefault();
+            var(uom, pricePerFt, pricePerCWT, pricePerPiece) = GetPriceUnits(product, shoppingCartItem);
+            product.Price = GetERPUnitPrice(uom, pricePerFt, pricePerCWT, pricePerPiece);
 
             return GetUnitPrice(product,
                 customer,
@@ -126,37 +125,109 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 out appliedDiscounts);
         }
 
-        private decimal? GetPrice(Product product)
+        public override decimal GetSubTotal(ShoppingCartItem shoppingCartItem,
+            bool includeDiscounts,
+            out decimal discountAmount,
+            out List<Discount> appliedDiscounts,
+            out int? maximumDiscountQty)
         {
-            var attr = _genericAttributeService.GetAttributesForEntity(product.Id, nameof(Product));
-            var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
-            var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
-            var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
-            var length = attr.FirstOrDefault(x => x.Key == "length")?.Value;
-            var weight = attr.FirstOrDefault(x => x.Key == "weight")?.Value;
+            if (shoppingCartItem == null)
+                throw new ArgumentNullException(nameof(shoppingCartItem));
 
-            string price = !string.IsNullOrEmpty(pricePerPiece) ? pricePerPiece : !string.IsNullOrEmpty(pricePerCWT) ? pricePerCWT : !string.IsNullOrEmpty(pricePerFt) ? pricePerFt : "0.00";
+            decimal subTotal;
+            maximumDiscountQty = null;
 
-            string defaultUnit = !string.IsNullOrEmpty(pricePerPiece) ? Constants.UnitPerPieceField : !string.IsNullOrEmpty(pricePerCWT) ? Constants.UnitPerWeightField : !string.IsNullOrEmpty(pricePerFt) ? Constants.UnitPerFtField : "0.00";
+            //unit price
+            var unitPrice = GetUnitPrice(shoppingCartItem, includeDiscounts,
+                out discountAmount, out appliedDiscounts);
 
-            var isnum = decimal.TryParse(price, out decimal priceDecimal);
-            decimal weightDecimal = (decimal)0.00;
-            decimal lengthDecimal = (decimal)0.00;
-            isnum = isnum && decimal.TryParse(length, out lengthDecimal);
-            isnum = isnum && decimal.TryParse(weight, out weightDecimal);
-            decimal? unitPrice = null;
+            // custom get erp units
+            var product = _productService.GetProductById(shoppingCartItem.ProductId);
+            var (uom, _, _, _) = GetPriceUnits(product, shoppingCartItem);
 
-            if (isnum)
+            //discount
+            if (appliedDiscounts.Any())
             {
-                if (defaultUnit == Constants.UnitPerWeightField)
-                    unitPrice = (weightDecimal / 100) * priceDecimal;
-                else if (defaultUnit == Constants.UnitPerFtField)
-                    unitPrice = lengthDecimal * unitPrice;
+                //we can properly use "MaximumDiscountedQuantity" property only for one discount (not cumulative ones)
+                Discount oneAndOnlyDiscount = null;
+                if (appliedDiscounts.Count == 1)
+                    oneAndOnlyDiscount = appliedDiscounts.First();
+
+                if ((oneAndOnlyDiscount?.MaximumDiscountedQuantity.HasValue ?? false) &&
+                    shoppingCartItem.Quantity > oneAndOnlyDiscount.MaximumDiscountedQuantity.Value)
+                {
+                    maximumDiscountQty = oneAndOnlyDiscount.MaximumDiscountedQuantity.Value;
+                    //we cannot apply discount for all shopping cart items
+                    var discountedQuantity = oneAndOnlyDiscount.MaximumDiscountedQuantity.Value;
+                    var discountedSubTotal = GetERPSubTotal(product, unitPrice, uom, discountedQuantity);
+                    discountAmount *= discountedQuantity;
+
+                    var notDiscountedQuantity = shoppingCartItem.Quantity - discountedQuantity;
+                    var notDiscountedUnitPrice = GetUnitPrice(shoppingCartItem, false);
+                    var notDiscountedSubTotal = notDiscountedUnitPrice * notDiscountedQuantity;
+
+                    subTotal = discountedSubTotal + notDiscountedSubTotal;
+                }
                 else
-                    unitPrice = priceDecimal;
+                {
+                    //discount is applied to all items (quantity)
+                    //calculate discount amount for all items
+                    discountAmount *= shoppingCartItem.Quantity;
+
+                    subTotal = GetERPSubTotal(product, unitPrice, uom, shoppingCartItem.Quantity);
+                }
+            }
+            else
+            {
+                subTotal = GetERPSubTotal(product, unitPrice, uom, shoppingCartItem.Quantity);
             }
 
+            return subTotal;
+        }
+
+        private decimal GetERPUnitPrice(string uom, decimal pricePerFt, decimal pricePerCWT, decimal pricePerPiece)
+        {
+            decimal unitPrice = uom == Constants.UnitPerPieceField ? pricePerPiece : uom == Constants.UnitPerWeightField ? pricePerCWT : uom == Constants.UnitPerFtField ? pricePerFt : decimal.Zero;
+
             return unitPrice;
+        }
+
+        private decimal GetERPSubTotal(Product product, decimal unitPrice, string uom, int qty)
+        {
+            decimal subtotal;
+
+            if (uom == Constants.UnitPerWeightField)
+            {
+                var totalWeight = Math.Round(product.Weight * qty, 0) / 100;
+                subtotal = unitPrice * totalWeight;
+            }
+            else if (uom == Constants.UnitPerFtField)
+            {
+                var totalLength = Math.Round(product.Length * qty, 0);
+                subtotal = unitPrice * totalLength;
+            }   
+            else
+                subtotal = unitPrice * qty;
+
+            return subtotal;
+        }
+
+        private (string, decimal, decimal, decimal) GetPriceUnits(Product product, ShoppingCartItem item)
+        {
+            var attr = _genericAttributeService.GetAttributesForEntity(product.Id, nameof(Product));
+            decimal.TryParse(attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value, out var pricePerFt);
+            decimal.TryParse(attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value, out var pricePerCWT);
+            decimal.TryParse(attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value, out var pricePerPiece);
+
+            var attribute = _productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+            var mappings = _productAttributeParser.ParseProductAttributeMappings(item.AttributesXml);
+            var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
+
+            var uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+
+            uom = uom == Constants.UnitPerPieceField && pricePerPiece == decimal.Zero ? pricePerCWT != decimal.Zero ? Constants.UnitPerWeightField : pricePerFt != decimal.Zero ? Constants.UnitPerFtField  : Constants.UnitPerPieceField : uom;
+
+            return (uom, pricePerFt, pricePerCWT, pricePerPiece);
         }
     }
 }

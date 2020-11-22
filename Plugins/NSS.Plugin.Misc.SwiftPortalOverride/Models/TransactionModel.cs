@@ -33,7 +33,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public double Weight { get; set; }
         public double OrderTotal { get; set; }
         public string PONo { get; set; }
-        public DateTime EstDeliveryDate { get; set; }
+        public DateTime? EstDeliveryDate { get; set; }
         public string OrderStatusName { get; set; }
     }
 

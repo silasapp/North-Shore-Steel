@@ -53,7 +53,7 @@
                                                 <td>@(string.Format("{0:N2}", order.Weight))</td>
                                                 <td>$@(string.Format("{0:N2}", order.OrderTotal))</td>
                                                 <td>@order.PONo</td>
-                                                <td>@order.EstDeliveryDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@order.EstDeliveryDate?.ToString("MM/dd/yyyy")</td>
                                                 <td>@order.OrderStatusName</td>
                                             </tr>
                                         }

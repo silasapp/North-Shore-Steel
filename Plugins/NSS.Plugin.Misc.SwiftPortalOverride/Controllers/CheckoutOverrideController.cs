@@ -79,11 +79,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly ICustomerCompanyProductService _customerCompanyProductService;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeParser _productAttributeParser;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
+        public CheckoutOverrideController(IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -130,6 +132,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _orderTotalCalculationService = orderTotalCalculationService;
             _customerCompanyService = customerCompanyService;
             _customerCompanyProductService = customerCompanyProductService;
+            _productAttributeParser = productAttributeParser;
+            _productAttributeService = productAttributeService;
         }
         #endregion
 
@@ -773,7 +777,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod, string deliveryDate)
         {
-
             var shippingAddress = _addressService.GetAddressById(order.ShippingAddressId ?? 0);
             var pickupAddress = _addressService.GetAddressById(order.PickupAddressId ?? 0);
 
@@ -798,60 +801,89 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var orderItems = new List<DTOs.Requests.OrderItem>();
             foreach (var item in orderItemList)
             {
-                var attrs = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                var genAttrs = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                var mappings = _productAttributeParser.ParseProductAttributeMappings(item.AttributesXml);
+                var attrs = _productAttributeService.GetAllProductAttributes();
+
+                var noteAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.WorkOrderInstructionsAttribute);
+                var sawOptionAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CutOptionsAttribute);
+                var sawToleranceAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.LengthToleranceCutAttribute);
+                var uomAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.PurchaseUnitAttribute);
+
+                string uom = null, notes = null, sawoptions = null, sawTolerance = null;
+
+                foreach (var mapping in mappings)
+                {
+                    if(mapping.ProductAttributeId == noteAttr?.Id)
+                    {
+                        notes = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
+                    }
+                    else if (mapping.ProductAttributeId == sawOptionAttr?.Id)
+                    {
+                        sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                    }
+                    else if (mapping.ProductAttributeId == sawToleranceAttr?.Id)
+                    {
+                        sawTolerance = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
+                    }
+                    else if (mapping.ProductAttributeId == uomAttr?.Id)
+                    {
+                        uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                    }
+                }
 
                 orderItems.Add(new DTOs.Requests.OrderItem
                 {
-                    Description = attrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
-                    ItemId = (int.TryParse(attrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
+                    Description = genAttrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
+                    ItemId = (int.TryParse(genAttrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
                     CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? null) : null,
                     Quantity = item.Quantity,
                     TotalPrice = item.PriceExclTax,
                     UnitPrice = item.UnitPriceExclTax,
-                    TotalWeight = (decimal.TryParse(attrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int) Math.Round(weight * item.Quantity) : 0),
+                    TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int) Math.Round(weight * item.Quantity) : 0),
                     // product attr
-                    Notes = "",
-                    SawOptions = "",
-                    SawTolerance = "",
-                    Uom = "EA"
+                    Notes = notes,
+                    SawOptions = sawoptions,
+                    SawTolerance = sawTolerance,
+                    Uom = uom
                 });
             }
 
             var request = new ERPCreateOrderRequest()
             {
-                OrderId = order.Id,
-                OrderTotal = order.OrderTotal,
-                PaymentMethodReferenceNo = order.AuthorizationTransactionId,
-                PaymentMethodType = paymentMethod,
                 ContactEmail = _workContext.CurrentCustomer.Email,
                 ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute),
                 ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute),
                 ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute),
+                UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
 
                 ShippingAddressLine1 = shippingAddress?.Address1,
                 ShippingAddressLine2 = shippingAddress?.Address2,
                 ShippingAddressState = _stateProvinceService.GetStateProvinceById(shippingAddress?.StateProvinceId ?? 0)?.Abbreviation,
                 ShippingAddressCity = shippingAddress?.City,
                 ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
-
                 PickupInStore = order.PickupInStore,
-                PickupLocationId = pickupAddress?.City?.ToLower() == "houston" ? 1 : (pickupAddress?.City?.ToLower() == "beaumont" ? 2 : 0),
-                UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
-
-                PoNo = poValues.FirstOrDefault(),
+                PickupLocationId = order.PickupInStore && pickupAddress?.City?.ToLower() == "houston" ? 1 : order.PickupInStore && pickupAddress?.City?.ToLower() == "beaumont" ? 2 : (order.PickupInStore ? 1 : 0),
 
                 DeliveryDate = deliveryDate ?? string.Empty,
-                ShippingTotal = order.OrderShippingExclTax,
+                ShippingTotal = Math.Round(order.OrderShippingExclTax, 2),
 
-                TaxTotal = order.OrderTax,
+                TaxTotal = Math.Round(order.OrderTax, 2),
 
                 // discounts
-                DiscountTotal = order.OrderDiscount,
+                DiscountTotal = Math.Round(order.OrderDiscount, 2),
                 Discounts = JsonConvert.SerializeObject(discounts.ToArray()),
 
                 // order items
-                LineItemTotal = order.OrderSubtotalExclTax,
-                OrderItems = JsonConvert.SerializeObject(orderItems.ToArray())
+                LineItemTotal = Math.Round(order.OrderSubtotalExclTax, 2),
+                OrderItems = JsonConvert.SerializeObject(orderItems.ToArray()),
+
+                OrderId = order.Id,
+                OrderTotal = Math.Round(order.OrderTotal, 2),
+                PaymentMethodReferenceNo = order.AuthorizationTransactionId,
+                PaymentMethodType = paymentMethod,
+                PoNo = poValues.FirstOrDefault()
             };
 
             // api call

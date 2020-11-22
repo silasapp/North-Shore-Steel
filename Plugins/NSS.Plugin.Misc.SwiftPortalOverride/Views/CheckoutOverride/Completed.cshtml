@@ -41,8 +41,8 @@
             </p>
         </div>
         <div class="fieldset order-result-fieldset">
-            <p class="boldText">ORDER NUMBER: @(erpOrderNo?.ToString() ?? "Np_"+@Model.OrderId.ToString()</p>
-            <p class="link"><a href="/orders/@Model.OrderId">CLICK HERE TO VIEW ORDER DETAILS</a>
+            <p class="boldText">ORDER NUMBER: @(erpOrderNo)</p>
+            <p class="link"><a href="/orders/@erpOrderNo">CLICK HERE TO VIEW ORDER DETAILS</a>
         </div>
 
         </p>
@@ -50,5 +50,4 @@
             <a href="/"><input class="button-1 login-button" type="submit" value="Continue"></a>
         </div>
     </div>
-
 </div>
