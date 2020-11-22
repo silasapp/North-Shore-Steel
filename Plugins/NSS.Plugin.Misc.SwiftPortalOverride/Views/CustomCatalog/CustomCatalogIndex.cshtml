@@ -13,6 +13,12 @@
     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
 
+
+<div id="overlay">
+    <div class="w-100 d-flex justify-content-center align-items-center">
+        <div class="spinner"></div>
+    </div>
+</div>
 <div id="app" class="page catalog-page">
     @*<div class="cart-side-drawer-trigger">
             <img src="Themes/SwiftPortal/Content/assets/settings-adjust.svg" alt="">
@@ -212,11 +218,6 @@
                 <div id="partialview"></div>
             </div>
         </div>
-    </div>
-</div>
-<div id="overlay">
-    <div class="w-100 d-flex justify-content-center align-items-center">
-        <div class="spinner"></div>
     </div>
 </div>
 
