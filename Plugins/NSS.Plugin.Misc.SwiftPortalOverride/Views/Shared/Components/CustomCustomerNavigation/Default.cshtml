@@ -1,4 +1,4 @@
-﻿@using Nop.Web.Models.Customer
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @model CustomerNavigationModel
 
 <div class="account-page-card">
@@ -10,7 +10,7 @@
                 {
                     <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")">
                         <a href="@Url.RouteUrl(item.RouteName)">
-                            <img src="@item.Title" alt="">@(item.Title)
+                            <img src="@item.ItemLogo" alt="">@(item.Title)
                         </a>
                     </li>
                 }
