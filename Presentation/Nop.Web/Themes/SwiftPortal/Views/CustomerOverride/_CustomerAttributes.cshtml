@@ -12,15 +12,22 @@
         var textPrompt = attribute.Name;
 
 
-<div class="inputs custom-attributes">
-    @if (attribute.Name == Constants.PreferredLocationIdAttribute) { <label>Preferred Pickup Location</label>} else {<label>@textPrompt</label>}
-   
+<div class=" custom-attributes">
+    @if (attribute.Name == Constants.PreferredLocationIdAttribute)
+    {<label>Preferred Pickup Location</label>}
+    else
+    {<label>@textPrompt</label>}
+    @if (attribute.IsRequired)
+    {
+        <nop-required />
+    }
+
     @switch (attribute.AttributeControlType)
     {
         case AttributeControlType.DropdownList:
             {
-                
-                <select name="@(controlId)" id="@(controlId)">
+
+                <select name="@(controlId)" id="@(controlId)" class="custom-input form-control">
                     @if (!attribute.IsRequired)
                     {
                         <option value="0">---</option>
@@ -77,10 +84,6 @@
                 //not support attribute type
             }
             break;
-    }
-    @if (attribute.IsRequired)
-    {
-        <nop-required />
     }
 </div>
     }
