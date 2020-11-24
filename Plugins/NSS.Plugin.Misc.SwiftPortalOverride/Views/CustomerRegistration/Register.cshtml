@@ -1,4 +1,4 @@
-﻿@using Nop.Web.Models.Customer
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Nop.Services.Customers
 @using NSS.Plugin.Misc.SwiftCore.Helpers;
 @model RegisterModel
@@ -53,37 +53,25 @@
                     <div class="title">
                         <strong>PERSONAL INFORMATION</strong>
                     </div>
-
                     <div>
                         <div class="form-group row">
-                            @if (Model.FirstNameEnabled)
-                            {
-                                <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                    <label asp-for="FirstName">First Name</label>
-                                    <nop-required />
-                                    <input asp-for="FirstName" class="form-control custom-input" />
-                                    <span asp-validation-for="FirstName" style="display:flex;"></span>
-                                </div>
-                            }
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="FirstName">First Name</label>
+                                <nop-required />
+                                <input asp-for="FirstName" class="form-control custom-input" />
+                                <span asp-validation-for="FirstName" style="display:flex;"></span>
+                            </div>
 
-
-                            @if (Model.LastNameEnabled)
-                            {
-                                <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                    <label asp-for="LastName">Last Name</label>
-                                    <nop-required />
-                                    <input asp-for="LastName" class="form-control custom-input" />
-                                    <span asp-validation-for="LastName" style="display: flex;"></span>
-                                </div>
-                            }
-
-
-
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                                <label asp-for="LastName">Last Name</label>
+                                <nop-required />
+                                <input asp-for="LastName" class="form-control custom-input" />
+                                <span asp-validation-for="LastName" style="display: flex;"></span>
+                            </div>
                         </div>
 
 
                         <div class="form-group row">
-
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="Email">Work Email</label>
                                 <nop-required />
@@ -91,21 +79,16 @@
                                 <span asp-validation-for="Email" style="display:flex;"></span>
                             </div>
 
-                            @if (Model.EnteringEmailTwice)
-                            {
-                                <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                    <label asp-for="ConfirmEmail">Confirm Email</label>
-                                    <nop-required />
-                                    <input asp-for="ConfirmEmail" class="form-control custom-input" />
-                                    <span asp-validation-for="ConfirmEmail" style="display:flex;"></span>
-                                </div>
-                            }
-
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                                <label asp-for="ConfirmEmail">Confirm Email</label>
+                                <nop-required />
+                                <input asp-for="ConfirmEmail" class="form-control custom-input" />
+                                <span asp-validation-for="ConfirmEmail" style="display:flex;"></span>
+                            </div>
                         </div>
 
 
                         <div class="form-group row">
-
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="Password">Set Password</label>
                                 <nop-required />
@@ -113,79 +96,88 @@
                                 <span asp-validation-for="Password" style="display:flex;"></span>
 
                             </div>
-
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                 <label asp-for="ConfirmPassword">Confirm Password</label>
                                 <nop-required />
                                 <input asp-for="ConfirmPassword" class="form-control custom-input" />
                                 <span asp-validation-for="ConfirmPassword" style="display:flex;"></span>
                             </div>
-                            @if (Model.DisplayCaptcha)
-                            {
-                                <nop-captcha />
-                            }
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="WorkPhone">Work Phone</label>
+                                <nop-required />
+                                <input asp-for="WorkPhone" class="form-control custom-input" />
+                                <span asp-validation-for="WorkPhone" style="display:flex;"></span>
+                            </div>
+
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                                <label asp-for="CellPhone">Cell Phone</label>
+                                <nop-required />
+                                <input asp-for="CellPhone" class="form-control custom-input" />
+                                <span asp-validation-for="CellPhone" style="display:flex;"></span>
+                            </div>
 
                         </div>
+
 
 
                         <div class="form-group row">
-                            @if (Model.CompanyEnabled)
-                            {
-                                <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                    <label asp-for="Company">Company Name</label>
-                                    <nop-required />
-                                    <input asp-for="Company" class="form-control custom-input" />
-                                    <span asp-validation-for="Company" style="display:flex;"></span>
-
-                                    @{
-                                        var isExistingCustomerCtrl = Model.CustomerAttributes.Where(x => x.Name == "Existing Customer").FirstOrDefault();
-                                    }
-                                    @if (isExistingCustomerCtrl != null)
-                                    {
-                                        var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{isExistingCustomerCtrl.Id}";
-                                        <ul class="option-list">
-                                            @foreach (var attributeValue in isExistingCustomerCtrl.Values)
-                                            {
-                                                <li>
-                                                    <input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
-                                                    <label for="@(controlId)_@(attributeValue.Id)" id="current-customer">I am a current customer</label>
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-
-                                </div>
-                            }
-
-                            @if (Model.PhoneEnabled)
-                            {
-                                <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                    <label asp-for="Phone">Phone Number</label>
-                                    <nop-required />
-                                    <input asp-for="Phone" class="form-control custom-input" />
-                                    <span asp-validation-for="Phone" style="display:flex;"></span>
-                                </div>
-                            }
-
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="Company">Company Name</label>
+                                <nop-required />
+                                <input asp-for="Company" class="form-control custom-input" />
+                                <span asp-validation-for="Company" style="display:flex;"></span>
+                                <ul class="option-list">
+                                    <li>
+                                        <input asp-for="IsCurrentCustomer" type="checkbox" />
+                                        <label asp-for="IsCurrentCustomer" id="current_customer">I am a current customer</label>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
+            @* Other Information Section *@
+            <div class="fieldset">
+                <div class="form-fields">
+                    <div class="title">
+                        <strong>OTHER INFORMATION</strong>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div style="margin-bottom: 2em">
+                                <label>How did you hear about us?</label>
+                                <nop-required />
+                                <select asp-for="HearAboutUsId" asp-items="Model.AvailableAvenues"  onchange="otherMethodCheck(this);"></select>
+                                <span asp-validation-for="HearAboutUsId"></span>
+
+                                @*<select id="accountSelect" class="form-control custom-input" onchange="otherMethodCheck(this);" data-role="accountSelect">
+                                    <option value="0"> ---</option>
+                                    <option selected asp-for="HearAboutUs"> Social Media </option>
+                                    <option asp-for="HearAboutUs"> Website </option>
+                                    <option asp-for="HearAboutUs"> Other </option>
+                                </select>*@
+
+                                @*<div class="inputs">
+                                        <label asp-for="CountryId" asp-postfix=":"></label>
+                                        <select asp-for="CountryId" asp-items="Model.AvailableCountries"
+                                                data-trigger="country-select"
+                                                data-url="@(Url.RouteUrl("GetStatesByCountryId"))"
+                                                data-stateprovince="#@Html.IdFor(model => model.StateProvinceId)"
+                                                data-loading="#states-loading-progress"></select>
+                                        @if (Model.CountryRequired)
+                                        {
+                                            <nop-required />
+                                        }
+                                        <span asp-validation-for="CountryId"></span>
+                                    </div>*@
 
 
-            @if (Model.CustomerAttributes.Count > 0)
-            {
-                <div class="fieldset">
-                    <div class="form-fields">
-                        <div class="title">
-                            <strong>OTHER INFORMATION</strong>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 col-sm-12 col-xs-12">
-                                <div style="margin-bottom: 2em">
-                                    @foreach (var attribute in Model.CustomerAttributes)
+                                @*@foreach (var attribute in Model.CustomerAttributes)
                                     {
                                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
                                         var textPrompt = attribute.Name;
@@ -205,10 +197,10 @@
                                                 }
                                             </select>
                                         }
-                                    }
-                                </div>
+                                    }*@
+                            </div>
 
-                                <div style="margin-bottom: 2em">
+                            @*<div style="margin-bottom: 2em">
                                     @foreach (var attribute in Model.CustomerAttributes)
                                     {
                                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
@@ -223,9 +215,9 @@
                                             </div>
                                         }
                                     }
-                                </div>
+                                </div>*@
 
-                                <div>
+                            @*<div>
                                     @foreach (var attribute in Model.CustomerAttributes)
                                     {
                                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
@@ -249,9 +241,9 @@
                                         }
 
                                     }
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                </div>*@
+                        </div>
+                        @*<div class="col-md-6 col-sm-12 col-xs-12">
                                 @foreach (var attribute in Model.CustomerAttributes)
                                 {
                                     var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
@@ -265,14 +257,12 @@
                                         </div>
                                     }
                                 }
-                            </div>
-
-                        </div>
+                            </div>*@
                     </div>
 
-                    @if (Model.AcceptPrivacyPolicyEnabled)
-                    {
-                        <script asp-location="Footer">
+                </div>
+
+                <script asp-location="Footer">
                                 $(document).ready(function() {
                                     $('#register-button').on('click', function() {
                                         if ($('#accept-consent').is(':checked')) {
@@ -285,15 +275,13 @@
                                         }
                                     });
                                 });
-                        </script>
-                        <div class="accept-consent">
-                            <label class=pure-material-checkbox>
-                                <input id="accept-consent" type="checkbox" name="accept-consent" />
-                                <span class="checkmark"></span>
-                                @if (Model.AcceptPrivacyPolicyPopup)
-                                {
-                                    <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
-                                    <script asp-location="Footer">
+                </script>
+                <div class="accept-consent">
+                    <label class=pure-material-checkbox>
+                        <input id="accept-consent" type="checkbox" name="accept-consent" />
+                        <span class="checkmark"></span>
+                        <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
+                        <script asp-location="Footer">
                             $(document).ready(function () {
                                 $('#read-privacyinfo').on('click',
                                    function(e) {
@@ -302,42 +290,14 @@
 		                            '');
                             });
                             });
-                                    </script>
-                                }
-                                else
-                                {
-                                    @*<a class="read" id="read-privacyinfo" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("privacyinfo") })">@T("Account.Fields.AcceptPrivacyPolicy.Read")</a>*@
-                                }
-                            </label>
-                        </div>
-                    }
-
-                    <div class="buttons">
-                        <input type="submit" id="register-button" class="button-1 register-next-step-button" value="@T("Account.Register.Button")" name="register-button" />
-                    </div>
+                        </script>
+                    </label>
                 </div>
-            }
 
-
-            @if (Model.NewsletterEnabled)
-            {
-                <div class="fieldset">
-                    <div class="form-fields" style="padding:1em;">
-                        <div class="news-field" style="background-color: #fff;padding: 1em 0;">
-                            <div class="title">
-                                <strong>KEEP INFORMED</strong>
-                            </div>
-                            <div style="text-align:center">
-                                <input asp-for="Newsletter" />
-                                <label asp-for="Newsletter">Sign me up to your newsletter</label>
-                                <span asp-validation-for="Newsletter"></span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="buttons">
+                    <input type="submit" id="register-button" class="button-1 register-next-step-button" value="@T("Account.Register.Button")" name="register-button" />
                 </div>
-            }
-
-
+            </div>
 
         </form>
         <div class="external-authentication">

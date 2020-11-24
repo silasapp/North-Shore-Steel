@@ -19,5 +19,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// <returns>Customer navigation model</returns>
         CustomerNavigationModel PrepareCustomerNavigationModel(int selectedTabId = 0);
 
+        /// <summary>
+        /// Prepare the customer register model
+        /// </summary>
+        /// <param name="model">Customer register model</param>
+        /// <param name="excludeProperties">Whether to exclude populating of model properties from the entity</param>
+        /// <param name="overrideCustomCustomerAttributesXml">Overridden customer attributes in XML format; pass null to use CustomCustomerAttributes of customer</param>
+        /// <param name="setDefaultValues">Whether to populate model properties by default values</param>
+        /// <returns>Customer register model</returns>
+        RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
+            string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false);
     }
 }

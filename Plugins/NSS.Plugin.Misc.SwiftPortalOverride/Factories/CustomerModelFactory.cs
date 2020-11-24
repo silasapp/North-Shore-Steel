@@ -39,10 +39,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
     {
 
         private readonly IThemeContext _themeContext;
+        private readonly CustomerSettings _customerSettings;
+        private readonly CommonSettings _commonSettings;
 
-        public CustomerModelFactory(IThemeContext themeContext)
+        public CustomerModelFactory(IThemeContext themeContext, CommonSettings commonSettings, CustomerSettings customerSettings)
         {
             _themeContext = themeContext;
+            _customerSettings = customerSettings;
+            _commonSettings = commonSettings;
         }
         /// <summary>
         /// Prepare the customer navigation model
@@ -87,6 +91,78 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-       
+
+        /// <summary>
+        /// Prepare the customer register model
+        /// </summary>
+        /// <param name="model">Customer register model</param>
+        /// <param name="excludeProperties">Whether to exclude populating of model properties from the entity</param>
+        /// <param name="overrideCustomCustomerAttributesXml">Overridden customer attributes in XML format; pass null to use CustomCustomerAttributes of customer</param>
+        /// <param name="setDefaultValues">Whether to populate model properties by default values</param>
+        /// <returns>Customer register model</returns>
+        public virtual RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
+            string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            model.AvailableAvenues.Add(new SelectListItem
+            {
+                Text = "Social Media",
+                Value = 1.ToString(),
+                Selected = true
+            });
+
+            model.AvailableAvenues.Add(new SelectListItem
+            {
+                Text = "Website",
+                Value = 2.ToString(),
+                Selected = false
+            });
+
+            model.AvailableAvenues.Add(new SelectListItem
+            {
+                Text = "Other",
+                Value = 3.ToString(),
+                Selected = false
+            });
+
+            //form fields
+            model.FirstNameEnabled = _customerSettings.FirstNameEnabled;
+            model.LastNameEnabled = _customerSettings.LastNameEnabled;
+            model.FirstNameRequired = _customerSettings.FirstNameRequired;
+            model.LastNameRequired = _customerSettings.LastNameRequired;
+            model.GenderEnabled = _customerSettings.GenderEnabled;
+            model.DateOfBirthEnabled = _customerSettings.DateOfBirthEnabled;
+            model.DateOfBirthRequired = _customerSettings.DateOfBirthRequired;
+            model.CompanyEnabled = _customerSettings.CompanyEnabled;
+            model.CompanyRequired = _customerSettings.CompanyRequired;
+            model.StreetAddressEnabled = _customerSettings.StreetAddressEnabled;
+            model.StreetAddressRequired = _customerSettings.StreetAddressRequired;
+            model.StreetAddress2Enabled = _customerSettings.StreetAddress2Enabled;
+            model.StreetAddress2Required = _customerSettings.StreetAddress2Required;
+            model.ZipPostalCodeEnabled = _customerSettings.ZipPostalCodeEnabled;
+            model.ZipPostalCodeRequired = _customerSettings.ZipPostalCodeRequired;
+            model.CityEnabled = _customerSettings.CityEnabled;
+            model.CityRequired = _customerSettings.CityRequired;
+            model.CountyEnabled = _customerSettings.CountyEnabled;
+            model.CountyRequired = _customerSettings.CountyRequired;
+            model.CountryEnabled = _customerSettings.CountryEnabled;
+            model.CountryRequired = _customerSettings.CountryRequired;
+            model.StateProvinceEnabled = _customerSettings.StateProvinceEnabled;
+            model.StateProvinceRequired = _customerSettings.StateProvinceRequired;
+            model.PhoneEnabled = _customerSettings.PhoneEnabled;
+            model.PhoneRequired = _customerSettings.PhoneRequired;
+            model.FaxEnabled = _customerSettings.FaxEnabled;
+            model.FaxRequired = _customerSettings.FaxRequired;
+            model.NewsletterEnabled = _customerSettings.NewsletterEnabled;
+            model.AcceptPrivacyPolicyEnabled = _customerSettings.AcceptPrivacyPolicyEnabled;
+            model.AcceptPrivacyPolicyPopup = _commonSettings.PopupForTermsOfServiceLinks;
+            model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
+            model.CheckUsernameAvailabilityEnabled = _customerSettings.CheckUsernameAvailabilityEnabled;
+            model.EnteringEmailTwice = _customerSettings.EnteringEmailTwice;
+            
+            return model;
+        }
     }
 }
