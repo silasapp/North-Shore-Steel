@@ -27,6 +27,7 @@ using System.Linq;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using ICustomerModelFactory = NSS.Plugin.Misc.SwiftPortalOverride.Factories.ICustomerModelFactory;
+using NSS.Plugin.Misc.SwiftCore.Services;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -57,6 +58,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly TaxSettings _taxSettings;
         private readonly ERPApiProvider _nSSApiProvider;
         private readonly WorkFlowMessageServiceOverride _workFlowMessageServiceOverride;
+        private readonly IUserRegistrationService _userRegistrationService;
 
 
         #endregion
@@ -86,7 +88,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             LocalizationSettings localizationSettings,
             TaxSettings taxSettings,
             ERPApiProvider nSSApiProvider,
-            WorkFlowMessageServiceOverride workFlowMessageServiceOverride
+            WorkFlowMessageServiceOverride workFlowMessageServiceOverride,
+            IUserRegistrationService userRegistrationService
             )
         {
             _customerSettings = customerSettings;
@@ -112,6 +115,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _taxSettings = taxSettings;
             _nSSApiProvider = nSSApiProvider;
             _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
+            _userRegistrationService = userRegistrationService;
         }
 
         #endregion
@@ -218,14 +222,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 
                
 
-                //var registrationResult = _customerRegistrationService.RegisterCustomer(registrationRequest);
-                //if (registrationResult.Success)
-                //{ 
-                //}
+                var registrationResult = _userRegistrationService.InsertUser(userRegistrationRequest);
+                if (registrationResult.Success)
+                {
+                    // registration successful
+                    // redirect to confirmation page
+                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/Confirmation.cshtml", model);
+                }
 
-                //errors
-                //foreach (var error in registrationResult.Errors)
-                //    ModelState.AddModelError("", error);
+                // errors
+                foreach (var error in registrationResult.Errors)
+                    ModelState.AddModelError("", error);
             }
 
             //If we got this far, something failed, redisplay form
