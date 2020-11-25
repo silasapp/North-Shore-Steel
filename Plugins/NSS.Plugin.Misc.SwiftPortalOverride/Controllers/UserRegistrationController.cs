@@ -137,16 +137,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (String.IsNullOrEmpty(model.PreferredPickupLocationId.ToString()))
                 warnings.Add("Please Enter Preferred Pickup Location");
 
-            if (!model.IsCurrentCustomer)
-            {
-                userRoles = new string[] { "Buyer", "Operations", "AP" };
-            } else
-            {
-                var AP = model.APRole ? "AP" : "";
-                var Buyer = model.BuyerRole ? "Buyer" : "";
-                var Operations = model.OperationRole ? "Operations" : "";
-                userRoles = new string[]{ AP, Buyer, Operations};
-            }
+            
 
             foreach (var error in warnings)
             {
@@ -164,15 +155,26 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     Phone = model.Phone,
                     CompanyName = model.Company,
                     IsExistingCustomer = model.IsCurrentCustomer,
-                    RoleArray = userRoles,
                     HearAboutUs = model.HearAboutUs,
                     Other = model.Other,
                     ItemsForNextProject = model.ItemsForNextProject,
                     PreferredLocationId = model.PreferredPickupLocationId,
                     StatusId = (int)UserRegistrationStatus.Pending
                 };
-                
-               
+
+                if (!model.IsCurrentCustomer)
+                {
+                    userRegistrationRequest.APRole = true;
+                    userRegistrationRequest.OperationsRole = true;
+                    userRegistrationRequest.BuyerRole = true;
+                }
+                else
+                {
+                    userRegistrationRequest.APRole = model.APRole;
+                    userRegistrationRequest.APRole = model.BuyerRole;
+                    userRegistrationRequest.APRole = model.OperationRole;
+                }
+
 
                 var registrationResult = _userRegistrationService.InsertUser(userRegistrationRequest);
                 if (registrationResult.Success)

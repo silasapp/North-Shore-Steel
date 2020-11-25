@@ -97,7 +97,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// </summary>
         /// <param name="model">Customer register model</param>
         /// <param name="excludeProperties">Whether to exclude populating of model properties from the entity</param>
-        /// <param name="overrideCustomCustomerAttributesXml">Overridden customer attributes in XML format; pass null to use CustomCustomerAttributes of customer</param>
         /// <param name="setDefaultValues">Whether to populate model properties by default values</param>
         /// <returns>Customer register model</returns>
         public virtual RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
@@ -111,8 +110,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 model.AvailablePlatforms.Add(new SelectListItem
                 {
                     Text = a.Text,
-                    Value = a.Value,
-                    Selected = a.Selected
+                    Value = a.Value
                 });
 
             }
@@ -122,8 +120,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 model.AvailablePickupLocations.Add(new SelectListItem
                 {
                     Text = a.Text,
-                    Value = a.Value.ToString(),
-                    Selected = a.Selected
+                    Value = a.Value.ToString()
                 });
 
             }
@@ -169,9 +166,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         public virtual List<AvailablePlatforms> GetAllAvailablePlatforms()
         {
             var availablePlatforms = new List<AvailablePlatforms>();
-            availablePlatforms.Add(new AvailablePlatforms { Text = "Social Media", Value = "Social Media", Selected = true });
-            availablePlatforms.Add(new AvailablePlatforms { Text = "Website", Value = "Website", Selected = false });
-            availablePlatforms.Add(new AvailablePlatforms { Text = "Other", Value = "Other", Selected = false });
+            availablePlatforms.Add(new AvailablePlatforms { Text = "Social Media", Value = "Social Media"});
+            availablePlatforms.Add(new AvailablePlatforms { Text = "Website", Value = "Website"});
+            availablePlatforms.Add(new AvailablePlatforms { Text = "Other", Value = "Other"});
 
             return availablePlatforms;
         }
@@ -179,8 +176,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         public virtual List<AvailablePickupLocations> GetAllAvailablePickupLocations()
         {
             var availablePickupLocations = new List<AvailablePickupLocations>();
-            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Houston", Value = 1, Selected = true });
-            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Beaumont", Value = 2, Selected = false });
+            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Houston", Value = 1});
+            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Beaumont", Value = 2});
 
             return availablePickupLocations;
         }
@@ -189,14 +186,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         {
             public string Text { get; set; }
             public string Value { get; set; }
-            public bool Selected { get; set; }
         }
 
         public class AvailablePickupLocations
         {
             public string Text { get; set; }
             public int Value { get; set; }
-            public bool Selected { get; set; }
         }
     }
 }
