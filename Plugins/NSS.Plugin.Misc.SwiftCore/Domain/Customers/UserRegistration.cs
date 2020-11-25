@@ -55,5 +55,12 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
             get => (UserRegistrationStatus)StatusId;  
             set => StatusId = (int)value;  
         }
+
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        public PreferredLocation PreferredLocation
+        {
+            get => (PreferredLocation)PreferredLocationId;
+            set => PreferredLocationId = (int)value;
+        }
     }
 }
