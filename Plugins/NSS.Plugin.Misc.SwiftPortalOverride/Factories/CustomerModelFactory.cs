@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
-using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Media;
@@ -29,6 +28,7 @@ using Nop.Services.Stores;
 using Nop.Web.Models.Common;
 using Nop.Web.Framework.Themes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
+using Nop.Core.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -106,26 +106,27 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-            model.AvailableAvenues.Add(new SelectListItem
+            foreach (var a in GetAllAvailablePlatforms())
             {
-                Text = "Social Media",
-                Value = 1.ToString(),
-                Selected = true
-            });
+                model.AvailablePlatforms.Add(new SelectListItem
+                {
+                    Text = a.Text,
+                    Value = a.Value,
+                    Selected = a.Selected
+                });
 
-            model.AvailableAvenues.Add(new SelectListItem
-            {
-                Text = "Website",
-                Value = 2.ToString(),
-                Selected = false
-            });
+            }
 
-            model.AvailableAvenues.Add(new SelectListItem
+            foreach (var a in GetAllAvailablePickupLocations())
             {
-                Text = "Other",
-                Value = 3.ToString(),
-                Selected = false
-            });
+                model.AvailablePickupLocations.Add(new SelectListItem
+                {
+                    Text = a.Text,
+                    Value = a.Value.ToString(),
+                    Selected = a.Selected
+                });
+
+            }
 
             //form fields
             model.FirstNameEnabled = _customerSettings.FirstNameEnabled;
@@ -161,8 +162,41 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             model.CheckUsernameAvailabilityEnabled = _customerSettings.CheckUsernameAvailabilityEnabled;
             model.EnteringEmailTwice = _customerSettings.EnteringEmailTwice;
-            
+
             return model;
+        }
+
+        public virtual List<AvailablePlatforms> GetAllAvailablePlatforms()
+        {
+            var availablePlatforms = new List<AvailablePlatforms>();
+            availablePlatforms.Add(new AvailablePlatforms { Text = "Social Media", Value = "Social Media", Selected = true });
+            availablePlatforms.Add(new AvailablePlatforms { Text = "Website", Value = "Website", Selected = false });
+            availablePlatforms.Add(new AvailablePlatforms { Text = "Other", Value = "Other", Selected = false });
+
+            return availablePlatforms;
+        }
+
+        public virtual List<AvailablePickupLocations> GetAllAvailablePickupLocations()
+        {
+            var availablePickupLocations = new List<AvailablePickupLocations>();
+            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Houston", Value = 1, Selected = true });
+            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Beaumont", Value = 2, Selected = false });
+
+            return availablePickupLocations;
+        }
+
+        public class AvailablePlatforms
+        {
+            public string Text { get; set; }
+            public string Value { get; set; }
+            public bool Selected { get; set; }
+        }
+
+        public class AvailablePickupLocations
+        {
+            public string Text { get; set; }
+            public int Value { get; set; }
+            public bool Selected { get; set; }
         }
     }
 }

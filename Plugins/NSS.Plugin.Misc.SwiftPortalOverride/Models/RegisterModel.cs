@@ -11,7 +11,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     {
         public RegisterModel()
         {
-            AvailableAvenues = new List<SelectListItem>();
+            AvailablePlatforms = new List<SelectListItem>();
+            AvailablePickupLocations = new List<SelectListItem>();
         }
         
         [DataType(DataType.EmailAddress)]
@@ -75,10 +76,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             return dateOfBirth;
         }
 
-        public int HearAboutUsId { get; set; }
-        public IList<SelectListItem> AvailableAvenues { get; set; }
+        public string HearAboutUs { get; set; }
+        public IList<SelectListItem> AvailablePlatforms { get; set; }
 
-        public int PreferredLocation { get; set; }
+        public bool APRole { get; set; }
+        public bool OperationRole { get; set; }
+        public bool BuyerRole { get; set; }
+
+        public string ItemsForNextProject { get; set; }
+
+        public string Other { get; set; }
+
+        public int PreferredPickupLocationId { get; set; }
+        public IList<SelectListItem> AvailablePickupLocations { get; set; }
         public bool CompanyEnabled { get; set; }
         public bool CompanyRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.Company")]
@@ -125,11 +135,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public bool PhoneRequired { get; set; }
         [DataType(DataType.PhoneNumber)]
         [NopResourceDisplayName("Account.Fields.Phone")]
-        public string WorkPhone { get; set; }
+        public string CellPhone { get; set; }
 
         [DataType(DataType.PhoneNumber)]
         [NopResourceDisplayName("Account.Fields.Phone")]
-        public string CellPhone { get; set; }
+        public string Phone { get; set; }
 
         public bool FaxEnabled { get; set; }
         public bool FaxRequired { get; set; }
@@ -150,6 +160,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [NopResourceDisplayName("Account.Fields.TimeZone")]
         public string TimeZoneId { get; set; }
         public bool AllowCustomersToSetTimeZone { get; set; }
+
         public IList<SelectListItem> AvailableTimeZones { get; set; }
 
         //EU VAT
@@ -159,11 +170,5 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
         public bool HoneypotEnabled { get; set; }
         public bool DisplayCaptcha { get; set; }
-
-        public class HearAboutus
-        {
-            public string Text { get; set; }
-            public int Value { get; set; }
-        }
     }
 }

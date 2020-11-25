@@ -24,6 +24,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
 
         public bool IsExistingCustomer { get; set; }
 
+        public int PreferredLocationId { get; set; }
+
         public string Roles { get; set; }
 
         public string HearAboutUs { get; set; }

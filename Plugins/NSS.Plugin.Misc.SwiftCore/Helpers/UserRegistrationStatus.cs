@@ -7,7 +7,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
     public enum UserRegistrationStatus
     {
         Pending = 1,
-        Approved,
-        Rejected
+        Approved = 2,
+        Rejected = 3
     }
 }
