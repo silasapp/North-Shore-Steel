@@ -92,13 +92,13 @@
                         <div class="form-group row">
 
 
-                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="CellPhone">Cell Phone</label>
                                 <nop-required />
                                 <input asp-for="CellPhone" class="form-control custom-input" />
                                 <span asp-validation-for="CellPhone" style="display:flex;"></span>
                             </div>
-                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                 <label asp-for="Phone">Work Phone</label>
                                 <nop-required />
                                 <input asp-for="Phone" class="form-control custom-input" />
@@ -114,27 +114,28 @@
                                 <nop-required />
                                 <input asp-for="Company" class="form-control custom-input" />
                                 <span asp-validation-for="Company" style="display:flex;"></span>
-                                <ul class="option-list">
+                                <ul class="option-list pt-2">
                                     <li>
                                         <input onclick="customerCheck()" id="is_current_customer" asp-for="IsCurrentCustomer" type="checkbox" />
-                                        <label asp-for="IsCurrentCustomer" id="current_customer">I am a current customer</label>
+                                        <label asp-for="IsCurrentCustomer" id="current_customer" class="mb-1">I am a current customer</label>
                                     </li>
                                 </ul>
                             </div>
 
-                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <ul class="option-list" id="user_roles" style="display:none">
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3" id="user_roles" style="display:none">
+                                <label asp-for="Company">Roles</label>
+                                <ul class="option-list d-flex">
                                     <li>
-                                        <input asp-for="BuyerRole" type="checkbox" checked />
-                                        <label asp-for="BuyerRole" id="buyer_role">Buyer</label>
+                                        <input asp-for="BuyerRole" class="mb-2" type="checkbox" checked />
+                                        <label asp-for="BuyerRole" class="mb-2 pr-3" id="buyer_role">Buyer</label>
                                     </li>
                                     <li>
-                                        <input asp-for="OperationRole" type="checkbox" checked />
-                                        <label asp-for="OperationRole" id="operations_role">Operations</label>
+                                        <input asp-for="OperationRole" class="mb-2" type="checkbox" checked />
+                                        <label asp-for="OperationRole" class="mb-2 pr-3" id="operations_role">Operations</label>
                                     </li>
                                     <li>
-                                        <input asp-for="APRole" type="checkbox" checked />
-                                        <label asp-for="APRole" id="ap_role">AP</label>
+                                        <input asp-for="APRole" class="mb-2" type="checkbox" checked />
+                                        <label asp-for="APRole" class="mb-2 pr-3" id="ap_role">AP</label>
                                     </li>
                                 </ul>
                             </div>
