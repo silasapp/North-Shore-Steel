@@ -174,7 +174,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var shapes = _shapeService.GetShapes();
 
             if(shapes.Count > 0)
-                model.Shapes = shapes;
+            {
+                //model.Shapes = shapes;
+
+                foreach (var shape in shapes)
+                {
+
+                    model.FilterItems.Add(new ShapeFilterItem { Shape = shape, ProductCount = 1 });
+                }
+            }
 
             return model;
         }

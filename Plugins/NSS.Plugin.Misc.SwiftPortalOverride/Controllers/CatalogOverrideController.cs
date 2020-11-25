@@ -61,7 +61,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
-            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.Shapes.OrderBy(s => s.Order ).ToList();
+            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.Select(x => x.Shape).OrderBy(s => s.Order ).ToList();
 
             List<ShapeData> shapeData = new List<ShapeData>();
             for (var i = 0; i < shapes.Count; i++)
