@@ -79,6 +79,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
+            //approval
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/userconfirmation/",
+             new { controller = "UserConfirmation", action = "Index" },
+             new { },
+             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+             );
+
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/approve/",
+              new { controller = "UserConfirmation", action = "Approve" },
+              new { },
+              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+              );
+
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/reject/",
+             new { controller = "UserConfirmation", action = "Reject" },
+             new { },
+             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+             );
 
             // dashboard
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/",

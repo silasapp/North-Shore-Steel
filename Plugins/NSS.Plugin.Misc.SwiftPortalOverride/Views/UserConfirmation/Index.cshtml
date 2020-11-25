@@ -1,0 +1,89 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@model RegisterModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts("UserConfirmation");
+    //page class
+    Html.AppendPageCssClassParts("html-registration-page");
+
+}
+
+<style>
+    /*.header-menu {
+        display: none !important;
+    }
+
+    .header-upper {
+        background-color: transparent !important;
+        border-bottom: none !important;
+    }
+
+    .nav-bar-search {
+        display: none !important;
+    }
+
+    .header-links-wrapper {
+        display: none !important;
+    }
+
+    .master-wrapper-content {
+        display: block !important;
+    }*/
+</style>
+
+<div class="page registration-result-page">
+    <div class=page-title>
+        <h1></h1>
+    </div>
+    <div class="page-body">
+        <div class="account-page-card">
+            <div class="title"><strong>USER INFORMATION</strong></div>
+            <div class="form-fields">
+                <div class="inputs">
+                    <label asp-for="FirstName" asp-postfix=":">First Name</label>
+                    <input asp-for="FirstName" />
+                </div>
+
+                <div class="inputs">
+                    <label asp-for="Email" asp-postfix=":">Work Email</label>
+                    <input asp-for="Email" readonly style="cursor: unset" />
+                </div>
+
+                <div class="inputs">
+                    <label asp-for="LastName" asp-postfix=":">Last Name</label>
+                    <input asp-for="LastName" />
+                </div>
+
+                <div class="inputs">
+                    <label asp-for="Phone" asp-postfix=":">Phone Number</label>
+                    <input asp-for="Phone" />
+                </div>
+
+                <div class="inputs">
+                    <label asp-for="Company" asp-postfix=":">Company Name</label>
+                    <input asp-for="Company" />
+                </div>
+
+                <div class="inputs">
+                    <label>Customer Number</label>
+                    <label>2</label>
+                </div>
+
+
+                @*@if (Model.CustomerAttributes.Count > 0)
+                    {
+                        @await Html.PartialAsync("_CustomerAttributes", Model.CustomerAttributes);
+                    }*@
+
+            </div>
+            <div class="buttons save-customer-info-button">
+                <input type=submit name=send-email value="APPROVE" class="button-2 mr-4" />
+                @*<input type=submit id=save-info-button value='Save Changes' name=save-info-button class="button-2 ">*@
+                <input type="button" onclick="location.href='@Url.RouteUrl("Homepage")'" value="REJECT" class="button-2" />
+            </div>
+        </div>
+    </div>
+    <br />
+</div>

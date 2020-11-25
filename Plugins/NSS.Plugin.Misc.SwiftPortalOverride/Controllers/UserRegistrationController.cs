@@ -36,28 +36,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
     {
         #region fields
         private readonly CustomerSettings _customerSettings;
-        private readonly DateTimeSettings _dateTimeSettings;
-        private readonly GdprSettings _gdprSettings;
-        private readonly IAddressService _addressService;
         private readonly IAuthenticationService _authenticationService;
-        private readonly ICustomerAttributeParser _customerAttributeParser;
-        private readonly ICustomerAttributeService _customerAttributeService;
         private readonly ICustomerModelFactory _customerModelFactory;
-        private readonly ICustomerRegistrationService _customerRegistrationService;
         private readonly ICustomerService _customerService;
         private readonly IEventPublisher _eventPublisher;
-        private readonly IGdprService _gdprService;
-        private readonly IGenericAttributeService _genericAttributeService;
-        private readonly ILocalizationService _localizationService;
-        private readonly ILogger _logger;
         private readonly IStoreContext _storeContext;
-        private readonly ITaxService _taxService;
         private readonly IWorkContext _workContext;
-        private readonly IWorkflowMessageService _workflowMessageService;
-        private readonly LocalizationSettings _localizationSettings;
-        private readonly TaxSettings _taxSettings;
-        private readonly ERPApiProvider _nSSApiProvider;
-        private readonly WorkFlowMessageServiceOverride _workFlowMessageServiceOverride;
         private readonly IUserRegistrationService _userRegistrationService;
 
 
@@ -67,54 +51,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public UserRegistrationController(
             CustomerSettings customerSettings,
-            DateTimeSettings dateTimeSettings,
-            GdprSettings gdprSettings,
-            IAddressService addressService,
             IAuthenticationService authenticationService,
-            ICustomerAttributeParser customerAttributeParser,
-            ICustomerAttributeService customerAttributeService,
             ICustomerModelFactory customerModelFactory,
-            ICustomerRegistrationService customerRegistrationService,
             ICustomerService customerService,
             IEventPublisher eventPublisher,
-            IGdprService gdprService,
-            IGenericAttributeService genericAttributeService,
-            ILocalizationService localizationService,
-            ILogger logger,
             IStoreContext storeContext,
-            ITaxService taxService,
             IWorkContext workContext,
-            IWorkflowMessageService workflowMessageService,
-            LocalizationSettings localizationSettings,
-            TaxSettings taxSettings,
-            ERPApiProvider nSSApiProvider,
-            WorkFlowMessageServiceOverride workFlowMessageServiceOverride,
             IUserRegistrationService userRegistrationService
             )
         {
             _customerSettings = customerSettings;
-            _dateTimeSettings = dateTimeSettings;
-            _gdprSettings = gdprSettings;
-            _addressService = addressService;
             _authenticationService = authenticationService;
-            _customerAttributeParser = customerAttributeParser;
-            _customerAttributeService = customerAttributeService;
             _customerModelFactory = customerModelFactory;
-            _customerRegistrationService = customerRegistrationService;
             _customerService = customerService;
             _eventPublisher = eventPublisher;
-            _gdprService = gdprService;
-            _genericAttributeService = genericAttributeService;
-            _localizationService = localizationService;
-            _logger = logger;
-            _storeContext = storeContext;
-            _taxService = taxService;
+           _storeContext = storeContext;
             _workContext = workContext;
-            _workflowMessageService = workflowMessageService;
-            _localizationSettings = localizationSettings;
-            _taxSettings = taxSettings;
-            _nSSApiProvider = nSSApiProvider;
-            _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
             _userRegistrationService = userRegistrationService;
         }
 
