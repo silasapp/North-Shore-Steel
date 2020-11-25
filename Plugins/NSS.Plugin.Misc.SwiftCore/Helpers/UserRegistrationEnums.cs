@@ -6,8 +6,14 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 {
     public enum UserRegistrationStatus
     {
-        Pending = 1,
-        Approved = 2,
-        Rejected = 3
+        Rejected = -1,
+        Pending = 0,
+        Approved = 1
+    }
+
+    public enum PreferredLocation
+    {
+        Houston = 1,
+        Beaumont
     }
 }
