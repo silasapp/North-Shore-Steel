@@ -175,11 +175,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             var store = _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
 
-            // config
-            //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
-
             var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName, store.Id);
             if (!messageTemplates.Any())
                 return new List<int>();
@@ -213,11 +208,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         {
             var store = _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
-
-            // config
-            //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
 
             var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName, store.Id);
             if (!messageTemplates.Any())
