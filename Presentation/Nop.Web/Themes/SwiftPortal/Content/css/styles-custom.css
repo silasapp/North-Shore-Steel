@@ -890,6 +890,9 @@ table input {
     outline: none;
     padding: 1px;
 }
+.e-grid td.e-active {
+    background: #a8a8a9 !important;
+}
 
 /* treeview */
 
@@ -897,14 +900,22 @@ table input {
     margin-top: 1px;
     box-shadow: none !important;
 }
-
+    /*#accordion > .card > .card-link > .card-header::after {
+        content: 'closed';
+    }*/
     #accordion > .card > .card-link > .card-header {
-        background-color: #03175b;
+        background: #03175b url(../assets/icon-arrow-up-white.svg) right center no-repeat;
         text-align: left;
         font: normal normal medium 16px/24px "Teko";
         letter-spacing: 0.13px;
         color: #ffffff;
         opacity: 1;
+        padding-right: 15px;
+        background-position-x: 95%;
+    }
+    #accordion > .card > .opened > .card-header {
+        background: #03175b url(../assets/icn-arrow-down-white.svg) right center no-repeat;
+        background-position-x: 95%;
     }
 
     #accordion > .card > .collapse > .card-body {
