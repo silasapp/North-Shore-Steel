@@ -893,7 +893,9 @@ table input {
 .e-grid td.e-active {
     background: #a8a8a9 !important;
 }
-
+.chipsStyle {
+    display: flex  !important;
+}
 /* treeview */
 
 #accordion > .card {
