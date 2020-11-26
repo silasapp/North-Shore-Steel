@@ -170,6 +170,74 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }).ToList();
         }
 
+        public IList<int> SendNewCustomerPendingApprovalEmailNotificationMessage(string email, string fullName, bool existingCustomer, int languageId)
+        {
+            var store = _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName, store.Id);
+            if (!messageTemplates.Any())
+                return new List<int>();
+
+            //tokens
+            var commonTokens = new List<Token>();
+            //_messageTokenProvider.AddCustomerTokens(commonTokens, customer);
+
+            return messageTemplates.Select(messageTemplate =>
+            {
+                //email account
+                var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+                var tokens = new List<Token>(commonTokens);
+                _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+
+                // include erp id as token
+                //tokens.Add(new Token("Customer.ErpId", erpId?.ToString()));
+
+                //event notification
+                _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+                var toEmail = email;
+                var toName = fullName;
+
+                return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
+            }).ToList();
+        }
+
+        public IList<int> SendNewCustomerRejectionEmailNotificationMessage(string email, string fullName, int languageId)
+        {
+            var store = _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName, store.Id);
+            if (!messageTemplates.Any())
+                return new List<int>();
+
+            //tokens
+            var commonTokens = new List<Token>();
+            //_messageTokenProvider.AddCustomerTokens(commonTokens, customer);
+
+            return messageTemplates.Select(messageTemplate =>
+            {
+                //email account
+                var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+                var tokens = new List<Token>(commonTokens);
+                _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+
+                // include erp id as token
+                //tokens.Add(new Token("Customer.ErpId", erpId?.ToString()));
+
+                //event notification
+                _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+                var toEmail = email;
+                var toName = fullName;
+
+                return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
+            }).ToList();
+        }
+
         #endregion
     }
 }
