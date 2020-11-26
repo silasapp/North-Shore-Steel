@@ -31,6 +31,10 @@
     .master-wrapper-content {
         display: block !important;
     }
+
+    div.text > iframe {
+        width: -webkit-fill-available !important;
+    }
 </style>
 
 <div class="page registration-result-page">
@@ -51,7 +55,13 @@
                 <p class="text">
                     If you need immediate assistance, call Marcelo at 713-980-5879.
                 </p>
-                <div class="">A marketing video here...</div>
+                <div class="text">
+                    <iframe height="315"
+                            src=@Model.MarketingVideoUrl
+                            frameborder="0"
+                            allowfullscreen>
+                    </iframe>
+                </div>
             }
             else
             {
@@ -68,10 +78,6 @@
                     If you need immediate assistance, call Marcelo at 713-980-5879.
                 </p>
             }
-            <!--<div class=buttons>-->
-            @*<input type=submit name=send-email class="button-1 password-recovery-button" value="Continue">*@
-            <!--<input type="button" class="button-1 password-recovery-button" onclick="location.href='@Url.RouteUrl("Homepage")'" value="Continue" />
-            </div>-->
         </div>
 
     </div>

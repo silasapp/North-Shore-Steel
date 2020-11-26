@@ -46,5 +46,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
 
         }
+
+        //create customer
+            //create nopcustomer
+            //var user company=new user company
+            //buyer operation and ap
+            //getbyerpcompanyId :: i have company here
+            //need, company, usercompany, userregistrationbyId
+
     }
 }

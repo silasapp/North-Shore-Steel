@@ -68,6 +68,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public bool AcceptPrivacyPolicyEnabled { get; set; }
         public bool AcceptPrivacyPolicyPopup { get; set; }
 
+        public string MarketingVideoUrl { get; set; }
+
  
     }
 }

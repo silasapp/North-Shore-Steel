@@ -79,22 +79,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
-            //approval
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/userconfirmation/",
-             new { controller = "UserConfirmation", action = "Index" },
+            //confirm registration
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "userregistration/{id:int}/confirmregistration/",
+             new { controller = "UserRegistration", action = "ConfirmRegistration" },
              new { },
              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
              );
 
 
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/approve/",
-              new { controller = "UserConfirmation", action = "Approve" },
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "approveregistration/",
+              new { controller = "UserRegistration", action = "Approve" },
               new { },
               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
               );
 
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "/reject/",
-             new { controller = "UserConfirmation", action = "Reject" },
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "rejectregistration/",
+             new { controller = "UserRegistration", action = "Reject" },
              new { },
              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
              );

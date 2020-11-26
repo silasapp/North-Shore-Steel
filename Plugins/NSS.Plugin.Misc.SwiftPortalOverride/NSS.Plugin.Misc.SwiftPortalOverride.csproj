@@ -63,7 +63,6 @@
     <None Remove="Views\Shared\Components\CustomSearchBox\Default.cshtml" />
     <None Remove="Views\Shared\_ExternalAuthentication.Errors.cshtml" />
     <None Remove="Views\TermsOfService.cshtml" />
-    <None Remove="Views\UserConfirmation\Index.cshtml" />
     <None Remove="Views\_ViewImports.cshtml" />
     <None Remove="Views\Confirmation.cshtml" />
   </ItemGroup>
@@ -141,7 +140,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\UserConfirmation\Index.cshtml">
+    <Content Include="Views\UserRegistration\ConfirmRegistration.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\UserRegistration\Register.cshtml">

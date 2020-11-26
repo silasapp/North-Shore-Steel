@@ -145,6 +145,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (ModelState.IsValid)
             {
+                model.MarketingVideoUrl = "http://www.youtube.com/embed/fxCEcPxUbYA";
                 var userRegistrationRequest = new SwiftCore.Domain.Customers.UserRegistration
                 {
                     FirstName = model.FirstName,
@@ -181,6 +182,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (registrationResult.Success)
                 {
                     // registration successful
+                    //TODO: send email with registrationId to Approval
+
                     // redirect to confirmation page
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/Confirmation.cshtml", model);
                 }
@@ -195,11 +198,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View(model);
         }
 
-     
+
+        #region Confirm Regsitration
+        public virtual IActionResult ConfirmRegistration(int userId)
+        {
+
+            return View();
+        }
+
+        public virtual IActionResult Approve()
+        {
+            return null;
+        }
+
+        public virtual IActionResult Reject()
+        {
+            return null;
+        }
+        #endregion
 
         #endregion
-        
-       
+
+
 
     }
 }
