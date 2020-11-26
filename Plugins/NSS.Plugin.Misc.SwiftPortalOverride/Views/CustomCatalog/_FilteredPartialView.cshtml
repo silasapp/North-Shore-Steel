@@ -363,19 +363,19 @@
     ${/if}
 
     ${if(_sawOption == "true")}
-    <button class="table-action-button"
-            onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_product}`); return false;">
-        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" title="saw options" width="20" height="20" alt="">
-    </button>
+    @*<button class="table-action-button"
+           >*@
+        <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" class="icon-btn" onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_product}`); return false;" title="saw options" width="20" height="20" alt="">
+    @*</button>*@
     ${/if}
     ${if(_eRPCompanyIdExist == "true")}
-    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" title="add to cart" width="20" height="20" alt="">
-    </button>
+    @*<button class="table-action-button">*@
+        <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" class="icon-btn" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;" title="add to cart" width="20" height="20" alt="">
+    @*</button>*@
     ${/if}
-    <button class="table-action-button" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
-        <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" title="add to wishlist" width="20" height="20" alt="">
-    </button>
+    @*<button class="table-action-button">*@
+        <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="icon-btn" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;" title="add to wishlist" width="20" height="20" alt="">
+    @*</button>*@
 </script>
 
 <script>

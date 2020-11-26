@@ -35,46 +35,46 @@
                 <div class="form-fields">
                     @if (Model.FirstNameEnabled)
                     {
-                        <div class="inputs">
+                        <div class="input-block">
                             <label asp-for="FirstName" asp-postfix=":">First Name</label>
-                            <input asp-for="FirstName" />
                             @if (Model.FirstNameRequired)
                             {
                                 <nop-required />
                             }
+                            <input asp-for="FirstName" class="form-control custom-input" />
                             <span asp-validation-for="FirstName"></span>
                         </div>
                     }
 
-                    <div class="inputs">
+                    <div class="">
                         <label asp-for="Email" asp-postfix=":">Work Email</label>
-                        <input asp-for="Email" readonly style="cursor: unset" />
                         <nop-required />
+                        <input asp-for="Email" readonly style="cursor: unset" class="form-control custom-input" />
                         <span asp-validation-for="Email"></span>
                     </div>
 
                     @if (Model.LastNameEnabled)
                     {
-                        <div class="inputs">
+                        <div class="">
                             <label asp-for="LastName" asp-postfix=":">Last Name</label>
-                            <input asp-for="LastName" />
                             @if (Model.LastNameRequired)
                             {
                                 <nop-required />
                             }
+                            <input asp-for="LastName" class="form-control custom-input" />
                             <span asp-validation-for="LastName"></span>
                         </div>
                     }
 
                     @if (Model.PhoneEnabled)
                     {
-                        <div class="inputs">
+                        <div class="">
                             <label asp-for="Phone" asp-postfix=":">Phone Number</label>
-                            <input asp-for="Phone" />
                             @if (Model.PhoneRequired)
                             {
                                 <nop-required />
                             }
+                            <input asp-for="Phone" class="form-control custom-input" />
                             <span asp-validation-for="Phone"></span>
                         </div>
                     }
@@ -82,20 +82,20 @@
 
                     @if (Model.CompanyEnabled)
                     {
-                        <div class="inputs">
+                        <div class="">
                             <label asp-for="Company" asp-postfix=":">Company Name</label>
-                            <input asp-for="Company" />
                             @if (Model.CompanyRequired)
                             {
-                                <nop-required />
+                                <nop-required class="form-control custom-input" />
                             }
+                            <input asp-for="Company" class="form-control custom-input" />
                             <span asp-validation-for="Company"></span>
                         </div>
                     }
 
                     @if (!String.IsNullOrEmpty(ErpId.ToString()))
                     {
-                        <div class="inputs">
+                        <div class="">
                             <label>Customer Number</label>
                             <label>@ErpId</label>
                         </div>

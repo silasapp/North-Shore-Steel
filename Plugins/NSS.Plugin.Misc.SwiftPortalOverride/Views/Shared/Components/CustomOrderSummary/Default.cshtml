@@ -96,7 +96,7 @@
         <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
             <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
 
-                <div class="col-md-4 cart-input-options">
+                <div class="col-md-5 cart-input-options">
                     <div class="cart-filter-menu">
                         <label for="purchase-order">Purchase Order #</label>
                         @if (purchasechkattr != null)
@@ -114,7 +114,7 @@
 
                 @if (Model.IsEditable)
                 {
-                    <div class="common-buttons col-md-4 cart-action-options">
+                    <div class="common-buttons col-md-5 cart-action-options">
                         @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
                             <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
                         <div class="cart-action-btn">

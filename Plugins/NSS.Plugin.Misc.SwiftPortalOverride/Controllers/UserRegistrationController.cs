@@ -95,7 +95,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [ValidateHoneypot]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public virtual IActionResult Register(RegisterModel model, string returnUrl, bool captchaValid, IFormCollection form)
+        public virtual IActionResult Register(RegisterModel model, string returnUrl)
         {
             //check whether registration is allowed
             if (_customerSettings.UserRegistrationType == UserRegistrationType.Disabled)
@@ -116,7 +116,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             customer.RegisteredInStoreId = _storeContext.CurrentStore.Id;
 
             var warnings = new List<string>();
-            string[] userRoles;
 
             if (String.IsNullOrEmpty(model.FirstName))
                 warnings.Add("Please Enter First Name");
@@ -130,23 +129,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 warnings.Add("Please Enter Work Phone");
             if (String.IsNullOrEmpty(model.Company))
                 warnings.Add("Please Enter Company Name");
-            if (String.IsNullOrEmpty(model.HearAboutUs))
+            if (String.IsNullOrEmpty(model.HearAboutUs.ToString()))
                 warnings.Add("Please Enter How did you hear about us");
             if (String.IsNullOrEmpty(model.ItemsForNextProject))
                 warnings.Add("Please Enter How we can help");
             if (String.IsNullOrEmpty(model.PreferredPickupLocationId.ToString()))
                 warnings.Add("Please Enter Preferred Pickup Location");
 
-            if (!model.IsCurrentCustomer)
-            {
-                userRoles = new string[] { "Buyer", "Operations", "AP" };
-            } else
-            {
-                var AP = model.APRole ? "AP" : "";
-                var Buyer = model.BuyerRole ? "Buyer" : "";
-                var Operations = model.OperationRole ? "Operations" : "";
-                userRoles = new string[]{ AP, Buyer, Operations};
-            }
+            
 
             foreach (var error in warnings)
             {
@@ -164,15 +154,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     Phone = model.Phone,
                     CompanyName = model.Company,
                     IsExistingCustomer = model.IsCurrentCustomer,
-                    RoleArray = userRoles,
-                    HearAboutUs = model.HearAboutUs,
+                    HearAboutUs = model.HearAboutUs.ToString(),
                     Other = model.Other,
                     ItemsForNextProject = model.ItemsForNextProject,
                     PreferredLocationId = model.PreferredPickupLocationId,
-                    StatusId = (int)UserRegistrationStatus.Pending
-                };
-                
-               
+                    StatusId = (int)UserRegistrationStatus.Pending,
+                    CreatedOnUtc = DateTime.UtcNow,
+                    ModifiedOnUtc = DateTime.UtcNow
+            };
+
+                if (!model.IsCurrentCustomer)
+                {
+                    userRegistrationRequest.APRole = true;
+                    userRegistrationRequest.OperationsRole = true;
+                    userRegistrationRequest.BuyerRole = true;
+                }
+                else
+                {
+                    userRegistrationRequest.APRole = model.APRole;
+                    userRegistrationRequest.BuyerRole = model.BuyerRole;
+                    userRegistrationRequest.OperationsRole = model.OperationsRole;
+                }
+
 
                 var registrationResult = _userRegistrationService.InsertUser(userRegistrationRequest);
                 if (registrationResult.Success)
@@ -193,6 +196,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
      
+
         #endregion
         
        

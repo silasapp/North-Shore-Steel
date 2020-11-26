@@ -253,7 +253,7 @@
                                                         <span class="product-quantity">@item.Quantity</span>
                                                     }
                                                 </td>
-                                                <td style="text-align:left" class="d-flex flex-row justify-content-around">
+                                                <td style="text-align:left" class="d-flex flex-row ">
                                                     @if (!string.IsNullOrEmpty(mtr))
                                                     {
                                                         <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
@@ -262,16 +262,16 @@
                                                     }
                                                     @if (hasSawOption)
                                                     {
-                                                        <button type="button" class="table-action-button" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
-                                                            <img src="~/Themes/@themeName/Content/assets/saw-blade.svg" title="saw options" width="20" height="20" alt="">
-                                                        </button>
+                                                        @*<button type="button" class="table-action-button">*@
+                                                        <img class="icon-btn" src="~/Themes/@themeName/Content/assets/saw-blade.svg" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))" title="saw options" width="20" height="20" alt="">
+                                                        @*</button>*@
                                                     }
                                                     @if (eRPCompanyIdExist)
                                                     {
-                                                        <button class="table-action-button" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);">
-                                                            <img src="~/Themes/@themeName/Content/assets/shopping-cart.svg" title="add to cart" width="20"
-                                                                 height="20" alt="">
-                                                        </button>
+                                                        @*<button class="table-action-button">*@
+                                                        <img class="icon-btn" src="~/Themes/@themeName/Content/assets/shopping-cart.svg" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" title="add to cart" width="20"
+                                                             height="20" alt="">
+                                                        @*</button>*@
                                                     }
                                                     <div class="table-action-button">
                                                         <label class="mb-0">

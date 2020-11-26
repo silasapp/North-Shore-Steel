@@ -401,7 +401,11 @@ a:not([href]):not([class]) {
 
     .top-menu > li > a:hover, .nav-sub-menu a:hover {
         text-decoration: none;
-        color: #0076b4 !important;
+        color: #242424 !important;
+    }
+    .top-menu > li > a.active-tab, .nav-sub-menu > a.active-tab {
+        text-decoration: none;
+        color: #0076B4 !important;
     }
 
     .top-menu > li > a, .nav-sub-menu a {
@@ -1784,12 +1788,18 @@ table input {
 .save-customer-info-button {
     display: flex;
     justify-content: flex-end;
+    margin-top: 20px;
 }
-
+.header-menu > ul > li > a {
+    color: #AAAAAA !important;
+}
 .account-page-card > .block .listbox {
     padding: 0;
 }
-
+.icon-btn {
+    cursor: pointer;
+    margin: 0 2px;
+}
 .account-page-card > .form-fields,
 .address-block {
     display: grid;
@@ -2170,6 +2180,7 @@ table input {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-column-gap: 32px;
+    grid-row-gap: 20px;
     border: none;
 }
 
