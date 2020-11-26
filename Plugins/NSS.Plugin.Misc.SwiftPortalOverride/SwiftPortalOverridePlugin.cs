@@ -164,6 +164,39 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
 
                 _messageTemplateService.InsertMessageTemplate(changePasswordTemplate);
             }
+
+
+            // pennding aproval email
+            var pendingApprovalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName)?.FirstOrDefault();
+            if (pendingApprovalTemplate == null)
+            {
+                pendingApprovalTemplate = new MessageTemplate
+                {
+                    Name = SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName,
+                    Subject = "%Store.Name%. Pending Approval",
+                    EmailAccountId = _emailAccountSettings.DefaultEmailAccountId,
+                    Body = $"<a href={"\"%Store.URL%\""}>%Store.Name%</a>  <br />  <br />   Your registration is pending approval.  <br />  <br />  %Store.Name%  ",
+                    IsActive = true,
+                };
+
+                _messageTemplateService.InsertMessageTemplate(pendingApprovalTemplate);
+            }
+
+            // reject email
+            var denialTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName)?.FirstOrDefault();
+            if (denialTemplate == null)
+            {
+                denialTemplate = new MessageTemplate
+                {
+                    Name = SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName,
+                    Subject = "%Store.Name%. Registration Denial",
+                    EmailAccountId = _emailAccountSettings.DefaultEmailAccountId,
+                    Body = $"<a href={"\"%Store.URL%\""}>%Store.Name%</a>  <br />  <br />   Your registration has been denied.  <br />  <br />  %Store.Name%  ",
+                    IsActive = true,
+                };
+
+                _messageTemplateService.InsertMessageTemplate(denialTemplate);
+            }
         }
 
         static string GetSQL(string file)
