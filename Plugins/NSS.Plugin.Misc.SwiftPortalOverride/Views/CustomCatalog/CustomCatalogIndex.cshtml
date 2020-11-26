@@ -130,7 +130,7 @@
 
                     <div id="accordion">
                         <div class="card">
-                            <a class="card-link" data-toggle="collapse" href="#collapseOne">
+                            <a class="card-link opened" data-toggle="collapse" href="#collapseOne" id="collapseHeaderone" onclick="openHeader('collapseHeaderone')">
                                 <div class="card-header">SHAPES</div>
                             </a>
                             <div id="collapseOne" class="collapse show">
@@ -176,7 +176,7 @@
                                 if (@key == "METAL" || @key == "COATING")
                                 {
                                     <div class="card defaultSpecs" style="display: flex">
-                                        <a class="collapsed card-link" data-toggle="collapse" href="#collapse-@index">
+                                        <a class="collapsed card-link opened" data-toggle="collapse" href="#collapse-@index" id="collapse-header-@index" onclick="openHeader('collapse-header-@index')">
                                             <div class="card-header"> @key</div>
                                         </a>
                                         @foreach (var item in group)
@@ -519,11 +519,18 @@
         var results = regex.exec(location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     };
-    //$(window).resize(sliderheight);
-    //function sliderheight() {
-    //    divHeight = $('.catalog-page').height();
-    //    $('.cat-side-drawer').css({ 'height': divHeight+140 });
-    //}
-    //sliderheight();
 </script>
+<script>
+    function openHeader(id) {
+        var idx = '#' + id;
+        var isOpened = $(idx).hasClass('opened');
+        console.log('is opened', isOpened);
+        if (isOpened) {
+            $(idx).removeClass('opened');
+        } else {
+            $(idx).addClass('opened');
+        }
+    }
+</script>
+
 <ejs-scripts></ejs-scripts>
