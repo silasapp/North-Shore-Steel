@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftCore.Helpers
@@ -14,6 +15,17 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
     public enum PreferredLocation
     {
         Houston = 1,
-        Beaumont
+        Beaumont = 2
+    }
+
+    public enum HearAboutUs
+    {
+        [Display(Name = "Social Media")]
+        SocialMedia = 1,
+        Website = 2,
+        Other = 3
+
+
     }
 }
+

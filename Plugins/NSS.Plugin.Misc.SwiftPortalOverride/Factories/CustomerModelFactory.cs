@@ -29,6 +29,7 @@ using Nop.Web.Models.Common;
 using Nop.Web.Framework.Themes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using Nop.Core.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -105,93 +106,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-            foreach (var a in GetAllAvailablePlatforms())
-            {
-                model.AvailablePlatforms.Add(new SelectListItem
-                {
-                    Text = a.Text,
-                    Value = a.Value
-                });
-
-            }
-
-            foreach (var a in GetAllAvailablePickupLocations())
-            {
-                model.AvailablePickupLocations.Add(new SelectListItem
-                {
-                    Text = a.Text,
-                    Value = a.Value.ToString()
-                });
-
-            }
-
+           
             //form fields
             model.FirstNameEnabled = _customerSettings.FirstNameEnabled;
             model.LastNameEnabled = _customerSettings.LastNameEnabled;
             model.FirstNameRequired = _customerSettings.FirstNameRequired;
             model.LastNameRequired = _customerSettings.LastNameRequired;
-            model.GenderEnabled = _customerSettings.GenderEnabled;
-            model.DateOfBirthEnabled = _customerSettings.DateOfBirthEnabled;
-            model.DateOfBirthRequired = _customerSettings.DateOfBirthRequired;
             model.CompanyEnabled = _customerSettings.CompanyEnabled;
             model.CompanyRequired = _customerSettings.CompanyRequired;
-            model.StreetAddressEnabled = _customerSettings.StreetAddressEnabled;
-            model.StreetAddressRequired = _customerSettings.StreetAddressRequired;
-            model.StreetAddress2Enabled = _customerSettings.StreetAddress2Enabled;
-            model.StreetAddress2Required = _customerSettings.StreetAddress2Required;
-            model.ZipPostalCodeEnabled = _customerSettings.ZipPostalCodeEnabled;
-            model.ZipPostalCodeRequired = _customerSettings.ZipPostalCodeRequired;
-            model.CityEnabled = _customerSettings.CityEnabled;
-            model.CityRequired = _customerSettings.CityRequired;
-            model.CountyEnabled = _customerSettings.CountyEnabled;
-            model.CountyRequired = _customerSettings.CountyRequired;
-            model.CountryEnabled = _customerSettings.CountryEnabled;
-            model.CountryRequired = _customerSettings.CountryRequired;
-            model.StateProvinceEnabled = _customerSettings.StateProvinceEnabled;
-            model.StateProvinceRequired = _customerSettings.StateProvinceRequired;
             model.PhoneEnabled = _customerSettings.PhoneEnabled;
             model.PhoneRequired = _customerSettings.PhoneRequired;
-            model.FaxEnabled = _customerSettings.FaxEnabled;
-            model.FaxRequired = _customerSettings.FaxRequired;
-            model.NewsletterEnabled = _customerSettings.NewsletterEnabled;
             model.AcceptPrivacyPolicyEnabled = _customerSettings.AcceptPrivacyPolicyEnabled;
             model.AcceptPrivacyPolicyPopup = _commonSettings.PopupForTermsOfServiceLinks;
-            model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             model.CheckUsernameAvailabilityEnabled = _customerSettings.CheckUsernameAvailabilityEnabled;
             model.EnteringEmailTwice = _customerSettings.EnteringEmailTwice;
 
             return model;
-        }
-
-        public virtual List<AvailablePlatforms> GetAllAvailablePlatforms()
-        {
-            var availablePlatforms = new List<AvailablePlatforms>();
-            availablePlatforms.Add(new AvailablePlatforms { Text = "Social Media", Value = "Social Media"});
-            availablePlatforms.Add(new AvailablePlatforms { Text = "Website", Value = "Website"});
-            availablePlatforms.Add(new AvailablePlatforms { Text = "Other", Value = "Other"});
-
-            return availablePlatforms;
-        }
-
-        public virtual List<AvailablePickupLocations> GetAllAvailablePickupLocations()
-        {
-            var availablePickupLocations = new List<AvailablePickupLocations>();
-            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Houston", Value = 1});
-            availablePickupLocations.Add(new AvailablePickupLocations { Text = "Beaumont", Value = 2});
-
-            return availablePickupLocations;
-        }
-
-        public class AvailablePlatforms
-        {
-            public string Text { get; set; }
-            public string Value { get; set; }
-        }
-
-        public class AvailablePickupLocations
-        {
-            public string Text { get; set; }
-            public int Value { get; set; }
         }
     }
 }

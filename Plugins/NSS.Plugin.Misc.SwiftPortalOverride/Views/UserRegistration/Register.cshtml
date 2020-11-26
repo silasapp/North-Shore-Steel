@@ -130,8 +130,8 @@
                                         <label asp-for="BuyerRole" class="mb-2 pr-3" id="buyer_role">Buyer</label>
                                     </li>
                                     <li>
-                                        <input asp-for="OperationRole" class="mb-2" type="checkbox" checked />
-                                        <label asp-for="OperationRole" class="mb-2 pr-3" id="operations_role">Operations</label>
+                                        <input asp-for="OperationsRole" class="mb-2" type="checkbox" checked />
+                                        <label asp-for="OperationsRole" class="mb-2 pr-3" id="operations_role">Operations</label>
                                     </li>
                                     <li>
                                         <input asp-for="APRole" class="mb-2" type="checkbox" checked />
@@ -157,7 +157,7 @@
                             <div style="margin-bottom: 2em">
                                 <label>How did you hear about us?</label>
                                 <nop-required />
-                                <select asp-for="HearAboutUs" asp-items="Model.AvailablePlatforms" class="form-control custom-input" onchange="otherMethodCheck(this);"></select>
+                                <select asp-for="HearAboutUs" asp-items="Html.GetEnumSelectList<HearAboutUs>()" class="form-control custom-input" onchange="otherMethodCheck(this);"> </select>
                                 <span asp-validation-for="HearAboutUs"></span>
                             </div>
 
@@ -173,7 +173,7 @@
                             <div>
                                 <label>Preferred pickup location</label>
                                 <nop-required />
-                                <select asp-for="PreferredPickupLocationId" asp-items="Model.AvailablePickupLocations" class="form-control custom-input"></select>
+                                <select asp-for="PreferredPickupLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
                                 <span asp-validation-for="PreferredPickupLocationId"></span>
 
                             </div>

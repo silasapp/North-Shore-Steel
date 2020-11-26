@@ -4,16 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
     public partial class RegisterModel : BaseNopModel
     {
-        public RegisterModel()
-        {
-            AvailablePlatforms = new List<SelectListItem>();
-            AvailablePickupLocations = new List<SelectListItem>();
-        }
+        
         
         [DataType(DataType.EmailAddress)]
         [NopResourceDisplayName("Account.Fields.Email")]
@@ -23,27 +20,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [DataType(DataType.EmailAddress)]
         [NopResourceDisplayName("Account.Fields.ConfirmEmail")]
         public string ConfirmEmail { get; set; }
-
-        public bool UsernamesEnabled { get; set; }
-        [NopResourceDisplayName("Account.Fields.Username")]
-        public string Username { get; set; }
-
         public bool CheckUsernameAvailabilityEnabled { get; set; }
 
-        [DataType(DataType.Password)]
-        [NoTrim]
-        [NopResourceDisplayName("Account.Fields.Password")]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [NoTrim]
-        [NopResourceDisplayName("Account.Fields.ConfirmPassword")]
-        public string ConfirmPassword { get; set; }
-
         //form fields & properties
-        public bool GenderEnabled { get; set; }
-        [NopResourceDisplayName("Account.Fields.Gender")]
-        public string Gender { get; set; }
 
         public bool FirstNameEnabled { get; set; }
         [NopResourceDisplayName("Account.Fields.FirstName")]
@@ -54,85 +33,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string LastName { get; set; }
         public bool LastNameRequired { get; set; }
 
-        public bool DateOfBirthEnabled { get; set; }
-        [NopResourceDisplayName("Account.Fields.DateOfBirth")]
-        public int? DateOfBirthDay { get; set; }
-        [NopResourceDisplayName("Account.Fields.DateOfBirth")]
-        public int? DateOfBirthMonth { get; set; }
-        [NopResourceDisplayName("Account.Fields.DateOfBirth")]
-        public int? DateOfBirthYear { get; set; }
-        public bool DateOfBirthRequired { get; set; }
-        public DateTime? ParseDateOfBirth()
-        {
-            if (!DateOfBirthYear.HasValue || !DateOfBirthMonth.HasValue || !DateOfBirthDay.HasValue)
-                return null;
-
-            DateTime? dateOfBirth = null;
-            try
-            {
-                dateOfBirth = new DateTime(DateOfBirthYear.Value, DateOfBirthMonth.Value, DateOfBirthDay.Value);
-            }
-            catch { }
-            return dateOfBirth;
-        }
-
-        public string HearAboutUs { get; set; }
-        public IList<SelectListItem> AvailablePlatforms { get; set; }
-
-        public bool APRole { get; set; }
-        public bool OperationRole { get; set; }
-        public bool BuyerRole { get; set; }
+        public HearAboutUs HearAboutUs { get; set; }
+        
+        public int PreferredPickupLocationId { get; set; }
+        
+        public string Other { get; set; }
 
         public string ItemsForNextProject { get; set; }
 
-        public string Other { get; set; }
+        public bool APRole { get; set; }
 
-        public int PreferredPickupLocationId { get; set; }
-        public IList<SelectListItem> AvailablePickupLocations { get; set; }
+        public bool OperationsRole { get; set; }
+
+        public bool BuyerRole { get; set; }
+
         public bool CompanyEnabled { get; set; }
         public bool CompanyRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.Company")]
         public string Company { get; set; }
 
-        public bool StreetAddressEnabled { get; set; }
-        public bool StreetAddressRequired { get; set; }
-        [NopResourceDisplayName("Account.Fields.StreetAddress")]
-        public string StreetAddress { get; set; }
-
-        public bool StreetAddress2Enabled { get; set; }
-        public bool StreetAddress2Required { get; set; }
-        [NopResourceDisplayName("Account.Fields.StreetAddress2")]
-        public string StreetAddress2 { get; set; }
-
-        public bool ZipPostalCodeEnabled { get; set; }
-        public bool ZipPostalCodeRequired { get; set; }
-        [NopResourceDisplayName("Account.Fields.ZipPostalCode")]
-        public string ZipPostalCode { get; set; }
-
-        public bool CityEnabled { get; set; }
-        public bool CityRequired { get; set; }
-        [NopResourceDisplayName("Account.Fields.City")]
-        public string City { get; set; }
-
-        public bool CountyEnabled { get; set; }
-        public bool CountyRequired { get; set; }
-        [NopResourceDisplayName("Account.Fields.County")]
-        public string County { get; set; }
-
-        public bool CountryEnabled { get; set; }
-        public bool CountryRequired { get; set; }
-        [NopResourceDisplayName("Account.Fields.Country")]
-        public int CountryId { get; set; }
-        public IList<SelectListItem> AvailableCountries { get; set; }
-
-        public bool StateProvinceEnabled { get; set; }
-        public bool StateProvinceRequired { get; set; }
-        [NopResourceDisplayName("Account.Fields.StateProvince")]
-        public int StateProvinceId { get; set; }
-        public IList<SelectListItem> AvailableStates { get; set; }
-
         public bool PhoneEnabled { get; set; }
         public bool PhoneRequired { get; set; }
+
         [DataType(DataType.PhoneNumber)]
         [NopResourceDisplayName("Account.Fields.Phone")]
         public string CellPhone { get; set; }
@@ -141,34 +63,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [NopResourceDisplayName("Account.Fields.Phone")]
         public string Phone { get; set; }
 
-        public bool FaxEnabled { get; set; }
-        public bool FaxRequired { get; set; }
-        [DataType(DataType.PhoneNumber)]
-        [NopResourceDisplayName("Account.Fields.Fax")]
-        public string Fax { get; set; }
-        
-        public bool NewsletterEnabled { get; set; }
-        [NopResourceDisplayName("Account.Fields.Newsletter")]
-        public bool Newsletter { get; set; }
-
         public bool IsCurrentCustomer { get; set; }
 
         public bool AcceptPrivacyPolicyEnabled { get; set; }
         public bool AcceptPrivacyPolicyPopup { get; set; }
 
-        //time zone
-        [NopResourceDisplayName("Account.Fields.TimeZone")]
-        public string TimeZoneId { get; set; }
-        public bool AllowCustomersToSetTimeZone { get; set; }
-
-        public IList<SelectListItem> AvailableTimeZones { get; set; }
-
-        //EU VAT
-        [NopResourceDisplayName("Account.Fields.VatNumber")]
-        public string VatNumber { get; set; }
-        public bool DisplayVatNumber { get; set; }
-
-        public bool HoneypotEnabled { get; set; }
-        public bool DisplayCaptcha { get; set; }
+ 
     }
 }

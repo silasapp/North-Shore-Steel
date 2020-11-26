@@ -30,9 +30,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             if (userRegistration == null)
                 throw new ArgumentNullException(nameof(userRegistration));
 
-            //if (request.Customer == null)
-            //    throw new ArgumentException("Can't load current customer");
-
             var result = new CustomerRegistrationResult();
 
             if (!CommonHelper.IsValidEmail(userRegistration.WorkEmail))
@@ -43,7 +40,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
 
             //at this point request is valid
-            //userRegistration.Customer.Email = request.Email;
             _userRegistrationRepository.Insert(userRegistration);
 
             return result;
