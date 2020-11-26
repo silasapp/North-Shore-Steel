@@ -1,5 +1,5 @@
-﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
-@model RegisterModel
+﻿@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
+@model UserRegistration
 @{
     Layout = "_ColumnsOne";
 
@@ -43,27 +43,32 @@
             <div class="form-fields">
                 <div class="inputs">
                     <label asp-for="FirstName" asp-postfix=":">First Name</label>
-                    <input asp-for="FirstName" />
-                </div>
-
-                <div class="inputs">
-                    <label asp-for="Email" asp-postfix=":">Work Email</label>
-                    <input asp-for="Email" readonly style="cursor: unset" />
+                    <input asp-for="FirstName" disabled />
                 </div>
 
                 <div class="inputs">
                     <label asp-for="LastName" asp-postfix=":">Last Name</label>
-                    <input asp-for="LastName" />
+                    <input asp-for="LastName" disabled />
                 </div>
 
                 <div class="inputs">
-                    <label asp-for="Phone" asp-postfix=":">Phone Number</label>
-                    <input asp-for="Phone" />
+                    <label asp-for="CompanyName" asp-postfix=":">Company Name</label>
+                    <input asp-for="CompanyName" disabled />
                 </div>
 
                 <div class="inputs">
-                    <label asp-for="Company" asp-postfix=":">Company Name</label>
-                    <input asp-for="Company" />
+                    <label asp-for="WorkEmail" asp-postfix=":">Work Email</label>
+                    <input asp-for="WorkEmail" disabled />
+                </div>
+
+                <div class="inputs">
+                    <label asp-for="Cell" asp-postfix=":">Cell Phone</label>
+                    <input asp-for="Cell" disabled />
+                </div>
+
+                <div class="inputs">
+                    <label asp-for="Phone" asp-postfix=":">Work Phone</label>
+                    <input asp-for="Phone" disabled />
                 </div>
 
                 <div class="inputs">

@@ -10,6 +10,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
     {
         CustomerRegistrationResult InsertUser(UserRegistration userRegistration);
 
+        UserRegistration GetUserById(int id);
         //Customer GetCustomerByEmail(string email);
     }
 }

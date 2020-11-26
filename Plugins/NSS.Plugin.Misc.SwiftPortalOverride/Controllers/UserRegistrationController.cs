@@ -65,7 +65,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _customerModelFactory = customerModelFactory;
             _customerService = customerService;
             _eventPublisher = eventPublisher;
-           _storeContext = storeContext;
+            _storeContext = storeContext;
             _workContext = workContext;
             _userRegistrationService = userRegistrationService;
         }
@@ -74,7 +74,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         #region Utilities
-  
+
         #endregion
 
 
@@ -136,7 +136,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (String.IsNullOrEmpty(model.PreferredPickupLocationId.ToString()))
                 warnings.Add("Please Enter Preferred Pickup Location");
 
-            
+
 
             foreach (var error in warnings)
             {
@@ -145,7 +145,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (ModelState.IsValid)
             {
-                model.MarketingVideoUrl = "http://www.youtube.com/embed/fxCEcPxUbYA";
                 var userRegistrationRequest = new SwiftCore.Domain.Customers.UserRegistration
                 {
                     FirstName = model.FirstName,
@@ -162,7 +161,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     StatusId = (int)UserRegistrationStatus.Pending,
                     CreatedOnUtc = DateTime.UtcNow,
                     ModifiedOnUtc = DateTime.UtcNow
-            };
+                };
 
                 if (!model.IsCurrentCustomer)
                 {
@@ -185,6 +184,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     //TODO: send email with registrationId to Approval
 
                     // redirect to confirmation page
+                    model.MarketingVideoUrl = "http://www.youtube.com/embed/fxCEcPxUbYA";
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/Confirmation.cshtml", model);
                 }
 
@@ -199,11 +199,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
 
-        #region Confirm Regsitration
+        #region Confirm Registration
         public virtual IActionResult ConfirmRegistration(int userId)
         {
-
-            return View();
+            var model = new SwiftCore.Domain.Customers.UserRegistration();
+            model = _userRegistrationService.GetUserById(userId);
+            return View(model);
         }
 
         public virtual IActionResult Approve()

@@ -23,7 +23,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _userRegistrationRepository = userRegistrationRepository;
         }
 
-        
+        public virtual UserRegistration GetUserById(int id)
+        {
+            var user = _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id);
+            return user;
+        }
 
         public virtual CustomerRegistrationResult InsertUser(UserRegistration userRegistration)
         {
@@ -48,11 +52,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         }
 
         //create customer
-            //create nopcustomer
-            //var user company=new user company
-            //buyer operation and ap
-            //getbyerpcompanyId :: i have company here
-            //need, company, usercompany, userregistrationbyId
+        //create nopcustomer
+        //var user company=new user company
+        //buyer operation and ap
+        //getbyerpcompanyId :: i have company here
+        //need, company, usercompany, userregistrationbyId
 
     }
 }
