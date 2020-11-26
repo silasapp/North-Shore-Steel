@@ -1012,6 +1012,224 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
+        public (ERPRegisterUserResponse, string) CreateUserRegistration(int regId, ERPRegisterUserRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            //initialize
+            var retVal = new ERPRegisterUserResponse();
+            var respContent = string.Empty;
+            string error = string.Empty;
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                error = "NSS API attributes not configured correctly.";
+
+                _logger.Warning("Swift Api provider - CreateUserRegistration", new NopException(error));
+
+                return (retVal, error);
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        error = "NSS token returned empty";
+
+                        _logger.Warning($"NSS.CreateUserRegistration -> {regId}", new Exception(error));
+
+                        return (retVal, error);
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+
+                    // create user resource
+                    var resource = $"/userregistration/{regId}";
+
+                    //body params
+                    var param = request.ToKeyValue();
+
+                    var content = new FormUrlEncodedContent(param);
+
+                    var response = httpClient.PostAsync(resource, content).Result;
+
+                    //// throw error if not successful
+                    //response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        error = respContent;
+                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
+                    }
+
+                    retVal = ERPRegisterUserResponse.FromJson(respContent) ?? new ERPRegisterUserResponse();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.CreateUserRegistration -> {regId}", ex);
+                return (retVal, error);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUserRegistration => regId: {regId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+
+            return (retVal, error);
+        }
+
+        public string RejectUserRegistration(int regId)
+        {
+            //initialize
+            var respContent = string.Empty;
+            var error = string.Empty;
+
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                error = "NSS API attributes not configured correctly.";
+
+                _logger.Warning("Swift Api provider - RejectUserRegistration", new NopException(error));
+
+                return error;
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        error = "NSS token returned empty";
+
+                        _logger.Warning($"NSS.RejectUserRegistration -> {regId}", new NopException(error));
+
+                        return error;
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+                    // create user resource
+                    var resource = $"/userregistration/{regId}/reject";
+
+                    var response = httpClient.PutAsync(resource, null).Result;
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        error = respContent;
+                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.RejectUserRegistration -> {regId}", ex);
+                return error;
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.RejectUserRegistration => regId: {regId}", $"resp content ==> {respContent ?? "empty"}");
+
+            return error;
+        }
+
+        public (ERPApproveUserRegistrationResponse, string) ApproveUserRegistration(int regId)
+        {
+            //initialize
+            var retVal = new ERPApproveUserRegistrationResponse();
+            var respContent = string.Empty;
+            var error = string.Empty;
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                error = "NSS API attributes not configured correctly.";
+
+                _logger.Warning("Swift Api provider - ApproveUserRegistration", new NopException(error));
+
+                return (retVal, error);
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        error = "NSS token returned empty";
+
+                        _logger.Warning($"NSS.ApproveUserRegistration -> {regId}", new Exception(error));
+
+                        return (retVal, error);
+                    }
+
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
+
+
+                    // create user resource
+                    var resource = $"/userregistration/{regId}/approve";
+
+                    var response = httpClient.PutAsync(resource, null).Result;
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        error = respContent;
+                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
+                    }
+
+                    retVal = ERPApproveUserRegistrationResponse.FromJson(respContent) ?? new ERPApproveUserRegistrationResponse();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.ApproveUserRegistration -> {regId}", ex);
+
+                return (retVal, error);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.ApproveUserRegistration => regId: {regId}", $"resp content ==> {respContent ?? "empty"}");
+
+            return (retVal, error);
+        }
 
         private void ConfigureNSSApiSettings()
         {
