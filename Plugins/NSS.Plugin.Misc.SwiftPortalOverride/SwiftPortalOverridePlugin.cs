@@ -104,6 +104,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalClientId.Hint"] = "Enter PayPal ClientID.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey"] = "PayPal Secret Key",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey.Hint"] = "Enter PayPal Secret Key.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl"] = "Marketing Video Url",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl.Hint"] = "Enter marketing video url that will be embedded when a customer signs up.",
             });
 
             // create proc
@@ -120,7 +122,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
 
             var sql = GetSQL("ProductLoadAllPagedSwiftPortal");
             dataProvider.ExecuteNonQuery(sql);
-
 
             // email template
             ConfigureMessageTemplates();

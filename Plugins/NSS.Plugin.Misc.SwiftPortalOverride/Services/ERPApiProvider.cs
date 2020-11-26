@@ -1012,7 +1012,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public (ERPRegisterUserResponse, string) CreateUserRegistration(int regId, ERPRegisterUserRequest request)
+        public (ERPRegisterUserResponse, string) CreateUserRegistration(ERPRegisterUserRequest request)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -1047,7 +1047,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     {
                         error = "NSS token returned empty";
 
-                        _logger.Warning($"NSS.CreateUserRegistration -> {regId}", new Exception(error));
+                        _logger.Warning($"NSS.CreateUserRegistration -> {request.SwiftRegistrationId}", new Exception(error));
 
                         return (retVal, error);
                     }
@@ -1057,7 +1057,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
 
                     // create user resource
-                    var resource = $"/userregistration/{regId}";
+                    var resource = $"/userregistration";
 
                     //body params
                     var param = request.ToKeyValue();
@@ -1083,12 +1083,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.CreateUserRegistration -> {regId}", ex);
+                _logger.Error($"NSS.CreateUserRegistration -> {request.SwiftRegistrationId}", ex);
                 return (retVal, error);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUserRegistration => regId: {regId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUserRegistration => regId: {request.SwiftRegistrationId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return (retVal, error);
         }
