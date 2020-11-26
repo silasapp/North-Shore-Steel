@@ -48,7 +48,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private CustomerSettings _customerSettings;
 
         public CustomersController(
-            //ICustomerApiService customerApiService,
+            ICustomerApiService customerApiService,
             IJsonFieldsSerializer jsonFieldsSerializer,
             IAclService aclService,
             ICustomerService customerService,
@@ -68,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService,
                  localizationService, pictureService)
         {
-            //_customerApiService = customerApiService;
+            _customerApiService = customerApiService;
             _factory = factory;
             _countryService = countryService;
             _mappingHelper = mappingHelper;
