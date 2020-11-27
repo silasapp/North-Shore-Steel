@@ -202,6 +202,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-remove-person.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-store-dark.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-users.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icon-arrow-up-white.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\instagram.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\linkedin.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\list.svg" />

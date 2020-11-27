@@ -37,7 +37,7 @@
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
                         @*<input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="From">
+                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="From" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -46,7 +46,7 @@
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
                         @*<input class=nss-form-control type="text" v-model="toDate" id="datepicker2" autocomplete="off" placeholder="To">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="To">
+                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="To" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -137,6 +137,28 @@
     $.fn.datepicker.defaults.format = "mm/dd/yyyy";
     $('.datepicker').datepicker({
         endDate: '0'
+    });
+    $(document).ready(function () {
+        $('.datepicker').keypress(function (e) {
+            if (((e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 47) && (!e.shiftKey && !e.altKey && !e.ctrlKey))) {
+                if (e.keyCode != 8) {
+                    var text = this.value;
+                    if ((text.length < 2 || text.length > 5 || (text.length > 2 || text.length < 5)) && e.keyCode == 47) {
+                        return false;
+                    }
+                    if (text.length == 2) {
+                        this.value = text + '/';
+                    }
+                    if (text.length == 5) {
+                        this.value = text + '/';
+                    }
+                }
+
+                return true;
+            }
+            e.preventDefault();
+            return false;
+        });
     });
 </script>
 <ejs-scripts></ejs-scripts>
