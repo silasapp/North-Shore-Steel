@@ -61,32 +61,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
-            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.Select(x => x.Shape).OrderBy(s => s.Order ).ToList();
+            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.OrderBy(s => s.Shape.Order).ToList();
 
             List<ShapeData> shapeData = new List<ShapeData>();
             for (var i = 0; i < shapes.Count; i++)
             {
-                var childShapes = shapes[i].SubCategories.ToList();
+                var childShapes = shapes[i].Shape?.SubCategories?.ToList();
                 var shape = new ShapeData
                 {
-                    id = shapes[i].Id,
-                    pid = shapes[i].ParentId,
-                    name = shapes[i].Name,
-                    hasChild = childShapes != null && childShapes.Count > 0
+                    id = shapes[i].Shape.Id,
+                    pid = shapes[i].Shape.ParentId,
+                    name = $"{shapes[i].Shape.Name} ({shapes[i].ProductCount})",
+                    hasChild = (shapes.Any(x => x.Shape.ParentId == shapes[i].Shape.Id)) ? true : (bool?)null
                 };
                 shapeData.Add(shape);
 
-                if (childShapes != null && childShapes.Count > 0)
-                    for (int j = 0; j < childShapes.Count; j++)
-                    {
-                        shape = new ShapeData
-                        {
-                            id = childShapes[j].Id,
-                            pid = childShapes[j].ParentId,
-                            name = childShapes[j].Name
-                        };
-                        shapeData.Add(shape);
-                    }
+                //if (childShapes != null && childShapes.Count > 0)
+                //    for (int j = 0; j < childShapes.Count; j++)
+                //    {
+                //        shape = new ShapeData
+                //        {
+                //            id = childShapes[j].Id,
+                //            pid = childShapes[j].ParentId,
+                //            name = childShapes[j].Name
+                //        };
+                //        shapeData.Add(shape);
+                //    }
             }
 
             ViewBag.dataSource = JavaScriptConvert.ToString(shapeData);
@@ -98,7 +98,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             public int id { get; set; }
             public int? pid { get; set; }
             public string name { get; set; }
-            public bool hasChild { get; set; }
+            public bool? hasChild { get; set; }
         }
 
         [HttpPost]

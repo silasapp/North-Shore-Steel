@@ -160,31 +160,46 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
                 _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager);
 
-            model.PagingFilteringContext.ShapeFilter = PrepareShapeFilterModel();
+            PrepareShapeFilterModel(ref model);
 
             model.PagingFilteringContext.LoadPagedList(products);
 
             return model;
         }
 
-        public ShapeFilterModel PrepareShapeFilterModel()
+        public void PrepareShapeFilterModel(ref CatalogModel model)
         {
-            var model = new ShapeFilterModel();
+            //var shapes = _shapeService.GetShapes();
+            var productGroup = model.Products.GroupBy(x => x.Shape.Id);
+            var shapes = model.Products.Select(x => x.Shape).Distinct();
 
-            var shapes = _shapeService.GetShapes();
-
-            if(shapes.Count > 0)
+            foreach (var shapeGroup in productGroup)
             {
-                //model.Shapes = shapes;
+                var filterItem = new ShapeFilterItem { Shape = shapeGroup.FirstOrDefault(x => x.Shape.Id == shapeGroup.Key).Shape, ProductCount = shapeGroup.Count() };
 
-                foreach (var shape in shapes)
+                if(filterItem.Shape.Parent != null)
                 {
+                    if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.ParentId))
+                    {
+                        model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.ParentId).ProductCount += filterItem.ProductCount;
+                    }
+                    else
+                    {
+                        // build parent
+                        model.PagingFilteringContext.ShapeFilter.FilterItems.Add(new ShapeFilterItem { Shape = filterItem.Shape.Parent, ProductCount = shapeGroup.Count() });
+                    }
+                }
 
-                    model.FilterItems.Add(new ShapeFilterItem { Shape = shape, ProductCount = 1 });
+                if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.Id))
+                {
+                    model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.Id).ProductCount += filterItem.ProductCount;
+                }
+                else
+                {
+                    // build shape
+                    model.PagingFilteringContext.ShapeFilter.FilterItems.Add(filterItem);
                 }
             }
-
-            return model;
         }
     }
 }
