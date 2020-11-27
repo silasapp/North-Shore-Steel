@@ -53,6 +53,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string ItemsForNextProject { get; set; }
 
         [JsonProperty("createdOnUtc")]
-        public DateTime CreatedOnUtc { get; set; }
+        public string CreatedOnUtc { get; set; }
     }
 }

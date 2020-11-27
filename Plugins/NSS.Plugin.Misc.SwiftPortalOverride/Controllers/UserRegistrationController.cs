@@ -29,6 +29,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using ICustomerModelFactory = NSS.Plugin.Misc.SwiftPortalOverride.Factories.ICustomerModelFactory;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -154,7 +155,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     Cell = model.CellPhone,
                     Phone = model.Phone,
                     CompanyName = model.Company,
-                    IsExistingCustomer = model.IsCurrentCustomer,
+                    IsExistingCustomer = model.IsExistingCustomer,
                     HearAboutUs = model.HearAboutUs.ToString(),
                     Other = model.Other,
                     ItemsForNextProject = model.ItemsForNextProject,
@@ -164,18 +165,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     ModifiedOnUtc = DateTime.UtcNow
                 };
 
-                if (!model.IsCurrentCustomer)
-                {
-                    userRegistrationRequest.APRole = true;
-                    userRegistrationRequest.OperationsRole = true;
-                    userRegistrationRequest.BuyerRole = true;
-                }
-                else
-                {
-                    userRegistrationRequest.APRole = model.APRole;
-                    userRegistrationRequest.BuyerRole = model.BuyerRole;
-                    userRegistrationRequest.OperationsRole = model.OperationsRole;
-                }
+                userRegistrationRequest.APRole = model.IsExistingCustomer ? model.APRole : true;
+                userRegistrationRequest.OperationsRole = model.IsExistingCustomer ? model.OperationsRole : true;
+                userRegistrationRequest.BuyerRole = model.IsExistingCustomer ? model.BuyerRole : true;
 
 
                 var registrationResult = _userRegistrationService.InsertUser(userRegistrationRequest);
@@ -193,17 +185,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         Phone = res.Phone,
                         CompanyName = res.CompanyName,
                         IsExistingCustomer = res.IsExistingCustomer,
-                        Buyer = res.BuyerRole,
-                        AP = res.APRole,
-                        Operations = res.OperationsRole,
-                        PreferredLocationId = res.PreferredLocationId.ToString(),
+                        PreferredLocationId = res.PreferredLocationId,
                         HearAboutUs = res.HearAboutUs,
                         Other = res.Other,
                         ItemsForNextProject = res.ItemsForNextProject,
-                        CreatedOnUtc = res.CreatedOnUtc
+                        CreatedOnUtc = res.CreatedOnUtc.ToString("s")
                     };
 
+                    request.AP = res.IsExistingCustomer ? res.APRole : (bool?)null;
+                    request.Buyer = res.IsExistingCustomer ? res.BuyerRole : (bool?)null;
+                    request.Operations = res.IsExistingCustomer ? res.OperationsRole : (bool?)null;
+
                     var response = _nSSApiProvider.CreateUserRegistration(request);
+                    // check if error in response
+                    // return error to screen
+
+
                     // registration successful
                     //TODO: send email with registrationId to Approval
 
@@ -226,27 +223,49 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region Confirm Registration
         public virtual IActionResult ConfirmRegistration(int regId)
         {
-            var model = new SwiftCore.Domain.Customers.UserRegistration();
-            model = _userRegistrationService.GetUserById(regId);
+            UserRegistration model = getRegisteredUser(regId);
             return View(model);
         }
 
-        public virtual IActionResult Approve()
+        public virtual IActionResult Approve(int regId)
         {
-            return null;
+            var response = _nSSApiProvider.ApproveUserRegistration(regId);
+            updateUserRegistration(regId, response.Item2, (int)UserRegistrationStatus.Approved);
+
+            UserRegistration model = getRegisteredUser(regId);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
         }
 
         public virtual IActionResult Reject(int regId)
         {
             var response = _nSSApiProvider.RejectUserRegistration(regId);
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml");
+            updateUserRegistration(regId, response, (int)UserRegistrationStatus.Rejected);
+
+            UserRegistration model = getRegisteredUser(regId);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
+        }
+
+        private void updateUserRegistration(int regId, string response, int statusId)
+        {
+            if (string.IsNullOrEmpty(response))
+            {
+                var user = _userRegistrationService.GetUserById(regId);
+                user.StatusId = statusId;
+                user.ModifiedOnUtc = DateTime.UtcNow;
+                _userRegistrationService.UpdateUser(user);
+            }
         }
 
         #endregion
 
         #endregion
 
-
+        private UserRegistration getRegisteredUser(int regId)
+        {
+            _ = new SwiftCore.Domain.Customers.UserRegistration();
+            UserRegistration model = _userRegistrationService.GetUserById(regId);
+            return model;
+        }
 
     }
 }

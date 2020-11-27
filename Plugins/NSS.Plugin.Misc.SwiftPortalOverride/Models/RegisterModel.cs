@@ -63,7 +63,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [NopResourceDisplayName("Account.Fields.Phone")]
         public string Phone { get; set; }
 
-        public bool IsCurrentCustomer { get; set; }
+        public bool IsExistingCustomer { get; set; }
 
         public bool AcceptPrivacyPolicyEnabled { get; set; }
         public bool AcceptPrivacyPolicyPopup { get; set; }

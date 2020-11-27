@@ -25,7 +25,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         public virtual UserRegistration GetUserById(int id)
         {
-            var user = _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id && u.StatusId == 0);
+            var user = _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id);
             return user;
         }
 
@@ -48,6 +48,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             return (result, userRegistration);
 
 
+        }
+
+        public void UpdateUser(UserRegistration userRegistration)
+        {
+            _userRegistrationRepository.Update(userRegistration);
         }
 
         //create customer
