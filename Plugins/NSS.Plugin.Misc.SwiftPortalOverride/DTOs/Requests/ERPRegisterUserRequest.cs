@@ -31,7 +31,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         [JsonProperty("isExistingCustomer")]
         public bool IsExistingCustomer { get; set; }
 
-        [JsonProperty("Buyer", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("buyer", NullValueHandling = NullValueHandling.Ignore)]
         public bool? Buyer { get; set; }
 
         [JsonProperty("AP", NullValueHandling = NullValueHandling.Ignore)]
@@ -40,7 +40,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         [JsonProperty("operations", NullValueHandling = NullValueHandling.Ignore)]
         public bool? Operations { get; set; }
 
-        [JsonProperty("preferredlocationId")]
+        [JsonProperty("preferredLocationId")]
         public string PreferredLocationId { get; set; }
 
         [JsonProperty("hearAboutUs")]
