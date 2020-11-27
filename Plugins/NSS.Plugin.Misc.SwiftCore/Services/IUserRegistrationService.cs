@@ -8,7 +8,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 {
     public interface IUserRegistrationService
     {
-        CustomerRegistrationResult InsertUser(UserRegistration userRegistration);
+        (CustomerRegistrationResult, UserRegistration) InsertUser(UserRegistration userRegistration);
 
         UserRegistration GetUserById(int id);
         //Customer GetCustomerByEmail(string email);

@@ -25,11 +25,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         public virtual UserRegistration GetUserById(int id)
         {
-            var user = _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id);
+            var user = _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id && u.StatusId == 0);
             return user;
         }
 
-        public virtual CustomerRegistrationResult InsertUser(UserRegistration userRegistration)
+        public virtual (CustomerRegistrationResult, UserRegistration) InsertUser(UserRegistration userRegistration)
         {
             if (userRegistration == null)
                 throw new ArgumentNullException(nameof(userRegistration));
@@ -39,14 +39,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             if (!CommonHelper.IsValidEmail(userRegistration.WorkEmail))
             {
                 result.AddError(_localizationService.GetResource("Common.WrongEmail"));
-                return result;
+                return (result, null);
             }
 
 
             //at this point request is valid
             _userRegistrationRepository.Insert(userRegistration);
-
-            return result;
+            return (result, userRegistration);
 
 
         }

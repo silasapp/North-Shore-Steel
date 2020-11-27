@@ -28,13 +28,14 @@ using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using ICustomerModelFactory = NSS.Plugin.Misc.SwiftPortalOverride.Factories.ICustomerModelFactory;
 using NSS.Plugin.Misc.SwiftCore.Services;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
 
     public partial class UserRegistrationController : BasePublicController
     {
-        #region fields
+        #region Fields
         private readonly CustomerSettings _customerSettings;
         private readonly IAuthenticationService _authenticationService;
         private readonly ICustomerModelFactory _customerModelFactory;
@@ -43,12 +44,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
         private readonly IUserRegistrationService _userRegistrationService;
-
-
+        private readonly ERPApiProvider _nSSApiProvider;
         #endregion
 
-        #region Constructor
-
+        #region Ctor
         public UserRegistrationController(
             CustomerSettings customerSettings,
             IAuthenticationService authenticationService,
@@ -57,7 +56,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IEventPublisher eventPublisher,
             IStoreContext storeContext,
             IWorkContext workContext,
-            IUserRegistrationService userRegistrationService
+            IUserRegistrationService userRegistrationService,
+            ERPApiProvider nSSApiProvider
             )
         {
             _customerSettings = customerSettings;
@@ -68,6 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _storeContext = storeContext;
             _workContext = workContext;
             _userRegistrationService = userRegistrationService;
+            _nSSApiProvider = nSSApiProvider;
         }
 
         #endregion
@@ -178,8 +179,31 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
                 var registrationResult = _userRegistrationService.InsertUser(userRegistrationRequest);
-                if (registrationResult.Success)
+                if (registrationResult.Item1.Success)
                 {
+                    // prepare request for create api create user registration call
+                    var res = registrationResult.Item2;
+                    var request = new ERPRegisterUserRequest
+                    {
+                        SwiftRegistrationId = res.Id,
+                        FirstName = res.FirstName,
+                        LastName = res.LastName,
+                        WorkEmail = res.WorkEmail,
+                        Cell = res.Cell,
+                        Phone = res.Phone,
+                        CompanyName = res.CompanyName,
+                        IsExistingCustomer = res.IsExistingCustomer,
+                        Buyer = res.BuyerRole,
+                        AP = res.APRole,
+                        Operations = res.OperationsRole,
+                        PreferredLocationId = res.PreferredLocationId.ToString(),
+                        HearAboutUs = res.HearAboutUs,
+                        Other = res.Other,
+                        ItemsForNextProject = res.ItemsForNextProject,
+                        CreatedOnUtc = res.CreatedOnUtc
+                    };
+
+                    var response = _nSSApiProvider.CreateUserRegistration(request);
                     // registration successful
                     //TODO: send email with registrationId to Approval
 
@@ -189,7 +213,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
 
                 // errors
-                foreach (var error in registrationResult.Errors)
+                foreach (var error in registrationResult.Item1.Errors)
                     ModelState.AddModelError("", error);
             }
 
@@ -200,10 +224,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         #region Confirm Registration
-        public virtual IActionResult ConfirmRegistration(int userId)
+        public virtual IActionResult ConfirmRegistration(int regId)
         {
             var model = new SwiftCore.Domain.Customers.UserRegistration();
-            model = _userRegistrationService.GetUserById(userId);
+            model = _userRegistrationService.GetUserById(regId);
             return View(model);
         }
 
@@ -212,10 +236,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return null;
         }
 
-        public virtual IActionResult Reject()
+        public virtual IActionResult Reject(int regId)
         {
-            return null;
+            var response = _nSSApiProvider.RejectUserRegistration(regId);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml");
         }
+
         #endregion
 
         #endregion

@@ -80,7 +80,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                );
 
             //confirm registration
-            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "userregistration/{userId:int}/confirmregistration/",
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Index", "userregistration/{regId:int}/confirmregistration/",
              new { controller = "UserRegistration", action = "ConfirmRegistration" },
              new { },
              new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }

@@ -86,7 +86,7 @@
             <div class="buttons save-customer-info-button">
                 <input type=submit name=send-email value="APPROVE" class="button-2 mr-4" />
                 @*<input type=submit id=save-info-button value='Save Changes' name=save-info-button class="button-2 ">*@
-                <input type="button" onclick="location.href='@Url.RouteUrl("Homepage")'" value="REJECT" class="button-2" />
+                <input type="button" onclick="location.href = '@(Url.Action("Reject","UserRegistration", new {userId = Model.Id}))'" value="REJECT" class="button-2" />
             </div>
         </div>
     </div>

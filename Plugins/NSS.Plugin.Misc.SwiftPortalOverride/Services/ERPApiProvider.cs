@@ -1074,7 +1074,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (!response.IsSuccessStatusCode)
                     {
                         error = respContent;
-                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
+                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}, request ==> {JsonConvert.SerializeObject(request)}");
                     }
 
                     retVal = ERPRegisterUserResponse.FromJson(respContent) ?? new ERPRegisterUserResponse();
