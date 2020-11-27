@@ -41,12 +41,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public bool? Operations { get; set; }
 
         [JsonProperty("preferredLocationId")]
-        public string PreferredLocationId { get; set; }
+        public int PreferredLocationId { get; set; }
 
         [JsonProperty("hearAboutUs")]
         public string HearAboutUs { get; set; }
 
-        [JsonProperty("other")]
+        [JsonProperty("other", NullValueHandling = NullValueHandling.Ignore)]
         public string Other { get; set; }
 
         [JsonProperty("itemsForNextProject")]
