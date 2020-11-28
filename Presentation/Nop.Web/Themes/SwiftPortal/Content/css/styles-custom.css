@@ -85,7 +85,7 @@ a:not([href]):not([class]) {
     overflow: hidden;
 }
 
-  /* #region spinner */
+/* #region spinner */
 .spinner {
     height: 60px;
     width: 60px;
@@ -112,7 +112,7 @@ a:not([href]):not([class]) {
     bottom: 6rem;
     z-index: 2;
 }
-  /* #endregion*/
+/* #endregion*/
 .nss-table,
 .cart-summary-content {
     text-align: left;
@@ -403,6 +403,7 @@ a:not([href]):not([class]) {
         text-decoration: none;
         color: #242424 !important;
     }
+
     .top-menu > li > a.active-tab, .nav-sub-menu > a.active-tab {
         text-decoration: none;
         color: #0076B4 !important;
@@ -444,10 +445,11 @@ a:not([href]):not([class]) {
         letter-spacing: 0px;
         color: #242424;
         opacity: 1;
+        margin-left: 5px !important;
     }
 
 .form-fields,
-.new-wrapper  .text {
+.new-wrapper .text {
     background-color: #ffffff !important;
     border: none !important;
 }
@@ -461,7 +463,7 @@ a:not([href]):not([class]) {
     opacity: 1;
 }
 
-.new-wrapper  .text,
+.new-wrapper .text,
 .fieldset > .text {
     margin: 0 !important;
     text-align: center;
@@ -504,16 +506,24 @@ a:not([href]):not([class]) {
 .inputs > textarea,
 .input-with-icon > input {
     width: 100% !important;
-    font-style: italic !important;
     font-size: 14px;
     background: #f6f6f6 0% 0% no-repeat padding-box !important;
+    font: normal normal normal 14px/24px "Exo 2" !important;
     opacity: 1;
     border: none;
-    font: italic normal normal 14px/24px "Exo 2";
     letter-spacing: 0px;
-    color: #aaaaaa;
+    color: #242424 !important;
     opacity: 1;
 }
+
+    .inputs > input::placeholder,
+    .inputs > select::placeholder,
+    .inputs > textarea::placeholder,
+    .input-with-icon > input::placeholder {
+        color: #AAAAAA;
+        font: italic normal normal 14px/24px "Exo 2" !important;
+        ;
+    }
 
 .inputs > select {
     font: normal normal normal 14px/24px "Exo 2";
@@ -890,11 +900,13 @@ table input {
     outline: none;
     padding: 1px;
 }
+
 .e-grid td.e-active {
-    background: #a8a8a9 !important;
+    background: transparent !important;
 }
+
 .chipsStyle {
-    display: flex  !important;
+    display: flex !important;
 }
 /* treeview */
 .option-list #current-customer {
@@ -918,6 +930,7 @@ table input {
         padding-right: 15px;
         background-position-x: 95%;
     }
+
     #accordion > .card > .opened > .card-header {
         background: #03175b url(../assets/icn-arrow-down-white.svg) right center no-repeat;
         background-position-x: 95%;
@@ -1042,6 +1055,9 @@ table input {
     display: inline-block;
 }
 
+.pure-material-checkbox > label {
+    margin-left: 5px;
+}
 .pure-material-checkbox > a {
     text-decoration: underline;
     font: normal normal normal 12px/16px "Exo 2";
@@ -1053,6 +1069,10 @@ table input {
 
 .checkmark:hover {
     border-color: #000000;
+}
+
+.inputs > input {
+    color: #242424 !important;
 }
 
 /* .pure-material-checkbox:hover input~.checkmark {
@@ -1807,16 +1827,20 @@ table input {
     justify-content: flex-end;
     margin-top: 20px;
 }
+
 .header-menu > ul > li > a {
     color: #AAAAAA !important;
 }
+
 .account-page-card > .block .listbox {
     padding: 0;
 }
+
 .icon-btn {
     cursor: pointer;
     margin: 0 2px;
 }
+
 .account-page-card > .form-fields,
 .address-block {
     display: grid;
@@ -2128,6 +2152,7 @@ table input {
 .orders-search-block label {
     text-align: left;
 }
+
 .nav-sub-menu {
     display: none;
     left: -7px;
@@ -2244,10 +2269,12 @@ table input {
 .custom-scroll::-webkit-scrollbar-thumb {
     background-color: #000000;
 }
+
 .login-page .new-wrapper .text {
     padding: 0;
     line-height: 1.5;
 }
+
 .new-wrapper.fieldset.register-block {
     justify-content: space-between;
     display: flex;
@@ -2265,6 +2292,7 @@ table input {
     .cat-side-drawer {
         display: block;
     }
+
     .login-page .new-wrapper .text {
         min-height: auto;
     }
