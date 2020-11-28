@@ -143,15 +143,19 @@
                                     @if (isExistingCustomerCtrl != null)
                                     {
                                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{isExistingCustomerCtrl.Id}";
-                                        <ul class="option-list pt-3">
+                                        <div class="option-list pt-3">
                                             @foreach (var attributeValue in isExistingCustomerCtrl.Values)
                                             {
-                                                <li>
+                                                @*<li>*@
+                                                <label class="pure-material-checkbox" for="@(controlId)_@(attributeValue.Id)" id="current-customer">
                                                     <input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
-                                                    <label for="@(controlId)_@(attributeValue.Id)" class="mb-1 pl-2" id="current-customer">I am a current customer</label>
-                                                </li>
+                                                    <span class="checkmark">I am a current customer</span>
+                                                </label>
+                                                @*<input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />*@
+                                                @*<label for="@(controlId)_@(attributeValue.Id)" class="mb-1 pl-2" id="current-customer">I am a current customer</label>*@
+                                                @*</li>*@
                                             }
-                                        </ul>
+                                        </div>
                                     }
 
                                 </div>

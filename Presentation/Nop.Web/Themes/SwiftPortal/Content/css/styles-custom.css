@@ -897,6 +897,9 @@ table input {
     display: flex  !important;
 }
 /* treeview */
+.option-list #current-customer {
+    margin: 0;
+}
 
 #accordion > .card {
     margin-top: 1px;
@@ -1045,6 +1048,7 @@ table input {
     letter-spacing: 0px;
     color: #242424;
     opacity: 1;
+    margin-left: 5px;
 }
 
 .checkmark:hover {
