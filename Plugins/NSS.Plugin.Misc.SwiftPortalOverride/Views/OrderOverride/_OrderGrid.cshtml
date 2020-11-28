@@ -11,7 +11,7 @@
 <div>
     <ejs-grid id="OrderGrid" dataSource="@Model.Orders" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-        <e-grid-pagesettings pageSize="50" pageSizes="true"></e-grid-pagesettings>
+        <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
             <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
             <e-grid-column field="PoNo" headerText="PO#" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>

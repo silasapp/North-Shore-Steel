@@ -11,12 +11,16 @@
 <div>
     <ejs-grid id="Grid" dataSource="@Model.Invoices" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-        <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
+        <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
             <e-grid-column template="#invoiceNo" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
             <e-grid-column template="#orderNo" headerText="Order #" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
             <e-grid-column field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
             <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+            @if (!Model.IsClosed)
+            {
+                <e-grid-column template="#balanceAmount" headerText="Balance Amount" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+            }
             <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
             @if (Model.IsClosed)
             {
@@ -40,5 +44,8 @@
 </script>
 <script id="invoiceAmount" type="text/x-template">
     $${InvoiceAmount}
+</script>
+<script id="balanceAmount" type="text/x-template">
+    $${BalanceAmount}
 </script>
 <ejs-scripts></ejs-scripts>
