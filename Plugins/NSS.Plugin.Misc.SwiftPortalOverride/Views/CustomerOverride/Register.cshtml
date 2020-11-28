@@ -218,7 +218,6 @@
                                         {
                                             <div id="found-us-container" style="display:none">
                                                 <label> Let us know how you found us</label>
-                                                <nop-required />
                                                 <input name="@(controlId)" placeholder="Enter how you found us" type="text" class="textbox form-control custom-input found-us" id="@(controlId)" value="@(attribute.DefaultValue)" />
                                                 <label id="found-us-text-error" style="display:none" class="text-danger mt-1 mb-0">How you found us is required</label>
                                             </div>
@@ -287,7 +286,6 @@
                                         } else {
                                             $("#found-us-text-error").css("display", "none")
                                         }
-                                        if ($("#found-us-text-error").is(":visible") || $("#help-text-error").is(":visible")) { return false;}
                                         if ($('#accept-consent').is(':checked')) {
                                             //do some stuff
                                             return true;
@@ -330,28 +328,6 @@
                     </div>
                 </div>
             }
-
-
-            @if (Model.NewsletterEnabled)
-            {
-                <div class="fieldset">
-                    <div class="form-fields" style="padding:1em;">
-                        <div class="news-field" style="background-color: #fff;padding: 1em 0;">
-                            <div class="title">
-                                <strong>KEEP INFORMED</strong>
-                            </div>
-                            <div style="text-align:center">
-                                <input asp-for="Newsletter" />
-                                <label asp-for="Newsletter">Sign me up to your newsletter</label>
-                                <span asp-validation-for="Newsletter"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-
-
-
         </form>
         <div class="external-authentication">
             @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
