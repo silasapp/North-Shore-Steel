@@ -232,6 +232,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var response = _nSSApiProvider.ApproveUserRegistration(regId);
             updateUserRegistration(regId, response.Item2, (int)UserRegistrationStatus.Approved);
 
+            //Create customer, company and user company
+
+
+
             UserRegistration model = getRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
         }
@@ -255,7 +259,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _userRegistrationService.UpdateUser(user);
             }
         }
-
         #endregion
 
         #endregion
