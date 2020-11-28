@@ -646,13 +646,16 @@ input:focus {
         color: white !important;
         outline: none !important;
     }
-.checkout-new-address  label {
+
+.checkout-new-address label {
     text-align: left;
 }
+
 .checkout-new-address-field {
     flex-basis: 48%;
     margin-top: 15px;
 }
+
 .ui-datepicker-header a.ui-corner-all {
     cursor: pointer;
     position: absolute;
@@ -1537,6 +1540,7 @@ table input {
     line-height: 1;
     opacity: 1;
 }
+
 .payment-item-card {
     flex-basis: 30%;
 }
@@ -1827,6 +1831,7 @@ table input {
         bottom: 0;
         margin: auto;
     }
+
 .checkout-card-1 {
     align-items: flex-end;
     display: flex;
@@ -1834,10 +1839,12 @@ table input {
     margin-top: 10px;
     flex-wrap: wrap;
 }
+
     .checkout-card-1 > div {
         flex-basis: 30%;
         text-align: left;
     }
+
 .order-search-btn {
     display: flex;
     justify-content: flex-end;
@@ -2389,9 +2396,11 @@ table input {
         grid-template-columns: repeat(2, minmax(200px, 1fr));
         grid-column-gap: 20px;
     }
+
     .checkout-nickname {
         width: 100% !important;
     }
+
     #orderSearchField > div {
         display: grid;
         grid-template-columns: repeat(1, 1fr);
@@ -2402,7 +2411,7 @@ table input {
         display: block;
         width: 0;
         position: absolute;
-        z-index: 1;
+        z-index: 9999;
         top: -50px;
         max-height: 60vh;
         left: 0px;
@@ -2524,6 +2533,7 @@ table input {
         text-align: left;
         margin-bottom: 10px !important;
     }
+
     .checkout-card-1 > div, .address-dropdown, .address-dropdown + button, .address-dropdown + label, .payment-item-card, .checkout-new-address-field {
         flex-basis: 100%;
         text-align: left;
@@ -3018,6 +3028,7 @@ and also iPads specifically.
 
     .catalog-page td:nth-child(2) {
         order: 3;
+        flex-basis: 100%;
     }
 
     .catalog-page td:nth-child(3) {
@@ -3025,11 +3036,11 @@ and also iPads specifically.
     }
 
     .catalog-page td:nth-child(4) {
-        order: 5;
+        order: 4;
     }
 
     .catalog-page td:nth-child(5) {
-        order: 4;
+        order: 5;
     }
 
     .shopping-cart-page td:nth-child(1) {
@@ -3076,38 +3087,65 @@ and also iPads specifically.
         flex-basis: auto;
     }
 
-    .catalog-page td:nth-child(3)::after {
-        padding-left: 5px;
-        white-space: nowrap;
-        content: 'lb';
+    #order-grid td:nth-child(1), #invoice-grid td:nth-child(1) {
+        order: 1;
     }
-    .shopping-cart-page td:nth-child(6)::after {
+
+    #order-grid td:nth-child(2), #invoice-grid td:nth-child(2) {
+        order: 2;
+    }
+
+    #order-grid td:nth-child(3), #invoice-grid td:nth-child(3) {
+        order: 3;
+        flex-basis: 100%;
+    }
+
+    #order-grid td:nth-child(4), #invoice-grid td:nth-child(4) {
+        order: 4;
+    }
+
+    #order-grid td:nth-child(5), #invoice-grid td:nth-child(5) {
+        order: 5;
+    }
+
+    #order-grid td:nth-child(6), #invoice-grid td:nth-child(6) {
+        order: 6;
+    }
+
+    #order-grid td:nth-child(7), #invoice-grid td:nth-child(7) {
+        order: 7;
+        flex-basis: 70%;
+    }
+
+    #order-grid td:nth-child(8), #invoice-grid td:nth-child(8) {
+        order: 8;
+        flex-basis: 30%;
+    }
+
+    .catalog-page td:nth-child(3)::after, .shopping-cart-page td:nth-child(6)::after, #order-grid td:nth-child(3)::after {
         padding-left: 5px;
         white-space: nowrap;
-        content: 'lb';
-    }.shopping-cart-page td:nth-child(7)::after {
+        content: 'lbs';
+    }
+
+    .shopping-cart-page td:nth-child(7)::after {
         padding-left: 5px;
         white-space: nowrap;
         content: 'ft';
     }
 
-    .catalog-page td:nth-child(1)::before {
+    .catalog-page td:nth-child(1)::before,.shopping-cart-page td:nth-child(1)::before, #order-grid td:nth-child(1)::before, #invoice-grid td:nth-child(1)::before, #order-grid td:nth-child(2)::before, #invoice-grid td:nth-child(2)::before, #invoice-grid td:nth-child(3)::before {
         padding-right: 1px;
         white-space: nowrap;
         content: '#';
     }
-    
-    .shopping-cart-page td:nth-child(1)::before {
-        padding-right: 1px;
-        white-space: nowrap;
-        content: '#';
-    }
-    /*.pure-material-checkbox {
-        position: unset;
-    }*/
 
     .cart-qty-input {
         width: 70px;
         height: 30px
+    }
+
+    #order-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox, #invoice-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox {
+        background: none !important;
     }
 }
