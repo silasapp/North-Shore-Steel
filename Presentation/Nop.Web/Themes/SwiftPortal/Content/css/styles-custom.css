@@ -646,7 +646,13 @@ input:focus {
         color: white !important;
         outline: none !important;
     }
-
+.checkout-new-address  label {
+    text-align: left;
+}
+.checkout-new-address-field {
+    flex-basis: 48%;
+    margin-top: 15px;
+}
 .ui-datepicker-header a.ui-corner-all {
     cursor: pointer;
     position: absolute;
@@ -1531,6 +1537,9 @@ table input {
     line-height: 1;
     opacity: 1;
 }
+.payment-item-card {
+    flex-basis: 30%;
+}
 
 .checkout-page {
     margin-bottom: 230px;
@@ -1818,7 +1827,17 @@ table input {
         bottom: 0;
         margin: auto;
     }
-
+.checkout-card-1 {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+    .checkout-card-1 > div {
+        flex-basis: 30%;
+        text-align: left;
+    }
 .order-search-btn {
     display: flex;
     justify-content: flex-end;
@@ -2365,13 +2384,14 @@ table input {
 }
 
 @media all and (max-width: 600px) {
-
     #invoiceSearchField > div {
         display: grid;
         grid-template-columns: repeat(2, minmax(200px, 1fr));
         grid-column-gap: 20px;
     }
-
+    .checkout-nickname {
+        width: 100% !important;
+    }
     #orderSearchField > div {
         display: grid;
         grid-template-columns: repeat(1, 1fr);
@@ -2504,6 +2524,11 @@ table input {
         text-align: left;
         margin-bottom: 10px !important;
     }
+    .checkout-card-1 > div, .address-dropdown, .address-dropdown + button, .address-dropdown + label, .payment-item-card, .checkout-new-address-field {
+        flex-basis: 100%;
+        text-align: left;
+        margin-bottom: 10px;
+    }
 }
 
 /* #region INPUTS */
@@ -2512,7 +2537,7 @@ table input {
     width: 100% !important;
     padding: .375rem .75rem;
     font-size: 14px;
-    background: #f6f6f6 0% 0% no-repeat padding-box !important;
+    background-color: #f6f6f6;
     border: none !important;
     font: normal normal 14px/24px "Exo 2";
     letter-spacing: 0px;
@@ -2789,6 +2814,7 @@ hr {
     color: #fff;
     opacity: 1;
 }
+
 
 .nss-table thead tr th {
     vertical-align: middle !important;
