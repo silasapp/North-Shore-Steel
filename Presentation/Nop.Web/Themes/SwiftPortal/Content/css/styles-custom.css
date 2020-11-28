@@ -796,6 +796,11 @@ input:focus {
     margin-bottom: 20px;
 }
 
+.cart-qty-input {
+    width: 100px;
+    height: 30px
+}
+
 .discount-block {
     width: 100%;
     margin-top: 100px;
@@ -904,6 +909,7 @@ table input {
 .e-grid td.e-active {
     background: transparent !important;
 }
+
 
 .chipsStyle {
     display: flex !important;
@@ -1058,6 +1064,7 @@ table input {
 .pure-material-checkbox > label {
     margin-left: 5px;
 }
+
 .pure-material-checkbox > a {
     text-decoration: underline;
     font: normal normal normal 12px/16px "Exo 2";
@@ -2932,3 +2939,149 @@ li {
 }
 
 /* #endregion */
+
+
+/* 
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+
+    table {
+        width: 100%;
+    }
+
+    /* Force table to not be like tables anymore */
+
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    colgroup {
+        display: none;
+    }
+
+    tr {
+        display: flex;
+        border: none !important;
+        /*justify-content: space-between;*/
+        flex-wrap: wrap;
+        padding: 10px 20px;
+        align-items: center;
+    }
+
+    td {
+        border: none !important;
+        position: relative;
+        flex-basis: 48%;
+        display: flex;
+    }
+
+        td > input {
+            width: 100% !important;
+        }
+
+    .catalog-page td:nth-child(1) {
+        order: 1;
+    }
+
+    .catalog-page td:nth-child(2) {
+        order: 3;
+    }
+
+    .catalog-page td:nth-child(3) {
+        order: 2;
+    }
+
+    .catalog-page td:nth-child(4) {
+        order: 5;
+    }
+
+    .catalog-page td:nth-child(5) {
+        order: 4;
+    }
+
+    .shopping-cart-page td:nth-child(1) {
+        order: 1;
+    }
+
+    .shopping-cart-page td:nth-child(2) {
+        order: 2;
+    }
+
+    .shopping-cart-page td:nth-child(3) {
+        order: 4;
+    }
+
+    .shopping-cart-page td:nth-child(4) {
+        order: 6;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .shopping-cart-page td:nth-child(5) {
+        order: 3;
+    }
+
+    .shopping-cart-page td:nth-child(6) {
+        order: 5;
+    }
+
+    .shopping-cart-page td:nth-child(7) {
+        order: 7;
+    }
+
+    .shopping-cart-page td:nth-child(8) {
+        order: 8;
+    }
+
+    .shopping-cart-page td:nth-child(9) {
+        order: 9;
+        flex-basis: auto;
+    }
+
+    .shopping-cart-page td:nth-child(10) {
+        order: 10;
+        flex-basis: auto;
+    }
+
+    .catalog-page td:nth-child(3)::after {
+        padding-left: 5px;
+        white-space: nowrap;
+        content: 'lb';
+    }
+    .shopping-cart-page td:nth-child(6)::after {
+        padding-left: 5px;
+        white-space: nowrap;
+        content: 'lb';
+    }.shopping-cart-page td:nth-child(7)::after {
+        padding-left: 5px;
+        white-space: nowrap;
+        content: 'ft';
+    }
+
+    .catalog-page td:nth-child(1)::before {
+        padding-right: 1px;
+        white-space: nowrap;
+        content: '#';
+    }
+    
+    .shopping-cart-page td:nth-child(1)::before {
+        padding-right: 1px;
+        white-space: nowrap;
+        content: '#';
+    }
+    /*.pure-material-checkbox {
+        position: unset;
+    }*/
+
+    .cart-qty-input {
+        width: 70px;
+        height: 30px
+    }
+}
