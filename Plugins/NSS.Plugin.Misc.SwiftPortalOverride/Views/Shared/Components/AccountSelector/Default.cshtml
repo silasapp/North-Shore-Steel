@@ -13,6 +13,7 @@
     CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
     selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
     selectAccountModel.loggedInCustomerId = customerId;
+    selectAccountModel.Count = customerCompanies.Count();
 }
 
 @{
@@ -21,7 +22,7 @@
 }
 
 
-@if (selectAccountModel.Companies != null)
+@if (selectAccountModel.Count > 1)
 {
     <div class="header-lower p-0">
         <div class="header-menu bg-white py-3 mb-0">

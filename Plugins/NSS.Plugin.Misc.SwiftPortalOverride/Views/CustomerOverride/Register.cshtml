@@ -61,7 +61,7 @@
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                     <label asp-for="FirstName">First Name</label>
                                     <nop-required />
-                                    <input asp-for="FirstName" class="form-control custom-input" />
+                                    <input asp-for="FirstName" placeholder="Enter first name" class="form-control custom-input" />
                                     <span asp-validation-for="FirstName" style="display:flex;"></span>
                                 </div>
                             }
@@ -72,7 +72,7 @@
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                     <label asp-for="LastName">Last Name</label>
                                     <nop-required />
-                                    <input asp-for="LastName" class="form-control custom-input" />
+                                    <input asp-for="LastName" placeholder="Enter last name" class="form-control custom-input" />
                                     <span asp-validation-for="LastName" style="display: flex;"></span>
                                 </div>
                             }
@@ -87,7 +87,7 @@
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="Email">Work Email</label>
                                 <nop-required />
-                                <input asp-for="Email" class="form-control custom-input" />
+                                <input asp-for="Email" placeholder="Enter email" class="form-control custom-input" />
                                 <span asp-validation-for="Email" style="display:flex;"></span>
                             </div>
 
@@ -96,7 +96,7 @@
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                     <label asp-for="ConfirmEmail">Confirm Email</label>
                                     <nop-required />
-                                    <input asp-for="ConfirmEmail" class="form-control custom-input" />
+                                    <input asp-for="ConfirmEmail" placeholder="Enter confirm email" class="form-control custom-input" />
                                     <span asp-validation-for="ConfirmEmail" style="display:flex;"></span>
                                 </div>
                             }
@@ -109,7 +109,7 @@
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="Password">Set Password</label>
                                 <nop-required />
-                                <input asp-for="Password" class="form-control custom-input" />
+                                <input asp-for="Password" placeholder="Enter password" class="form-control custom-input" />
                                 <span asp-validation-for="Password" style="display:flex;"></span>
 
                             </div>
@@ -117,7 +117,7 @@
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                 <label asp-for="ConfirmPassword">Confirm Password</label>
                                 <nop-required />
-                                <input asp-for="ConfirmPassword" class="form-control custom-input" />
+                                <input asp-for="ConfirmPassword" placeholder="Enter confirm password" class="form-control custom-input" />
                                 <span asp-validation-for="ConfirmPassword" style="display:flex;"></span>
                             </div>
                             @if (Model.DisplayCaptcha)
@@ -134,7 +134,7 @@
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                     <label asp-for="Company">Company Name</label>
                                     <nop-required />
-                                    <input asp-for="Company" class="form-control custom-input" />
+                                    <input asp-for="Company" placeholder="Enter company name" class="form-control custom-input" />
                                     <span asp-validation-for="Company" style="display:flex;"></span>
 
                                     @{
@@ -143,12 +143,12 @@
                                     @if (isExistingCustomerCtrl != null)
                                     {
                                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{isExistingCustomerCtrl.Id}";
-                                        <ul class="option-list">
+                                        <ul class="option-list pt-3">
                                             @foreach (var attributeValue in isExistingCustomerCtrl.Values)
                                             {
                                                 <li>
                                                     <input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
-                                                    <label for="@(controlId)_@(attributeValue.Id)" id="current-customer">I am a current customer</label>
+                                                    <label for="@(controlId)_@(attributeValue.Id)" class="mb-1 pl-2" id="current-customer">I am a current customer</label>
                                                 </li>
                                             }
                                         </ul>
@@ -162,7 +162,7 @@
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                     <label asp-for="Phone">Phone Number</label>
                                     <nop-required />
-                                    <input asp-for="Phone" class="form-control custom-input" />
+                                    <input asp-for="Phone" placeholder="Enter phone number" class="form-control custom-input" />
                                     <span asp-validation-for="Phone" style="display:flex;"></span>
                                 </div>
                             }
@@ -194,7 +194,7 @@
                                         {
                                             <label>How did you hear about us?</label>
                                             <nop-required />
-                                            <select name="@(controlId)" id="@(controlId)" class="form-control custom-input" onchange="otherMethodCheck(this);">
+                                            <select name="@(controlId)" id="@(controlId)" class="form-control custom-input about-us" onchange="otherMethodCheck(this);">
                                                 @if (!attribute.IsRequired)
                                                 {
                                                     <option value="0"> ---</option>
@@ -216,10 +216,11 @@
 
                                         @if (attribute.Name == Constants.OtherAttribute)
                                         {
-                                            <div id="other-method" style="display:none">
+                                            <div id="found-us-container" style="display:none">
                                                 <label> Let us know how you found us</label>
                                                 <nop-required />
-                                                <input name="@(controlId)" type="text" class="textbox form-control custom-input" id="@(controlId)" value="@(attribute.DefaultValue)" />
+                                                <input name="@(controlId)" placeholder="Enter how you found us" type="text" class="textbox form-control custom-input found-us" id="@(controlId)" value="@(attribute.DefaultValue)" />
+                                                <label id="found-us-text-error" style="display:none" class="text-danger mt-1 mb-0">How you found us is required</label>
                                             </div>
                                         }
                                     }
@@ -261,7 +262,8 @@
                                         <div>
                                             <label>How can we help?</label>
                                             <nop-required />
-                                            <textarea id="@(controlId)" placeholder="What items are you considering for your next project?" class="form-control custom-input" name="@(controlId)">@(attribute.DefaultValue)</textarea>
+                                            <textarea id="@(controlId)" placeholder="What items are you considering for your next project?" class="form-control custom-input help-text" name="@(controlId)">@(attribute.DefaultValue)</textarea>
+                                            <label id="help-text-error" style="display:none" class="text-danger mt-1 mb-0">How can we help is required</label>
                                         </div>
                                     }
                                 }
@@ -274,7 +276,18 @@
                     {
                         <script asp-location="Footer">
                                 $(document).ready(function() {
-                                    $('#register-button').on('click', function() {
+                                    $('#register-button').on('click', function () {
+                                        if ($(".help-text").val() == "") {
+                                            $("#help-text-error").css("display", "block")
+                                        } else {
+                                            $("#help-text-error").css("display", "none")
+                                        }
+                                        if ($("#found-us-container").is(":visible") && $(".found-us").val() == "") {
+                                            $("#found-us-text-error").css("display", "block")
+                                        } else {
+                                            $("#found-us-text-error").css("display", "none")
+                                        }
+                                        if ($("#found-us-text-error").is(":visible") || $("#help-text-error").is(":visible")) { return false;}
                                         if ($('#accept-consent').is(':checked')) {
                                             //do some stuff
                                             return true;
@@ -292,7 +305,7 @@
                                 <span class="checkmark"></span>
                                 @if (Model.AcceptPrivacyPolicyPopup)
                                 {
-                                    <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
+                                    <a class="read pl-2" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
                                     <script asp-location="Footer">
                             $(document).ready(function () {
                                 $('#read-privacyinfo').on('click',
@@ -348,12 +361,21 @@
 
 </div>
 <script>
+    $(document).ready(function () {
+        var hearAboutUsContainer = $(".about-us");
+        if (hearAboutUsContainer.children("option:selected")[0].label == "Other") {
+            $("#found-us-container").css("display", "block")
+        } else {
+            $("#found-us-container").css("display", "none")
+        }
+    });
+
     function otherMethodCheck(option) {
         let optionName = option.options[option.selectedIndex].text;
         if (optionName == "Other") {
-            document.getElementById("other-method").style.display = "block";
+            $("#found-us-container").css("display", "block")
         } else {
-            document.getElementById("other-method").style.display = "none";
+            $("#found-us-container").css("display", "none")
         }
     }
 </script>
