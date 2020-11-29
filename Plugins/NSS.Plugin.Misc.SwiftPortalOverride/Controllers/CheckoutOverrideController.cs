@@ -815,21 +815,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 foreach (var mapping in mappings)
                 {
-                    if(mapping.ProductAttributeId == noteAttr?.Id)
+                    if (mapping != null)
                     {
-                        notes = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
-                    }
-                    else if (mapping.ProductAttributeId == sawOptionAttr?.Id)
-                    {
-                        sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
-                    }
-                    else if (mapping.ProductAttributeId == sawToleranceAttr?.Id)
-                    {
-                        sawTolerance = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
-                    }
-                    else if (mapping.ProductAttributeId == uomAttr?.Id)
-                    {
-                        uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                        if (mapping.ProductAttributeId == noteAttr?.Id)
+                        {
+                                notes = _productAttributeParser.ParseValues(item.AttributesXml, mapping.Id)?.FirstOrDefault();
+                        }
+                        else if (mapping.ProductAttributeId == sawOptionAttr?.Id)
+                        {
+                            sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                        }
+                        else if (mapping.ProductAttributeId == sawToleranceAttr?.Id)
+                        {
+                            sawTolerance = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
+                        }
+                        else if (mapping.ProductAttributeId == uomAttr?.Id)
+                        {
+                            uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                        }
                     }
                 }
 
