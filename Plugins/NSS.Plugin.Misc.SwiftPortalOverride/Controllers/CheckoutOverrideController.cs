@@ -806,32 +806,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var mappings = _productAttributeParser.ParseProductAttributeMappings(item.AttributesXml);
                 var attrs = _productAttributeService.GetAllProductAttributes();
 
-                var noteAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.WorkOrderInstructionsAttribute);
-                var sawOptionAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CutOptionsAttribute);
-                var sawToleranceAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.LengthToleranceCutAttribute);
-                var uomAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.PurchaseUnitAttribute);
-
                 string uom = null, notes = null, sawoptions = null, sawTolerance = null;
 
+                // build prod attr
                 foreach (var mapping in mappings)
                 {
                     if (mapping != null)
                     {
+                        var noteAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.WorkOrderInstructionsAttribute);
+                        var sawOptionAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CutOptionsAttribute);
+                        var sawToleranceAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.LengthToleranceCutAttribute);
+                        var uomAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.PurchaseUnitAttribute);
+
                         if (mapping.ProductAttributeId == noteAttr?.Id)
                         {
-                                notes = _productAttributeParser.ParseValues(item.AttributesXml, mapping.Id)?.FirstOrDefault();
+                            notes = _productAttributeParser.ParseValues(item.AttributesXml, mapping.Id)?.FirstOrDefault();
                         }
                         else if (mapping.ProductAttributeId == sawOptionAttr?.Id)
                         {
-                            sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                            sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name;
                         }
                         else if (mapping.ProductAttributeId == sawToleranceAttr?.Id)
                         {
-                            sawTolerance = _productAttributeParser.ParseValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault();
+                            sawTolerance = _productAttributeParser.ParseValues(item.AttributesXml, mapping.Id)?.FirstOrDefault();
                         }
                         else if (mapping.ProductAttributeId == uomAttr?.Id)
                         {
-                            uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                            uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name;
                         }
                     }
                 }
