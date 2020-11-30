@@ -13,12 +13,6 @@
     var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
 }
 
-
-@*<div id="overlay">
-        <div class="w-100 d-flex justify-content-center align-items-center">
-            <div class="spinner"></div>
-        </div>
-    </div>*@
 <div id="app" class="page catalog-page">
     <div class="page-body">
         <div class="row">
@@ -152,8 +146,7 @@
             //Initialize TreeView component
             this.treeview = new ej.navigations.TreeView({
                 fields: { dataSource: this.shared.groupedShapes, id: 'id', parentID: 'parentId', text: 'displayName', hasChildren: 'hasChild' },
-                showCheckBox: true,
-                autoCheck: false,
+                showCheckBox: true, autoCheck: false, cssClass: 'custom',
                 nodeChecked: this.nodeChecked,
             });
 
@@ -314,34 +307,6 @@
                 this.getFilteredProduuts();
             },
 
-            populateFilteredProductsTable: function () {
-                $("#overlay").css("display", "flex");
-
-                let searchKeyword = getUrlParameter('q');
-                const shapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
-                const specIds = this.filterTags.filter(x => x.type === 'spec').map(x => x.id);
-                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword };
-
-                $.ajax({
-                    url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify(filterParams),
-                    success: function (data) {
-                        if (data != null) {
-                            console.log("partialView: ", data.partialView);
-                            $("#overlay").css("display", "none");
-                            $('#partialview').html(data.partialView);
-                        }
-                    },
-                    error: function (xhr, thrownError) {
-                        console.log(thrownError, 'datadata-error', xhr);
-                        $('#partialview').html('an error has occured here')
-                        $("#overlay").css("display", "none");
-                    }
-                });
-            },
-
             getFilteredProduuts: function () {
                 this.showLoading();
 
@@ -355,13 +320,13 @@
                     type: 'POST',
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(filterParams),
-                    success: function (data, textStatus, XMLHttpRequest) {
+                    success: function (data) {
                         if (data != null) {
                             $('#partialview').html(data.partialView);
                             self.shared.groupedShapes = JSON.parse(data.shapes);
                             self.resetTreeview();
-                            self.hideLoading();
                         }
+                        self.hideLoading();
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         console.log(thrownError, 'datadata-error', xhr);
