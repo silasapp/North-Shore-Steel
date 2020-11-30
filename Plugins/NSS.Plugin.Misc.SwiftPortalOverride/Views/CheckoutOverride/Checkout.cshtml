@@ -435,7 +435,9 @@
                                 var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
                                 var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
                                 var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
-                                var uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                                var uom = "EA";
+                                if(mapping != null)
+                                    uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
 
                                 var customerPathNo = "";
                                 if (customerCompany != null)
