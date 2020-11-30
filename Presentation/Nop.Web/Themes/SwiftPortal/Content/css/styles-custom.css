@@ -503,8 +503,8 @@ a:not([href]):not([class]) {
 
 .inputs > input,
 .inputs > select,
-.inputs > textarea,
-.input-with-icon > input {
+.inputs > textarea, .text-left > input,
+.input-with-icon > input, .custom-input {
     width: 100% !important;
     font-size: 14px;
     background: #f6f6f6 0% 0% no-repeat padding-box !important;
@@ -516,13 +516,20 @@ a:not([href]):not([class]) {
     opacity: 1;
 }
 
+.datepicker {
+    color: #242424 !important;
+    font: normal normal normal 14px/24px "Exo 2" !important;
+}
+
     .inputs > input::placeholder,
     .inputs > select::placeholder,
     .inputs > textarea::placeholder,
+    .custom-input::placeholder,
+    .datepicker::placeholder,
+    .cart-filter-menu > input::placeholder,
     .input-with-icon > input::placeholder {
         color: #AAAAAA;
         font: italic normal normal 14px/24px "Exo 2" !important;
-        ;
     }
 
 .inputs > select {
@@ -951,7 +958,7 @@ table input {
         background-position-x: 95%;
     }
 
-    #accordion > .card > .collapse > .card-body {
+    #accordion > .card > .collapse > .card-body, #accordion > .card > .collapsing > .card-body {
         padding: 5px 55px 12px;
     }
 
@@ -1188,7 +1195,7 @@ table input {
     font-size: 14px;
     padding: 5px;
     border: none;
-    color: #b8b8b8;
+    color: #242424;
 }
 
 .cart-input-options {
@@ -1280,7 +1287,7 @@ table input {
 
 #discountcouponcode {
     font-style: italic;
-    color: #f6f6f6;
+    color: #242424;
     border-radius: 0 !important;
     width: 250px;
 }
@@ -2223,7 +2230,7 @@ table input {
 .nss-container {
     padding: 30px 136px;
 }
-
+/*
 .custom-input {
     width: 100% !important;
     font-style: italic !important;
@@ -2234,7 +2241,7 @@ table input {
     letter-spacing: 0;
     color: #aaa;
     opacity: 1;
-}
+}*/
 
 .responsive-table-container {
     overflow-x: auto;
@@ -3114,11 +3121,13 @@ and also iPads specifically.
 
     #order-grid td:nth-child(7), #invoice-grid td:nth-child(7) {
         order: 7;
-        flex-basis: 70%;
     }
 
     #order-grid td:nth-child(8), #invoice-grid td:nth-child(8) {
         order: 8;
+        flex-basis: 70%;
+    } #order-grid td:nth-child(8), #invoice-grid td:nth-child(9) {
+        order: 9;
         flex-basis: 30%;
     }
 
