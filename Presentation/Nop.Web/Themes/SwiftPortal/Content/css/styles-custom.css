@@ -958,7 +958,7 @@ table input {
         background-position-x: 95%;
     }
 
-    #accordion > .card > .collapse > .card-body {
+    #accordion > .card > .collapse > .card-body, #accordion > .card > .collapsing > .card-body {
         padding: 5px 55px 12px;
     }
 
