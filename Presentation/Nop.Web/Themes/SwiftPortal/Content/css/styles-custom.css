@@ -1071,6 +1071,8 @@ table input {
     position: absolute;
     top: 0;
     left: 0;
+    bottom: 0;
+    margin: auto !important;
     height: 18px !important;
     width: 18px !important;
     background-color: #ffffff;
@@ -1086,7 +1088,7 @@ table input {
 }
 
 .pure-material-checkbox > label {
-    margin-left: 5px;
+    margin-left: 5px !important;
 }
 
 .pure-material-checkbox > a {
@@ -3074,6 +3076,7 @@ and also iPads specifically.
         order: 6;
         display: flex;
         flex-wrap: wrap;
+        align-items: baseline;
     }
 
     .shopping-cart-page td:nth-child(5) {
