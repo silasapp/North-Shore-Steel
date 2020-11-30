@@ -57,42 +57,42 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _webHelper.GetThisPageUrl(false),
                 _storeContext.CurrentStore.Id);
 
-            var shapeIds = new List<int>();
-            var specIds = new List<int>();
+            //var shapeIds = new List<int>();
+            //var specIds = new List<int>();
 
-            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
+            //CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds);
 
-            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.OrderBy(s => s.Shape.Order).ToList();
+            //var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.OrderBy(s => s.Shape.Order).ToList();
 
-            List<ShapeData> shapeData = new List<ShapeData>();
-            for (var i = 0; i < shapes.Count; i++)
-            {
-                var childShapes = shapes[i].Shape?.SubCategories?.ToList();
-                var shape = new ShapeData
-                {
-                    Id = shapes[i].Shape.Id,
-                    ParentId = shapes[i].Shape.ParentId,
-                    Name = $"{shapes[i].Shape.Name}",
-                    DisplayName = $"{shapes[i].Shape.Name} ({shapes[i].ProductCount})",
-                    Count = shapes[i].ProductCount,
-                    HasChild = shapes.Any(x => x.Shape.ParentId == shapes[i].Shape.Id),
-                };
-                shapeData.Add(shape);
+            //List<ShapeData> shapeData = new List<ShapeData>();
+            //for (var i = 0; i < shapes.Count; i++)
+            //{
+            //    var childShapes = shapes[i].Shape?.SubCategories?.ToList();
+            //    var shape = new ShapeData
+            //    {
+            //        Id = shapes[i].Shape.Id,
+            //        ParentId = shapes[i].Shape.ParentId,
+            //        Name = $"{shapes[i].Shape.Name}",
+            //        DisplayName = $"{shapes[i].Shape.Name} ({shapes[i].ProductCount})",
+            //        Count = shapes[i].ProductCount,
+            //        HasChild = shapes.Any(x => x.Shape.ParentId == shapes[i].Shape.Id),
+            //    };
+            //    shapeData.Add(shape);
 
-                //if (childShapes != null && childShapes.Count > 0)
-                //    for (int j = 0; j < childShapes.Count; j++)
-                //    {
-                //        shape = new ShapeData
-                //        {
-                //            id = childShapes[j].Id,
-                //            pid = childShapes[j].ParentId,
-                //            name = childShapes[j].Name
-                //        };
-                //        shapeData.Add(shape);
-                //    }
-            }
+            //    //if (childShapes != null && childShapes.Count > 0)
+            //    //    for (int j = 0; j < childShapes.Count; j++)
+            //    //    {
+            //    //        shape = new ShapeData
+            //    //        {
+            //    //            id = childShapes[j].Id,
+            //    //            pid = childShapes[j].ParentId,
+            //    //            name = childShapes[j].Name
+            //    //        };
+            //    //        shapeData.Add(shape);
+            //    //    }
+            //}
 
-            ViewBag.dataSource = JavaScriptConvert.ToString(shapeData);
+            //ViewBag.dataSource = JavaScriptConvert.ToString(shapeData);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
         }
 
@@ -132,6 +132,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 new {
                     partialView = RenderPartialViewToString("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel),
                     shapes = JavaScriptConvert.ToString(shapeData),
+                    specs = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.SpecificationFilter.FilterItems.GroupBy(sf => sf.SpecificationAttributeName)),
                 }
             );
         }

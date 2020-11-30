@@ -9,10 +9,6 @@
     Html.AppendPageCssClassParts("html-home-page");
 }
 
-@{
-    var groupedSpecificationAttributes = Model.PagingFilteringContext.SpecificationFilter.NotFilteredItems.GroupBy(sf => sf.SpecificationAttributeName);
-}
-
 <div id="app" class="page catalog-page">
     <div class="page-body">
         <div class="row">
@@ -44,9 +40,9 @@
                             <div :id="'default-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
                                 <div class="card-body">
                                     <label class="pure-material-checkbox">
-                                        <input :id="'checkbox-' + spec.specificationAttributeOptionId" :value="spec.SpecificationAttributeOptionName"
+                                        <input :id="'checkbox-' + spec.specificationAttributeOptionId"
                                                type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
-                                        <span class="checkmark"></span>{{ spec.specificationAttributeOptionName }}
+                                        <span class="checkmark"></span>{{ spec.displayName }}
                                     </label>
                                 </div>
                             </div>
@@ -59,9 +55,9 @@
                             <div :id="'other-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
                                 <div class="card-body">
                                     <label class="pure-material-checkbox">
-                                        <input :id="'checkbox-' + spec.specificationAttributeOptionId" :value="spec.SpecificationAttributeOptionName"
-                                               type="checkbox" v-bind:checked="spec.checked">
-                                        <span class="checkmark"></span>{{ spec.specificationAttributeOptionName }}
+                                        <input :id="'checkbox-' + spec.specificationAttributeOptionId"
+                                               type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
+                                        <span class="checkmark"></span>{{ spec.displayName }}
                                     </label>
                                 </div>
                             </div>
@@ -80,7 +76,7 @@
                             </button>
                         </span>
                     </div>
-                    <button v-on:click="clearFilters()" class="clear-filter">Clear filters</button>
+                    <button v-on:click="clearFilters" class="clear-filter ml-4">Clear filters</button>
                 </div>
                 <div id="partialview"></div>
             </div>
@@ -103,15 +99,10 @@
 }
 
 <script>
-    var groupedShapes = JSON.parse(@Html.Raw(Serialize(ViewBag.dataSource)));
-    var groupedSpecs = @Html.Raw(Serialize(groupedSpecificationAttributes));
-
-    console.log("groupedShapes: ", groupedShapes);
-
     const store = {
         state: {
-            groupedSpecs,
-            groupedShapes,
+            groupedSpecs: [],
+            groupedShapes: [],
 
             constants: {
                 SPEC_TYPE_DEFAULT: 1,
@@ -136,7 +127,7 @@
         },
         mounted: function () {
             this.getFilteredProduuts();
-            this.prepareGroupedSpecs();
+            //this.prepareGroupedSpecs();
 
             ej.base.enableRipple(false);
 
@@ -169,7 +160,7 @@
                 $('#custom-loading').hide();
             },
             prepareGroupedSpecs: function () {
-                groupedSpecs.forEach((specs, index) => {
+                this.shared.groupedSpecs.forEach((specs, index) => {
                     specs.forEach(spec => {
                         let name = '';
                         let type = this.shared.constants.SPEC_TYPE_OTHERS;
@@ -203,11 +194,12 @@
                         }
                         spec.name = name;
                         spec.type = type;
-                        spec.checked = false;
+                        spec.displayName = `${spec.specificationAttributeOptionName} (${spec.productCount})`;
+                        spec.checked = this.filterTags.some(x => x.type === 'spec' && x.id === spec.specificationAttributeOptionId);
                     });
                 });
-                console.log("grouped prepared: ", groupedSpecs);
-                this.groupedSpecs = groupedSpecs;
+                console.log("grouped prepared: ", this.shared.groupedSpecs);
+                this.groupedSpecs = this.shared.groupedSpecs;
             },
 
             nodeChecked: function (args) {
@@ -275,7 +267,7 @@
                     };
                     this.filterTags = [...this.filterTags, tag];
                 } else {
-                    this.filterTags = this.filterTags.filter(x => x.id !== spec.specificationAttributeOptionId && x.type === 'spec');
+                    this.filterTags = this.filterTags.filter(x => x.id !== spec.specificationAttributeOptionId || x.type !== 'spec');
                 }
                 this.getFilteredProduuts();
             },
@@ -321,7 +313,9 @@
                         if (data != null) {
                             $('#partialview').html(data.partialView);
                             self.shared.groupedShapes = JSON.parse(data.shapes);
+                            self.shared.groupedSpecs = JSON.parse(data.specs);
                             self.resetTreeview();
+                            self.prepareGroupedSpecs();
                         }
                         self.hideLoading();
                     },
