@@ -503,8 +503,8 @@ a:not([href]):not([class]) {
 
 .inputs > input,
 .inputs > select,
-.inputs > textarea,
-.input-with-icon > input, .custom-input, .datepicker {
+.inputs > textarea, .text-left > input,
+.input-with-icon > input, .custom-input {
     width: 100% !important;
     font-size: 14px;
     background: #f6f6f6 0% 0% no-repeat padding-box !important;
@@ -514,6 +514,11 @@ a:not([href]):not([class]) {
     letter-spacing: 0px;
     color: #242424 !important;
     opacity: 1;
+}
+
+.datepicker {
+    color: #242424 !important;
+    font: normal normal normal 14px/24px "Exo 2" !important;
 }
 
     .inputs > input::placeholder,
@@ -2225,7 +2230,7 @@ table input {
 .nss-container {
     padding: 30px 136px;
 }
-
+/*
 .custom-input {
     width: 100% !important;
     font-style: italic !important;
@@ -2236,7 +2241,7 @@ table input {
     letter-spacing: 0;
     color: #aaa;
     opacity: 1;
-}
+}*/
 
 .responsive-table-container {
     overflow-x: auto;
@@ -3116,11 +3121,13 @@ and also iPads specifically.
 
     #order-grid td:nth-child(7), #invoice-grid td:nth-child(7) {
         order: 7;
-        flex-basis: 70%;
     }
 
     #order-grid td:nth-child(8), #invoice-grid td:nth-child(8) {
         order: 8;
+        flex-basis: 70%;
+    } #order-grid td:nth-child(8), #invoice-grid td:nth-child(9) {
+        order: 9;
         flex-basis: 30%;
     }
 
