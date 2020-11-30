@@ -1,5 +1,6 @@
 ﻿@model ShoppingCartModel
 @using Nop.Core
+@using Syncfusion.EJ2
 @using Nop.Core.Domain.Orders
 @using Nop.Core.Domain.Tax
 @using Nop.Web.Models.ShoppingCart
@@ -61,23 +62,44 @@
     th {
         white-space: nowrap;
     }
+
+    .e-dlg-header {
+        color: #fff !important;
+        text-align: center;
+    }
+
+    .e-dialog .e-dlg-header {
+        width: 93% !important;
+    }
 </style>
 
 <!-- Modal -->
 <div id="overlay"></div>
-<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#03175B; color: #fff">
-                <span class="modal-title">Notes</span>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+
+@{
+
+    Func<object, object>
+    Content1 =
+    @<div id="viewNotesModal">
+        <div class="modal-body">
+            <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+        </div>
+    </div>;
+}
+
+@*<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#03175B; color: #fff">
+                    <span class="modal-title">NOTES</span>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </div>*@
 
 
 <div class="cart-summary-content card">
@@ -429,6 +451,8 @@
             @T("ShoppingCart.CartIsEmpty")
         </div>
     }
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("500px").Target("body").Render();
+
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
 </div>
 
@@ -579,10 +603,17 @@
 
 <script>
 
+    function onDialogCreated() {
+        viewNotesModal = this;
+    }
+
+
+
     let itemNoteId;
     function handleNotesModal(itemId) {
         itemNoteId = itemId;
         $("#productNote").val($(`#${itemNoteId}`).val());
+        viewNotesModal.show();
     }
 
     $('#noteModal').on('hidden.bs.modal', function () {
@@ -667,3 +698,4 @@
         return d ? r / m : r;
     }
 </script>
+<ejs-scripts></ejs-scripts>
