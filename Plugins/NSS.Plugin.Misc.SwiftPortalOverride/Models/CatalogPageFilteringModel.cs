@@ -329,6 +329,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             {
                 AlreadyFilteredItems = new List<SpecificationFilterItem>();
                 NotFilteredItems = new List<SpecificationFilterItem>();
+                FilterItems = new List<SpecificationFilterItem>();
             }
 
             #endregion
