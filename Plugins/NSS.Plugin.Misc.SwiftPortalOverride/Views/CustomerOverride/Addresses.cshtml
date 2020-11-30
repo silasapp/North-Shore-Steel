@@ -135,8 +135,15 @@
         }
         else
         {
-            <div class="no-data">
-                @T("Account.CustomerAddresses.NoAddresses")
+            <div class="account-page-card">
+                <div class="address-block">
+                    <a onclick="location.href='@Url.RouteUrl("CustomerAddressAdd")'" class="address-info">
+                        <ul>
+                            <img src="~/Themes/@themeName/Content/assets/icn-add.svg" alt="" />
+                            <li class="title">NEW ADDRESS</li>
+                        </ul>
+                    </a>
+                </div>
             </div>
         }
     </div>

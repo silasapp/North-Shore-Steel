@@ -27,7 +27,8 @@ using Nop.Services.Orders;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
 using Nop.Web.Models.Common;
-using Nop.Web.Models.Customer;
+using Nop.Web.Framework.Themes;
+using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -36,7 +37,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
     /// </summary>
     public partial class CustomerModelFactory : ICustomerModelFactory
     {
- 
+
+        private readonly IThemeContext _themeContext;
+
+        public CustomerModelFactory(IThemeContext themeContext)
+        {
+            _themeContext = themeContext;
+        }
         /// <summary>
         /// Prepare the customer navigation model
         /// </summary>
@@ -45,13 +52,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         public virtual CustomerNavigationModel PrepareCustomerNavigationModel(int selectedTabId = 0)
         {
             var model = new CustomerNavigationModel();
+            var themeName = _themeContext.WorkingThemeName;
 
             model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
             {
                 RouteName = "CustomerInfo",
                 Title = "MY PROFILE",
                 Tab = CustomerNavigationEnum.Info,
-                ItemClass = "customer-info"
+                ItemClass = "customer-info",
+                ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-person.svg"
             });
 
             model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
@@ -59,7 +68,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 RouteName = "CustomerAddresses",
                 Title = "ADDRESSES",
                 Tab = CustomerNavigationEnum.Addresses,
-                ItemClass = "customer-addresses"
+                ItemClass = "customer-addresses",
+                ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-location.svg"
             });
 
             model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
@@ -67,7 +77,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 RouteName = "CustomerChangePassword",
                 Title = "CHANGE PASSWORD",
                 Tab = CustomerNavigationEnum.ChangePassword,
-                ItemClass = "change-password"
+                ItemClass = "change-password",
+                ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-key.svg"
             });
 
 
@@ -76,6 +87,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-       
+
     }
 }

@@ -11,5 +11,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public IEnumerable<Company> Companies { get; set; }
 
         public int loggedInCustomerId { get; set; }
+        public int Count { get; set; }
     }
 }

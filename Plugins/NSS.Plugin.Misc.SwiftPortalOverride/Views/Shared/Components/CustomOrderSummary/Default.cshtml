@@ -1,5 +1,6 @@
 ﻿@model ShoppingCartModel
 @using Nop.Core
+@using Syncfusion.EJ2
 @using Nop.Core.Domain.Orders
 @using Nop.Core.Domain.Tax
 @using Nop.Web.Models.ShoppingCart
@@ -57,23 +58,48 @@
     .button-2.update-cart-button {
         min-width: 128px !important;
     }
+
+    th {
+        white-space: nowrap;
+    }
+
+    .e-dlg-header {
+        color: #fff !important;
+        text-align: center;
+    }
+
+    .e-dialog .e-dlg-header {
+        width: 93% !important;
+    }
 </style>
 
 <!-- Modal -->
 <div id="overlay"></div>
-<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#03175B; color: #fff">
-                <span class="modal-title">Notes</span>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+
+@{
+
+    Func<object, object>
+    Content1 =
+    @<div id="viewNotesModal">
+        <div class="modal-body">
+            <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+        </div>
+    </div>;
+}
+
+@*<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#03175B; color: #fff">
+                    <span class="modal-title">NOTES</span>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </div>*@
 
 
 <div class="cart-summary-content card">
@@ -189,9 +215,11 @@
                             //var unitPrice = "0.00";
 
                             <tr>
-                                <td>@(iNo)</td>
+                                <td><label style="margin:0;">@(iNo)</label></td>
                                 <td>
-                                    @item.ProductName
+                                    <label style="margin:0;">
+                                        @item.ProductName
+                                    </label>
                                     @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
                                         {
                                             <div class="attributes">
@@ -212,20 +240,15 @@
                                 </td>
                                 <td>
                                     @*//var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";*@
-                                    <input style="width: 100px;height: 30px;" type="text" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" />
+                                    <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" />
                                 </td>
-                                <td>
-                                    @*@{ 
-                                        string uom = purchaseUnitAttr.Values.FirstOrDefault(x => x.IsPreSelected)?.Name;
-                                        uom = uom == Constants.UnitPerPieceField && !string.IsNullOrEmpty(pricePerPiece) ? !string.IsNullOrEmpty(pricePerCWT) ? Constants.UnitPerWeightField : !string.IsNullOrEmpty(pricePerFt) ? Constants.UnitPerFtField : Constants.UnitPerPieceField : uom;
-                                        unitPrice = uom == Constants.UnitPerPieceField ? pricePerPiece : uom == Constants.UnitPerWeightField ? pricePerCWT : uom == Constants.UnitPerFtField ? pricePerFt : "0.00";
-                                    }*@
-
-                                    <input style="width: 100px;height: 30px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="@(item.UnitPrice)">
+                                <td style="white-space: nowrap;">
+                                    @*<input style="width: 70%;height: 24px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="@(item.UnitPrice)">*@
+                                    <label style="margin:0;margin-right:2px;" id="itemunitprice@(item.Id)">@item.UnitPrice</label> /
 
                                     @if (purchaseUnitAttr != null)
                                     {
-                                        <select name="@(unitControlId)" id="@(unitControlId)" style="height: 30px;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
+                                        <select name="@(unitControlId)" id="@(unitControlId)" style="height: 24px;min-width: auto;margin: 0 !important;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
                                             @foreach (var attributeValue in purchaseUnitAttr.Values)
                                             {
                                                 if (attributeValue.Name == "EA" && string.IsNullOrEmpty(pricePerPiece) || attributeValue.Name == "CWT" && string.IsNullOrEmpty(pricePerCWT) || attributeValue.Name == "FT" && string.IsNullOrEmpty(pricePerFt))
@@ -237,11 +260,11 @@
                                     }
 
                                 </td>
-                                <td id="itemsubtotal@(item.Id)"> @item.SubTotal </td>
-                                <td id="itemweight@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00") </td>
-                                <td id="itemlength@(item.Id)">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00") </td>
+                                <td id="itemsubtotal@(item.Id)"> <label style="margin:0;">@item.SubTotal</label></td>
+                                <td><label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></td>
+                                <td><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></td>
                                 <td>
-                                    <input name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px; height: 30px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+                                    <input style="height: 24px;" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px; height: 30px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
                                 </td>
                                 <td style="text-align:center">
                                     @if (noteAttr != null)
@@ -255,7 +278,7 @@
                                 </td>
                                 <td class="remove-from-cart" style="text-align:center">
                                     <label class="pure-material-checkbox">
-                                        <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" aria-label="@T("ShoppingCart.Remove")" />
+                                        <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" style=" position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
 
                                         <span class="checkmark"></span>
                                     </label>
@@ -345,7 +368,7 @@
                             </div>
                             <div class="terms-of-service" style="display: flex;align-items: center;">
 
-                                <label class="pure-material-checkbox">
+                                <label class="pure-material-checkbox" style=" display: unset;">
                                     <input id="termsofservice" type="checkbox" name="termsofservice" />
                                     <span class="checkmark"></span>@T("Checkout.TermsOfService.IAccept")
 
@@ -428,6 +451,8 @@
             @T("ShoppingCart.CartIsEmpty")
         </div>
     }
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("500px").Target("body").Render();
+
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
 </div>
 
@@ -578,10 +603,17 @@
 
 <script>
 
+    function onDialogCreated() {
+        viewNotesModal = this;
+    }
+
+
+
     let itemNoteId;
     function handleNotesModal(itemId) {
         itemNoteId = itemId;
         $("#productNote").val($(`#${itemNoteId}`).val());
+        viewNotesModal.show();
     }
 
     $('#noteModal').on('hidden.bs.modal', function () {
@@ -600,7 +632,7 @@
             itemUnit = el.options[el.selectedIndex].text;
         }
 
-        var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).value.replace(/\$/g, ''));
+        var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).innerHTML.replace(/\$/g, ''));
         var length = parseFloat(document.getElementById('itemlength' + itemId).innerHTML);
         var weight = parseFloat(document.getElementById('itemweight' + itemId).innerHTML);
         var subtotal = document.getElementById('itemsubtotal' + itemId);
@@ -650,7 +682,7 @@
                 break;
         }
 
-        unitPriceCtrl.value = `$${unitPrice}`;
+        unitPriceCtrl.innerHTML = `$${unitPrice}`;
 
         calculateItemTotalPrice(attrId, itemId);
     }
@@ -666,3 +698,4 @@
         return d ? r / m : r;
     }
 </script>
+<ejs-scripts></ejs-scripts>
