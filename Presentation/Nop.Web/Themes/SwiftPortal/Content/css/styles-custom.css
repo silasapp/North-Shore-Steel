@@ -906,7 +906,7 @@ table input {
         content: 'closed';
     }*/
     #accordion > .card > .card-link > .card-header {
-        background: #03175b url(../assets/icon-arrow-up-white.svg) right center no-repeat;
+        background: #03175b url(../assets/icn-arrow-down-white.svg) right center no-repeat;
         text-align: left;
         font: normal normal medium 16px/24px "Teko";
         letter-spacing: 0.13px;
@@ -915,8 +915,8 @@ table input {
         padding-right: 15px;
         background-position-x: 95%;
     }
-    #accordion > .card > .opened > .card-header {
-        background: #03175b url(../assets/icn-arrow-down-white.svg) right center no-repeat;
+    #accordion > .card > .card-link.collapsed > .card-header {
+        background: #03175b url(../assets/icon-arrow-up-white.svg) right center no-repeat;
         background-position-x: 95%;
     }
 
@@ -2897,6 +2897,21 @@ li {
 
 .e-footer-content {
     padding: 2rem;
+}
+
+/* #endregion */
+
+/* #region Custom Loading */
+
+#custom-loading {
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    background: #03175B;
+    opacity: 0.5;
 }
 
 /* #endregion */

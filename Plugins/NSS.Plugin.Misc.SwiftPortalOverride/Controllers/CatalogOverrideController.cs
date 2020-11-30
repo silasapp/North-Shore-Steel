@@ -12,7 +12,7 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using Nop.Web.Controllers;
-using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
+using NSS.Plugin.Misc.SwiftCore.Domain.Shapes; 
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using Syncfusion.EJ2.Linq;
@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.IO;
+using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogModel;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -69,10 +70,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var childShapes = shapes[i].Shape?.SubCategories?.ToList();
                 var shape = new ShapeData
                 {
-                    id = shapes[i].Shape.Id,
-                    pid = shapes[i].Shape.ParentId,
-                    name = $"{shapes[i].Shape.Name} ({shapes[i].ProductCount})",
-                    hasChild = (shapes.Any(x => x.Shape.ParentId == shapes[i].Shape.Id)) ? true : (bool?)null
+                    Id = shapes[i].Shape.Id,
+                    ParentId = shapes[i].Shape.ParentId,
+                    Name = $"{shapes[i].Shape.Name}",
+                    DisplayName = $"{shapes[i].Shape.Name} ({shapes[i].ProductCount})",
+                    Count = shapes[i].ProductCount,
+                    HasChild = shapes.Any(x => x.Shape.ParentId == shapes[i].Shape.Id),
                 };
                 shapeData.Add(shape);
 
@@ -93,17 +96,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
         }
 
-        public class ShapeData
-        {
-            public int id { get; set; }
-            public int? pid { get; set; }
-            public string name { get; set; }
-            public bool? hasChild { get; set; }
-        }
-
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public PartialViewResult FilteredProductsResult([FromBody] FilterParams filterParams)
+        public JsonResult FilteredProductsResult([FromBody] FilterParams filterParams)
         {
             var shapeIds = filterParams?.ShapeIds;
             var specIds = filterParams?.SpecIds;
@@ -116,8 +111,36 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds, searchKeyword);
             CatalogModel.FilterParams = filterParams;
 
-            return PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
+            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.OrderBy(s => s.Shape.Order).ToList();
 
+            List<ShapeData> shapeData = new List<ShapeData>();
+            for (var i = 0; i < shapes.Count; i++)
+            {
+                var childShapes = shapes[i].Shape?.SubCategories?.ToList();
+                var shape = new ShapeData
+                {
+                    Id = shapes[i].Shape.Id,
+                    ParentId = shapes[i].Shape.ParentId,
+                    Name = $"{shapes[i].Shape.Name}",
+                    DisplayName = $"{shapes[i].Shape.Name} ({shapes[i].ProductCount})",
+                    Count = shapes[i].ProductCount,
+                    HasChild = shapes.Any(x => x.Shape.ParentId == shapes[i].Shape.Id),
+                };
+                shapeData.Add(shape);
+            }
+
+            //var partialView = PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
+
+            return Json(new {
+                    partialView = RenderPartialViewToString("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel),
+                    shapes = JavaScriptConvert.ToString(shapeData),
+                });
+        }
+
+        public class PartialViewWithData
+        {
+            public PartialViewResult PartialViewData { get; set; }
+            public List<ShapeData> Shapes { get; set; }
         }
 
         public class FilterParams
