@@ -1100,6 +1100,7 @@ table input {
     margin-left: 5px;
 }
 
+
 .checkmark:hover {
     border-color: #000000;
 }
@@ -3038,7 +3039,15 @@ and also iPads specifically.
         td > input {
             width: 100% !important;
         }
-
+    .datepicker-days thead tr {
+        position: unset !important;
+    }
+    .datepicker-days tr {
+        display: table !important;
+    }
+    .datepicker-days td {
+        display: table-cell !important;
+    }
     .catalog-page td:nth-child(1) {
         order: 1;
     }
