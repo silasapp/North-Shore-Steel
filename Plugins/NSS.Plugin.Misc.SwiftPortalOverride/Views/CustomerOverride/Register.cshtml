@@ -43,6 +43,15 @@
         font-weight: bold;
         text-decoration: underline
     }
+
+    .e-dlg-header {
+        color: #fff !important;
+        text-align: center;
+    }
+
+    .e-dialog .e-dlg-header {
+        width: 97% !important;
+    }
 </style>
 
 
@@ -471,7 +480,7 @@
             @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
         </div>
     </div>
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render();
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render();
 
 </div>
 
