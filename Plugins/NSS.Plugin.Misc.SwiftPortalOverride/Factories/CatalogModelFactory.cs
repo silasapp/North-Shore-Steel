@@ -10,6 +10,7 @@ using Nop.Services.Directory;
 using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Events;
+using Nop.Web.Infrastructure.Cache;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
@@ -156,15 +157,102 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             }
 
             //specs
-            model.PagingFilteringContext.SpecificationFilter.PrepareSpecsFilters(specIds,
+            PrepareSpecsFilters(specIds,
                 filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
-                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager);
+                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model);
 
             PrepareShapeFilterModel(ref model);
 
             model.PagingFilteringContext.LoadPagedList(products);
 
             return model;
+        }
+
+        public void PrepareSpecsFilters(IList<int> alreadyFilteredSpecOptionIds,
+            int[] filterableSpecificationAttributeOptionIds,
+            ICacheKeyService cacheKeyService,
+            ISpecificationAttributeService specificationAttributeService, ILocalizationService localizationService,
+            IWebHelper webHelper, IWorkContext workContext, IStaticCacheManager staticCacheManager, ref CatalogModel model)
+        {
+            model.PagingFilteringContext.SpecificationFilter.Enabled = false;
+            var cacheKey = cacheKeyService.PrepareKeyForDefaultCache(NopModelCacheDefaults.SpecsFilterModelKey, filterableSpecificationAttributeOptionIds, workContext.WorkingLanguage);
+
+            var allOptions = specificationAttributeService.GetSpecificationAttributeOptionsByIds(filterableSpecificationAttributeOptionIds);
+            var allFilters = staticCacheManager.Get(cacheKey, () => allOptions.Select(sao =>
+            {
+                var specAttribute = specificationAttributeService.GetSpecificationAttributeById(sao.SpecificationAttributeId);
+
+                return new SpecificationAttributeOptionFilter
+                {
+                    SpecificationAttributeId = specAttribute.Id,
+                    SpecificationAttributeName = localizationService.GetLocalized(specAttribute, x => x.Name, workContext.WorkingLanguage.Id),
+                    SpecificationAttributeDisplayOrder = specAttribute.DisplayOrder,
+                    SpecificationAttributeOptionId = sao.Id,
+                    SpecificationAttributeOptionName = localizationService.GetLocalized(sao, x => x.Name, workContext.WorkingLanguage.Id),
+                    SpecificationAttributeOptionColorRgb = sao.ColorSquaresRgb,
+                    SpecificationAttributeOptionDisplayOrder = sao.DisplayOrder
+                };
+            }).ToList());
+
+            if (!allFilters.Any())
+                return;
+
+            //sort loaded options
+            allFilters = allFilters.OrderBy(saof => saof.SpecificationAttributeDisplayOrder)
+                .ThenBy(saof => saof.SpecificationAttributeName)
+                .ThenBy(saof => saof.SpecificationAttributeOptionDisplayOrder)
+                .ThenBy(saof => saof.SpecificationAttributeOptionName).ToList();
+
+            //prepare the model properties
+            model.PagingFilteringContext.SpecificationFilter.Enabled = true;
+            //var removeFilterUrl = webHelper.RemoveQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM);
+            //RemoveFilterUrl = ExcludeQueryStringParams(removeFilterUrl, webHelper);
+
+            //get already filtered specification options
+            var alreadyFilteredOptions = allFilters.Where(x => alreadyFilteredSpecOptionIds.Contains(x.SpecificationAttributeOptionId));
+            model.PagingFilteringContext.SpecificationFilter.AlreadyFilteredItems = alreadyFilteredOptions.Select(x =>
+                new SpecificationFilterItem
+                {
+                    SpecificationAttributeName = x.SpecificationAttributeName,
+                    SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
+                    SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb
+                }).ToList();
+
+            //get not filtered specification options
+            model.PagingFilteringContext.SpecificationFilter.NotFilteredItems = allFilters.Except(alreadyFilteredOptions).Select(x =>
+            {
+                //filter URL
+                var alreadyFiltered = alreadyFilteredSpecOptionIds.Concat(new List<int> { x.SpecificationAttributeOptionId });
+                //var filterUrl = webHelper.ModifyQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM,
+                //    alreadyFiltered.OrderBy(id => id).Select(id => id.ToString()).ToArray());
+
+                return new SpecificationFilterItem()
+                {
+                    SpecificationAttributeOptionId = x.SpecificationAttributeOptionId,
+                    SpecificationAttributeName = x.SpecificationAttributeName,
+                    SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
+                    SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb,
+                    ProductCount = 0
+                    //FilterUrl = ExcludeQueryStringParams(filterUrl, webHelper)
+                };
+            }).ToList();
+
+            var prodSpecs = model.Products.Select(x => x.SpecificationAttributeModels);
+
+            foreach (var specs in prodSpecs)
+            {
+                foreach (var spec in specs)
+                {
+                    if (model.PagingFilteringContext.SpecificationFilter.FilterItems.Any(x => x.SpecificationAttributeOptionId == spec.SpecificationAttributeOptionId))
+                    {
+                        model.PagingFilteringContext.SpecificationFilter.FilterItems.FirstOrDefault(x => x.SpecificationAttributeOptionId == spec.SpecificationAttributeOptionId).ProductCount += 1;
+                    }
+                    else
+                    {
+                        model.PagingFilteringContext.SpecificationFilter.FilterItems.Add(new SpecificationFilterItem { SpecificationAttributeName = spec.SpecificationAttributeName, SpecificationAttributeOptionId = spec.SpecificationAttributeOptionId, SpecificationAttributeOptionColorRgb = spec.ColorSquaresRgb, SpecificationAttributeOptionName = spec.SpecificationAttributeOptionName, ProductCount = 1 });
+                    }
+                }
+            }
         }
 
         public void PrepareShapeFilterModel(ref CatalogModel model)
