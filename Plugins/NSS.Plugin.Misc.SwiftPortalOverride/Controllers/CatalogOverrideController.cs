@@ -128,13 +128,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 };
                 shapeData.Add(shape);
             }
-
-            //var partialView = PartialView("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel);
-
-            return Json(new {
+            return Json(
+                new {
                     partialView = RenderPartialViewToString("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel),
                     shapes = JavaScriptConvert.ToString(shapeData),
-                });
+                }
+            );
         }
 
         public class PartialViewWithData
