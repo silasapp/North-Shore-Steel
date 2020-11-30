@@ -898,6 +898,14 @@ input:focus {
     .invoice-body > img {
         width: 100%;
     }
+    .hover-icon {
+        fill: #dedede;
+        cursor: pointer;
+    }
+.hover-icon:hover {
+    fill: #0076B4 !important;
+}
+
 
 table a {
     color: #0076b4;
