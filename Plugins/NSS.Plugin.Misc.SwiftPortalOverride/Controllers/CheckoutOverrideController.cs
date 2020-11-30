@@ -829,7 +829,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     }
                     else if (mapping.ProductAttributeId == uomAttr?.Id)
                     {
-                        uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name;
+                        uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping?.Id ?? 0)?.FirstOrDefault()?.Name ?? SwiftCore.Helpers.Constants.UnitPerPieceField;
                     }
                 }
 
