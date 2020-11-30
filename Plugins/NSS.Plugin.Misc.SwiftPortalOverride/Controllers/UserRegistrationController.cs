@@ -30,6 +30,8 @@ using ICustomerModelFactory = NSS.Plugin.Misc.SwiftPortalOverride.Factories.ICus
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using Nop.Core.Domain.Common;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -46,6 +48,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkContext _workContext;
         private readonly IUserRegistrationService _userRegistrationService;
         private readonly ERPApiProvider _nSSApiProvider;
+        private readonly ICustomerRegistrationService _customerRegistrationService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IWorkflowMessageService _workflowMessageService;
+        private readonly ICompanyService _companyService;
+        private readonly ICustomerCompanyService _customerCompanyService;
         #endregion
 
         #region Ctor
@@ -58,7 +65,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IStoreContext storeContext,
             IWorkContext workContext,
             IUserRegistrationService userRegistrationService,
-            ERPApiProvider nSSApiProvider
+            ERPApiProvider nSSApiProvider,
+            ICustomerRegistrationService customerRegistrationService,
+            IGenericAttributeService genericAttributeService,
+            IWorkflowMessageService workflowMessageService,
+            ICompanyService companyService,
+            ICustomerCompanyService customerCompanyService
             )
         {
             _customerSettings = customerSettings;
@@ -70,6 +82,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workContext = workContext;
             _userRegistrationService = userRegistrationService;
             _nSSApiProvider = nSSApiProvider;
+            _customerRegistrationService = customerRegistrationService;
+            _genericAttributeService = genericAttributeService;
+            _workflowMessageService = workflowMessageService;
+            _companyService = companyService;
+            _customerCompanyService = customerCompanyService;
         }
 
         #endregion
@@ -232,11 +249,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var response = _nSSApiProvider.ApproveUserRegistration(regId);
             updateUserRegistration(regId, response.Item2, (int)UserRegistrationStatus.Approved);
 
-            //Create customer, company and user company
-
-
-
             UserRegistration model = getRegisteredUser(regId);
+            //Create customer, company and user company
+            //create customer
+            registerApprovedCustomer(model);
+
+            //create company
+            createCompany(response.Item1);
+
+            //create User Company
+            createCustomerCompany(response.Item1);
+
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
         }
 
@@ -262,6 +285,114 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #endregion
 
         #endregion
+
+        private void registerApprovedCustomer(UserRegistration model)
+        {
+
+            if (_customerService.IsRegistered(_workContext.CurrentCustomer))
+            {
+                //Already registered customer. 
+                _authenticationService.SignOut();
+
+                //raise logged out event       
+                _eventPublisher.Publish(new CustomerLoggedOutEvent(_workContext.CurrentCustomer));
+
+                //Save a new record
+                _workContext.CurrentCustomer = _customerService.InsertGuestCustomer();
+            }
+            var customer = _workContext.CurrentCustomer;
+            customer.RegisteredInStoreId = _storeContext.CurrentStore.Id;
+
+            if (ModelState.IsValid)
+            {
+                var isApproved = _customerSettings.UserRegistrationType == UserRegistrationType.Standard;
+                var registrationRequest = new CustomerRegistrationRequest(customer,
+                    model.WorkEmail,
+                    model.WorkEmail,
+                    null,
+                    _customerSettings.DefaultPasswordFormat,
+                    _storeContext.CurrentStore.Id,
+                    isApproved);
+                var registrationResult = _userRegistrationService.RegisterCustomer(registrationRequest);
+                //var customerAttributesXml = ParseCustomCustomerAttributes(form);
+
+                if (registrationResult.Success)
+                {
+                    //form fields
+                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FirstNameAttribute, model.FirstName);
+                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.LastNameAttribute, model.LastName);
+                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CompanyAttribute, model.CompanyName);
+                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.PhoneAttribute, model.Phone);
+
+
+
+                    //save customer attributes
+                    //_genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CustomCustomerAttributes, customerAttributesXml);
+
+                    //login customer now
+                    if (isApproved)
+                        _authenticationService.SignIn(customer, true);
+
+                    //raise event       
+                    _eventPublisher.Publish(new CustomerRegisteredEvent(customer));
+                    //send customer welcome message
+                    _workflowMessageService.SendCustomerWelcomeMessage(customer, _workContext.WorkingLanguage.Id);
+
+                    //raise event       
+                    _eventPublisher.Publish(new CustomerActivatedEvent(customer));
+
+                }
+
+                //errors
+                foreach (var error in registrationResult.Errors)
+                    ModelState.AddModelError("", error);
+
+            }
+        }
+
+        private void createCompany(ERPApproveUserRegistrationResponse response)
+        {
+            Company company = _companyService.GetCompanyEntityByErpEntityId(response.CompanyId);
+
+            if (company == null)
+            {
+                company = new Company
+                {
+                    ErpCompanyId = response.CompanyId,
+                    Name = response.CompanyName,
+                    SalesContactEmail = response.SalesContactEmail,
+                    SalesContactName = response.SalesContactName,
+                    SalesContactPhone = response.SalesContactPhone
+                };
+
+                _companyService.InsertCompany(company);
+            }
+        }
+        
+        private void createCustomerCompany(ERPApproveUserRegistrationResponse response)
+        {
+            Company company = _companyService.GetCompanyEntityByErpEntityId(response.CompanyId);
+            var customer = _workContext.CurrentCustomer;
+            CustomerCompany customerCompany = new CustomerCompany
+            {
+                CustomerId = customer.Id,
+                CompanyId = company.Id,
+                CanCredit = false,
+                AP = response.Ap,
+                Buyer = response.Buyer,
+                Operations = response.Operations
+            };
+
+            CustomerCompany cc = _customerCompanyService.GetCustomerCompany(customerCompany.CustomerId, customerCompany.CompanyId);
+            if (cc != null)
+            {
+                _customerCompanyService.UpdateCustomerCompany(customerCompany);
+            }
+            else
+            {
+                _customerCompanyService.InsertCustomerCompany(customerCompany);
+            }
+        }
 
         private UserRegistration getRegisteredUser(int regId)
         {

@@ -12,6 +12,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         void UpdateUser(UserRegistration userRegistration);
         UserRegistration GetUserById(int id);
+
+        /// <summary>
+        /// Register customer
+        /// </summary>
+        /// <param name="request">Request</param>
+        /// <returns>Result</returns>
+        CustomerRegistrationResult RegisterCustomer(CustomerRegistrationRequest request);
         //Customer GetCustomerByEmail(string email);
     }
 }
