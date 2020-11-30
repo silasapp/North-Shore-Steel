@@ -961,8 +961,8 @@ table input {
         background-position-x: 95%;
     }
 
-    #accordion > .card > .opened > .card-header {
-        background: #03175b url(../assets/icn-arrow-down-white.svg) right center no-repeat;
+    #accordion > .card > .collapsed > .card-header {
+        background: #03175b url(../assets/icon-arrow-up-white.svg) right center no-repeat;
         background-position-x: 95%;
     }
 
