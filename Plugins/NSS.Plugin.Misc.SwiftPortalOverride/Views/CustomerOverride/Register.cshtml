@@ -181,13 +181,13 @@
 
     <div class="page-body">
         <form asp-route="Register" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
-            <div asp-validation-summary="ModelOnly" class="message-error"></div>
             <div class="fieldset">
 
                 <div class="form-fields">
                     <div class="title">
                         <strong>PERSONAL INFORMATION</strong>
                     </div>
+                    <div asp-validation-summary="ModelOnly" class="message-error" style="font-size:16px"></div>
 
                     <div>
                         <div class="form-group row">
@@ -284,7 +284,8 @@
                                                 @*<li>*@
                                                 <label class="pure-material-checkbox" for="@(controlId)_@(attributeValue.Id)" id="current-customer">
                                                     <input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
-                                                    <span class="checkmark">I am a current customer</span>
+                                                    <span class="checkmark"></span>
+                                                    <span class="pl-2">I am a current customer</span>
                                                 </label>
                                                 @*<input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />*@
                                                 @*<label for="@(controlId)_@(attributeValue.Id)" class="mb-1 pl-2" id="current-customer">I am a current customer</label>*@
@@ -444,12 +445,12 @@
                                 {
                                     <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
                                     <script asp-location="Footer">
-                                    $(document).ready(function () {
-                                        $('#read-privacyinfo').on('click',
-                                           function(e) {
-                                                handleTOSModal()
+                                        $(document).ready(function () {
+                                            $('#read-privacyinfo').on('click',
+                                                function (e) {
+                                                    handleTOSModal()
+                                                });
                                         });
-                                    });
                                     </script>
                                 }
                                 else
@@ -481,7 +482,7 @@
         viewTOSModal = this;
     }
 
-     function handleTOSModal() {
+    function handleTOSModal() {
         viewTOSModal.show();
     }
 
