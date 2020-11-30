@@ -472,6 +472,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             /// Not filtered yet items
             /// </summary>
             public IList<SpecificationFilterItem> NotFilteredItems { get; set; }
+            public IList<SpecificationFilterItem> FilterItems { get; set; }
             /// <summary>
             /// URL of "remove filters" button
             /// </summary>

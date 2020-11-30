@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using static NSS.Plugin.Misc.SwiftPortalOverride.Models.ProductOverviewModel;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -96,7 +97,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// </summary>
         /// <param name="product">Product</param>
         /// <returns>List of product specification model</returns>
-        public virtual IList<Nop.Web.Models.Catalog.ProductSpecificationModel> PrepareProductSpecificationModel(Product product)
+        public virtual IList<ProductSpecificationModel> PrepareProductSpecificationModel(Product product)
         {
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
@@ -111,10 +112,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         _specificationAttributeService.GetSpecificationAttributeById(specAttributeOption
                             .SpecificationAttributeId);
 
-                    var m = new Nop.Web.Models.Catalog.ProductSpecificationModel
+                    var m = new ProductSpecificationModel
                     {
                         SpecificationAttributeId = specAttribute.Id,
                         SpecificationAttributeName = _localizationService.GetLocalized(specAttribute, x => x.Name),
+                        SpecificationAttributeOptionId = specAttributeOption.Id,
+                        SpecificationAttributeOptionName = specAttributeOption.Name,
                         ColorSquaresRgb = specAttributeOption.ColorSquaresRgb,
                         AttributeTypeId = psa.AttributeTypeId
                     };
