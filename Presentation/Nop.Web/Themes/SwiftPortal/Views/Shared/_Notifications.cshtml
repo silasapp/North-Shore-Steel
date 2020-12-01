@@ -1,6 +1,7 @@
 ﻿@using Newtonsoft.Json
 @using Nop.Core.Domain.Messages
 @using Nop.Services.Messages
+@using System.Text.Encodings.Web 
 @inject MessagesSettings messagesSettings
 @{
     var successMessages = new List<string>();
@@ -67,6 +68,9 @@
         </script>
     }
 }
+<div id="custom-loading" style="display: none">
+    <div class="ajax-loading-block-window"></div>
+</div>
 
 <div class="ajax-loading-block-window" style="display: none">
 </div>
