@@ -52,7 +52,16 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string UnitPerWeightField => "CWT";
         #endregion
 
+        #region EmailTemplate
 
+        public static string ApprovalMessageTemplateName => "NewCustomer.Notification";
+        public static string ChangePasswordMessageTemplateName => "Customer.ChangePassword";
+        public static string NewCustomerPendingApprovalMessageTemplateName => "NewCustomer.PendingApproval";
+        public static string NewCustomerRejectionMessageTemplateName => "NewCustomer.Rejection";
+
+        public static string StoreRegistrationConfirmationUrl => "{0}/{1}/confirmation";
+
+        #endregion
         public static string MTRBlobName => "Product-MTR.{0}.pdf";
 
 		public static string ThemeName => "SwiftPortal";

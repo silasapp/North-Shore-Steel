@@ -1,0 +1,85 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@model RegisterModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts("Confirmation");
+    //page class
+    Html.AppendPageCssClassParts("html-registration-page");
+
+}
+
+<style>
+    .header-menu {
+        display: none !important;
+    }
+
+    .header-upper {
+        background-color: transparent !important;
+        border-bottom: none !important;
+    }
+
+    .nav-bar-search {
+        display: none !important;
+    }
+
+    .header-links-wrapper {
+        display: none !important;
+    }
+
+    .master-wrapper-content {
+        display: block !important;
+    }
+
+    div.text > iframe {
+        width: -webkit-fill-available !important;
+    }
+</style>
+
+<div class="page registration-result-page">
+    <div class=page-title>
+        <h1>WELCOME!</h1>
+    </div>
+    <div class="page-body">
+        <div class="fieldset welcome-fieldset">
+            @if (!Model.IsExistingCustomer)
+            {
+
+                <p class="text">
+                    Thank you for registering as a new customer.
+                </p>
+                <p class="text">
+                    Our goal is to have approval within one business hour.
+                </p>
+                <p class="text">
+                    If you need immediate assistance, call Marcelo at 713-980-5879.
+                </p>
+                <div class="text">
+                    <iframe height="315"
+                            src=@Model.MarketingVideoUrl
+                            frameborder="0"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+            }
+            else
+            {
+                <p class="text">
+                    Thank you for registering as an existing customer.
+                </p>
+                <p class="text">
+                    It is important that we properly synchronize you with our current database.
+                </p>
+                <p class="text">
+                    Our goal is to have approval within four business hour.
+                </p>
+                <p class="text">
+                    If you need immediate assistance, call Marcelo at 713-980-5879.
+                </p>
+            }
+        </div>
+
+    </div>
+    <br />
+</div>

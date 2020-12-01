@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
-using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Media;
@@ -29,6 +28,8 @@ using Nop.Services.Stores;
 using Nop.Web.Models.Common;
 using Nop.Web.Framework.Themes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
+using Nop.Core.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -39,10 +40,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
     {
 
         private readonly IThemeContext _themeContext;
+        private readonly CustomerSettings _customerSettings;
+        private readonly CommonSettings _commonSettings;
 
-        public CustomerModelFactory(IThemeContext themeContext)
+        public CustomerModelFactory(IThemeContext themeContext, CommonSettings commonSettings, CustomerSettings customerSettings)
         {
             _themeContext = themeContext;
+            _customerSettings = customerSettings;
+            _commonSettings = commonSettings;
         }
         /// <summary>
         /// Prepare the customer navigation model
@@ -88,5 +93,35 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         }
 
 
+        /// <summary>
+        /// Prepare the customer register model
+        /// </summary>
+        /// <param name="model">Customer register model</param>
+        /// <param name="excludeProperties">Whether to exclude populating of model properties from the entity</param>
+        /// <param name="setDefaultValues">Whether to populate model properties by default values</param>
+        /// <returns>Customer register model</returns>
+        public virtual RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
+            string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+           
+            //form fields
+            model.FirstNameEnabled = _customerSettings.FirstNameEnabled;
+            model.LastNameEnabled = _customerSettings.LastNameEnabled;
+            model.FirstNameRequired = _customerSettings.FirstNameRequired;
+            model.LastNameRequired = _customerSettings.LastNameRequired;
+            model.CompanyEnabled = _customerSettings.CompanyEnabled;
+            model.CompanyRequired = _customerSettings.CompanyRequired;
+            model.PhoneEnabled = _customerSettings.PhoneEnabled;
+            model.PhoneRequired = _customerSettings.PhoneRequired;
+            model.AcceptPrivacyPolicyEnabled = _customerSettings.AcceptPrivacyPolicyEnabled;
+            model.AcceptPrivacyPolicyPopup = _commonSettings.PopupForTermsOfServiceLinks;
+            model.CheckUsernameAvailabilityEnabled = _customerSettings.CheckUsernameAvailabilityEnabled;
+            model.EnteringEmailTwice = _customerSettings.EnteringEmailTwice;
+
+            return model;
+    }
     }
 }

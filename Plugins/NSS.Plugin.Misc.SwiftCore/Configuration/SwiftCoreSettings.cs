@@ -68,5 +68,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Configuration
         /// </summary>
         public string PayPalSecretKey { get; set; }
         #endregion
+
+        public string MarketingVideoUrl { get; set; }
     }
 }

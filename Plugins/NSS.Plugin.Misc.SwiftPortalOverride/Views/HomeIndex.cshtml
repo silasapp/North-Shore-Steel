@@ -35,7 +35,7 @@
                         <div class="responsive-table-container tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                             <ejs-grid id="OrderGrid" dataSource="@Model.RecentOrders" allowPaging="true" allowFiltering="false">
                                 <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                <e-grid-pagesettings pageSize="50" pageSizes="true"></e-grid-pagesettings>
+                                <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
                                 <e-grid-columns>
                                     <e-grid-column template="#orderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
                                     <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" minWidth="120" width="70"></e-grid-column>
@@ -49,7 +49,7 @@
                         <div class="responsive-table-container tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
                             <ejs-grid id="InvoiceGrid" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false">
                                 <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                <e-grid-pagesettings pageSize="50" pageSizes="true"></e-grid-pagesettings>
+                                <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
                                 <e-grid-columns>
                                     <e-grid-column field="InvoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
                                     <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
