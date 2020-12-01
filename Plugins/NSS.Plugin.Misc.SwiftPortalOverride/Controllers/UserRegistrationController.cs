@@ -263,15 +263,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (!CommonHelper.IsValidEmail(userRegistration.WorkEmail))
             {
-                warnings.Add("Common.WrongEmail");
+                warnings.Add("Wrong Email");
                 //return;
             }
 
             //validate unique user
             if (_customerService.GetCustomerByEmail(userRegistration.WorkEmail) != null)
             {
-                warnings.Add("Account.Register.Errors.EmailAlreadyExists");
+                warnings.Add("Email Already Exists");
                 //return;
+            }
+
+            foreach (var error in warnings)
+            {
+                ModelState.AddModelError("", error);
             }
 
             if (ModelState.IsValid)
@@ -305,7 +310,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _workFlowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", userRegistration.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
             }
 
-            user = getRegisteredUser(regId);
+            userRegistration = GetRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
 
         }
