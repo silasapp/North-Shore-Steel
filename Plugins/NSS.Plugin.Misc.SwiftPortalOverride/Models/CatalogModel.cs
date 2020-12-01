@@ -22,8 +22,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public IList<ProductOverviewModel> Products { get; set; }
         public CatalogPagingFilteringModel PagingFilteringContext { get; set; }
         public CatalogOverrideController.FilterParams FilterParams { get; internal set; }
+        public List<ShapeData> Shapes { get; set; }
 
         #region Nested Class
+
+        public class ShapeData
+        {
+            public int Id { get; set; }
+            public int? ParentId { get; set; }
+            public string Name { get; set; }
+            public string DisplayName { get; set; }
+            public bool? HasChild { get; set; }
+            public int Count { get; set; }
+        }
 
         #endregion
     }

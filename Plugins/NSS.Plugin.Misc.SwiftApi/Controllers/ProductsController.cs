@@ -335,7 +335,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                         AllowFiltering = true,
                         ProductId = entity.Id,
                         SpecificationAttributeOptionId = option.Id,
-                        AttributeType = SpecificationAttributeType.Option
+                        AttributeType = SpecificationAttributeType.Option,
+                        ShowOnProductPage = true 
                     };
                     _specificationAttributeService.InsertProductSpecificationAttribute(prodSpec);
                 }

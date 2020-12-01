@@ -329,6 +329,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             {
                 AlreadyFilteredItems = new List<SpecificationFilterItem>();
                 NotFilteredItems = new List<SpecificationFilterItem>();
+                FilterItems = new List<SpecificationFilterItem>();
             }
 
             #endregion
@@ -472,6 +473,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             /// Not filtered yet items
             /// </summary>
             public IList<SpecificationFilterItem> NotFilteredItems { get; set; }
+            public IList<SpecificationFilterItem> FilterItems { get; set; }
             /// <summary>
             /// URL of "remove filters" button
             /// </summary>
@@ -505,6 +507,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             /// Filter URL
             /// </summary>
             public string FilterUrl { get; set; }
+
+            public int ProductCount { get; set; }
         }
 
 
@@ -526,7 +530,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             /// </summary>
             public ShapeFilterModel()
             {
-                Shapes = new List<Shape>();
+                //Shapes = new List<Shape>();
+                FilterItems = new List<ShapeFilterItem>();
             }
 
             #endregion
@@ -550,13 +555,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             /// <summary>
             /// Filter items
             /// </summary>
-            public IList<Shape> Shapes { get; set; }
+            //public IList<Shape> Shapes { get; set; }            
+            
+            /// <summary>
+            /// Filter items
+            /// </summary>
+            public IList<ShapeFilterItem> FilterItems { get; set; }
             /// <summary>
             /// URL of "remove filters" button
             /// </summary>
             public string RemoveFilterUrl { get; set; }
 
             #endregion
+        }
+
+        /// <summary>
+        /// Specification filter item
+        /// </summary>
+        public partial class ShapeFilterItem : BaseNopModel
+        {
+            public ShapeFilterItem()
+            {
+                Shape = new Shape();
+            }
+
+            public Shape Shape { get; set; }
+            public int ProductCount { get; set; }
         }
 
         #endregion

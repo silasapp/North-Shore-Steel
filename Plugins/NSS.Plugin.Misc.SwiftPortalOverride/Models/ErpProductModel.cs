@@ -7,10 +7,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
     public partial class ErpProductModel
     {
-        [JsonProperty("itemId", Required = Required.Always)]
         public int itemId { get; set; }
 
-        [JsonProperty("shapeId", Required = Required.Always)]
         public int shapeId { get; set; }
 
         [JsonProperty("itemNo")]
@@ -19,7 +17,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [JsonProperty("itemTagNo")]
         public string itemTagNo { get; set; }
 
-        [JsonProperty("itemName", Required = Required.Always)]
         public string itemName { get; set; }
 
         [JsonProperty("displayLeg1")]

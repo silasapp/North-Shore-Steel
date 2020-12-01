@@ -50,8 +50,8 @@
                 </div>
             </div>
 
-            <div v-show="isSearchExpanded" class="row m-0 py-0">
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 pl-0">
+            <div v-show="isSearchExpanded" class="row m-0 py-0 px-2">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=orderFromDate>Invoice Dates</label>
                     <div class="input-with-icon">
                         @*<input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">*@
@@ -81,7 +81,7 @@
                     <label for=purchaseOrder>Purchase Order #</label>
                     <input class=nss-form-control type="text" v-model="poNo" placeholder="Enter...">
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0 pr-0">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
                     <button class="nss-btn-default ml-lg-5 w-100 text-center" style=" padding: 10px 16px;" v-on:click="searchInvoices">Search</button>
                 </div>
             </div>
