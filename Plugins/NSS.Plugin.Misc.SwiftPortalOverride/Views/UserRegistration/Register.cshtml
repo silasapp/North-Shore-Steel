@@ -1,4 +1,4 @@
-﻿@using Nop.Web.Models.Customer
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using Nop.Services.Customers
 @using NSS.Plugin.Misc.SwiftCore.Helpers;
 @using Syncfusion.EJ2
@@ -19,6 +19,19 @@
 
 
 <style>
+
+    /*.text-left > input {
+        width: 100% !important;
+        font-style: italic !important;
+        font-size: 14px;
+        background: #f6f6f6 0% 0% no-repeat padding-box !important;
+        opacity: 1;*/
+    /*border: none;*/
+    /*font: italic normal normal 14px/24px "Exo 2";
+        letter-spacing: 0px;
+        color: #aaaaaa;
+        opacity: 1;
+    }*/
 
     .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
         width: 67rem !important;
@@ -228,189 +241,119 @@
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                     <label asp-for="ConfirmEmail">Confirm Email</label>
                                     <nop-required />
-                                    <input asp-for="ConfirmEmail" placeholder="Enter confirm email" class="form-control custom-input" />
+                                    <input asp-for="ConfirmEmail" placeholder="Confirm email" class="form-control custom-input" />
                                     <span asp-validation-for="ConfirmEmail" style="display:flex;"></span>
                                 </div>
                             }
 
                         </div>
 
-
                         <div class="form-group row">
 
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <label asp-for="Password">Set Password</label>
+                                <label asp-for="CellPhone">Cell Phone</label>
                                 <nop-required />
-                                <input asp-for="Password" placeholder="Enter password" class="form-control custom-input" />
-                                <span asp-validation-for="Password" style="display:flex;"></span>
-
+                                <input asp-for="CellPhone" placeholder="Enter cell phone number" class="form-control custom-input" />
+                                <span asp-validation-for="CellPhone" style="display:flex;"></span>
                             </div>
-
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                <label asp-for="ConfirmPassword">Confirm Password</label>
+                                <label asp-for="Phone">Work Phone</label>
                                 <nop-required />
-                                <input asp-for="ConfirmPassword" placeholder="Enter confirm password" class="form-control custom-input" />
-                                <span asp-validation-for="ConfirmPassword" style="display:flex;"></span>
+                                <input asp-for="Phone" placeholder="Enter work phone number" class="form-control custom-input" />
+                                <span asp-validation-for="Phone" style="display:flex;"></span>
                             </div>
-                            @if (Model.DisplayCaptcha)
-                            {
-                                <nop-captcha />
-                            }
-
                         </div>
-
 
                         <div class="form-group row">
-                            @if (Model.CompanyEnabled)
-                            {
-                                <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                    <label asp-for="Company">Company Name</label>
-                                    <nop-required />
-                                    <input asp-for="Company" placeholder="Enter company name" class="form-control custom-input" />
-                                    <span asp-validation-for="Company" style="display:flex;"></span>
-
-                                    @{
-                                        var isExistingCustomerCtrl = Model.CustomerAttributes.Where(x => x.Name == "Existing Customer").FirstOrDefault();
-                                    }
-                                    @if (isExistingCustomerCtrl != null)
-                                    {
-                                        var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{isExistingCustomerCtrl.Id}";
-                                        <div class="option-list pt-3">
-                                            @foreach (var attributeValue in isExistingCustomerCtrl.Values)
-                                            {
-                                                @*<li>*@
-                                                <label class="pure-material-checkbox" for="@(controlId)_@(attributeValue.Id)" id="current-customer">
-                                                    <input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />
-                                                    <span class="checkmark"></span>
-                                                    <span class="pl-2">I am a current customer</span>
-                                                </label>
-                                                @*<input id="@(controlId)_@(attributeValue.Id)" type="checkbox" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected" />*@
-                                                @*<label for="@(controlId)_@(attributeValue.Id)" class="mb-1 pl-2" id="current-customer">I am a current customer</label>*@
-                                                @*</li>*@
-                                            }
-                                        </div>
-                                    }
-
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="Company">Company Name</label>
+                                <nop-required />
+                                <input asp-for="Company" placeholder="Enter company name" class="form-control custom-input" />
+                                <span asp-validation-for="Company" style="display:flex;"></span>
+                                <div class="pt-3">
+                                    <label class="pure-material-checkbox" id="current-customer">
+                                        <input onclick="customerCheck()" id="is_current_customer" asp-for="IsExistingCustomer" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span class="pl-2">I am a current customer</span>
+                                    </label>
                                 </div>
-                            }
+                            </div>
 
-                            @if (Model.PhoneEnabled)
-                            {
-                                <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                    <label asp-for="Phone">Phone Number</label>
-                                    <nop-required />
-                                    <input asp-for="Phone" placeholder="Enter phone number" class="form-control custom-input" />
-                                    <span asp-validation-for="Phone" style="display:flex;"></span>
-                                </div>
-                            }
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3" id="user_roles" style="display:none">
+                                <label asp-for="Company">Roles</label>
+                                <ul class="option-list d-flex">
+                                    <li>
+                                        <input asp-for="BuyerRole" class="mb-2" type="checkbox" checked />
+                                        <label asp-for="BuyerRole" class="mb-2 pr-3" id="buyer_role">Buyer</label>
+                                    </li>
+                                    <li>
+                                        <input asp-for="OperationsRole" class="mb-2" type="checkbox" checked />
+                                        <label asp-for="OperationsRole" class="mb-2 pr-3" id="operations_role">Operations</label>
+                                    </li>
+                                    <li>
+                                        <input asp-for="APRole" class="mb-2" type="checkbox" checked />
+                                        <label asp-for="APRole" class="mb-2 pr-3" id="ap_role">AP</label>
+                                    </li>
+                                </ul>
+                            </div>
 
                         </div>
+
 
                     </div>
                 </div>
             </div>
 
-
-
-            @if (Model.CustomerAttributes.Count > 0)
-            {
-                <div class="fieldset">
-                    <div class="form-fields">
-                        <div class="title">
-                            <strong>OTHER INFORMATION</strong>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 col-sm-12 col-xs-12">
-                                <div style="margin-bottom: 2em">
-                                    @foreach (var attribute in Model.CustomerAttributes)
-                                    {
-                                        var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                                        var textPrompt = attribute.Name;
-
-                                        @if (attribute.Name == Constants.HearAboutUsAttribute)
-                                        {
-                                            <label>How did you hear about us?</label>
-                                            <nop-required />
-                                            <select name="@(controlId)" id="@(controlId)" class="form-control custom-input about-us" onchange="otherMethodCheck(this);">
-                                                @if (!attribute.IsRequired)
-                                                {
-                                                    <option value="0"> ---</option>
-                                                }
-                                                @foreach (var attributeValue in attribute.Values)
-                                                {
-                                                    <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id"> @attributeValue.Name </option>
-                                                }
-                                            </select>
-                                        }
-                                    }
-                                </div>
-
-                                <div style="margin-bottom: 2em">
-                                    @foreach (var attribute in Model.CustomerAttributes)
-                                    {
-                                        var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                                        var textPrompt = attribute.Name;
-
-                                        @if (attribute.Name == Constants.OtherAttribute)
-                                        {
-                                            <div id="found-us-container" style="display:none">
-                                                <label> Let us know how you found us</label>
-                                                <input name="@(controlId)" placeholder="Enter how you found us" type="text" class="textbox form-control custom-input found-us" id="@(controlId)" value="@(attribute.DefaultValue)" />
-                                                <label id="found-us-text-error" style="display:none" class="text-danger mt-1 mb-0">How you found us is required</label>
-                                            </div>
-                                        }
-                                    }
-                                </div>
-
-                                <div>
-                                    @foreach (var attribute in Model.CustomerAttributes)
-                                    {
-                                        var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                                        var textPrompt = attribute.Name;
-
-
-                                        @if (attribute.Name == Constants.PreferredLocationIdAttribute)
-                                        {
-                                            <label>Preferred pickup location</label>
-                                            <nop-required />
-                                            <select name="@(controlId)" id="@(controlId)" class="form-control custom-input">
-                                                @if (!attribute.IsRequired)
-                                                {
-                                                    <option value="0">---</option>
-                                                }
-                                                @foreach (var attributeValue in attribute.Values)
-                                                {
-                                                    <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
-                                                }
-                                            </select>
-                                        }
-
-                                    }
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-sm-12 col-xs-12">
-                                @foreach (var attribute in Model.CustomerAttributes)
-                                {
-                                    var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
-                                    var textPrompt = attribute.Name;
-                                    @if (attribute.Name == Constants.ItemsForNextProjectAttribute)
-                                    {
-                                        <div>
-                                            <label>How can we help?</label>
-                                            <nop-required />
-                                            <textarea id="@(controlId)" placeholder="What items are you considering for your next project?" class="form-control custom-input help-text" name="@(controlId)">@(attribute.DefaultValue)</textarea>
-                                            <label id="help-text-error" style="display:none" class="text-danger mt-1 mb-0">How can we help is required</label>
-                                        </div>
-                                    }
-                                }
-                            </div>
-
-                        </div>
+            <div class="fieldset">
+                <div class="form-fields">
+                    <div class="title">
+                        <strong>OTHER INFORMATION</strong>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div style="margin-bottom: 2em">
+                                <label>How did you hear about us?</label>
+                                <nop-required />
+                                <select asp-for="HearAboutUs" asp-items="Html.GetEnumSelectList<HearAboutUs>()" class="form-control custom-input about-us" onchange="otherMethodCheck(this);"> </select>
+                                <span asp-validation-for="HearAboutUs"></span>
+                            </div>
 
-                    @if (Model.AcceptPrivacyPolicyEnabled)
-                    {
-                        <script asp-location="Footer">
+                            <div style="margin-bottom: 2em">
+                                <div id="other-method" style="display:none">
+                                    <label> Let us know how you found us</label>
+                                    <input asp-for="Other" placeholder="Enter how you found us" class="textbox form-control custom-input found-us" />
+                                    <label id="found-us-text-error" style="display:none" class="text-danger mt-1 mb-0">How you found us is required</label>
+                                    @*<span asp-validation-for="Other" style="display:flex;"></span>*@
+                                </div>
+                            </div>
+
+                            <div>
+                                <label>Preferred pickup location</label>
+                                <nop-required />
+                                <select asp-for="PreferredPickupLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
+                                <span asp-validation-for="PreferredPickupLocationId"></span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div>
+                                <label>How can we help?</label>
+                                <nop-required />
+                                <textarea asp-for="ItemsForNextProject" placeholder="What items are you considering for your next project?" class="form-control custom-input"></textarea>
+                                <span asp-validation-for="ItemsForNextProject" style="display:flex;"></span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                @if (Model.AcceptPrivacyPolicyEnabled)
+                {
+                    <script asp-location="Footer">
                                 $(document).ready(function() {
                                     $('#register-button').on('click', function () {
                                         if ($(".help-text").val() == "") {
@@ -433,36 +376,35 @@
                                         }
                                     });
                                 });
-                        </script>
-                        <div class="accept-consent">
-                            <label class=pure-material-checkbox>
-                                <input id="accept-consent" type="checkbox" name="accept-consent" />
-                                <span class="checkmark"></span>
-                                @if (Model.AcceptPrivacyPolicyPopup)
-                                {
-                                    <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
-                                    <script asp-location="Footer">
-                                        $(document).ready(function () {
-                                            $('#read-privacyinfo').on('click',
-                                                function (e) {
-                                                    handleTOSModal()
-                                                });
-                                        });
-                                    </script>
-                                }
-                                else
-                                {
-                                    @*<a class="read" id="read-privacyinfo" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("privacyinfo") })">@T("Account.Fields.AcceptPrivacyPolicy.Read")</a>*@
-                                }
-                            </label>
-                        </div>
-                    }
-
-                    <div class="buttons">
-                        <input type="submit" id="register-button" class="button-1 register-next-step-button" value="@T("Account.Register.Button")" name="register-button" />
+                    </script>
+                    <div class="accept-consent">
+                        <label class=pure-material-checkbox>
+                            <input id="accept-consent" type="checkbox" name="accept-consent" />
+                            <span class="checkmark"></span>
+                            @if (Model.AcceptPrivacyPolicyPopup)
+                            {
+                                <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
+                                <script asp-location="Footer">
+                                    $(document).ready(function () {
+                                        $('#read-privacyinfo').on('click',
+                                            function (e) {
+                                                handleTOSModal()
+                                            });
+                                    });
+                                </script>
+                            }
+                            else
+                            {
+                                @*<a class="read" id="read-privacyinfo" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("privacyinfo") })">@T("Account.Fields.AcceptPrivacyPolicy.Read")</a>*@
+                            }
+                        </label>
                     </div>
+                }
+
+                <div class="buttons">
+                    <input type="submit" id="register-button" class="button-1 register-next-step-button" value="@T("Account.Register.Button")" name="register-button" />
                 </div>
-            }
+            </div>
         </form>
         <div class="external-authentication">
             @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
@@ -495,10 +437,20 @@
     function otherMethodCheck(option) {
         let optionName = option.options[option.selectedIndex].text;
         if (optionName == "Other") {
-            $("#found-us-container").css("display", "block")
+            document.getElementById("other-method").style.display = "block";
         } else {
-            $("#found-us-container").css("display", "none")
+            document.getElementById("other-method").style.display = "none";
         }
     }
+
+    function customerCheck(option) {
+        var checked = document.getElementById("is_current_customer").checked;
+        if (checked) {
+            document.getElementById("user_roles").style.display = "block";
+        } else {
+            document.getElementById("user_roles").style.display = "none";
+        }
+    }
+
 </script>
 <ejs-scripts></ejs-scripts>

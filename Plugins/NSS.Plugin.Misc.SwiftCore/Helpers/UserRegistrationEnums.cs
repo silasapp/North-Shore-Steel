@@ -20,10 +20,15 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 
     public enum HearAboutUs
     {
-        [Display(Name = "Social Media")]
-        SocialMedia = 1,
+        Salesperson = 1,
         Website = 2,
-        Other = 3
+        Email = 3,
+        [Display(Name = "Social media")]
+        SocialMedia = 4,
+        Word_of_mouth = 5,
+        [Display(Name = "Trade publication")]
+        TradePublication = 6,
+        Other = 7
 
 
     }
