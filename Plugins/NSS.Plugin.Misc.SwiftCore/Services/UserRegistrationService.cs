@@ -69,7 +69,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             return user;
         }
 
-        private void insertCompany(int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone)
+        private void InsertCompany(int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone)
         {
             Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
             if (company == null)
@@ -87,10 +87,10 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
         }
 
-        public CustomerCompany insertCustomerCompany(int companyId, bool AP, bool Buyer, bool Operations)
+        public CustomerCompany InsertCustomerCompany(Nop.Core.Domain.Customers.Customer customer, int companyId, bool AP, bool Buyer, bool Operations)
         {
             Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
-            var customer = _workContext.CurrentCustomer;
+
             CustomerCompany customerCompany = new CustomerCompany
             {
                 CustomerId = customer.Id,
@@ -106,34 +106,41 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         }
 
 
-        public CustomerCompany CreateUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, int regId, string response, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool Ap, bool Buyer, bool Operations)
+        public CustomerCompany CreateUser(UserRegistration userReg, string password, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool Ap, bool Buyer, bool Operations)
         {
+            var customer = new Nop.Core.Domain.Customers.Customer
+            {
+                RegisteredInStoreId = _storeContext.CurrentStore.Id,
+                CustomerGuid = Guid.NewGuid(),
+                CreatedOnUtc = DateTime.UtcNow,
+                LastActivityDateUtc = DateTime.UtcNow,
+                Active = true,
+                Username = userReg.WorkEmail,
+                Email = userReg.WorkEmail
+            };
+
             //insert user
-            insertUser(user, customer);
+            InsertUser(userReg, customer, password);
 
             //insert company
-            insertCompany(companyId, companyName, salesContactEmail, salesContactName, salesContactPhone);
-
-            // update user state and modified state 
-            UpdateRegisteredUser(regId, response, statusId);
+            InsertCompany(companyId, companyName, salesContactEmail, salesContactName, salesContactPhone);
 
             //insert customer company
-            var cc = insertCustomerCompany(companyId, Ap, Buyer, Operations);
+            var cc = InsertCustomerCompany(customer, companyId, Ap, Buyer, Operations);
+
+            // update user state and modified state 
+            UpdateRegisteredUser(userReg.Id, statusId);
 
             return cc;
-
-
-
         }
 
-        private void insertUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer)
+        private void InsertUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, string password)
         {
             _customerService.InsertCustomer(customer);
 
             InsertFirstAndLastNameGenericAttributes(user.FirstName, user.LastName, customer);
 
             //password
-            var password = "pass$$123word";
             if (!string.IsNullOrWhiteSpace(password))
             {
                 AddPassword(password, customer);
@@ -214,15 +221,12 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _userRegistrationRepository.Update(userRegistration);
         }
 
-        public void UpdateRegisteredUser(int regId, string response, int statusId)
+        public void UpdateRegisteredUser(int regId, int statusId)
         {
-            if (string.IsNullOrEmpty(response))
-            {
-                var user = GetUserById(regId);
-                user.StatusId = statusId;
-                user.ModifiedOnUtc = DateTime.UtcNow;
-                UpdateUser(user);
-            }
+            var user = GetUserById(regId);
+            user.StatusId = statusId;
+            user.ModifiedOnUtc = DateTime.UtcNow;
+            UpdateUser(user);
         }
     }
 }

@@ -16,7 +16,7 @@ using System.Linq;
 using Nop.Services.Configuration;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
+namespace NSS.Plugin.Misc.SwiftCore.Services
 {
     public class WorkFlowMessageServiceOverride : WorkflowMessageService
     {
@@ -98,7 +98,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
             var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
 
-            var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.ApprovalMessageTemplateName, store.Id);
+            var messageTemplates = GetActiveMessageTemplates(Helpers.Constants.ApprovalMessageTemplateName, store.Id);
             if (!messageTemplates.Any())
                 return new List<int>();
 
@@ -128,6 +128,55 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         }
 
 
+        /// <summary>
+        /// Sends 'New customer' notification message to a NSS
+        /// </summary>
+        /// <param name="customer">Customer instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public IList<int> SendNSSCustomerRegisteredNotificationMessage(int regId, string email, string fullName, bool existingCustomer, int languageId)
+        {
+            var store = _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            // config
+            //load settings for a chosen store scope
+            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
+            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
+
+            var messageTemplates = GetActiveMessageTemplates(Helpers.Constants.ApprovalMessageTemplateName, store.Id);
+            if (!messageTemplates.Any())
+                return new List<int>();
+
+            //tokens
+            var commonTokens = new List<Token>();
+            //_messageTokenProvider.AddCustomerTokens(commonTokens, customer);
+
+            return messageTemplates.Select(messageTemplate =>
+            {
+                //email account
+                var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+                var tokens = new List<Token>(commonTokens);
+                _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+
+                // include erp id as token
+                tokens.Add(new Token("Customer.FullName", fullName));
+                tokens.Add(new Token("Customer.Email", email));
+                tokens.Add(new Token("Customer.ExistingCustomer", existingCustomer));
+                tokens.Add(new Token("Customer.ApprovalUrl", string.Format(Helpers.Constants.StoreRegistrationConfirmationUrl, store.Url, regId)));
+
+                //event notification
+                _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+                var toEmail = string.IsNullOrEmpty(swiftPortalOverrideSettings.ApproverMailBox) ? emailAccount.Email : swiftPortalOverrideSettings.ApproverMailBox;
+                var toName = emailAccount.DisplayName;
+
+                return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
+            }).ToList();
+        }
+
+
         public IList<int> SendChangePasswordEmailNotificationMessage(Nop.Core.Domain.Customers.Customer customer, int languageId)
         {
             if (customer == null)
@@ -141,7 +190,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             var storeScope = _storeContext.ActiveStoreScopeConfiguration;
             var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
 
-            var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName, store.Id);
+            var messageTemplates = GetActiveMessageTemplates(Helpers.Constants.ChangePasswordMessageTemplateName, store.Id);
             if (!messageTemplates.Any())
                 return new List<int>();
 
@@ -175,7 +224,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             var store = _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
 
-            var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName, store.Id);
+            var messageTemplates = GetActiveMessageTemplates(Helpers.Constants.NewCustomerPendingApprovalMessageTemplateName, store.Id);
             if (!messageTemplates.Any())
                 return new List<int>();
 
@@ -209,7 +258,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             var store = _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
 
-            var messageTemplates = GetActiveMessageTemplates(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName, store.Id);
+            var messageTemplates = GetActiveMessageTemplates(Helpers.Constants.NewCustomerRejectionMessageTemplateName, store.Id);
             if (!messageTemplates.Any())
                 return new List<int>();
 

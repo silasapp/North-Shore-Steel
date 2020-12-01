@@ -53,6 +53,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly ICompanyService _companyService;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly WorkFlowMessageServiceOverride _workFlowMessageService;
         #endregion
 
         #region Ctor
@@ -70,7 +71,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IGenericAttributeService genericAttributeService,
             IWorkflowMessageService workflowMessageService,
             ICompanyService companyService,
-            ICustomerCompanyService customerCompanyService
+            ICustomerCompanyService customerCompanyService,
+            WorkFlowMessageServiceOverride workFlowMessageService
             )
         {
             _customerSettings = customerSettings;
@@ -87,6 +89,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workflowMessageService = workflowMessageService;
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
+            _workflowMessageService = workflowMessageService;
         }
 
         #endregion
@@ -220,6 +223,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     // registration successful
                     //TODO: send email with registrationId to Approval
+                    _workFlowMessageService.SendNSSCustomerRegisteredNotificationMessage(res.Id, res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
 
                     // redirect to confirmation page
                     model.MarketingVideoUrl = "http://www.youtube.com/embed/fxCEcPxUbYA";
@@ -239,41 +243,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public virtual IActionResult ConfirmRegistration(int regId)
         {
-            UserRegistration model = getRegisteredUser(regId);
+            UserRegistration model = GetRegisteredUser(regId);
             return View(model);
         }
 
         public virtual IActionResult Approve(int regId)
         {
-            UserRegistration user = getRegisteredUser(regId);
-            var customer = new Nop.Core.Domain.Customers.Customer
-            {
-                RegisteredInStoreId = _storeContext.CurrentStore.Id,
-                CustomerGuid = Guid.NewGuid(),
-                CreatedOnUtc = DateTime.UtcNow,
-                LastActivityDateUtc = DateTime.UtcNow,
-                Active = true,
-                Username = user.WorkEmail,
-                Email = user.WorkEmail
-            };
+            UserRegistration userRegistration = GetRegisteredUser(regId);
+
 
             var warnings = new List<string>();
 
             // check model values
-            if (_customerService.IsRegistered(customer))
-            {
-                warnings.Add("Current customer is already registered");
-                //return Error();
-            }
+            //if (_customerService.IsRegistered(customer))
+            //{
+            //    warnings.Add("Current customer is already registered");
+            //    //return Error();
+            //}
 
-            if (!CommonHelper.IsValidEmail(customer.Email))
+            if (!CommonHelper.IsValidEmail(userRegistration.WorkEmail))
             {
                 warnings.Add("Common.WrongEmail");
                 //return;
             }
 
             //validate unique user
-            if (_customerService.GetCustomerByEmail(customer.Email) != null)
+            if (_customerService.GetCustomerByEmail(userRegistration.WorkEmail) != null)
             {
                 warnings.Add("Account.Register.Errors.EmailAlreadyExists");
                 //return;
@@ -282,15 +277,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (ModelState.IsValid)
             {
                 // approve user from nss
-                var response = _nSSApiProvider.ApproveUserRegistration(regId);
-                var userRegistrationResponse = response.Item1;
+                var (response, error) = _nSSApiProvider.ApproveUserRegistration(regId);
+
+                if(!string.IsNullOrEmpty(error))
+                    warnings.Add(error);
+
+                var userRegistrationResponse = response;
+
+                var password = "pass$$123word";
 
                 //create user
                 var cc = _userRegistrationService.CreateUser(
-                    user,
-                    customer,
-                    regId,
-                    response.Item2,
+                    userRegistration,
+                    password,
                     (int)UserRegistrationStatus.Approved,
                     userRegistrationResponse.CompanyId,
                     userRegistrationResponse.CompanyName,
@@ -301,12 +300,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     userRegistrationResponse.Buyer,
                     userRegistrationResponse.Operations
                     );
+
+                // send email
+                _workFlowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", userRegistration.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
             }
 
-            // send welcome email
-
             //UserRegistration user = getRegisteredUser(regId);
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", user);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
 
         }
 
@@ -314,18 +314,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var response = _nSSApiProvider.RejectUserRegistration(regId);
 
-            // update user state and modified state 
-            _userRegistrationService.UpdateRegisteredUser(regId, response, (int)UserRegistrationStatus.Rejected);
+            var model = GetRegisteredUser(regId);
 
-            UserRegistration model = getRegisteredUser(regId);
+            // update user state and modified state 
+            _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Rejected);
+
+            // send reject email
+            _workFlowMessageService.SendNewCustomerRejectionEmailNotificationMessage(model.WorkEmail, $"{model.FirstName} {model.LastName}", _storeContext.CurrentStore.DefaultLanguageId);
+
+            
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
         }
 
         #endregion
 
-        private UserRegistration getRegisteredUser(int regId)
+        private UserRegistration GetRegisteredUser(int regId)
         {
-            _ = new SwiftCore.Domain.Customers.UserRegistration();
             UserRegistration model = _userRegistrationService.GetUserById(regId);
             return model;
         }
