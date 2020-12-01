@@ -246,6 +246,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public virtual IActionResult Approve(int regId)
         {
             UserRegistration user = getRegisteredUser(regId);
+            var password = "pass$$123word";
             var customer = new Nop.Core.Domain.Customers.Customer
             {
                 RegisteredInStoreId = _storeContext.CurrentStore.Id,
@@ -288,6 +289,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //create user
                 var cc = _userRegistrationService.CreateUser(
                     user,
+                    password,
                     customer,
                     regId,
                     response.Item2,
@@ -305,7 +307,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // send welcome email
 
-            //UserRegistration user = getRegisteredUser(regId);
+            user = getRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", user);
 
         }

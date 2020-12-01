@@ -106,10 +106,10 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         }
 
 
-        public CustomerCompany CreateUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, int regId, string response, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool Ap, bool Buyer, bool Operations)
+        public CustomerCompany CreateUser(UserRegistration user, string password, Nop.Core.Domain.Customers.Customer customer, int regId, string response, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool Ap, bool Buyer, bool Operations)
         {
             //insert user
-            insertUser(user, customer);
+            insertUser(user, customer, password);
 
             //insert company
             insertCompany(companyId, companyName, salesContactEmail, salesContactName, salesContactPhone);
@@ -126,18 +126,35 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         }
 
-        private void insertUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer)
+        private void insertUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, string password)
         {
             _customerService.InsertCustomer(customer);
 
             InsertFirstAndLastNameGenericAttributes(user.FirstName, user.LastName, customer);
 
             //password
-            var password = "pass$$123word";
+            
             if (!string.IsNullOrWhiteSpace(password))
             {
                 AddPassword(password, customer);
             }
+
+            //add to 'Registered' role
+            var registeredRole = _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.RegisteredRoleName);
+            if (registeredRole == null)
+                throw new NopException("'Registered' role could not be loaded");
+
+            _customerService.AddCustomerRoleMapping(new CustomerCustomerRoleMapping { CustomerId = customer.Id, CustomerRoleId = registeredRole.Id });
+
+            //remove from 'Guests' role            
+            if (_customerService.IsGuest(customer))
+            {
+                var guestRole = _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.GuestsRoleName);
+                _customerService.RemoveCustomerRoleMapping(customer, guestRole);
+            }
+
+            _customerService.UpdateCustomer(customer);
+
         }
 
         private void InsertFirstAndLastNameGenericAttributes(string firstName, string lastName, Nop.Core.Domain.Customers.Customer newCustomer)

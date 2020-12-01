@@ -13,7 +13,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         void UpdateUser(UserRegistration userRegistration);
         UserRegistration GetUserById(int id);
-        CustomerCompany CreateUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, int regId, string response, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool AP, bool Buyer, bool Operations);
+        CustomerCompany CreateUser(UserRegistration user, string password, Nop.Core.Domain.Customers.Customer customer, int regId, string response, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool AP, bool Buyer, bool Operations);
         
         void UpdateRegisteredUser(int regId, string response, int statusId);
     }
