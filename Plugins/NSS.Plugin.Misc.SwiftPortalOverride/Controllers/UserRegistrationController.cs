@@ -305,7 +305,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _workFlowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", userRegistration.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
             }
 
-            //UserRegistration user = getRegisteredUser(regId);
+            user = getRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
 
         }

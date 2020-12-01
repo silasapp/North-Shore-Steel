@@ -145,6 +145,23 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             {
                 AddPassword(password, customer);
             }
+
+            //add to 'Registered' role
+            var registeredRole = _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.RegisteredRoleName);
+            if (registeredRole == null)
+                throw new NopException("'Registered' role could not be loaded");
+
+            _customerService.AddCustomerRoleMapping(new CustomerCustomerRoleMapping { CustomerId = customer.Id, CustomerRoleId = registeredRole.Id });
+
+            //remove from 'Guests' role            
+            if (_customerService.IsGuest(customer))
+            {
+                var guestRole = _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.GuestsRoleName);
+                _customerService.RemoveCustomerRoleMapping(customer, guestRole);
+            }
+
+            _customerService.UpdateCustomer(customer);
+
         }
 
         private void InsertFirstAndLastNameGenericAttributes(string firstName, string lastName, Nop.Core.Domain.Customers.Customer newCustomer)
