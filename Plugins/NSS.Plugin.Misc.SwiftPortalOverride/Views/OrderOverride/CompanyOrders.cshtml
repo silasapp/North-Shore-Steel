@@ -14,7 +14,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" integrity="sha512-TQQ3J4WkE/rwojNFo6OJdyu6G8Xe9z8rMrlF9y7xpFbQfW5g8aSWcygCQ4vqRiJqFsDsE1T6MoAOMJkFXlrI9A==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" />
 
-
 <div id="overlay">
     <div class="w-100 d-flex justify-content-center align-items-center">
         <div class="spinner"></div>
@@ -37,7 +36,7 @@
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
                         @*<input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="From" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="startDate" placeholder="From (mm/dd/yyyy)" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -46,15 +45,15 @@
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
                         @*<input class=nss-form-control type="text" v-model="toDate" id="datepicker2" autocomplete="off" placeholder="To">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="To" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="endDate" placeholder="To (mm/dd/yyyy)" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
                 </div>
                 @*<div class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label>Order #</label>
-                    <input class="nss-form-control" type="text" v-model="orderId" placeholder="Enter...">
-                </div>*@
+                        <label>Order #</label>
+                        <input class="nss-form-control" type="text" v-model="orderId" placeholder="Enter...">
+                    </div>*@
                 <div class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label>Purchase Order #</label>
                     <input class=nss-form-control type=text v-model="poNo" placeholder="Enter...">
@@ -110,6 +109,7 @@
                     isClosed: this.isClosed,
                 };
                 $("#overlay").css("display", "flex");
+                console.log('request', request);
                 $.ajax({
                     url: "@Url.Action("SearchCompanyOrders", "OrderOverride")",
                     type: 'POST',
@@ -135,9 +135,21 @@
 <script>
 
     $.fn.datepicker.defaults.format = "mm/dd/yyyy";
-    $('.datepicker').datepicker({
-        endDate: '0'
-    });
+    $('#startDate').datepicker();
+    $('#endDate').datepicker();
+
+    $('#startDate').datepicker()
+        .on('changeDate', function (e) {
+            vm.fromDate = $(this).val();
+        });
+
+    $('#endDate').datepicker()
+        .on('changeDate', function (e) {
+            vm.toDate = $(this).val();
+        });
+
+
+
     $(document).ready(function () {
         $('.datepicker').keypress(function (e) {
             if (((e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 47) && (!e.shiftKey && !e.altKey && !e.ctrlKey))) {
@@ -153,7 +165,6 @@
                         this.value = text + '/';
                     }
                 }
-
                 return true;
             }
             e.preventDefault();

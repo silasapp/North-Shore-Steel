@@ -55,7 +55,7 @@
                     <label for=orderFromDate>Invoice Dates</label>
                     <div class="input-with-icon">
                         @*<input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="From" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" id="startDate" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="From (mm/dd/yyyy)" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -64,7 +64,7 @@
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
                         @*<input class=nss-form-control type="text" v-model="toDate" id="datepicker2" autocomplete="off" placeholder="To">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="To" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" id="endDate" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" placeholder="To (mm/dd/yyyy)" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -143,6 +143,8 @@
                 };
                 this.showLoading();
                 $("#overlay").css("display", "flex");
+
+                console.log('request', request);
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("SearchCompanyInvoices", "Invoice")",
@@ -169,9 +171,19 @@
 <script>
 
     $.fn.datepicker.defaults.format = "mm/dd/yyyy";
-    $('.datepicker').datepicker({
-        endDate: '0'
-    });
+    $('#startDate').datepicker();
+    $('#endDate').datepicker();
+
+    $('#startDate').datepicker()
+        .on('changeDate', function (e) {
+            vm.fromDate = $(this).val();
+        });
+
+    $('#endDate').datepicker()
+        .on('changeDate', function (e) {
+            vm.toDate = $(this).val();
+        });
+
     $(document).ready(function () {
         $('.datepicker').keypress(function (e) {
             if (((e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 47) && (!e.shiftKey && !e.altKey && !e.ctrlKey))) {
