@@ -7,6 +7,11 @@ using Nop.Services.Localization;
 using System.Linq;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Security;
+using Nop.Services.Authentication;
+using Nop.Services.Events;
+using Nop.Services.Common;
+using Nop.Services.Messages;
+using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
@@ -17,6 +22,14 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         private readonly ICustomerService _customerService;
         private readonly IEncryptionService _encryptionService;
         private readonly CustomerSettings _customerSettings;
+        private readonly ICompanyService _companyService;
+        private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly IWorkContext _workContext;
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IStoreContext _storeContext;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IWorkflowMessageService _workflowMessageService;
 
 
         public UserRegistrationService(
@@ -24,7 +37,15 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             IRepository<UserRegistration> userRegistrationRepository,
             ICustomerService customerService,
             IEncryptionService encryptionService,
-            CustomerSettings customerSettings
+            CustomerSettings customerSettings,
+            ICompanyService companyService,
+            IWorkContext workContext,
+            ICustomerCompanyService customerCompanyService,
+            IAuthenticationService authenticationService,
+            IEventPublisher eventPublisher,
+            IStoreContext storeContext,
+            IGenericAttributeService genericAttributeService,
+            IWorkflowMessageService workflowMessageService
         )
         {
             _localizationService = localizationService;
@@ -32,12 +53,139 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _customerService = customerService;
             _encryptionService = encryptionService;
             _customerSettings = customerSettings;
+            _companyService = companyService;
+            _customerCompanyService = customerCompanyService;
+            _workContext = workContext;
+            _authenticationService = authenticationService;
+            _eventPublisher = eventPublisher;
+            _storeContext = storeContext;
+            _genericAttributeService = genericAttributeService;
+            _workflowMessageService = workflowMessageService;
         }
 
         public virtual UserRegistration GetUserById(int id)
         {
             var user = _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id);
             return user;
+        }
+
+        private void insertCompany(int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone)
+        {
+            Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
+            if (company == null)
+            {
+                company = new Company
+                {
+                    ErpCompanyId = companyId,
+                    Name = companyName,
+                    SalesContactEmail = salesContactEmail,
+                    SalesContactName = salesContactName,
+                    SalesContactPhone = salesContactPhone
+                };
+
+                _companyService.InsertCompany(company);
+            }
+        }
+
+        public CustomerCompany insertCustomerCompany(int companyId, bool AP, bool Buyer, bool Operations)
+        {
+            Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
+            var customer = _workContext.CurrentCustomer;
+            CustomerCompany customerCompany = new CustomerCompany
+            {
+                CustomerId = customer.Id,
+                CompanyId = company.Id,
+                CanCredit = false,
+                AP = AP,
+                Buyer = Buyer,
+                Operations = Operations
+            };
+
+            _customerCompanyService.InsertCustomerCompany(customerCompany);
+            return customerCompany;
+        }
+
+
+        public CustomerCompany CreateUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, int regId, string response, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool Ap, bool Buyer, bool Operations)
+        {
+            //insert user
+            insertUser(user, customer);
+
+            //insert company
+            insertCompany(companyId, companyName, salesContactEmail, salesContactName, salesContactPhone);
+
+            // update user state and modified state 
+            UpdateRegisteredUser(regId, response, statusId);
+
+            //insert customer company
+            var cc = insertCustomerCompany(companyId, Ap, Buyer, Operations);
+
+            return cc;
+
+
+
+        }
+
+        private void insertUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer)
+        {
+            _customerService.InsertCustomer(customer);
+
+            InsertFirstAndLastNameGenericAttributes(user.FirstName, user.LastName, customer);
+
+            //password
+            var password = "pass$$123word";
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                AddPassword(password, customer);
+            }
+        }
+
+        private void InsertFirstAndLastNameGenericAttributes(string firstName, string lastName, Nop.Core.Domain.Customers.Customer newCustomer)
+        {
+            // we assume that if the first name is not sent then it will be null and in this case we don't want to update it
+            if (firstName != null)
+            {
+                _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.FirstNameAttribute, firstName);
+            }
+
+            if (lastName != null)
+            {
+                _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.LastNameAttribute, lastName);
+            }
+        }
+
+        private void AddPassword(string newPassword, Nop.Core.Domain.Customers.Customer customer)
+        {
+            var customerPassword = new CustomerPassword
+            {
+                CustomerId = customer.Id,
+                PasswordFormat = _customerSettings.DefaultPasswordFormat,
+                CreatedOnUtc = DateTime.UtcNow
+            };
+
+            switch (_customerSettings.DefaultPasswordFormat)
+            {
+                case PasswordFormat.Clear:
+                    {
+                        customerPassword.Password = newPassword;
+                    }
+                    break;
+                case PasswordFormat.Encrypted:
+                    {
+                        customerPassword.Password = _encryptionService.EncryptText(newPassword);
+                    }
+                    break;
+                case PasswordFormat.Hashed:
+                    {
+                        var saltKey = _encryptionService.CreateSaltKey(5);
+                        customerPassword.PasswordSalt = saltKey;
+                        customerPassword.Password = _encryptionService.CreatePasswordHash(newPassword, saltKey, _customerSettings.HashedPasswordFormat);
+                    }
+                    break;
+            }
+            _customerService.InsertCustomerPassword(customerPassword);
+
+            _customerService.UpdateCustomer(customer);
         }
 
         public virtual (CustomerRegistrationResult, UserRegistration) InsertUser(UserRegistration userRegistration)
@@ -61,96 +209,20 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         }
 
-        public CustomerRegistrationResult RegisterCustomer(CustomerRegistrationRequest request)
-        {
-
-            var result = new CustomerRegistrationResult();
-
-            if (_customerService.IsRegistered(request.Customer))
-            {
-                result.AddError("Current customer is already registered");
-                return result;
-            }
-
-            if (string.IsNullOrEmpty(request.Email))
-            {
-                result.AddError(_localizationService.GetResource("Account.Register.Errors.EmailIsNotProvided"));
-                return result;
-            }
-
-            if (!CommonHelper.IsValidEmail(request.Email))
-            {
-                result.AddError(_localizationService.GetResource("Common.WrongEmail"));
-                return result;
-            }
-
-            //validate unique user
-            if (_customerService.GetCustomerByEmail(request.Email) != null)
-            {
-                result.AddError(_localizationService.GetResource("Account.Register.Errors.EmailAlreadyExists"));
-                return result;
-            }
-
-            //at this point request is valid
-            request.Customer.Username = request.Username;
-            request.Customer.Email = request.Email;
-            request.Password = "pass$$123word";
-            var customerPassword = new CustomerPassword
-            {
-                CustomerId = request.Customer.Id,
-                PasswordFormat = request.PasswordFormat,
-                CreatedOnUtc = DateTime.UtcNow
-            };
-            switch (request.PasswordFormat)
-            {
-                case PasswordFormat.Clear:
-                    customerPassword.Password = request.Password;
-                    break;
-                case PasswordFormat.Encrypted:
-                    customerPassword.Password = _encryptionService.EncryptText(request.Password);
-                    break;
-                case PasswordFormat.Hashed:
-                    var saltKey = _encryptionService.CreateSaltKey(NopCustomerServicesDefaults.PasswordSaltKeySize);
-                    customerPassword.PasswordSalt = saltKey;
-                    customerPassword.Password = _encryptionService.CreatePasswordHash(request.Password, saltKey, _customerSettings.HashedPasswordFormat);
-                    break;
-            }
-
-            _customerService.InsertCustomerPassword(customerPassword);
-
-            request.Customer.Active = request.IsApproved;
-
-            //add to 'Registered' role
-            var registeredRole = _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.RegisteredRoleName);
-            if (registeredRole == null)
-                throw new NopException("'Registered' role could not be loaded");
-
-            _customerService.AddCustomerRoleMapping(new CustomerCustomerRoleMapping { CustomerId = request.Customer.Id, CustomerRoleId = registeredRole.Id });
-
-            //remove from 'Guests' role            
-            if (_customerService.IsGuest(request.Customer))
-            {
-                var guestRole = _customerService.GetCustomerRoleBySystemName(NopCustomerDefaults.GuestsRoleName);
-                _customerService.RemoveCustomerRoleMapping(request.Customer, guestRole);
-            }
-
-            _customerService.UpdateCustomer(request.Customer);
-
-            return result;
-        }
-
-
         public void UpdateUser(UserRegistration userRegistration)
         {
             _userRegistrationRepository.Update(userRegistration);
         }
 
-        //create customer
-        //create nopcustomer
-        //var user company=new user company
-        //buyer operation and ap
-        //getbyerpcompanyId :: i have company here
-        //need, company, usercompany, userregistrationbyId
-
+        public void UpdateRegisteredUser(int regId, string response, int statusId)
+        {
+            if (string.IsNullOrEmpty(response))
+            {
+                var user = GetUserById(regId);
+                user.StatusId = statusId;
+                user.ModifiedOnUtc = DateTime.UtcNow;
+                UpdateUser(user);
+            }
+        }
     }
 }

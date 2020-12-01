@@ -1,8 +1,9 @@
-﻿using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+﻿
 using System;
 using System.Collections.Generic;
 using Nop.Services.Customers;
 using System.Text;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
@@ -12,13 +13,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         void UpdateUser(UserRegistration userRegistration);
         UserRegistration GetUserById(int id);
-
-        /// <summary>
-        /// Register customer
-        /// </summary>
-        /// <param name="request">Request</param>
-        /// <returns>Result</returns>
-        CustomerRegistrationResult RegisterCustomer(CustomerRegistrationRequest request);
-        //Customer GetCustomerByEmail(string email);
+        CustomerCompany CreateUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, int regId, string response, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool AP, bool Buyer, bool Operations);
+        
+        void UpdateRegisteredUser(int regId, string response, int statusId);
     }
 }

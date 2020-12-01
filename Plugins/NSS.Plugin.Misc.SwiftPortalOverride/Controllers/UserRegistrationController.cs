@@ -237,7 +237,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
 
-        #region Confirm Registration
         public virtual IActionResult ConfirmRegistration(int regId)
         {
             UserRegistration model = getRegisteredUser(regId);
@@ -246,153 +245,83 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public virtual IActionResult Approve(int regId)
         {
-            var response = _nSSApiProvider.ApproveUserRegistration(regId);
-            updateUserRegistration(regId, response.Item2, (int)UserRegistrationStatus.Approved);
+            UserRegistration user = getRegisteredUser(regId);
+            var customer = new Nop.Core.Domain.Customers.Customer
+            {
+                RegisteredInStoreId = _storeContext.CurrentStore.Id,
+                CustomerGuid = Guid.NewGuid(),
+                CreatedOnUtc = DateTime.UtcNow,
+                LastActivityDateUtc = DateTime.UtcNow,
+                Active = true,
+                Username = user.WorkEmail,
+                Email = user.WorkEmail
+            };
 
-            UserRegistration model = getRegisteredUser(regId);
-            //Create customer, company and user company
-            //create customer
-            registerApprovedCustomer(model);
+            var warnings = new List<string>();
 
-            //create company
-            createCompany(response.Item1);
+            // check model values
+            if (_customerService.IsRegistered(customer))
+            {
+                warnings.Add("Current customer is already registered");
+                //return Error();
+            }
 
-            //create User Company
-            createCustomerCompany(response.Item1);
+            if (!CommonHelper.IsValidEmail(customer.Email))
+            {
+                warnings.Add("Common.WrongEmail");
+                //return;
+            }
 
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
+            //validate unique user
+            if (_customerService.GetCustomerByEmail(customer.Email) != null)
+            {
+                warnings.Add("Account.Register.Errors.EmailAlreadyExists");
+                //return;
+            }
+
+            if (ModelState.IsValid)
+            {
+                // approve user from nss
+                var response = _nSSApiProvider.ApproveUserRegistration(regId);
+                var userRegistrationResponse = response.Item1;
+
+                //create user
+                var cc = _userRegistrationService.CreateUser(
+                    user,
+                    customer,
+                    regId,
+                    response.Item2,
+                    (int)UserRegistrationStatus.Approved,
+                    userRegistrationResponse.CompanyId,
+                    userRegistrationResponse.CompanyName,
+                    userRegistrationResponse.SalesContactEmail,
+                    userRegistrationResponse.SalesContactName,
+                    userRegistrationResponse.SalesContactPhone,
+                    userRegistrationResponse.Ap,
+                    userRegistrationResponse.Buyer,
+                    userRegistrationResponse.Operations
+                    );
+            }
+
+            // send welcome email
+
+            //UserRegistration user = getRegisteredUser(regId);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", user);
+
         }
 
         public virtual IActionResult Reject(int regId)
         {
             var response = _nSSApiProvider.RejectUserRegistration(regId);
-            updateUserRegistration(regId, response, (int)UserRegistrationStatus.Rejected);
+
+            // update user state and modified state 
+            _userRegistrationService.UpdateRegisteredUser(regId, response, (int)UserRegistrationStatus.Rejected);
 
             UserRegistration model = getRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
         }
 
-        private void updateUserRegistration(int regId, string response, int statusId)
-        {
-            if (string.IsNullOrEmpty(response))
-            {
-                var user = _userRegistrationService.GetUserById(regId);
-                user.StatusId = statusId;
-                user.ModifiedOnUtc = DateTime.UtcNow;
-                _userRegistrationService.UpdateUser(user);
-            }
-        }
         #endregion
-
-        #endregion
-
-        private void registerApprovedCustomer(UserRegistration model)
-        {
-
-            if (_customerService.IsRegistered(_workContext.CurrentCustomer))
-            {
-                //Already registered customer. 
-                _authenticationService.SignOut();
-
-                //raise logged out event       
-                _eventPublisher.Publish(new CustomerLoggedOutEvent(_workContext.CurrentCustomer));
-
-                //Save a new record
-                _workContext.CurrentCustomer = _customerService.InsertGuestCustomer();
-            }
-            var customer = _workContext.CurrentCustomer;
-            customer.RegisteredInStoreId = _storeContext.CurrentStore.Id;
-
-            if (ModelState.IsValid)
-            {
-                var isApproved = _customerSettings.UserRegistrationType == UserRegistrationType.Standard;
-                var registrationRequest = new CustomerRegistrationRequest(customer,
-                    model.WorkEmail,
-                    model.WorkEmail,
-                    null,
-                    _customerSettings.DefaultPasswordFormat,
-                    _storeContext.CurrentStore.Id,
-                    isApproved);
-                var registrationResult = _userRegistrationService.RegisterCustomer(registrationRequest);
-                //var customerAttributesXml = ParseCustomCustomerAttributes(form);
-
-                if (registrationResult.Success)
-                {
-                    //form fields
-                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FirstNameAttribute, model.FirstName);
-                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.LastNameAttribute, model.LastName);
-                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CompanyAttribute, model.CompanyName);
-                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.PhoneAttribute, model.Phone);
-
-
-
-                    //save customer attributes
-                    //_genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CustomCustomerAttributes, customerAttributesXml);
-
-                    //login customer now
-                    if (isApproved)
-                        _authenticationService.SignIn(customer, true);
-
-                    //raise event       
-                    _eventPublisher.Publish(new CustomerRegisteredEvent(customer));
-                    //send customer welcome message
-                    _workflowMessageService.SendCustomerWelcomeMessage(customer, _workContext.WorkingLanguage.Id);
-
-                    //raise event       
-                    _eventPublisher.Publish(new CustomerActivatedEvent(customer));
-
-                }
-
-                //errors
-                foreach (var error in registrationResult.Errors)
-                    ModelState.AddModelError("", error);
-
-            }
-        }
-
-        private void createCompany(ERPApproveUserRegistrationResponse response)
-        {
-            Company company = _companyService.GetCompanyEntityByErpEntityId(response.CompanyId);
-
-            if (company == null)
-            {
-                company = new Company
-                {
-                    ErpCompanyId = response.CompanyId,
-                    Name = response.CompanyName,
-                    SalesContactEmail = response.SalesContactEmail,
-                    SalesContactName = response.SalesContactName,
-                    SalesContactPhone = response.SalesContactPhone
-                };
-
-                _companyService.InsertCompany(company);
-            }
-        }
-        
-        private void createCustomerCompany(ERPApproveUserRegistrationResponse response)
-        {
-            Company company = _companyService.GetCompanyEntityByErpEntityId(response.CompanyId);
-            var customer = _workContext.CurrentCustomer;
-            CustomerCompany customerCompany = new CustomerCompany
-            {
-                CustomerId = customer.Id,
-                CompanyId = company.Id,
-                CanCredit = false,
-                AP = response.Ap,
-                Buyer = response.Buyer,
-                Operations = response.Operations
-            };
-
-            CustomerCompany cc = _customerCompanyService.GetCustomerCompany(customerCompany.CustomerId, customerCompany.CompanyId);
-            if (cc != null)
-            {
-                _customerCompanyService.UpdateCustomerCompany(customerCompany);
-            }
-            else
-            {
-                _customerCompanyService.InsertCustomerCompany(customerCompany);
-            }
-        }
 
         private UserRegistration getRegisteredUser(int regId)
         {
