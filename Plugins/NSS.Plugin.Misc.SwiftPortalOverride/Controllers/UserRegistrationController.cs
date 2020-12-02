@@ -69,10 +69,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             ERPApiProvider nSSApiProvider,
             ICustomerRegistrationService customerRegistrationService,
             IGenericAttributeService genericAttributeService,
-            IWorkflowMessageService workflowMessageService,
             ICompanyService companyService,
             ICustomerCompanyService customerCompanyService,
-            WorkFlowMessageServiceOverride workFlowMessageService
+            WorkFlowMessageServiceOverride workflowMessageService
             )
         {
             _customerSettings = customerSettings;
@@ -305,7 +304,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _workFlowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", userRegistration.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
             }
 
-            user = getRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
 
         }
