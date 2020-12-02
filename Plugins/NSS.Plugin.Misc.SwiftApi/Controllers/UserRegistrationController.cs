@@ -39,6 +39,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [HttpPut]
         [Route("/api/userregistration/{id}/approve")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
@@ -55,8 +56,11 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             if (registration == null)
                 return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
 
+            if (registration.StatusId != (int)UserRegistrationStatus.Pending)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user is approved/rejected");
+
             //generate password
-            var password = "pass$$123word";
+            string password = Common.GenerateRandomPassword();
 
             var cc = _userRegistrationService.CreateUser(
                 registration, 
@@ -78,14 +82,15 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error(HttpStatusCode.NotFound, "customer", "not created successfully");
 
             // send email
-            _workFlowMessageService.SendCustomerWelcomeMessage(customer, _storeContext.CurrentStore.DefaultLanguageId);
+            _workFlowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
 
             return new RawJsonActionResult(JsonConvert.SerializeObject(new { swiftUserId = customer.Id, companyId = cc.CompanyId }));
         }
 
         [HttpPut]
         [Route("/api/userregistration/{id}/reject")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
@@ -100,6 +105,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             if (userRegistration == null)
                 return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
+
+            if (userRegistration.StatusId != (int)UserRegistrationStatus.Pending)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is approved or rejected");
 
             // call user registration reject
             _userRegistrationService.UpdateRegisteredUser(id, (int)UserRegistrationStatus.Rejected);
