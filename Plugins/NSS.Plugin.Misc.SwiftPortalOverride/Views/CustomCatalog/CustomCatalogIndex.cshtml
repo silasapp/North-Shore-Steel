@@ -99,6 +99,8 @@
 }
 
 <script>
+    let gridData = [];
+    let gridColumns = [];
     const store = {
         state: {
             groupedSpecs: [],
@@ -111,7 +113,7 @@
         },
     }
 
-    var vm = new Vue({
+    const shopVm = new Vue({
         el: '#app',
         data: {
             shared: store.state,
@@ -119,7 +121,6 @@
             shapeNames: [],
             specIDs: [],
             shapeIDs: [],
-            boxId: 0,
             filterTags: [],
             groupedSpecs: [],
             treeview: null,
