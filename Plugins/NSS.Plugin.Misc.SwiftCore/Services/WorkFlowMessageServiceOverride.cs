@@ -165,7 +165,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                 tokens.Add(new Token("Customer.FullName", fullName));
                 tokens.Add(new Token("Customer.Email", email));
                 tokens.Add(new Token("Customer.ExistingCustomer", existingCustomer));
-                tokens.Add(new Token("Customer.ApprovalUrl", string.Format(Helpers.Constants.StoreRegistrationConfirmationUrl, store.Url, regId)));
+                tokens.Add(new Token("Customer.RegistrationConfirmationUrl", string.Format(Helpers.Constants.StoreRegistrationConfirmationUrl, store.Url, regId)));
 
                 //event notification
                 _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
