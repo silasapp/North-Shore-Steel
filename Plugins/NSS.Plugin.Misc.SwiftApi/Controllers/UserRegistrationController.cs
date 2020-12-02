@@ -57,7 +57,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
 
             if (registration.StatusId != (int)UserRegistrationStatus.Pending)
-                return Error(HttpStatusCode.BadRequest, "userRegistration", "user is approved/rejected");
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is approved or rejected");
+
+            if(_customerService.GetCustomerByEmail(registration.WorkEmail) != null)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user exists");
 
             //generate password
             string password = Common.GenerateRandomPassword();
@@ -108,6 +111,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             if (userRegistration.StatusId != (int)UserRegistrationStatus.Pending)
                 return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is approved or rejected");
+
+            if (_customerService.GetCustomerByEmail(userRegistration.WorkEmail) != null)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user exists");
 
             // call user registration reject
             _userRegistrationService.UpdateRegisteredUser(id, (int)UserRegistrationStatus.Rejected);
