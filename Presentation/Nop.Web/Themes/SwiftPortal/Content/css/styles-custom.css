@@ -15,6 +15,7 @@ a:not([href]):not([class]) {
     background-color: #0076b4;
     padding-top: 24px;
     padding-bottom: 24px;
+    z-index: 0 !important;
 }
 
 .nav-bar-content {
@@ -144,12 +145,12 @@ a:not([href]):not([class]) {
 
 .header-lower {
     width: 100%;
-    box-shadow: 0px 4px 20px 1px #eeefef;
+    box-shadow: 0px 4px 20px 0px #eeefef;
     padding-bottom: 0;
     padding-top: 0;
     background-color: #ffffff !important;
     /*margin-bottom: 50px;*/
-    z-index: 1;
+    /*z-index: 1;*/
 }
 
 .catalog-page-wrapper .header-lower {
@@ -820,7 +821,6 @@ input:focus {
 .discount-block {
     width: 100%;
     margin-top: 100px;
-    position: relative;
 }
 
     .discount-block > img {
@@ -2426,31 +2426,46 @@ table input {
     }
 
     .cat-side-drawer {
-        display: block;
+        height: 100%; 
         width: 0;
-        position: absolute;
-        z-index: 9999;
-        top: -50px;
-        max-height: 60vh;
-        left: 0px;
+        position: fixed;
+        z-index: 1;
+        top: 0; 
+        left: 0;
+        background-color: #ffffff;
         overflow-x: hidden;
+        padding-top: 30px;
         transition: 0.5s;
-        background: #ffffff;
-        transform: translateX(-100%);
-        transition: transform .2s ease-in;
-        text-align: left;
     }
 
-        .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover {
+        .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover,
+        .cart-side-drawer-trigger:focus + .cat-side-drawer, .cat-side-drawer:focus {
             width: 70%;
             transform: translateX(0);
         }
-
+    #accordion {
+        text-align: left;
+        overflow: hidden;
+    }
+        #accordion .e-treeview .e-ul {
+            overflow-x: hidden !important;
+        }
+        #accordion li, accordion label {
+            display: block;
+        }
+    .card-header {
+        display: block;
+        white-space: nowrap;
+    }
+    #accordion .pure-material-checkbox {
+        display: block;
+        white-space: nowrap;
+    }
     .cart-side-drawer-trigger {
         display: none;
-        position: absolute;
-        top: 30vh;
-        left: 0px;
+        position: fixed;
+        top: 0;
+        left: -10px;
         bottom: 0;
         margin: auto;
         z-index: 1;
@@ -2462,6 +2477,7 @@ table input {
         display: flex;
         align-items: center;
         justify-content: center;
+        border: 1px solid black;
     }
 
 
