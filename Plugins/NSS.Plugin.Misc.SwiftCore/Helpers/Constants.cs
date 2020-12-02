@@ -60,7 +60,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string NewCustomerPendingApprovalMessageTemplateName => "NewCustomer.PendingApproval";
         public static string NewCustomerRejectionMessageTemplateName => "NewCustomer.Rejection";
 
-        public static string StoreRegistrationConfirmationUrl => "{0}/{1}/confirmation";
+        public static string StoreRegistrationConfirmationUrl => "{0}/userregistration/{1}/confirmregistration";
 
         #endregion
         public static string MTRBlobName => "Product-MTR.{0}.pdf";

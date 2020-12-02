@@ -33,6 +33,7 @@ using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using Nop.Core.Domain.Common;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using System.Net;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -54,6 +55,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICompanyService _companyService;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly WorkFlowMessageServiceOverride _workflowMessageService;
+        private readonly SwiftCoreSettings _swiftCoreSettings;
         #endregion
 
         #region Ctor
@@ -71,7 +73,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IGenericAttributeService genericAttributeService,
             ICompanyService companyService,
             ICustomerCompanyService customerCompanyService,
-            WorkFlowMessageServiceOverride workflowMessageService
+            WorkFlowMessageServiceOverride workflowMessageService,
+            SwiftCoreSettings swiftCoreSettings
             )
         {
             _customerSettings = customerSettings;
@@ -89,6 +92,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
             _workflowMessageService = workflowMessageService;
+            _swiftCoreSettings = swiftCoreSettings;
         }
 
         #endregion
@@ -222,10 +226,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     // registration successful
                     //TODO: send email with registrationId to Approval
+                    _workflowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
                     _workflowMessageService.SendNSSCustomerRegisteredNotificationMessage(res.Id, res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
 
                     // redirect to confirmation page
-                    model.MarketingVideoUrl = "http://www.youtube.com/embed/fxCEcPxUbYA";
+                    model.MarketingVideoUrl = _swiftCoreSettings.MarketingVideoUrl;
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/Confirmation.cshtml", model);
                 }
 
@@ -283,8 +288,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 // approve user from nss
                 var (response, error) = _nSSApiProvider.ApproveUserRegistration(regId);
 
-                if(!string.IsNullOrEmpty(error))
+                if (!string.IsNullOrEmpty(error))
+                {
                     warnings.Add(error);
+                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
+                }
 
                 var userRegistrationResponse = response;
 
