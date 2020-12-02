@@ -107,9 +107,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey.Hint"] = "Enter PayPal Secret Key.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl"] = "Marketing Video Url",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl.Hint"] = "Enter marketing video url that will be embedded when a customer signs up.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.NewCustomerWelcomeMessage.Text"] = @"
+                    <p>
+                        Thank you for registering as a new customer.
+                    </p>
+                    <p>
+                        Our goal is to have approval within one business hour.
+                    </p>
+                    <p>
+                        If you need immediate assistance, call Marcelo at 713-980-5879.
+                    </p>",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.OldCustomerWelcomeMessage.Text"] = @"
+                    <p>
+                        Thank you for registering as an existing customer.
+                    </p>
+                    <p>
+                        It is important that we properly synchronize you with our current database.
+                    </p>
+                    <p>
+                        Our goal is to have approval within four business hour.
+                    </p>
+                    <p>
+                        If you need immediate assistance, call Marcelo at 713-980-5879.
+                    </p>",
 
                 // add other text
-            });
+    });
 
             // create proc
             var settings = DataSettingsManager.LoadSettings();
