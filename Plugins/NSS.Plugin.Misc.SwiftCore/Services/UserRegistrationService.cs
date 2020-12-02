@@ -105,7 +105,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         }
 
 
-        public CustomerCompany CreateUser(UserRegistration userReg, string password, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool Ap, bool Buyer, bool Operations)
+        public CustomerCompany CreateUser(UserRegistration userReg, string password, int statusId, int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone, bool Ap, bool Buyer, bool Operations, int wintrixId)
         {
             var customer = new Nop.Core.Domain.Customers.Customer
             {
@@ -119,7 +119,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             };
 
             //insert user
-            InsertUser(userReg, customer, password);
+            InsertUser(userReg, customer, password, wintrixId);
 
             //insert company
             InsertCompany(companyId, companyName, salesContactEmail, salesContactName, salesContactPhone);
@@ -133,11 +133,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             return cc;
         }
 
-        private void InsertUser(UserRegistration reg, Nop.Core.Domain.Customers.Customer customer, string password)
+        private void InsertUser(UserRegistration reg, Nop.Core.Domain.Customers.Customer customer, string password, int wintrixId)
         {
             _customerService.InsertCustomer(customer);
 
-            InsertCustomGenericAttributes(reg, customer);
+            InsertCustomGenericAttributes(reg, customer, wintrixId);
 
             //password
             if (!string.IsNullOrWhiteSpace(password))
@@ -162,7 +162,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _customerService.UpdateCustomer(customer);
         }
 
-        private void InsertCustomGenericAttributes(UserRegistration reg, Nop.Core.Domain.Customers.Customer newCustomer)
+        private void InsertCustomGenericAttributes(UserRegistration reg, Nop.Core.Domain.Customers.Customer newCustomer, int wintrixId)
         {
             // save custom fields
 
@@ -175,7 +175,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.PreferredLocationIdAttribute, reg.PreferredLocationId);
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.ItemsForNextProjectAttribute, reg.ItemsForNextProject);
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.IsExistingCustomerAttribute, reg.IsExistingCustomer);
-            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.ErpKeyAttribute, 200);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.ErpKeyAttribute, wintrixId);
             
         }
 

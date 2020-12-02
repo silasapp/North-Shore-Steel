@@ -32,6 +32,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using Nop.Core.Domain.Common;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
+using System.Net;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -287,7 +288,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 var userRegistrationResponse = response;
 
-                var password = "pass$$123word";
+                //generate password
+                string password = Common.GenerateRandomPassword();
 
                 //create user
                 var cc = _userRegistrationService.CreateUser(
@@ -301,11 +303,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     userRegistrationResponse.SalesContactPhone,
                     userRegistrationResponse.Ap,
                     userRegistrationResponse.Buyer,
-                    userRegistrationResponse.Operations
+                    userRegistrationResponse.Operations,
+                    userRegistrationResponse.WintrixId
                     );
 
+                // get customer
+                var customer = _customerService.GetCustomerById(cc.CustomerId);
+
+                if (customer == null)
+                    warnings.Add("customer not created successfully");
+
                 // send email
-                _workflowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", userRegistration.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+                _workflowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
             }
 
             userRegistration = GetRegisteredUser(regId);

@@ -76,7 +76,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 registrationDto.SalesContactPhone,
                 registrationDto.Ap,
                 registrationDto.Buyer,
-                registrationDto.Operations);
+                registrationDto.Operations,
+                registrationDto.WintrixId
+                );
 
             // get customer
             var customer = _customerService.GetCustomerById(cc.CustomerId);

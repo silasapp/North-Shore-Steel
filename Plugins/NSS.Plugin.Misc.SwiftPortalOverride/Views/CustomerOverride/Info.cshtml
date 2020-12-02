@@ -29,22 +29,29 @@
 <div class="page account-page customer-info-page">
     <div class="page-body">
         <form asp-route="CustomerInfo" method="post">
-            <div asp-validation-summary="ModelOnly" class="message-error"></div>
             <div class="account-page-card">
                 <div class="title"><strong>PERSONAL INFORMATION</strong></div>
+                <div asp-validation-summary="ModelOnly" class="message-error"></div>
                 <div class="form-fields">
-                    @if (Model.FirstNameEnabled)
-                    {
-                        <div class="input-block">
-                            <label asp-for="FirstName" asp-postfix=":">First Name</label>
-                            @if (Model.FirstNameRequired)
-                            {
-                                <nop-required />
-                            }
-                            <input asp-for="FirstName" class="form-control custom-input" />
-                            <span asp-validation-for="FirstName"></span>
-                        </div>
-                    }
+                    <div class="input-block">
+                        <label asp-for="FirstName" asp-postfix=":">First Name</label>
+                        @if (Model.FirstNameRequired)
+                        {
+                            <nop-required />
+                        }
+                        <input asp-for="FirstName" class="form-control custom-input" />
+                        <span asp-validation-for="FirstName"></span>
+                    </div>
+
+                    <div class="">
+                        <label asp-for="LastName" asp-postfix=":">Last Name</label>
+                        @if (Model.LastNameRequired)
+                        {
+                            <nop-required />
+                        }
+                        <input asp-for="LastName" class="form-control custom-input" />
+                        <span asp-validation-for="LastName"></span>
+                    </div>
 
                     <div class="">
                         <label asp-for="Email" asp-postfix=":">Work Email</label>
@@ -53,18 +60,7 @@
                         <span asp-validation-for="Email"></span>
                     </div>
 
-                    @if (Model.LastNameEnabled)
-                    {
-                        <div class="">
-                            <label asp-for="LastName" asp-postfix=":">Last Name</label>
-                            @if (Model.LastNameRequired)
-                            {
-                                <nop-required />
-                            }
-                            <input asp-for="LastName" class="form-control custom-input" />
-                            <span asp-validation-for="LastName"></span>
-                        </div>
-                    }
+
 
                     @if (Model.PhoneEnabled)
                     {
