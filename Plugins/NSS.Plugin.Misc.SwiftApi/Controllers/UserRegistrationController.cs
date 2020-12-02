@@ -89,7 +89,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             // send email
             _workFlowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
 
-            return new RawJsonActionResult(JsonConvert.SerializeObject(new { swiftUserId = customer.Id, companyId = cc.CompanyId }));
+            return new RawJsonActionResult(JsonConvert.SerializeObject(new { swiftUserId = customer.Id, swiftCompanyId = cc.CompanyId }));
         }
 
         [HttpPut]
@@ -99,7 +99,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
-        public IActionResult RejectUserRegistration(int id, UserRegistrationDto registrationDto)
+        public IActionResult RejectUserRegistration(int id)
         {
             if (!ModelState.IsValid)
             {
