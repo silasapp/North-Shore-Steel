@@ -53,27 +53,21 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
                     .Table("CustomerCompany")
                     .AddColumn("CanCredit")
                     .AsBoolean()
-                    .WithDefaultValue("");
+                    .WithDefaultValue(false);
 
             }
 
             if (!Schema.Table("CustomerCompany").Column("AP").Exists())
             {
-
-                Alter.Table("CustomerCompany").AddColumn("AP").AsBoolean();
-
+                Alter.Table("CustomerCompany").AddColumn("AP").AsBoolean().WithDefaultValue(false); ;
             }
             if (!Schema.Table("CustomerCompany").Column("Buyer").Exists())
             {
-
-                Alter.Table("CustomerCompany").AddColumn("Buyer").AsBoolean();
-
+                Alter.Table("CustomerCompany").AddColumn("Buyer").AsBoolean().WithDefaultValue(false); ;
             }
             if (!Schema.Table("CustomerCompany").Column("Operations").Exists())
             {
-
-                Alter.Table("CustomerCompany").AddColumn("Operations").AsBoolean();
-
+                Alter.Table("CustomerCompany").AddColumn("Operations").AsBoolean().WithDefaultValue(false); ;
             }
         }
         #endregion

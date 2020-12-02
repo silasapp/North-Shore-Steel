@@ -39,6 +39,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [HttpPut]
         [Route("/api/userregistration/{id}/approve")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
@@ -49,11 +50,21 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return BadRequest();
             }
 
-            //generate password
-            var password = "pass$$123word";
-
             // call user registration create
-            var registration = _userRegistrationService.GetUserById(id);
+            var registration = _userRegistrationService.GetById(id);
+
+            if (registration == null)
+                return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
+
+            if (registration.StatusId != (int)UserRegistrationStatus.Pending)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is approved or rejected");
+
+            if(_customerService.GetCustomerByEmail(registration.WorkEmail) != null)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user exists");
+
+            //generate password
+            string password = Common.GenerateRandomPassword();
+
             var cc = _userRegistrationService.CreateUser(
                 registration, 
                 password, 
@@ -70,15 +81,19 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             // get customer
             var customer = _customerService.GetCustomerById(cc.CustomerId);
 
+            if (customer == null)
+                return Error(HttpStatusCode.NotFound, "customer", "not created successfully");
+
             // send email
-            _workFlowMessageService.SendCustomerWelcomeMessage(customer, _storeContext.CurrentStore.DefaultLanguageId);
+            _workFlowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
 
             return new RawJsonActionResult(JsonConvert.SerializeObject(new { swiftUserId = customer.Id, companyId = cc.CompanyId }));
         }
 
         [HttpPut]
         [Route("/api/userregistration/{id}/reject")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
@@ -89,7 +104,16 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return BadRequest();
             }
 
-            var userRegistration = _userRegistrationService.GetUserById(id);
+            var userRegistration = _userRegistrationService.GetById(id);
+
+            if (userRegistration == null)
+                return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
+
+            if (userRegistration.StatusId != (int)UserRegistrationStatus.Pending)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is approved or rejected");
+
+            if (_customerService.GetCustomerByEmail(userRegistration.WorkEmail) != null)
+                return Error(HttpStatusCode.BadRequest, "userRegistration", "user exists");
 
             // call user registration reject
             _userRegistrationService.UpdateRegisteredUser(id, (int)UserRegistrationStatus.Rejected);

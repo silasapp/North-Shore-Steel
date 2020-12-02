@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nop.Services.Configuration;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
+using Nop.Core.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
@@ -282,6 +283,42 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
                 var toEmail = email;
                 var toName = fullName;
+
+                return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
+            }).ToList();
+        }
+
+        public IList<int> SendCustomerWelcomeMessage(Customer customer, string password, int languageId)
+        {
+            if (customer == null)
+                throw new ArgumentNullException(nameof(customer));
+
+            var store = _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplates = GetActiveMessageTemplates(MessageTemplateSystemNames.CustomerWelcomeMessage, store.Id);
+            if (!messageTemplates.Any())
+                return new List<int>();
+
+            //tokens
+            var commonTokens = new List<Token>();
+            _messageTokenProvider.AddCustomerTokens(commonTokens, customer);
+
+            return messageTemplates.Select(messageTemplate =>
+            {
+                //email account
+                var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+                var tokens = new List<Token>(commonTokens);
+                _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+
+                tokens.Add(new Token("Customer.TempPassword", password));
+
+                //event notification
+                _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+                var toEmail = customer.Email;
+                var toName = _customerService.GetCustomerFullName(customer);
 
                 return SendNotification(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
             }).ToList();
