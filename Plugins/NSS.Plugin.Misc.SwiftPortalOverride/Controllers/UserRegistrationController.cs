@@ -283,8 +283,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 // approve user from nss
                 var (response, error) = _nSSApiProvider.ApproveUserRegistration(regId);
 
-                if(!string.IsNullOrEmpty(error))
+                if (!string.IsNullOrEmpty(error))
+                {
                     warnings.Add(error);
+                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
+                }
 
                 var userRegistrationResponse = response;
 
