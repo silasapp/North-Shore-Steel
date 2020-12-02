@@ -898,13 +898,15 @@ input:focus {
     .invoice-body > img {
         width: 100%;
     }
-    .hover-icon {
-        fill: #dedede;
-        cursor: pointer;
-    }
-.hover-icon:hover {
-    fill: #0076B4 !important;
+
+.hover-icon {
+    fill: #dedede;
+    cursor: pointer;
 }
+
+    .hover-icon:hover {
+        fill: #0076B4 !important;
+    }
 
 
 table a {
@@ -1799,6 +1801,10 @@ table input {
     margin-top: 50px;
 }
 
+.sideDrawerClose {
+    display: none;
+}
+
 .collapse-icon {
     -moz-transition: all 0.05s linear;
     -webkit-transition: all 0.05s linear;
@@ -2426,41 +2432,48 @@ table input {
     }
 
     .cat-side-drawer {
-        height: 100%; 
+        height: 100%;
         width: 0;
         position: fixed;
         z-index: 1;
-        top: 0; 
+        top: 0;
         left: 0;
         background-color: #ffffff;
         overflow-x: hidden;
-        padding-top: 30px;
+        /*padding-top: 30px;*/
         transition: 0.5s;
     }
 
-        .cart-side-drawer-trigger:hover + .cat-side-drawer, .cat-side-drawer:hover,
-        .cart-side-drawer-trigger:focus + .cat-side-drawer, .cat-side-drawer:focus {
+    /*.cart-side-drawer-trigger:hover + .cat-side-drawer,*/
+    /*.cat-side-drawer:hover,*/
+    /*, .cat-side-drawer:focus*/
+    /* .cart-side-drawer-trigger:active + .cat-side-drawer {
             width: 70%;
             transform: translateX(0);
-        }
+        }*/
     #accordion {
         text-align: left;
         overflow: hidden;
     }
+
         #accordion .e-treeview .e-ul {
             overflow-x: hidden !important;
         }
+
         #accordion li, accordion label {
             display: block;
         }
+
     .card-header {
         display: block;
         white-space: nowrap;
     }
+
     #accordion .pure-material-checkbox {
         display: block;
         white-space: nowrap;
     }
+
     .cart-side-drawer-trigger {
         display: none;
         position: fixed;
@@ -2480,6 +2493,13 @@ table input {
         border: 1px solid black;
     }
 
+    .sideDrawerClose {
+        display: block;
+        font-size: 32px;
+        display: flex;
+        justify-content: flex-end;
+        padding: 0px 10px;
+    }
 
     .cart-filter-menu {
         margin-bottom: 15px;
@@ -3055,15 +3075,19 @@ and also iPads specifically.
         td > input {
             width: 100% !important;
         }
+
     .datepicker-days thead tr {
         position: unset !important;
     }
+
     .datepicker-days tr {
         display: table !important;
     }
+
     .datepicker-days td {
         display: table-cell !important;
     }
+
     .catalog-page td:nth-child(1) {
         order: 1;
     }
@@ -3162,7 +3186,9 @@ and also iPads specifically.
     #order-grid td:nth-child(8), #invoice-grid td:nth-child(8) {
         order: 8;
         flex-basis: 70%;
-    } #order-grid td:nth-child(8), #invoice-grid td:nth-child(9) {
+    }
+
+    #order-grid td:nth-child(8), #invoice-grid td:nth-child(9) {
         order: 9;
         flex-basis: 30%;
     }
@@ -3179,7 +3205,7 @@ and also iPads specifically.
         content: 'ft';
     }
 
-    .catalog-page td:nth-child(1)::before,.shopping-cart-page td:nth-child(1)::before, #order-grid td:nth-child(1)::before, #invoice-grid td:nth-child(1)::before, #order-grid td:nth-child(2)::before, #invoice-grid td:nth-child(2)::before, #invoice-grid td:nth-child(3)::before {
+    .catalog-page td:nth-child(1)::before, .shopping-cart-page td:nth-child(1)::before, #order-grid td:nth-child(1)::before, #invoice-grid td:nth-child(1)::before, #order-grid td:nth-child(2)::before, #invoice-grid td:nth-child(2)::before, #invoice-grid td:nth-child(3)::before {
         padding-right: 1px;
         white-space: nowrap;
         content: '#';
