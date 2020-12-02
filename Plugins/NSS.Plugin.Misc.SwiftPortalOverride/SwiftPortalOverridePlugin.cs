@@ -80,6 +80,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             //locales
             _localizationService.AddPluginLocaleResource(new Dictionary<string, string>
             {
+                // config fields
                 ["Plugins.Misc.SwiftPortalOverride.Fields.UseSandBox"] = "Use SandBox",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.UseSandBox.Hint"] = "Enable sandbox mode.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.TestEmailAddress"] = "Test Email Address",
@@ -106,6 +107,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey.Hint"] = "Enter PayPal Secret Key.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl"] = "Marketing Video Url",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl.Hint"] = "Enter marketing video url that will be embedded when a customer signs up.",
+
+                // add other text
             });
 
             // create proc
@@ -145,6 +148,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             if (changePasswordTemplate != null)
                 _messageTemplateService.DeleteMessageTemplate(changePasswordTemplate);
 
+            var pendingApprovalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName)?.FirstOrDefault();
+            if (pendingApprovalTemplate != null)
+                _messageTemplateService.DeleteMessageTemplate(changePasswordTemplate);
+
+            var denialTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName)?.FirstOrDefault();
+            if (denialTemplate != null)
+                _messageTemplateService.DeleteMessageTemplate(changePasswordTemplate);
+
             base.Uninstall();
         }
 
@@ -174,7 +185,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 pendingApprovalTemplate = new MessageTemplate
                 {
                     Name = SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName,
-                    Subject = "%Store.Name%. Pending Approval",
+                    Subject = "%Store.Name%. Registration Pending Approval",
                     EmailAccountId = _emailAccountSettings.DefaultEmailAccountId,
                     Body = $"<a href={"\"%Store.URL%\""}>%Store.Name%</a>  <br />  <br />   Your registration is pending approval.  <br />  <br />  %Store.Name%  ",
                     IsActive = true,
