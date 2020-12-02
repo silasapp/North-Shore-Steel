@@ -261,7 +261,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (!CommonHelper.IsValidEmail(userRegistration.WorkEmail))
             {
-                warnings.Add("Wrong Email");
+                warnings.Add("Email is not valid");
                 //return;
             }
 
