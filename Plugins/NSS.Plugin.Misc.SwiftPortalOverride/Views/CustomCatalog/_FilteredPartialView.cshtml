@@ -346,6 +346,9 @@
     gridData = @Html.Raw(Serialize(ObjectData));
     gridColumns = @Html.Raw(Serialize(headerColumns));
 
+    console.log("gridData: ", gridData);
+    console.log("gridColumns: ", gridColumns);
+
     new Vue({
         el: '_partialview',
         data: {
