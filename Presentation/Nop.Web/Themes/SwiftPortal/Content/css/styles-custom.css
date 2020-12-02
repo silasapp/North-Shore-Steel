@@ -2346,9 +2346,9 @@ table input {
         grid-column-gap: 30px;
     }
 
-    .cat-side-drawer {
+    /*.cat-side-drawer {
         display: block;
-    }
+    }*/
 
     .login-page .new-wrapper .text {
         min-height: auto;
