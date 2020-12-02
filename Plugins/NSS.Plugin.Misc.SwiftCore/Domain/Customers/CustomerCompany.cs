@@ -29,5 +29,20 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
         /// </summary>
         public Company Company { get; set; }
 
+        /// <summary>
+        /// Gets or sets the AP entity
+        /// </summary>
+        public bool AP { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Buyer entity
+        /// </summary>
+        public bool Buyer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Operations entity
+        /// </summary>
+        public bool Operations { get; set; }
+
     }
 }

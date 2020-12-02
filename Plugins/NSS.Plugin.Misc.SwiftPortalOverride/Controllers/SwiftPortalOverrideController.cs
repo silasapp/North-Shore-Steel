@@ -72,6 +72,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 PayPalUseSandbox = swiftPortalOverrideSettings.PayPalUseSandbox,
                 PayPalClientId = swiftPortalOverrideSettings.PayPalClientId,
                 PayPalSecretKey = swiftPortalOverrideSettings.PayPalSecretKey,
+                MarketingVideoUrl = swiftPortalOverrideSettings.MarketingVideoUrl,
                 ActiveStoreScopeConfiguration = storeScope
             };
             if (storeScope > 0)
@@ -88,6 +89,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 model.PayPalUseSandbox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, storeScope);
                 model.PayPalClientId_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalClientId, storeScope);
                 model.PayPalSecretKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalSecretKey, storeScope);
+                model.MarketingVideoUrl_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.MarketingVideoUrl, storeScope);
             }
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/Configure.cshtml", model);
@@ -119,6 +121,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             swiftPortalOverrideSettings.PayPalUseSandbox = model.PayPalUseSandbox;
             swiftPortalOverrideSettings.PayPalClientId = model.PayPalClientId;
             swiftPortalOverrideSettings.PayPalSecretKey = model.PayPalSecretKey;
+            swiftPortalOverrideSettings.MarketingVideoUrl = model.MarketingVideoUrl;
 
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
@@ -136,6 +139,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, model.PayPalUseSandbox_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalClientId, model.PayPalClientId_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalSecretKey, model.PayPalSecretKey_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.MarketingVideoUrl, model.MarketingVideoUrl_OverrideForStore, storeScope, false);
 
             //now clear settings cache
             _settingService.ClearCache();

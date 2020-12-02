@@ -13,6 +13,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string ErpOrderNoAttribute => "ErpOrderNo";
 
         #region NSSCustomerAttributes           
+        public static string CellAttribute => "Cell";
         public static string IsExistingCustomerAttribute => "Existing Customer";
         public static string PreferredLocationIdAttribute => "Preferred Location";
         public static string HearAboutUsAttribute => "Hear About Us";
@@ -52,7 +53,16 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string UnitPerWeightField => "CWT";
         #endregion
 
+        #region EmailTemplate
 
+        public static string ApprovalMessageTemplateName => "NewCustomer.Notification";
+        public static string ChangePasswordMessageTemplateName => "Customer.ChangePassword";
+        public static string NewCustomerPendingApprovalMessageTemplateName => "NewCustomer.PendingApproval";
+        public static string NewCustomerRejectionMessageTemplateName => "NewCustomer.Rejection";
+
+        public static string StoreRegistrationConfirmationUrl => "{0}/userregistration/{1}/confirmregistration";
+
+        #endregion
         public static string MTRBlobName => "Product-MTR.{0}.pdf";
 
 		public static string ThemeName => "SwiftPortal";

@@ -53,5 +53,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [NoTrim]
         public string PayPalSecretKey { get; set; }
         public bool PayPalSecretKey_OverrideForStore { get; set; }
+
+        // marketing video
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl")]
+        public string MarketingVideoUrl { get; set; }
+        public bool MarketingVideoUrl_OverrideForStore { get; set; }
     }
 }

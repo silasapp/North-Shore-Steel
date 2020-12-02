@@ -140,7 +140,10 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\CustomerOverride\Register.cshtml">
+    <Content Include="Views\UserRegistration\ConfirmRegistration.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\UserRegistration\Register.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\CustomOrder\CustomerOrders.cshtml">
@@ -184,7 +187,7 @@
     <Content Include="Views\Shared\Components\CustomOrderSummary\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\CustomerOverride\Confirmation.cshtml">
+    <Content Include="Views\UserRegistration\Confirmation.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\CustomShoppingCart\Cart.cshtml">
