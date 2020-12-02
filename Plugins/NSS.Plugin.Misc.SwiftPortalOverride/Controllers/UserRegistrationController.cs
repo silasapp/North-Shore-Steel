@@ -50,10 +50,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ERPApiProvider _nSSApiProvider;
         private readonly ICustomerRegistrationService _customerRegistrationService;
         private readonly IGenericAttributeService _genericAttributeService;
-        private readonly IWorkflowMessageService _workflowMessageService;
         private readonly ICompanyService _companyService;
         private readonly ICustomerCompanyService _customerCompanyService;
-        private readonly WorkFlowMessageServiceOverride _workFlowMessageService;
+        private readonly WorkFlowMessageServiceOverride _workflowMessageService;
         #endregion
 
         #region Ctor
@@ -222,7 +221,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     // registration successful
                     //TODO: send email with registrationId to Approval
-                    _workFlowMessageService.SendNSSCustomerRegisteredNotificationMessage(res.Id, res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+                    _workflowMessageService.SendNSSCustomerRegisteredNotificationMessage(res.Id, res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
 
                     // redirect to confirmation page
                     model.MarketingVideoUrl = "http://www.youtube.com/embed/fxCEcPxUbYA";
@@ -306,7 +305,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     );
 
                 // send email
-                _workFlowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", userRegistration.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+                _workflowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", userRegistration.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
             }
 
             userRegistration = GetRegisteredUser(regId);
@@ -324,7 +323,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Rejected);
 
             // send reject email
-            _workFlowMessageService.SendNewCustomerRejectionEmailNotificationMessage(model.WorkEmail, $"{model.FirstName} {model.LastName}", _storeContext.CurrentStore.DefaultLanguageId);
+            _workflowMessageService.SendNewCustomerRejectionEmailNotificationMessage(model.WorkEmail, $"{model.FirstName} {model.LastName}", _storeContext.CurrentStore.DefaultLanguageId);
 
             
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);

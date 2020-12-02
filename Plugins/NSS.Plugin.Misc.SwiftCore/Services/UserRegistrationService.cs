@@ -175,6 +175,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.PreferredLocationIdAttribute, reg.PreferredLocationId);
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.ItemsForNextProjectAttribute, reg.ItemsForNextProject);
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.IsExistingCustomerAttribute, reg.IsExistingCustomer);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.ErpKeyAttribute, 200);
             
         }
 
