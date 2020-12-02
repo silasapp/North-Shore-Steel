@@ -334,7 +334,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private UserRegistration GetRegisteredUser(int regId)
         {
-            UserRegistration model = _userRegistrationService.GetUserById(regId);
+            UserRegistration model = _userRegistrationService.GetById(regId);
             return model;
         }
 

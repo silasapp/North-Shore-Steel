@@ -63,10 +63,9 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _workflowMessageService = workflowMessageService;
         }
 
-        public virtual UserRegistration GetUserById(int id)
+        public virtual UserRegistration GetById(int id)
         {
-            var user = _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id);
-            return user;
+            return _userRegistrationRepository.Table.FirstOrDefault(u => u.Id == id);
         }
 
         private void InsertCompany(int companyId, string companyName, string salesContactEmail, string salesContactName, string salesContactPhone)
@@ -134,11 +133,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             return cc;
         }
 
-        private void InsertUser(UserRegistration user, Nop.Core.Domain.Customers.Customer customer, string password)
+        private void InsertUser(UserRegistration reg, Nop.Core.Domain.Customers.Customer customer, string password)
         {
             _customerService.InsertCustomer(customer);
 
-            InsertFirstAndLastNameGenericAttributes(user.FirstName, user.LastName, customer);
+            InsertCustomGenericAttributes(reg, customer);
 
             //password
             if (!string.IsNullOrWhiteSpace(password))
@@ -161,21 +160,22 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             _customerService.UpdateCustomer(customer);
-
         }
 
-        private void InsertFirstAndLastNameGenericAttributes(string firstName, string lastName, Nop.Core.Domain.Customers.Customer newCustomer)
+        private void InsertCustomGenericAttributes(UserRegistration reg, Nop.Core.Domain.Customers.Customer newCustomer)
         {
-            // we assume that if the first name is not sent then it will be null and in this case we don't want to update it
-            if (firstName != null)
-            {
-                _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.FirstNameAttribute, firstName);
-            }
+            // save custom fields
 
-            if (lastName != null)
-            {
-                _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.LastNameAttribute, lastName);
-            }
+            _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.FirstNameAttribute, reg.FirstName);
+            _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.LastNameAttribute, reg.LastName);
+            _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.PhoneAttribute, reg.Phone);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.CellAttribute, reg.Cell);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.HearAboutUsAttribute, reg.HearAboutUs);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.OtherAttribute, reg.Other);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.PreferredLocationIdAttribute, reg.PreferredLocationId);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.ItemsForNextProjectAttribute, reg.ItemsForNextProject);
+            _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.IsExistingCustomerAttribute, reg.IsExistingCustomer);
+            
         }
 
         private void AddPassword(string newPassword, Nop.Core.Domain.Customers.Customer customer)
@@ -240,7 +240,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         public void UpdateRegisteredUser(int regId, int statusId)
         {
-            var user = GetUserById(regId);
+            var user = GetById(regId);
             user.StatusId = statusId;
             user.ModifiedOnUtc = DateTime.UtcNow;
             UpdateUser(user);
