@@ -254,7 +254,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public virtual IActionResult Approve(int regId)
         {
             UserRegistration userRegistration = GetRegisteredUser(regId);
-
+            if(userRegistration.StatusId != 0)
+            {
+                return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
+            }
 
             var warnings = new List<string>();
 
@@ -332,18 +335,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public virtual IActionResult Reject(int regId)
         {
+
+            var userRegistration = GetRegisteredUser(regId);
+            if (userRegistration.StatusId != 0)
+            {
+                return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
+            }
+
             var response = _nSSApiProvider.RejectUserRegistration(regId);
-
-            var model = GetRegisteredUser(regId);
-
             // update user state and modified state 
             _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Rejected);
 
             // send reject email
-            _workflowMessageService.SendNewCustomerRejectionEmailNotificationMessage(model.WorkEmail, $"{model.FirstName} {model.LastName}", _storeContext.CurrentStore.DefaultLanguageId);
+            _workflowMessageService.SendNewCustomerRejectionEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", _storeContext.CurrentStore.DefaultLanguageId);
 
-            
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", model);
+            userRegistration = GetRegisteredUser(regId);
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
         }
 
         #endregion
