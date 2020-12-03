@@ -1,5 +1,10 @@
 ﻿@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @using NSS.Plugin.Misc.SwiftCore.Helpers;
+@using Nop.Services.Customers;
+@using Nop.Core;
+@inject ICustomerService _customerService;
+@inject IWorkContext _workContext;
+
 @model UserRegistration
 @{
     Layout = "_ColumnsOne";
@@ -8,6 +13,11 @@
     Html.AddTitleParts("Confirm Registration");
     //page class
     Html.AppendPageCssClassParts("html-registration-page");
+
+}
+@{
+    var currentCustomer = _workContext.CurrentCustomer;
+    var isAdmin = _customerService.IsAdmin(currentCustomer);
 
 }
 
@@ -35,83 +45,90 @@
 </style>
 
 <div class="page registration-result-page">
-    <div class=page-title>
-        @if (Model.StatusId != 0)
-        {
-            <h2 class="message-success" style="@(Model.StatusId == 1 ? Html.Raw("color:green") : Html.Raw("color:red"))">This User has been @Model.Status</h2>
-        }
-    </div>
-    <div class="page-body">
-        <div class="account-page-card">
-            <div class="title"><strong>USER INFORMATION</strong></div>
-            <div asp-validation-summary="ModelOnly" class="message-error" style="font-size:16px;"></div>
-            <div class="form-fields">
-                <div class="inputs">
-                    <label asp-for="FirstName" asp-postfix=":">First Name</label>
-                    <input asp-for="FirstName" disabled />
-                </div>
+    @if (isAdmin)
+    {
+        <div class=page-title>
+            @if (Model.StatusId != 0)
+            {
+                <h2 class="message-success" style="@(Model.StatusId == 1 ? Html.Raw("color:green") : Html.Raw("color:red"))">This User has been @Model.Status</h2>
+            }
+        </div>
+        <div class="page-body">
+            <div class="account-page-card">
+                <div class="title"><strong>USER INFORMATION</strong></div>
+                <div asp-validation-summary="ModelOnly" class="message-error" style="font-size:16px;"></div>
+                <div class="form-fields">
+                    <div class="inputs">
+                        <label asp-for="FirstName" asp-postfix=":">First Name</label>
+                        <input asp-for="FirstName" disabled />
+                    </div>
 
-                <div class="inputs">
-                    <label asp-for="LastName" asp-postfix=":">Last Name</label>
-                    <input asp-for="LastName" disabled />
-                </div>
+                    <div class="inputs">
+                        <label asp-for="LastName" asp-postfix=":">Last Name</label>
+                        <input asp-for="LastName" disabled />
+                    </div>
 
-                <div class="inputs">
-                    <label asp-for="CompanyName" asp-postfix=":">Company Name</label>
-                    <input asp-for="CompanyName" disabled />
-                    @if (Model.IsExistingCustomer)
+                    <div class="inputs">
+                        <label asp-for="CompanyName" asp-postfix=":">Company Name</label>
+                        <input asp-for="CompanyName" disabled />
+                        @if (Model.IsExistingCustomer)
+                        {
+                            <label asp-for="IsExistingCustomer" id="current_customer" class="mb-1">Exisitng Customer</label>
+                        }
+
+                    </div>
+
+                    <div class="inputs">
+                        <label asp-for="WorkEmail" asp-postfix=":">Work Email</label>
+                        <input asp-for="WorkEmail" disabled />
+                    </div>
+
+                    <div class="inputs">
+                        <label asp-for="Cell" asp-postfix=":">Cell Phone</label>
+                        <input asp-for="Cell" disabled />
+                    </div>
+
+                    <div class="inputs">
+                        <label asp-for="Phone" asp-postfix=":">Work Phone</label>
+                        <input asp-for="Phone" disabled />
+                    </div>
+
+                    <div class="inputs">
+                        <label asp-for="HearAboutUs" asp-postfix=":">How did you hear about us?</label>
+                        <input asp-for="HearAboutUs" disabled />
+                    </div>
+
+                    <div class="inputs">
+                        <label asp-for="PreferredLocationId" asp-postfix=":">Preferred Pickup Location</label>
+                        <select asp-for="PreferredLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input" disabled></select>
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="ItemsForNextProject" asp-postfix=":">How can we help?</label>
+                        <textarea asp-for="ItemsForNextProject" class="form-control custom-input"></textarea>
+                    </div>
+                    @if (Model.Other != null)
                     {
-                        <label asp-for="IsExistingCustomer" id="current_customer" class="mb-1">Exisitng Customer</label>
+                        <div class="inputs">
+                            <label asp-for="Other" asp-postfix=":">Let us know how you found us</label>
+                            <input asp-for="Other" disabled />
+                        </div>
                     }
 
                 </div>
 
-                <div class="inputs">
-                    <label asp-for="WorkEmail" asp-postfix=":">Work Email</label>
-                    <input asp-for="WorkEmail" disabled />
-                </div>
-
-                <div class="inputs">
-                    <label asp-for="Cell" asp-postfix=":">Cell Phone</label>
-                    <input asp-for="Cell" disabled />
-                </div>
-
-                <div class="inputs">
-                    <label asp-for="Phone" asp-postfix=":">Work Phone</label>
-                    <input asp-for="Phone" disabled />
-                </div>
-
-                <div class="inputs">
-                    <label asp-for="HearAboutUs" asp-postfix=":">How did you hear about us?</label>
-                    <input asp-for="HearAboutUs" disabled />
-                </div>
-
-                <div class="inputs">
-                    <label asp-for="PreferredLocationId" asp-postfix=":">Preferred Pickup Location</label>
-                    <select asp-for="PreferredLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input" disabled></select>
-                </div>
-                <div class="inputs">
-                    <label asp-for="ItemsForNextProject" asp-postfix=":">How can we help?</label>
-                    <textarea asp-for="ItemsForNextProject" class="form-control custom-input"></textarea>
-                </div>
-                @if (Model.Other != null)
+                @if (Model.StatusId == 0)
                 {
-                    <div class="inputs">
-                        <label asp-for="Other" asp-postfix=":">Let us know how you found us</label>
-                        <input asp-for="Other" disabled />
+                    <div class="buttons save-customer-info-button">
+                        <input type="button" onclick="location.href = '@(Url.Action("Approve", "UserRegistration", new { regId = Model.Id }))'" value="APPROVE" class="button-2 mr-4" />
+                        <input type="button" onclick="location.href = '@(Url.Action("Reject", "UserRegistration", new { regId = Model.Id }))'" value="REJECT" class="button-2" />
                     </div>
                 }
-
             </div>
-
-            @if (Model.StatusId == 0)
-            {
-                <div class="buttons save-customer-info-button">
-                    <input type="button" onclick="location.href = '@(Url.Action("Approve","UserRegistration", new {regId = Model.Id}))'" value="APPROVE" class="button-2 mr-4" />
-                    <input type="button" onclick="location.href = '@(Url.Action("Reject","UserRegistration", new {regId = Model.Id}))'" value="REJECT" class="button-2" />
-                </div>
-            }
         </div>
-    </div>
-    <br />
+        <br />
+    }
+    else
+    {
+        <p>You don't have permission to view this page.</p>
+    }
 </div>
