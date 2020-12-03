@@ -45,7 +45,7 @@
 </style>
 
 <div class="page registration-result-page">
-    @if (isAdmin)
+    @if (Model != null && isAdmin)
     {
         <div class=page-title>
             @if (Model.StatusId != 0)
