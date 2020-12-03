@@ -394,12 +394,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                 : _customerService.GetCustomerByEmail(model.Email);
 
                             bool isPassWordChanged = _genericAttributeService.GetAttribute<bool>(customer, "IsPasswordChanged");
-                            if(!isPassWordChanged)
+                            if (!isPassWordChanged)
                             {
                                 var changePasswordModel = _customerModelFactory.PrepareChangePasswordModel();
                                 Response.Cookies.Append(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange, model.Email);
                                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", changePasswordModel);
                             }
+
                             //migrate shopping cart
                             _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer, true);
 
@@ -413,6 +414,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                             _customerActivityService.InsertActivity(customer, "PublicStore.Login",
                                 _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
 
+                           
                             if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
                                 return RedirectToRoute("Homepage");
 
@@ -817,14 +819,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     _genericAttributeService.SaveAttribute(customer, "IsPasswordChanged", true);
                     model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
                     Response.Cookies.Delete(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange);
-                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePassword.cshtml", model);
+
+                    //migrate shopping cart
+                    _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer, true);
+
+                    //sign in new customer
+                    _authenticationService.SignIn(customer, true);
+
+                    //raise event       
+                    _eventPublisher.Publish(new CustomerLoggedinEvent(customer));
+
+                    //activity log
+                    _customerActivityService.InsertActivity(customer, "PublicStore.Login",
+                        _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+
+                    return RedirectToRoute("Homepage");
                 }
 
                 //errors
                 foreach (var error in changePasswordResult.Errors)
                     ModelState.AddModelError("", error);
             }
-
+            
             //If we got this far, something failed, redisplay form
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", model);
         }
