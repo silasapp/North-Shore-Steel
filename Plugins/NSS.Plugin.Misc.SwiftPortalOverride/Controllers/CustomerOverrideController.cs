@@ -79,6 +79,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ERPApiProvider _nSSApiProvider;
         private readonly WorkFlowMessageServiceOverride _workFlowMessageServiceOverride;
         private readonly ICountryService _countryService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly ICustomerActivityService _customerActivityService;
 
         #endregion
 
@@ -116,6 +118,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
             _countryService = countryService;
             _forumSettings = forumSettings;
+            _shoppingCartService = shoppingCartService;
+            _customerActivityService = customerActivityService;
         }
 
         #endregion
@@ -359,6 +363,88 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var model = _customerModelFactory.PrepareLoginModel(checkoutAsGuest);
             return View(model);
         }
+
+        [HttpPost]
+        [ValidateCaptcha]
+        //available even when a store is closed
+        [CheckAccessClosedStore(true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(true)]
+        public override IActionResult Login(LoginModel model, string returnUrl, bool captchaValid)
+        {
+            //validate CAPTCHA
+            if (_captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage && !captchaValid)
+            {
+                ModelState.AddModelError("", _localizationService.GetResource("Common.WrongCaptchaMessage"));
+            }
+
+            if (ModelState.IsValid)
+            {
+                if (_customerSettings.UsernamesEnabled && model.Username != null)
+                {
+                    model.Username = model.Username.Trim();
+                }
+                var loginResult = _customerRegistrationService.ValidateCustomer(_customerSettings.UsernamesEnabled ? model.Username : model.Email, model.Password);
+                switch (loginResult)
+                {
+                    case CustomerLoginResults.Successful:
+                        {
+                            var customer = _customerSettings.UsernamesEnabled
+                                ? _customerService.GetCustomerByUsername(model.Username)
+                                : _customerService.GetCustomerByEmail(model.Email);
+
+                            bool isPassWordChanged = _genericAttributeService.GetAttribute<bool>(customer, "IsPasswordChanged");
+                            if(!isPassWordChanged)
+                            {
+                                var changePasswordModel = _customerModelFactory.PrepareChangePasswordModel();
+                                Response.Cookies.Append(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange, model.Email);
+                                return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", changePasswordModel);
+                            }
+                            //migrate shopping cart
+                            _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer, true);
+
+                            //sign in new customer
+                            _authenticationService.SignIn(customer, model.RememberMe);
+
+                            //raise event       
+                            _eventPublisher.Publish(new CustomerLoggedinEvent(customer));
+
+                            //activity log
+                            _customerActivityService.InsertActivity(customer, "PublicStore.Login",
+                                _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+
+                            if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+                                return RedirectToRoute("Homepage");
+
+                            return Redirect(returnUrl);
+                        }
+                    case CustomerLoginResults.CustomerNotExist:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.CustomerNotExist"));
+                        break;
+                    case CustomerLoginResults.Deleted:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.Deleted"));
+                        break;
+                    case CustomerLoginResults.NotActive:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotActive"));
+                        break;
+                    case CustomerLoginResults.NotRegistered:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotRegistered"));
+                        break;
+                    case CustomerLoginResults.LockedOut:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.LockedOut"));
+                        break;
+                    case CustomerLoginResults.WrongPassword:
+                    default:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials"));
+                        break;
+                }
+            }
+
+            //If we got this far, something failed, redisplay form
+            model = _customerModelFactory.PrepareLoginModel(model.CheckoutAsGuest);
+            return View(model);
+        }
+
 
         #endregion
 
@@ -699,7 +785,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 {
                     // send change password email
                     _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
-
                     model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
                     return View(model);
                 }
@@ -713,7 +798,38 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View(model);
         }
 
-       
+
+        [CheckAccessPublicStore(true)]
+        public virtual IActionResult NewCustomerChangePassword(ChangePasswordModel model)
+        {
+            string newUserEmailForPasswordChange = Request.Cookies[SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange].ToString();
+            var customer = _customerService.GetCustomerByEmail(newUserEmailForPasswordChange);
+
+            if (ModelState.IsValid)
+            {
+                var changePasswordRequest = new ChangePasswordRequest(customer.Email,
+                    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
+                var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
+                if (changePasswordResult.Success)
+                {
+                    // send change password email
+                    _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+                    _genericAttributeService.SaveAttribute(customer, "IsPasswordChanged", true);
+                    model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
+                    Response.Cookies.Delete(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange);
+                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePassword.cshtml", model);
+                }
+
+                //errors
+                foreach (var error in changePasswordResult.Errors)
+                    ModelState.AddModelError("", error);
+            }
+
+            //If we got this far, something failed, redisplay form
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", model);
+        }
+
+
         [HttpsRequirement]
         public override IActionResult Info()
         {
