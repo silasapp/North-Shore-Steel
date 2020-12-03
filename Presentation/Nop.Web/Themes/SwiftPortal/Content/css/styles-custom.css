@@ -3063,6 +3063,7 @@ and also iPads specifically.
         flex-wrap: wrap;
         padding: 10px 20px;
         align-items: center;
+        height: auto !important;
     }
 
     td {
@@ -3070,6 +3071,7 @@ and also iPads specifically.
         position: relative;
         flex-basis: 48%;
         display: flex;
+        line-height: normal !important;
     }
 
         td > input {
