@@ -9,43 +9,51 @@
     }
 </style>
 <div>
+    @Html.Raw(buildTemplate("Invoice #", "InvoiceId"));
+    @Html.Raw(buildTemplate("Purchase Order #", "PoNo"));
+    @Html.Raw(buildTemplate("Invoice Date", "InvoiceDate"));
+    @Html.Raw(buildTemplate("Paid Date", "InvoicePaidDate"));
+    @Html.Raw(buildTemplate("Due Date", "InvoiceDueDate"));
+    @Html.Raw(buildTemplate("Status", "InvoiceStatusName"));
     <ejs-grid id="Grid" dataSource="@Model.Invoices" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
-            <e-grid-column template="#invoiceNo" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
+            <e-grid-column template="#InvoiceIdTemplate" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
             <e-grid-column template="#orderNo" headerText="Order #" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+            <e-grid-column template="#PoNoTemplate" field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
             <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
             @if (!Model.IsClosed)
             {
                 <e-grid-column template="#balanceAmount" headerText="Balance Amount" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
             }
-            <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
+            <e-grid-column template="#InvoiceDateTemplate" field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
             @if (Model.IsClosed)
             {
-                <e-grid-column field="InvoicePaidDate" headerText="Paid Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#InvoicePaidDateTemplate" field="InvoicePaidDate" headerText="Paid Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
             }
             else
             {
-                <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="80" width="100" maxWidth="120"></e-grid-column>
+                <e-grid-column template="#InvoiceDueDateTemplate" field="InvoiceDueDate" headerText="Due Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#InvoiceStatusNameTemplate" field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="80" width="100" maxWidth="120"></e-grid-column>
             }
             <e-grid-column type="checkbox" width="30"></e-grid-column>
         </e-grid-columns>
     </ejs-grid>
 </div>
 
-<script id="invoiceNo" type="text/x-template">
-    ${InvoiceId}
-</script>
+@functions {
+    string buildTemplate(string headerText, string field) => $@"<script id='{field}Template' type='text/x-template'>
+    <div><label class='mv-title'>{ headerText }:</label><label>${{{ field }}}</label></div></script>";
+}
+
 <script id="orderNo" type="text/x-template">
-    <a href="/orders/${OrderNo}">${OrderNo}</a>
+    <div><label class='mv-title'>Order #: </label><a href="/orders/${OrderNo}">${OrderNo}</a></div>
 </script>
 <script id="invoiceAmount" type="text/x-template">
-    $${InvoiceAmount}
+    <div><label class='mv-title'>Invoice Amount: </label>$${InvoiceAmount}</div>
 </script>
 <script id="balanceAmount" type="text/x-template">
-    $${BalanceAmount}
+    <div><label class='mv-title'>Balance Amount: </label>$${BalanceAmount}</div>
 </script>
 <ejs-scripts></ejs-scripts>
