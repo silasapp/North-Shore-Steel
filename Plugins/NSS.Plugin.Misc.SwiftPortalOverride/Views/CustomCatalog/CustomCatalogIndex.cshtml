@@ -523,20 +523,27 @@
         document.getElementById("drawerPane").style.width = "0px";
     }
 
-    document.addEventListener('click', function () {
-        var el = document.getElementById("drawerPane");
-        if (el.style.width == "0px") {
-            return;
-        }
-        el.style.width = "0px";
-    });
+    //document.addEventListener('click', function () {
+    //    var el = document.getElementById("drawerPane");
+    //    if (el.style.width == "0px" || window.screen.availWidth > 600) {
+    //        return;
+    //    }
+    //    el.style.width = "0px";
+    //});
 
-    document.getElementById("drawerTrigger").addEventListener('click', function (event) {
-        event.stopPropagation();
-    });
+    //document.getElementById("drawerTrigger").addEventListener('click', function (event) {
 
-    document.getElementById("drawerPane").addEventListener('click', function (event) {
-        event.stopPropagation();
-    });
+    //    if ( window.screen.availWidth > 600) {
+    //        return;
+    //    }
+    //    event.stopPropagation();
+    //});
+
+    //document.getElementById("drawerPane").addEventListener('click', function (event) {
+    //    if ( window.screen.availWidth > 600) {
+    //        return;
+    //    }
+    //    event.stopPropagation();
+    //});
 </script>
 <ejs-scripts></ejs-scripts>

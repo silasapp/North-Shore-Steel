@@ -2414,6 +2414,11 @@ table input {
     }
 }
 
+@media all and (min-width: 600px) {
+    #drawerPane {
+        width: auto !important;
+    }
+}
 @media all and (max-width: 600px) {
     #invoiceSearchField > div {
         display: grid;
@@ -3036,15 +3041,19 @@ Max width before this PARTICULAR table gets nasty
 This query will take effect for any screen smaller than 760px
 and also iPads specifically.
 */
-@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+.mv-title {
+    display: none;
+}
 
+@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
     table {
         width: 100%;
     }
 
     /* Force table to not be like tables anymore */
-
-
+    .mv-title {
+        display: block;
+    }
     /* Hide table headers (but not display: none;, for accessibility) */
     thead tr {
         position: absolute;
@@ -3064,19 +3073,45 @@ and also iPads specifically.
         padding: 10px 20px;
         align-items: center;
         height: auto !important;
+        border-bottom: 3px solid #ddd;
+        display: block;
+        margin-bottom: .625em;
     }
 
     td {
-        border: none !important;
+        /*border: none !important;
         position: relative;
-        flex-basis: 48%;
-        display: flex;
-        line-height: normal !important;
+        flex-basis: 100%;
+        display: flex;*/
+        line-height: 1.5 !important;
+        padding: 0 !important;
+        /*border-bottom: 1px solid #ddd !important;*/
+        display: block !important;
+        border: 0 !important;
+        /*font-size: .8em !important;*/
+        text-align: right !important;
     }
+
 
         td > input {
             width: 100% !important;
+            margin: 5px 0 10px;
         }
+
+        td > div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+            td > div > .mv-value {
+                white-space: break-spaces;
+            }
+            td > div > .mv-title {
+                font-weight: bold;
+                color: #03175b;
+                margin-right: 10px;
+                font-style: italic;
+            }
 
     .datepicker-days thead tr {
         position: unset !important;
@@ -3090,7 +3125,7 @@ and also iPads specifically.
         display: table-cell !important;
     }
 
-    .catalog-page td:nth-child(1) {
+    /* .catalog-page td:nth-child(1) {
         order: 1;
     }
 
@@ -3193,25 +3228,7 @@ and also iPads specifically.
     #order-grid td:nth-child(8), #invoice-grid td:nth-child(9) {
         order: 9;
         flex-basis: 30%;
-    }
-
-    .catalog-page td:nth-child(3)::after, .shopping-cart-page td:nth-child(6)::after, #order-grid td:nth-child(3)::after {
-        padding-left: 5px;
-        white-space: nowrap;
-        content: 'lbs';
-    }
-
-    .shopping-cart-page td:nth-child(7)::after {
-        padding-left: 5px;
-        white-space: nowrap;
-        content: 'ft';
-    }
-
-    .catalog-page td:nth-child(1)::before, .shopping-cart-page td:nth-child(1)::before, #order-grid td:nth-child(1)::before, #invoice-grid td:nth-child(1)::before, #order-grid td:nth-child(2)::before, #invoice-grid td:nth-child(2)::before, #invoice-grid td:nth-child(3)::before {
-        padding-right: 1px;
-        white-space: nowrap;
-        content: '#';
-    }
+    }*/
 
     .cart-qty-input {
         width: 70px;

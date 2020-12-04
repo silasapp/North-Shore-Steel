@@ -283,7 +283,7 @@
 
     string buildGridScript(string title, string columnName)
     {
-        return $"<script id='{columnName.ToLower()}Template' type='text/x-template'><div><label class='mv-title'>{ title }:</label><label>${{{ columnName.ToLower() }}}</label></div></script>";
+        return $"<script id='{columnName.ToLower()}Template' type='text/x-template'><div><label class='mv-title'>{ title }:</label><label class='mv-value'>${{{ columnName.ToLower() }}}</label></div></script>";
     }
 }
 
