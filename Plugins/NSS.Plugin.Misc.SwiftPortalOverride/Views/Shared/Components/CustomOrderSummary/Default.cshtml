@@ -51,8 +51,14 @@
     .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
         width: 67rem !important;
         margin: auto;
-        position: relative !important;
-        top: -111rem !important;
+        top: 0 !important;
+        bottom: 0;
+        right: 0;
+        height: fit-content !important;
+    }
+
+    .ui-dialog-content {
+        max-height: initial !important;
     }
 
     .button-2.update-cart-button {
