@@ -161,63 +161,6 @@
 
 @{List<object> ObjectData = new List<object>(); }
 
-@{
-    Func<object, object> SawOptionContent =
-    @<form id="sawOptionModal">
-        <div class="d-flex flex-column">
-            <div class="d-flex flex-column mt-4 mb-2">
-                <label class="nss-modal-title">SAW OPTIONS</label>
-                <div class="d-flex flex-row">
-                    <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
-                           class="mr-3 d-flex align-items-center cursor-pointer">
-                        <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
-                               v-bind:value="option.id" v-model="sawOption">
-                        {{ option.name }}
-                    </label>
-                </div>
-            </div>
-            <hr />
-            <div class="d-flex flex-column">
-                <label class="nss-modal-title">WORK ORDER INSTRUCTIONS</label>
-                <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
-            </div>
-            <hr />
-            <div class="d-flex flex-row justify-content-between mb-3">
-                <div class="d-flex flex-column">
-                    <label class="nss-modal-title">LENGTH TOLERANCE CUT</label>
-                    <div class="d-flex flex-row">
-                        <button type="button" class="nss-btn-box"
-                                v-on:click="decrementToleranceCut">
-                            -
-                        </button>
-                        <input type="text" class="nss-input" v-model="lengthToleranceCut" />
-                        <button type="button" class="nss-btn-box"
-                                v-on:click="incrementToleranceCut">
-                            +
-                        </button>
-                    </div>
-                </div>
-                <div class="d-flex flex-column">
-                    <label class="nss-modal-title">ITEM QUANTITY</label>
-                    <div class="d-flex flex-row">
-                        <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
-                        <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
-                        <button type="button" class="nss-btn-box" v-on:click="incrementQuantity">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex flex-row-reverse mt-4">
-                <button type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
-                        v-on:click="addToCart">
-                    ADD TO CART
-                </button>
-            </div>
-        </div>
-    </form>;
-}
-
-@{List<object> CustomScripts = new List<object>();}
-
 @if (Model.Products != null && Model.Products.Count > 0)
 {
 
@@ -289,15 +232,15 @@
             var Code = _isSerialized == "True" ? "itemTagNo" : "itemNo";
             itemCode = itemCode == "itemNo" ? Code : itemCode;
             productRowData.Add(it.Code.ToLower(), item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
+            @Html.Raw(buildGridScript(it.DisplayName, it.Code));
             if (it.Code != it.Sort)
             {
                 double value = 0;
                 double.TryParse((item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Sort)?.Value), out value);
                 productRowData.Add($"{it.Sort.ToLower()}", value);
 
-                var script = buildScript(it.Code);
+                var script = buildDisplayScript(it.Code);
                 @Html.Raw(script);
-                CustomScripts.Add(script);
             }
         }
 
@@ -335,9 +278,12 @@
         });
     }
 
-    string buildScript(string columnName)
+    string buildDisplayScript(string columnName) => $"<script id='{columnName.ToLower()}Template' type='text/x-template'><label>${{{ columnName.ToLower() }}}</label></script>";
+
+
+    string buildGridScript(string title, string columnName)
     {
-        return $"<script id='{columnName.ToLower()}Template' type='text/x-template'><label>${{{ columnName.ToLower() }}}</label></script>";
+        return $"<script id='{columnName.ToLower()}Template' type='text/x-template'><div><label class='mv-title'>{ title }:</label><label>${{{ columnName.ToLower() }}}</label></div></script>";
     }
 }
 
@@ -368,7 +314,11 @@
                             template: `#${col.code.toLowerCase()}Template`, width: 120,
                         };
                      else
-                        column = { field: col.code.toLowerCase(), headerText: col.displayName, width: col.displayName.includes("Description") ? 230 : 150, };
+                        column = {
+                            field: col.code.toLowerCase(), headerText: col.displayName,
+                            template: `#${col.code.toLowerCase()}Template`,
+                            width: col.displayName.includes("Description") ? 230 : 150,
+                        };
 
                     retVal = [...retVal, column];
                 });
@@ -384,6 +334,8 @@
                     filterSettings: { type: 'CheckBox' },
                     enableHover: false,
                     rowHeight: 38,
+                    enableResponsiveRow: true,
+                    isResponsive: true,
                     columns: [
                         ...gridColumns,
                         { headerText: 'Quantity', width: 120, template: '#quantityTemplate' },
