@@ -1186,9 +1186,6 @@ table input {
         font-family: "Exo 2";
     }
 
-.clear-filter {
-    margin-left: 40px;
-}
 
 .filter-tag > button:hover {
     transform: translate(7px, 3px) scale(1.5);
@@ -2998,9 +2995,6 @@ li {
     height: 42px;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
 }
-.ui-dialog-content {
-    max-height: initial !important;
-}
 .nss-input {
     padding: 0.5rem;
     border: 1px solid #ddd;
@@ -3087,6 +3081,7 @@ and also iPads specifically.
         border-bottom: 3px solid #ddd;
         display: block;
         margin-bottom: .625em;
+        padding-bottom: 20px !important;
     }
 
     td {
@@ -3133,16 +3128,14 @@ and also iPads specifically.
             font-style: italic;
         }
 
-    tr > .quantity, .catalog-page td:nth-child(4) {
+    tr > .quantity, .catalog-page td:nth-last-child(2) {
         float: left;
     }
-    .cart-table td:nth-child(9) {
+    .cart-table td:nth-last-child(2) {
         float: right;
     }
 
-    .table-icon-group, .catalog-page td:nth-child(5), .remove-from-cart {
-        margin-top: 5px;
-    }
+    
 
     .datepicker-days thead tr {
         position: unset !important;
@@ -3155,110 +3148,6 @@ and also iPads specifically.
     .datepicker-days td {
         display: table-cell !important;
     }
-
-    /* .catalog-page td:nth-child(1) {
-        order: 1;
-    }
-
-    .catalog-page td:nth-child(2) {
-        order: 3;
-        flex-basis: 100%;
-    }
-
-    .catalog-page td:nth-child(3) {
-        order: 2;
-    }
-
-    
-
-    .catalog-page td:nth-child(5) {
-        order: 5;
-    }
-
-    .shopping-cart-page td:nth-child(1) {
-        order: 1;
-    }
-
-    .shopping-cart-page td:nth-child(2) {
-        order: 2;
-    }
-
-    .shopping-cart-page td:nth-child(3) {
-        order: 4;
-    }
-
-    .shopping-cart-page td:nth-child(4) {
-        order: 6;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-    }
-
-    .shopping-cart-page td:nth-child(5) {
-        order: 3;
-    }
-
-    .shopping-cart-page td:nth-child(6) {
-        order: 5;
-    }
-
-    .shopping-cart-page td:nth-child(7) {
-        order: 7;
-    }
-
-    .shopping-cart-page td:nth-child(8) {
-        order: 8;
-    }
-
-    .shopping-cart-page td:nth-child(9) {
-        order: 9;
-        flex-basis: auto;
-    }
-
-    .shopping-cart-page td:nth-child(10) {
-        order: 10;
-        flex-basis: auto;
-    }
-
-    #order-grid td:nth-child(1), #invoice-grid td:nth-child(1) {
-        order: 1;
-    }
-
-    #order-grid td:nth-child(2), #invoice-grid td:nth-child(2) {
-        order: 2;
-    }
-
-    #order-grid td:nth-child(3), #invoice-grid td:nth-child(3) {
-        order: 3;
-        flex-basis: 100%;
-    }
-
-    #order-grid td:nth-child(4), #invoice-grid td:nth-child(4) {
-        order: 4;
-    }
-
-    #order-grid td:nth-child(5), #invoice-grid td:nth-child(5) {
-        order: 5;
-    }
-
-    #order-grid td:nth-child(6), #invoice-grid td:nth-child(6) {
-        order: 6;
-    }
-
-    #order-grid td:nth-child(7), #invoice-grid td:nth-child(7) {
-        order: 7;
-    }
-
-    #order-grid td:nth-child(8), #invoice-grid td:nth-child(8) {
-        order: 8;
-        flex-basis: 70%;
-    }
-
-    #order-grid td:nth-child(8), #invoice-grid td:nth-child(9) {
-        order: 9;
-        flex-basis: 30%;
-    }*/
-
     .cart-qty-input {
         width: 70px;
         height: 30px
