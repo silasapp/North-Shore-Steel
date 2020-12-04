@@ -369,7 +369,7 @@
     ${if(_isSerialized == "true")}
     <label style="width: 40px" for="">1</label>
     ${else}
-    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}"
+    <input type="number" min="1" name="quantity" style="width: 40px" class="qty-input" id="qty${_itemId}"
            oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">
     ${/if}
 </script>
