@@ -169,6 +169,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.FirstNameAttribute, reg.FirstName);
             _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.LastNameAttribute, reg.LastName);
             _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.PhoneAttribute, reg.Phone);
+            _genericAttributeService.SaveAttribute(newCustomer, NopCustomerDefaults.CompanyAttribute, reg.CompanyName);
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.CellAttribute, reg.Cell);
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.HearAboutUsAttribute, reg.HearAboutUs);
             _genericAttributeService.SaveAttribute(newCustomer, Helpers.Constants.OtherAttribute, reg.Other);
