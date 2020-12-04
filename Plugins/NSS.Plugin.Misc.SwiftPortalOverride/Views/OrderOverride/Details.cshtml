@@ -307,7 +307,7 @@
 
                     @if (Model.MtrCount == 1)
                     {
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault().MtrId</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
                     }
                     else if (Model.MtrCount > 1)
                     {
