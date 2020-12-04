@@ -215,11 +215,12 @@
                             //var unitPrice = "0.00";
 
                             <tr>
-                                <td><label style="margin:0;">@(iNo)</label></td>
+                                <td><div><label class="mv-title">Item #:</label><label class="mv-value" style="margin:0;">@(iNo)</label></div></td>
                                 <td>
-                                    <label style="margin:0;">
-                                        @item.ProductName
-                                    </label>
+                                    <div><label class="mv-title">Description:</label><label class="mv-value" style="margin:0;">@item.ProductName</label></div>
+                                    @*<label style="margin:0;">
+                                            @item.ProductName
+                                        </label>*@
                                     @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
                                         {
                                             <div class="attributes">
@@ -240,33 +241,38 @@
                                 </td>
                                 <td>
                                     @*//var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";*@
-                                    <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" />
+                                    <div> <label class="mv-title">Customer Part #:</label><input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" /></div>
                                 </td>
                                 <td style="white-space: nowrap;">
                                     @*<input style="width: 70%;height: 24px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="@(item.UnitPrice)">*@
-                                    <label style="margin:0;margin-right:2px;" id="itemunitprice@(item.Id)">@item.UnitPrice</label> /
+                                    <div>
+                                        <label class="mv-title">Unit Price:</label>
+                                        <div>
+                                            <label style="margin:0;margin-right:2px;" id="itemunitprice@(item.Id)">@item.UnitPrice</label> /
 
-                                    @if (purchaseUnitAttr != null)
-                                    {
-                                        <select name="@(unitControlId)" id="@(unitControlId)" style="height: 24px;min-width: auto;margin: 0 !important;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
-                                            @foreach (var attributeValue in purchaseUnitAttr.Values)
+                                            @if (purchaseUnitAttr != null)
                                             {
-                                                if (attributeValue.Name == "EA" && string.IsNullOrEmpty(pricePerPiece) || attributeValue.Name == "CWT" && string.IsNullOrEmpty(pricePerCWT) || attributeValue.Name == "FT" && string.IsNullOrEmpty(pricePerFt))
-                                                    continue;
+                                                <select name="@(unitControlId)" id="@(unitControlId)" style="height: 24px;min-width: auto;margin: 0 !important;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
+                                                    @foreach (var attributeValue in purchaseUnitAttr.Values)
+                                                    {
+                                                        if (attributeValue.Name == "EA" && string.IsNullOrEmpty(pricePerPiece) || attributeValue.Name == "CWT" && string.IsNullOrEmpty(pricePerCWT) || attributeValue.Name == "FT" && string.IsNullOrEmpty(pricePerFt))
+                                                            continue;
 
-                                                <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
+                                                        <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
+                                                    }
+                                                </select>
                                             }
-                                        </select>
-                                    }
+                                        </div>
+                                    </div>
 
                                 </td>
-                                <td id="itemsubtotal@(item.Id)"> <label style="margin:0;">@item.SubTotal</label></td>
-                                <td><label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></td>
-                                <td><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></td>
+                                <td id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
+                                <td><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></div></td>
+                                <td><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>
                                 <td>
                                     <input style="height: 24px;" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px; height: 30px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
                                 </td>
-                                <td style="text-align:center">
+                                <td>
                                     @if (noteAttr != null)
                                     {
                                         var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
@@ -280,7 +286,7 @@
                                         <input type="hidden" id=@controlId name="@controlId" value="@noteAttr.DefaultValue" />
                                     }
                                 </td>
-                                <td class="remove-from-cart" style="text-align:center">
+                                <td class="remove-from-cart">
                                     <label class="pure-material-checkbox">
                                         <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" style=" position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
 
