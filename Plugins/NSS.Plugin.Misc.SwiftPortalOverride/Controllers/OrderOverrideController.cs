@@ -30,8 +30,11 @@ using Nop.Services.Vendors;
 using Nop.Web.Controllers;
 //using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
+using NSS.Plugin.Misc.SwiftPortalOverride.Services;
+using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -50,12 +53,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkContext _workContext;
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly IOrderModelFactory _orderModelFactory;
+        private readonly ERPApiProvider _erpApiProvider;
 
         #endregion
 
         #region Ctor
 
-        public OrderOverrideController(ICustomerService customerService,
+        public OrderOverrideController(ERPApiProvider erpApiProvider, 
+            ICustomerService customerService,
             Nop.Web.Factories.IOrderModelFactory orderNopModelFactory,
             IOrderProcessingService orderProcessingService,
             IOrderService orderService,
@@ -78,6 +83,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workContext = workContext;
             _rewardPointsSettings = rewardPointsSettings;
             _orderModelFactory = orderModelFactory;
+            _erpApiProvider = erpApiProvider;
         }
 
         #endregion
@@ -92,10 +98,23 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
 
-            var model = new OrderDetailsModel();
+            ERPGetOrderDetailsResponse orderDetailsResponse = null;
 
+            // call api
             if (eRPCompanyId > 0 && orderId > 0)
-                model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId);
+                orderDetailsResponse = _erpApiProvider.GetOrderDetails(eRPCompanyId, orderId);
+
+            if (orderDetailsResponse == null)
+                return Challenge();
+
+            // get mtrs if count > 0
+            var orderMTRs = new List<ERPGetOrderMTRResponse>();
+            if (int.TryParse(orderDetailsResponse.MtrCount, out int mtrCount) && mtrCount > 0)
+            {
+                orderMTRs = _erpApiProvider.GetOrderMTRs(eRPCompanyId, orderId);
+            }
+            
+            var model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs);
 
             return View(model);
         }

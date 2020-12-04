@@ -457,7 +457,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.CalculateShipping -> {request.DestinationAddressLine1}", ex);
+                _logger.Error($"NSS.CalculateShipping -> request => {JsonConvert.SerializeObject(request)}", ex);
 
                 throw;
             }
@@ -590,7 +590,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (response.IsSuccessStatusCode)
                         retVal = JsonConvert.DeserializeObject<ERPCreateOrderResponse>(respContent);
                     else
-                        throw new NopException($"An error ocurred while placing order: {respContent}", respContent);
+                        throw new NopException($"An error ocurred while placing order: {respContent}", $"request => {JsonConvert.SerializeObject(request)}, result: {respContent}");
                 }
             }
             catch (Exception ex)
@@ -890,8 +890,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         public ERPGetOrderDetailsResponse GetOrderDetails(int companyId, int erpOrderId)
         {
             //initialize
-            var retVal = new ERPGetOrderDetailsResponse();
+            ERPGetOrderDetailsResponse retVal = null;
             var respContent = string.Empty;
+            string error = string.Empty;
 
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -928,11 +929,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     var response = httpClient.GetAsync(resource).Result;
 
-                    // throw error if not successful
-                    response.EnsureSuccessStatusCode();
-
                     respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = ERPGetOrderDetailsResponse.FromJson(respContent) ?? new ERPGetOrderDetailsResponse();
+
+                    // throw error if not successful
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        error = respContent;
+                        throw new NopException($"NSS.GetOrderDetails Request returned status of {response.StatusCode.ToString()} and content: {respContent}");
+                    }
+                 
+                    retVal = ERPGetOrderDetailsResponse.FromJson(respContent);
                 }
 
             }
@@ -952,6 +958,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             //initialize
             var retVal = new List<ERPGetOrderMTRResponse>();
             var respContent = string.Empty;
+            var error = string.Empty;
 
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -993,10 +1000,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     else
                         response = httpClient.GetAsync(resource).Result;
 
-                    // throw error if not successful
-                    response.EnsureSuccessStatusCode();
-
                     respContent = response.Content.ReadAsStringAsync().Result;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        error = respContent;
+                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
+                    }
+
                     retVal = ERPGetOrderMTRResponse.FromJson(respContent) ?? new List<ERPGetOrderMTRResponse>();
                 }
 
