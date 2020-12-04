@@ -815,7 +815,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (changePasswordResult.Success)
                 {
                     // send change password email
-                    _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+                    //_workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
                     _genericAttributeService.SaveAttribute(customer, "IsPasswordChanged", true);
                     model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
                     Response.Cookies.Delete(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange);
