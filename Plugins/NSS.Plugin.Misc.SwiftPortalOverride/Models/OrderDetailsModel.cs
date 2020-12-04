@@ -17,6 +17,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         }
 
         public int OrderId { get; set; }
+        public int? SysOrderId { get; set; }
         public int Weight { get; set; }
         public string PoNo { get; set; }
         public DateTimeOffset? OrderDate { get; set; }

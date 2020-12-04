@@ -104,22 +104,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-        public OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId)
+        public OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs)
         {
-            // call api
-            var orderDetailsResponse = _nSSApiProvider.GetOrderDetails(companyId, erpOrderId);
             var model = new OrderDetailsModel();
             Nop.Core.Domain.Orders.Order order = null;
 
             if (orderDetailsResponse != null)
             {
-                // get mtrs if count > 0
-                var orderMTRs = new List<ERPGetOrderMTRResponse>();
-                if (int.TryParse(orderDetailsResponse.MtrCount, out int mtrCount) && mtrCount > 0)
-                {
-                    orderMTRs = _nSSApiProvider.GetOrderMTRs(companyId, erpOrderId);
-                }
-
                 model.OrderId = orderDetailsResponse.OrderId;
                 model.Weight = orderDetailsResponse.Weight;
                 model.PoNo = orderDetailsResponse.PoNo;
@@ -149,6 +140,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
                 if (order != null)
                 {
+                    // nC orderId
+                    model.SysOrderId = order.Id;
+
                     // billing address
                     var billingAddress = _addressService.GetAddressById(order.BillingAddressId);
 
@@ -199,32 +193,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 };
 
                 // line items
-                foreach (var item in orderDetailsResponse.OrderItems)
-                {
-                    var orderMTR = new OrderDetailsModel.OrderMTRModel();
-
-                    var mtr = orderMTRs.FirstOrDefault(x => x.LineNo == item.LineNo);
-                    if (mtr != null)
-                        orderMTR = new OrderDetailsModel.OrderMTRModel { LineNo = mtr.LineNo, Description = mtr.Description, HeatNo = mtr.HeatNo, MtrId = mtr.MtrId };
-
-                    var orderItem = new OrderDetailsModel.OrderItemModel
+                if (orderDetailsResponse.OrderItems != null)
+                    foreach (var item in orderDetailsResponse.OrderItems)
                     {
-                        CustomerPartNo = item.CustomerPartNo,
-                        Description = item.Description,
-                        LineNo = item.LineNo,
-                        Quantity = item.Quantity,
-                        TotalPrice = item.TotalPrice,
-                        TotalWeight = item.TotalWeight,
-                        UnitPrice = item.UnitPrice,
-                        UOM = item.UOM.ToString(),
-                        WeightPerPiece = item.WeightPerPiece,
+                        var orderMTR = new OrderDetailsModel.OrderMTRModel();
 
-                        // mtr
-                        MTR = orderMTR
-                    };
+                        var mtr = orderMTRs.FirstOrDefault(x => x.LineNo == item.LineNo);
+                        if (mtr != null)
+                            orderMTR = new OrderDetailsModel.OrderMTRModel { LineNo = mtr.LineNo, Description = mtr.Description, HeatNo = mtr.HeatNo, MtrId = mtr.MtrId };
 
-                    model.OrderItems.Add(orderItem);
-                }
+                        var orderItem = new OrderDetailsModel.OrderItemModel
+                        {
+                            CustomerPartNo = item.CustomerPartNo,
+                            Description = item.Description,
+                            LineNo = item.LineNo,
+                            Quantity = item.Quantity,
+                            TotalPrice = item.TotalPrice,
+                            TotalWeight = item.TotalWeight,
+                            UnitPrice = item.UnitPrice,
+                            UOM = item.UOM,
+                            WeightPerPiece = item.WeightPerPiece,
+
+                            // mtr
+                            MTR = orderMTR
+                        };
+
+                        model.OrderItems.Add(orderItem);
+                    }
 
                 // mtrs
                 foreach (var mtr in orderMTRs)

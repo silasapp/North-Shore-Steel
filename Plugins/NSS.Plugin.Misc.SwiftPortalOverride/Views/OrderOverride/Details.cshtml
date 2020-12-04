@@ -44,10 +44,14 @@
             Back to Orders
         </div>
         <label class="h3-primary-sans my-3">ORDER NUMBER: @Model.OrderId</label>
-        <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.OrderId })')">
-            <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
-            Order Again
-        </div>
+        @if (Model.SysOrderId != null)
+        {
+            <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')">
+                <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
+                Order Again
+            </div>
+        }
+
     </div>
     <div class="row mx-0 d-flex flex-row bg-white-shadow px-4 py-4 mt-4">
         <div class="col-md-4 col-sm-6">
