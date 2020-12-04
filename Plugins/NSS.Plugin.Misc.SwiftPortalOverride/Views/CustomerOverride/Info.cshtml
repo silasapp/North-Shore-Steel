@@ -55,7 +55,8 @@
 
                     <div class="">
                         <label asp-for="Email" asp-postfix=":">Work Email</label>
-                        <label class="form-control custom-input" style="cursor:unset" readonly>@Model.Email</label>
+                        <input asp-for="Email" class="form-control custom-input" style="cursor:unset" readonly />
+                        @* <label class="form-control custom-input" asp-for="Email" style="cursor:unset" readonly>@Model.Email</label>*@
                     </div>
 
 
@@ -78,7 +79,8 @@
                     {
                         <div class="">
                             <label asp-for="Company" asp-postfix=":">Company Name</label>
-                            <label class="form-control custom-input" style="cursor:unset" readonly>@Model.Company</label>
+                            <input asp-for="Company" class="form-control custom-input" style="cursor:unset" readonly />
+                            @*<label class="form-control custom-input" style="cursor:unset" asp-for="Company" readonly>@Model.Company</label>*@
                         </div>
                     }
 
