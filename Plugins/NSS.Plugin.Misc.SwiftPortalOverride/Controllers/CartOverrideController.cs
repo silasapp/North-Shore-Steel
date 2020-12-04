@@ -682,7 +682,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
+        public override IActionResult StartCheckout(IFormCollection form)
+        {
+            //update cart
+            UpdateCart(form);
 
+            return base.StartCheckout(form);
+        }
 
         [HttpsRequirement]
         public override IActionResult Wishlist(Guid? customerGuid)

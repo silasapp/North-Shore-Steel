@@ -211,7 +211,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                             TotalPrice = item.TotalPrice,
                             TotalWeight = item.TotalWeight,
                             UnitPrice = item.UnitPrice,
-                            UOM = item.UOM.ToString(),
+                            UOM = item.UOM,
                             WeightPerPiece = item.WeightPerPiece,
 
                             // mtr
