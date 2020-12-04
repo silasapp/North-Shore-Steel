@@ -123,7 +123,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             // send reject email
             _workFlowMessageService.SendNewCustomerRejectionEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", _storeContext.CurrentStore.DefaultLanguageId);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

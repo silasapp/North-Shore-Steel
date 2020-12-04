@@ -44,10 +44,14 @@
             Back to Orders
         </div>
         <label class="h3-primary-sans my-3">ORDER NUMBER: @Model.OrderId</label>
-        <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.OrderId })')">
-            <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
-            Order Again
-        </div>
+        @if (Model.SysOrderId != null)
+        {
+            <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')">
+                <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
+                Order Again
+            </div>
+        }
+
     </div>
     <div class="row mx-0 d-flex flex-row bg-white-shadow px-4 py-4 mt-4">
         <div class="col-md-4 col-sm-6">
@@ -296,18 +300,22 @@
                      v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
                 <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket</label>
             </div>
-            <div class="d-flex flex-row mt-4 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
-                <img alt="MTR Icon" v-bind:src="isHoveringViewMTR ? '/Themes/@themeName/Content/assets/invoice.svg' : '/Themes/@themeName/Content/assets/invoice.svg'" />
+            @if (Model.MtrCount > 0)
+            {
+                <div class="d-flex flex-row mt-4 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
+                    <img alt="MTR Icon" v-bind:src="isHoveringViewMTR ? '/Themes/@themeName/Content/assets/invoice.svg' : '/Themes/@themeName/Content/assets/invoice.svg'" />
 
-                @if (Model.MtrCount == 1)
-                {
-                    <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault().MtrId</label>
-                }
-                else if (Model.MtrCount > 1)
-                {
-                    <label class="h4-primary mb-0 ml-1 cursor-pointer" onclick="handleMtrModal()">View MTRs</label>
-                }
-            </div>
+                    @if (Model.MtrCount == 1)
+                    {
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault().MtrId</label>
+                    }
+                    else if (Model.MtrCount > 1)
+                    {
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer" onclick="handleMtrModal()">View MTRs</label>
+                    }
+                </div>
+            }
+
         </div>
     </div>
     <div class="mt-4">
