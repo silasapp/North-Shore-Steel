@@ -9,7 +9,7 @@
     }
 </style>
 <div>
-    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" allowPaging="true" allowFiltering="true">
+    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" allowExcelExport="true" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
@@ -33,6 +33,26 @@
         </e-grid-columns>
     </ejs-grid>
 </div>
+
+<script>
+    function toolbarClick() {
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        //if (args.item.id === 'OrderGrid_excelexport') {
+        var exceldata = gridObj.getSelectedRecords();
+        var exportProperties = {
+            dataSource: exceldata
+        };
+        console.log(exportProperties);
+        gridObj.excelExport(exportProperties);
+        //}
+    }
+
+    function excelQueryCellInfo(args) {
+        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
+        if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
+    }
+
+</script>
 
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderId}">${OrderId}</a>
