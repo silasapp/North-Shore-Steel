@@ -55,7 +55,7 @@
             @if (!Model.IsExistingCustomer)
             {
                 @Html.Raw(T("Plugins.Misc.SwiftPortalOverride.Fields.NewCustomerWelcomeMessage.Text"))
-                <div>
+                <div class="text">
                     <iframe height="315"
                             src=@Model.MarketingVideoUrl
                             frameborder="0"

@@ -40,7 +40,8 @@
         //if (args.item.id === 'OrderGrid_excelexport') {
         var exceldata = gridObj.getSelectedRecords();
         var exportProperties = {
-            dataSource: exceldata
+            dataSource: exceldata,
+            fileName: "OrdersExport.xlsx"
         };
         console.log(exportProperties);
         gridObj.excelExport(exportProperties);

@@ -42,7 +42,8 @@
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
         var exportProperties = {
-            dataSource: exceldata
+            dataSource: exceldata,
+            fileName: "InvoiceExport.xlsx"
         };
         gridObj.excelExport(exportProperties);
     }
