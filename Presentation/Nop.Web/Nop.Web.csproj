@@ -222,6 +222,8 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\twitter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\youtube.svg" />
     <Content Remove="Themes\SwiftPortal\Content\css\styles-custom.css" />
+    <Content Remove="Themes\SwiftPortal\Content\images\filter.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\images\sort.svg" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css.map" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css" />

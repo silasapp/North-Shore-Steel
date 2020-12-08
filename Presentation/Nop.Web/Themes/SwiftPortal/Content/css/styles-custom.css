@@ -2344,269 +2344,6 @@ table input {
     flex-direction: column;
 }
 
-@media all and (min-width: 1001px) {
-    /* CUSTOM STYLE */
-    .customer-blocks {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-column-gap: 30px;
-    }
-
-    /*.cat-side-drawer {
-        display: block;
-    }*/
-
-    .login-page .new-wrapper .text {
-        min-height: auto;
-    }
-}
-
-@media all and (max-width: 1028px) {
-    #invoiceSearchField > div {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(200px, 1fr));
-        grid-column-gap: 20px;
-    }
-
-    #orderSearchField > div {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-column-gap: 20px;
-    }
-
-    .password-fieldset {
-        padding: 30px 15%;
-    }
-
-    /*custom container*/
-    .nss-container {
-        padding: 30px 80px;
-    }
-
-    .login-page .fieldset {
-        padding: 24px 40px;
-    }
-
-    .registration-page .fieldset {
-        padding: 24px 100px;
-    }
-}
-
-@media all and (max-width: 800px) {
-    .account-select {
-        position: relative;
-    }
-
-    .top-menu > li {
-        background-color: transparent;
-        border-bottom: 1px solid #f6f6f6 !important;
-    }
-    /*custom container*/
-    .nss-container {
-        padding: 30px 36px;
-    }
-
-    .footer-main > .footer-content {
-        flex-basis: 30%;
-        margin-bottom: 30px;
-    }
-
-    .login-page .fieldset {
-        padding: 24px 40px;
-    }
-
-    .registration-page .fieldset {
-        padding: 24px 70px;
-    }
-}
-
-@media all and (min-width: 600px) {
-    #drawerPane {
-        width: auto !important;
-    }
-}
-
-@media all and (max-width: 600px) {
-    #invoiceSearchField > div {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(200px, 1fr));
-        grid-column-gap: 20px;
-    }
-
-    .checkout-nickname {
-        width: 100% !important;
-    }
-
-    #orderSearchField > div {
-        display: grid;
-        grid-template-columns: repeat(1, 1fr);
-        grid-column-gap: 20px;
-    }
-
-    .cat-side-drawer {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        background-color: #ffffff;
-        overflow-x: hidden;
-        /*padding-top: 30px;*/
-        transition: 0.5s;
-    }
-
-    /*.cart-side-drawer-trigger:hover + .cat-side-drawer,*/
-    /*.cat-side-drawer:hover,*/
-    /*, .cat-side-drawer:focus*/
-    /* .cart-side-drawer-trigger:active + .cat-side-drawer {
-            width: 70%;
-            transform: translateX(0);
-        }*/
-    #accordion {
-        text-align: left;
-        overflow: hidden;
-    }
-
-        #accordion .e-treeview .e-ul {
-            overflow-x: hidden !important;
-        }
-
-        #accordion li, accordion label {
-            display: block;
-        }
-
-    .card-header {
-        display: block;
-        white-space: nowrap;
-    }
-
-    #accordion .pure-material-checkbox {
-        display: block;
-        white-space: nowrap;
-    }
-
-    .cart-side-drawer-trigger {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: -10px;
-        bottom: 0;
-        margin: auto;
-        z-index: 1;
-        height: 50px;
-        width: 50px;
-        background: #ffffff;
-        border-radius: 50%;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid black;
-    }
-
-    .sideDrawerClose {
-        display: block;
-        font-size: 32px;
-        display: flex;
-        justify-content: flex-end;
-        padding: 0px 10px;
-    }
-
-    .cart-filter-menu {
-        margin-bottom: 15px;
-        width: 100%;
-    }
-
-    .cart-action-options {
-        justify-content: space-between;
-    }
-
-    .cart-input-options {
-        padding: 0;
-    }
-
-    .cart-filter-menu {
-        flex-basis: 100%;
-    }
-
-    .nav-bar-content > .header-logo {
-        order: 1;
-        flex-basis: 40%;
-    }
-
-    .nav-bar-content > .nav-bar-search {
-        order: 3;
-        margin-top: 10px;
-    }
-
-    .nav-bar-content > .header-links-wrapper {
-        order: 2;
-    }
-
-    .footer-main > .footer-content {
-        flex-basis: 48%;
-    }
-
-    .footer-logo {
-        flex-basis: 100% !important;
-    }
-
-    .nss-container {
-        padding: 30px 20px;
-    }
-
-    .login-page .fieldset {
-        padding: 24px 20px;
-    }
-
-    .registration-page .fieldset {
-        padding: 24px 40px;
-    }
-
-    .account-block {
-        display: grid;
-        grid-row-gap: 20px;
-    }
-
-    .account-btn {
-        margin: 0;
-    }
-
-    .contact-block {
-        margin-top: 20px;
-    }
-
-    .account-page-card > .form-fields, .address-block {
-        grid-template-columns: repeat(1, 1fr);
-    }
-
-    .address-edit-page .edit-address {
-        grid-template-columns: repeat(1, 1fr);
-        grid-row-gap: 20px;
-    }
-
-    .hide-mobile {
-        display: none;
-    }
-
-    .catalog-page {
-        margin-top: 0;
-    }
-
-    .invoice-summary-content > div {
-        flex-basis: 38%;
-        text-align: left;
-        margin-bottom: 10px !important;
-    }
-
-    .checkout-card-1 > div, .address-dropdown, .address-dropdown + button, .address-dropdown + label, .payment-item-card, .checkout-new-address-field {
-        flex-basis: 100%;
-        text-align: left;
-        margin-bottom: 10px;
-    }
-}
-
 /* #region INPUTS */
 
 .nss-form-control {
@@ -2807,7 +2544,7 @@ table input {
 }
 
 .bg-primary {
-    background: #03175b;
+    background: #03175b !important;
 }
 
 .bg-white-shadow {
@@ -3051,7 +2788,281 @@ and also iPads specifically.
     display: none;
 }
 
-@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+@media all and (min-width: 1001px) {
+    /* CUSTOM STYLE */
+    .customer-blocks {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-column-gap: 30px;
+    }
+
+    /*.cat-side-drawer {
+        display: block;
+    }*/
+
+    .login-page .new-wrapper .text {
+        min-height: auto;
+    }
+}
+
+@media all and (max-width: 1028px) {
+    #invoiceSearchField > div {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
+        grid-column-gap: 20px;
+    }
+
+    #orderSearchField > div {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-column-gap: 20px;
+    }
+
+    .password-fieldset {
+        padding: 30px 15%;
+    }
+
+    /*custom container*/
+    .nss-container {
+        padding: 30px 80px;
+    }
+
+    .login-page .fieldset {
+        padding: 24px 40px;
+    }
+
+    .registration-page .fieldset {
+        padding: 24px 100px;
+    }
+}
+
+@media all and (max-width: 800px) {
+    .account-select {
+        position: relative;
+    }
+
+    .top-menu > li {
+        background-color: transparent;
+        border-bottom: 1px solid #f6f6f6 !important;
+    }
+    /*custom container*/
+    .nss-container {
+        padding: 30px 36px;
+    }
+
+    .footer-main > .footer-content {
+        flex-basis: 30%;
+        margin-bottom: 30px;
+    }
+
+    .login-page .fieldset {
+        padding: 24px 40px;
+    }
+
+    .registration-page .fieldset {
+        padding: 24px 70px;
+    }
+}
+
+@media all and (max-width: 600px) {
+    #invoiceSearchField > div {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+        grid-column-gap: 20px;
+    }
+
+    .checkout-nickname {
+        width: 100% !important;
+    }
+
+    #orderSearchField > div {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        grid-column-gap: 20px;
+    }
+
+   
+
+    /*.cart-side-drawer-trigger:hover + .cat-side-drawer,*/
+    /*.cat-side-drawer:hover,*/
+    /*, .cat-side-drawer:focus*/
+    /* .cart-side-drawer-trigger:active + .cat-side-drawer {
+            width: 70%;
+            transform: translateX(0);
+        }*/
+
+
+    .cart-total-left, .cart-total-right {
+        line-height: normal !important;
+        padding: 5px 0 !important;
+        display: inline-table;
+        border: 0 !important;
+        text-align: right !important;
+        display: inline-table !important;
+    }
+
+    .cart-total > tbody > tr {
+        padding: 0px 20px !important;
+    }
+
+    .cart-total-left {
+        text-align: left !important;
+    }
+
+    .cart-table td:nth-last-child(2) {
+        float: right;
+    }
+
+
+
+    .datepicker-days thead tr {
+        position: unset !important;
+    }
+
+    .datepicker-days tr {
+        display: table !important;
+    }
+
+    .datepicker-days td {
+        display: table-cell !important;
+    }
+
+    .cart-qty-input {
+        width: 70px;
+        height: 30px
+    }
+
+    #order-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox, #invoice-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox {
+        background: none !important;
+    }
+   
+
+    .cart-filter-menu {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    .cart-action-options {
+        justify-content: space-between;
+    }
+
+    .cart-input-options {
+        padding: 0;
+    }
+
+    .cart-filter-menu {
+        flex-basis: 100%;
+    }
+
+    .nav-bar-content > .header-logo {
+        order: 1;
+        flex-basis: 40%;
+    }
+
+    .nav-bar-content > .nav-bar-search {
+        order: 3;
+        margin-top: 10px;
+    }
+
+    .nav-bar-content > .header-links-wrapper {
+        order: 2;
+    }
+
+    .footer-main > .footer-content {
+        flex-basis: 48%;
+    }
+
+    .footer-logo {
+        flex-basis: 100% !important;
+    }
+
+    .nss-container {
+        padding: 30px 20px;
+    }
+
+    .login-page .fieldset {
+        padding: 24px 20px;
+    }
+
+    .registration-page .fieldset {
+        padding: 24px 40px;
+    }
+
+    .account-block {
+        display: grid;
+        grid-row-gap: 20px;
+    }
+
+    .account-btn {
+        margin: 0;
+    }
+
+    .contact-block {
+        margin-top: 20px;
+    }
+
+    .account-page-card > .form-fields, .address-block {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .address-edit-page .edit-address {
+        grid-template-columns: repeat(1, 1fr);
+        grid-row-gap: 20px;
+    }
+
+    .hide-mobile {
+        display: none;
+    }
+
+    .catalog-page {
+        margin-top: 0;
+    }
+
+    .invoice-summary-content > div {
+        flex-basis: 38%;
+        text-align: left;
+        margin-bottom: 10px !important;
+    }
+
+    .checkout-card-1 > div, .address-dropdown, .address-dropdown + button, .address-dropdown + label, .payment-item-card, .checkout-new-address-field {
+        flex-basis: 100%;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+}
+
+/* #region BOOTSTRAP MEDIA QUERIES */
+
+/*// Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) {
+    
+}
+
+/*// Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+    td > input[type=number]::placeholder {
+        color: #FFF;
+    }
+}
+
+/*// Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) {
+    
+}
+
+/*// Extra large devices (large desktops, 1200px and up)*/
+@media (min-width: 1200px) {
+    .cat-side-drawer {
+        width: auto !important;
+    }
+
+    .filter-options, .overlay-off-canvas {
+        display: none !important;
+    }
+}
+
+/*// Small devices (landscape phones, less than 768px)*/
+@media (max-width: 767.98px) {
     table {
         width: 100%;
     }
@@ -3059,6 +3070,9 @@ and also iPads specifically.
     /* Force table to not be like tables anymore */
     .mv-title {
         display: block;
+    }
+    .non-default-column {
+        display: none !important;
     }
     /* Hide table headers (but not display: none;, for accessibility) */
     thead tr {
@@ -3091,72 +3105,81 @@ and also iPads specifically.
         border: 0 !important;
         text-align: right !important;
     }
-    .cart-total-left, .cart-total-right {
-        line-height: normal !important;
-        padding: 5px 0 !important;
-        display: inline-table;
-        border: 0 !important;
-        text-align: right !important;
-        display: inline-table !important;
-    }
-    .cart-total > tbody > tr {
-        padding: 0px 20px !important;
-    }
 
-    .cart-total-left {
-        text-align: left !important;
-    }
-
-    td > input {
-        /*width: 100% !important;*/
-        margin: 5px 0 10px;
-    }
-
-    td > div {
-        display: flex;
-        justify-content: space-between;
-    }
-
-        td > div > .mv-value {
-            white-space: break-spaces;
+        td > input {
+            width: 100px !important;
+            margin: 5px 0 10px;
         }
 
-        td > div > .mv-title {
-            font-weight: bold;
-            color: #03175b;
-            margin-right: 10px;
-            font-style: italic;
+            td > input[type=number]::-webkit-inner-spin-button,
+            td > input[type=number]::-webkit-outer-spin-button {
+                opacity: 1;
+            }
+
+        td > div {
+            display: flex;
+            justify-content: space-between;
         }
+
+            td > div > .mv-value {
+                white-space: break-spaces;
+            }
+
+            td > div > .mv-title {
+                font-weight: bold;
+                color: #03175b;
+                margin-right: 10px;
+                font-style: italic;
+            }
 
     tr > .quantity, .catalog-page td:nth-last-child(2) {
         float: left;
     }
-    .cart-table td:nth-last-child(2) {
-        float: right;
+}
+
+/*// Medium devices (tablets, less than 992px)*/
+@media (max-width: 991.98px) {
+}
+
+/*// Large devices (desktops, less than 1200px)*/
+@media (max-width: 1199.98px) {
+    .cat-side-drawer {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #ffffff;
+        overflow-x: hidden;
+        transition: 0.5s;
     }
 
-    
-
-    .datepicker-days thead tr {
-        position: unset !important;
+    #accordion {
+        text-align: left;
+        overflow: hidden;
     }
 
-    .datepicker-days tr {
-        display: table !important;
+    #accordion .e-treeview .e-ul {
+        overflow-x: hidden !important;
     }
 
-    .datepicker-days td {
-        display: table-cell !important;
-    }
-    .cart-qty-input {
-        width: 70px;
-        height: 30px
+    #accordion li, accordion label {
+        display: block;
     }
 
-    #order-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox, #invoice-grid .e-grid.e-responsive .e-rowcell.e-gridchkbox {
-        background: none !important;
+    .card-header {
+        display: block;
+        white-space: nowrap;
+    }
+
+    #accordion .pure-material-checkbox {
+        display: block;
+        white-space: nowrap;
     }
 }
+
+/* #endregion */
 
 /* #region Custom Loading */
 
@@ -3173,9 +3196,6 @@ and also iPads specifically.
 
 /* #endregion */
 
-/*.custom .e-list-item .e-icons {
-    font-family: "Customize-icon";
-}*/
 
 .custom.e-treeview .e-list-item .e-icon-expandable::before {
     content: '\002B';
@@ -3213,3 +3233,58 @@ and also iPads specifically.
 [v-cloak] {
     display: none;
 }
+
+/* #region CATALOG FILTERS */
+
+#drawerPane {
+    z-index: 1070;
+}
+
+.overlay-off-canvas {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(221,221,221,.6);
+    z-index: 1010;
+    -webkit-transition: background .3s ease-in-out;
+    transition: background .3s ease-in-out;
+}
+
+.filter-options {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 0 15px rgba(0,0,0,.2);
+    font-size: 0;
+    z-index: 1000;
+    background: white;
+}
+
+.filter-options label {
+    font-size: 14px;
+    text-transform: uppercase;
+    margin-bottom: 0px;
+}
+
+.filter-options div {
+    position: relative;
+}
+
+.filter-options div select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+/* #endregion*/

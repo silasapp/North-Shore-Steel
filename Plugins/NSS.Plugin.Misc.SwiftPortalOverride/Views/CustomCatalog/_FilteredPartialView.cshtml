@@ -278,25 +278,27 @@
         });
     }
 
-    string buildDisplayScript(string columnName) => $"<script id='{columnName.ToLower()}Template' type='text/x-template'><label>${{{ columnName.ToLower() }}}</label></script>";
+    string buildDisplayScript(string columnName) => $@"<script id='{columnName.ToLower()}Template' type='text/x-template'>
+    <label class='{(isDefaultColumn(columnName) ? "non-default-column" : "")}>${{{ columnName.ToLower() }}}</label></script>";
 
+    string buildGridScript(string title, string columnName) => $@"<script id='{columnName.ToLower()}Template' type='text/x-template'>
+    <div class='{(!isDefaultColumn(columnName) ? "non-default-column" : "")}'><label class='mv-title'>{ title }:</label><label>${{{ columnName.ToLower() }}}</label></div></script>";
 
-    string buildGridScript(string title, string columnName)
-    {
-        return $"<script id='{columnName.ToLower()}Template' type='text/x-template'><div><label class='mv-title'>{ title }:</label><label class='mv-value'>${{{ columnName.ToLower() }}}</label></div></script>";
-    }
+    bool isDefaultColumn(string columnName) => columnName.ToLower() == "itemno" || columnName.ToLower() == "itemname" || columnName.ToLower() == "itemtagno";
 }
 
 <script>
     gridData = @Html.Raw(Serialize(ObjectData));
     gridColumns = @Html.Raw(Serialize(headerColumns));
+    shopVm.buildSortOptions(gridColumns);
 
     console.log("gridData: ", gridData);
     console.log("gridColumns: ", gridColumns);
 
-    new Vue({
+    var gridVm = new Vue({
         el: '_partialview',
         data: {
+            grid: null,
             gridData,
         },
         mounted: function() {
@@ -326,7 +328,7 @@
             },
             buildGrid: function () {
                 const gridColumns = this.getGridColumns();
-                const grid = new ej.grids.Grid({
+                this.grid = new ej.grids.Grid({
                     dataSource: gridData,
                     allowPaging: true,
                     allowSorting: true,
@@ -343,7 +345,7 @@
                     ],
                     pageSettings: { pageSize: 100 },
                 });
-                grid.appendTo('#Grid');
+                this.grid.appendTo('#Grid');
             },
         },
     });
@@ -369,7 +371,7 @@
     ${if(_isSerialized == "true")}
     <label style="width: 40px" for="">1</label>
     ${else}
-    <input type="number" min="1" name="quantity" style="width: 40px" class="qty-input" id="qty${_itemId}"
+    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}" placeholder="Qty"
            oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">
     ${/if}
 </script>

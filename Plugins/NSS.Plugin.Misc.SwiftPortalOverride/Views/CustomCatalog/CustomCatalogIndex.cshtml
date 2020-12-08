@@ -14,13 +14,14 @@
 <div id="app" class="page catalog-page">
     <div class="page-body">
         <div class="row">
-            <div class="col-md-4 col-lg-3 col-xl-3 shapes-treeview">
-                <div class="cart-side-drawer-trigger" id="drawerTrigger" onclick="openSideDrawer()">
-                    <img src="Themes/SwiftPortal/Content/assets/settings-adjust.svg" alt="">
-                </div>
+            <div class="col-lg-12 col-xl-3 shapes-treeview">
 
                 <div class="cat-side-drawer" id="drawerPane">
-                    <span class="sideDrawerClose" onclick="closeSideDrawer()">&times;</span>
+                    <div class="d-xl-none">
+                        <div class="d-flex flex-row justify-content-end">
+                            <img class="bg-primary my-2 mx-2" src="Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close filter" v-on:click="closeFiltersDrawer()" width="24">
+                        </div>
+                    </div>
                     <div id="accordion">
                         <div class="card">
                             <a class="card-link" data-toggle="collapse" href="#collapseOne" id="shapes-header"
@@ -68,7 +69,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-8 col-lg-9 col-xl-9">
+            <div class="col-lg-12 col-xl-9">
                 <div class="d-flex flex-row mb-1 flex-wrap" v-if="filterTags.length > 0">
                     <div v-for="(tag, i) in filterTags" class="d-flex flex-row my-1" V-bind:class="{'mr-1': i == (filterTags.length - 1) }">
                         <span class="filter-tag">
@@ -85,6 +86,24 @@
             </div>
         </div>
     </div>
+    <div class="overlay-off-canvas" v-bind:style="{'display': isFilterOpen ? 'block' : 'none' }" v-on:click="closeFiltersDrawer"></div>
+
+    <div class="filter-options d-flex flex-row justify-content-around">
+        <div class="d-flex flex-row flex-fill p-3 align-items-center justify-content-center" v-on:click="openFiltersDrawer">
+            <img src="Themes/SwiftPortal/Content/images/filter.svg" alt="" width="24">
+            <label class="ml-1">FILTERS</label>
+        </div>
+        <div class="d-flex flex-row flex-fill p-3 align-items-center justify-content-center">
+            <img src="Themes/SwiftPortal/Content/images/sort.svg" alt="" width="24">
+            <label class="">SORT</label>
+            <select aria-label="Select product sort order" v-model="sortOption" v-on:change="handleSortChanged">
+                <option v-for="option in sortOptions" v-bind:key="option.code" v-bind:value="option">
+                    {{ option.name }}
+                </option>
+            </select>
+        </div>
+    </div>
+
 </div>
 
 @functions{
@@ -172,7 +191,7 @@
             constants: {
                 SPEC_TYPE_DEFAULT: 1,
                 SPEC_TYPE_OTHERS: 2,
-            }
+            },
         },
     }
 
@@ -189,6 +208,10 @@
             treeview: null,
             checkedNodes: [],
             dialog: null,
+
+            isFilterOpen: false,
+            sortOption: null,
+            sortOptions: [],
         },
         mounted: function () {
             this.getFilteredProduuts();
@@ -199,8 +222,7 @@
             //Initialize TreeView component
             this.treeview = new ej.navigations.TreeView({
                 fields: { dataSource: this.shared.groupedShapes, id: 'id', parentID: 'parentId', text: 'displayName', hasChildren: 'hasChild' },
-                showCheckBox: true, autoCheck: false, cssClass: 'custom',
-                nodeChecked: this.nodeChecked,
+                showCheckBox: true, autoCheck: false, cssClass: 'custom', nodeChecked: this.nodeChecked,
             });
 
             //Render initialized TreeView
@@ -263,7 +285,6 @@
                         spec.checked = this.filterTags.some(x => x.type === 'spec' && x.id === spec.specificationAttributeOptionId);
                     });
                 });
-                console.log("grouped prepared: ", this.shared.groupedSpecs);
                 this.groupedSpecs = this.shared.groupedSpecs;
             },
 
@@ -276,27 +297,14 @@
                     visible: false,
                     width: '650px',
                     isModal: true,
-                    //animationSettings: { effect: 'none' }
                 });
-                console.log("buildDialog: ");
                 this.dialog.appendTo('#dialog');
             },
             nodeChecked: function (args) {
                 if (!args.isInteracted) return;
-
                 this.toggleShape(args.data[0]);
             },
             toggleShape: function (node) {
-                //if (!this.treeview)
-                //    this.treeview = document.getElementById('treedata').ej2_instances[0];
-                // if it's checked
-                    // if its topmost level, get all children and check them
-                    // else
-                        // add to previously selected nodes
-                        // if all children in the pid are selected, add the parentId
-                // else
-                    // if it's topmost level, uncheck self and all children
-                    // else, uncheck self and parent
                 const shape = this.shared.groupedShapes.find(x => x.id == node.id);
                 let resultShapes = [];
                 let resultNodes = [];
@@ -404,6 +412,7 @@
                         self.hideLoading();
                     }
                 });
+                this.closeFiltersDrawer();
             },
 
             resetTreeview: function () {
@@ -424,7 +433,55 @@
                 const collapsed = $('#' + id).hasClass('collapsed');
                 if (collapsed) $('#' + id).removeClass('collapsed');
                 else $('#' + id).addClass('collapsed');
-            }
+            },
+
+            openFiltersDrawer: function () {
+                console.log("opening filters...");
+                const drawer = document.getElementById("drawerPane");
+                drawer.style.width = 'auto';
+                drawer.style.maxWidth = '70%';
+                drawer.style.minWidth = '240px';
+                drawer.style.transform = 'translateX(0)';
+                this.isFilterOpen = true;
+            },
+            closeFiltersDrawer: function () {
+                console.log("closing filters...");
+                const drawer = document.getElementById("drawerPane");
+                drawer.style.width = '0px';
+                drawer.style.minWidth = '0px';
+                this.isFilterOpen = false;
+            },
+
+            buildSortOptions: function (columns) {
+                let retVal = [];
+                const itemNo = columns.find(x => x.code.toLowerCase() === 'itemno');
+                const itemName = columns.find(x => x.code.toLowerCase() === 'itemname');
+                const tagNo = columns.find(x => x.code.toLowerCase() === 'itemtagno');
+                if (itemNo) {
+                    const { displayName, sort } = itemNo;
+                    const ascColumn = { name: `${displayName}: Ascending`, sort, sortType: 'Ascending' };
+                    const descColumn = { name: `${displayName}: Descending`, sort, sortType: 'Descending' };
+                    retVal = [...retVal, ascColumn, descColumn];
+                }
+                if (itemName) {
+                    const { displayName, sort } = itemName;
+                    const ascColumn = { name: `${displayName}: Ascending`, sort, sortType: 'Ascending' };
+                    const descColumn = { name: `${displayName}: Descending`, sort, sortType: 'Descending' };
+                    retVal = [...retVal, ascColumn, descColumn];
+                }
+                if (tagNo) {
+                    const { displayName, sort } = tagNo;
+                    const ascColumn = { name: `${displayName}: Ascending`, sort, sortType: 'Ascending' };
+                    const descColumn = { name: `${displayName}: Descending`, sort, sortType: 'Descending' };
+                    retVal = [...retVal, ascColumn, descColumn];
+                }
+                console.log("buildSortOptions: ", retVal);
+                this.sortOptions = retVal;
+            },
+            handleSortChanged: function () {
+                console.log("handleSortChanged: ", this.sortOption);
+                gridVm.grid.sortColumn(this.sortOption.sort.toLowerCase(), this.sortOption.sortType, false);
+            },
         },
     });
 
@@ -512,38 +569,5 @@
         var results = regex.exec(location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     };
-</script>
-<script>
-    function openSideDrawer() {
-        var el = document.getElementById("drawerPane");
-        el.style.width = '70%';
-        el.style.transform = 'translateX(0)';
-    }
-    function closeSideDrawer() {
-        document.getElementById("drawerPane").style.width = "0px";
-    }
-
-    //document.addEventListener('click', function () {
-    //    var el = document.getElementById("drawerPane");
-    //    if (el.style.width == "0px" || window.screen.availWidth > 600) {
-    //        return;
-    //    }
-    //    el.style.width = "0px";
-    //});
-
-    //document.getElementById("drawerTrigger").addEventListener('click', function (event) {
-
-    //    if ( window.screen.availWidth > 600) {
-    //        return;
-    //    }
-    //    event.stopPropagation();
-    //});
-
-    //document.getElementById("drawerPane").addEventListener('click', function (event) {
-    //    if ( window.screen.availWidth > 600) {
-    //        return;
-    //    }
-    //    event.stopPropagation();
-    //});
 </script>
 <ejs-scripts></ejs-scripts>
