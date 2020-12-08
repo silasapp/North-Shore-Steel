@@ -3,6 +3,7 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @using NSS.Plugin.Misc.SwiftCore.Services
+@using NSS.Plugin.Misc.SwiftCore.Helpers 
 @inject IWorkContext workContext
 @inject ICustomerCompanyService customerCompanyService
 @{
@@ -18,7 +19,8 @@
 
 @{
     // get cust company
-    var erpCompId = GetCustomerCompanyDetails();
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
 }
 
 
@@ -34,7 +36,7 @@
                 }
             </select>
         }
-        @await Component.InvokeAsync("TopMenu")
+        @await Component.InvokeAsync("CustomTopMenu")
     </div>
 </div>
 
@@ -49,21 +51,10 @@
         }
 
 
-        var erpCompId = @Html.Raw(erpCompId);
+        var erpCompId = @Html.Raw(eRPCompanyId);
         $(document).ready(function () {
             $('select[name="options"]').find('option[value='+erpCompId+']').attr("selected", true);
         });
 
 </script>
-@functions{
 
-    int GetCustomerCompanyDetails()
-    {
-        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-
-        int.TryParse(Context.Request.Cookies[compIdCookieKey], out int eRPCompanyId);
-
-
-        return eRPCompanyId;
-    }
-}

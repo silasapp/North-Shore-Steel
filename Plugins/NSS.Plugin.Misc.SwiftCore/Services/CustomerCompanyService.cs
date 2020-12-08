@@ -1,5 +1,6 @@
 ﻿using Nop.Data;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -79,5 +80,35 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _customerCompanyRepository.Update(cCompany);
         }
 
+        public bool Authorize(int customerId, int erpCompanyId, ERPRole role)
+        {
+            if (customerId == 0 || erpCompanyId == 0)
+                return false;
+
+            var company = _companyRepository.Table.FirstOrDefault(c => c.ErpCompanyId == erpCompanyId);
+            if (company == null)
+                return false;
+
+            var customerCompany = _customerCompanyRepository.Table.FirstOrDefault(c => c.CustomerId == customerId && c.CompanyId == company.Id);
+            if (customerCompany == null)
+                return false;
+
+            switch (role)
+            {
+                case ERPRole.AP:
+                    return customerCompany.AP;
+                case ERPRole.Buyer:
+                    return customerCompany.Buyer;
+                case ERPRole.Operations:
+                    return customerCompany.Operations;
+                case ERPRole.CanCredit:
+                    return customerCompany.CanCredit;
+                default:
+                    break;
+            }
+
+            return false;
+
+        }
     }
 }

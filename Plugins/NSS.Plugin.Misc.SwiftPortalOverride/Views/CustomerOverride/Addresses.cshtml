@@ -1,5 +1,11 @@
-﻿@using Nop.Web.Models.Customer
+﻿@using Nop.Core
+@using Nop.Web.Models.Customer
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
 @using Nop.Web.Framework.Themes
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
 @inject IThemeContext themeContext
 @model CustomerAddressListModel
 @{
@@ -11,9 +17,16 @@
     Html.AppendPageCssClassParts("html-account-page");
     Html.AppendPageCssClassParts("html-address-list-page");
 }
+
+@{
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+}
+
 @section left
 {
-    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses })
+    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses, isABuyer = isBuyer })
 }
 
 @{
@@ -21,33 +34,7 @@
 }
 
 <style>
-    /*.popup {
-        position: relative;
-    }
 
-    .popup-content {
-        display: none;
-        position: absolute;
-        background-color: #f1f1f1;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-    }
-
-        .popup-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-
-            .popup-content a:hover {
-                background-color: #ddd;
-            }
-
-    .popup:hover .popup-content {
-        display: block;
-    }*/
 
     .action-btn {
         background-color: #f6f6f6 !important;

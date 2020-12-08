@@ -1,11 +1,15 @@
 ﻿@using Nop.Core
 @using Nop.Web.Models.Customer
-@using NSS.Plugin.Misc.SwiftCore.Helpers;
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
 @using Nop.Services.Common
 @model CustomerInfoModel
 @inject Nop.Core.IWebHelper webHelper
 @inject IWorkContext workContext
 @inject IGenericAttributeService genericAttributeService
+@inject ICustomerCompanyService customerCompanyService
+
 @{
     Layout = "_ColumnsTwo";
 
@@ -16,14 +20,24 @@
     Html.AppendPageCssClassParts("html-customer-info-page");
 }
 
+@{
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+}
+
+
+
 @section left
     {
-    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Info })
+    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Info, isABuyer = isBuyer })
 }
 
 @{
     var customer = workContext.CurrentCustomer;
     int ErpId = genericAttributeService.GetAttribute<int>(customer, Constants.ErpKeyAttribute);
+
+    string CellPhone = genericAttributeService.GetAttribute<string>(customer, Constants.CellAttribute);
 }
 
 <div class="page account-page customer-info-page">
@@ -53,27 +67,24 @@
                         <span asp-validation-for="LastName"></span>
                     </div>
 
+
+
+                    <div class="">
+                        <label asp-for="Phone" asp-postfix=":">Work Phone</label>
+                        <input asp-for="Phone" class="form-control custom-input" />
+                        <span asp-validation-for="Phone"></span>
+                    </div>
+
+                    <div class="">
+                        <label asp-for="Phone" asp-postfix=":">Cell Phone</label>
+                        <input name="cell-phone" id="cell-phone" class="form-control custom-input" value="@CellPhone" />
+                        <span asp-validation-for="Phone"></span>
+                    </div>
+
                     <div class="">
                         <label asp-for="Email" asp-postfix=":">Work Email</label>
                         <input asp-for="Email" class="form-control custom-input" style="cursor:unset" readonly />
-                        @* <label class="form-control custom-input" asp-for="Email" style="cursor:unset" readonly>@Model.Email</label>*@
                     </div>
-
-
-
-                    @if (Model.PhoneEnabled)
-                    {
-                        <div class="">
-                            <label asp-for="Phone" asp-postfix=":">Phone Number</label>
-                            @if (Model.PhoneRequired)
-                            {
-                                <nop-required />
-                            }
-                            <input asp-for="Phone" class="form-control custom-input" />
-                            <span asp-validation-for="Phone"></span>
-                        </div>
-                    }
-
 
                     @if (Model.CompanyEnabled)
                     {

@@ -904,6 +904,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
+            string cellPhone = form["cell-phone"];
+
+            if (string.IsNullOrEmpty(cellPhone) && string.IsNullOrEmpty(model.Phone))
+                ModelState.AddModelError("", "Cell or Work Phone is required");
+
             var oldCustomerModel = new CustomerInfoModel();
 
             var customer = _workContext.CurrentCustomer;
@@ -1067,6 +1072,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     if (_gdprSettings.GdprEnabled)
                         LogGdpr(customer, oldCustomerModel, model, form);
 
+                    _genericAttributeService.SaveAttribute(customer, Constants.CellAttribute, cellPhone);
 
                     var request = new ERPUpdateUserRequest
                     {

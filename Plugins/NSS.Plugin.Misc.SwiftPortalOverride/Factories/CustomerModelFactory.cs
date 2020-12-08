@@ -54,7 +54,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// </summary>
         /// <param name="selectedTabId">Identifier of the selected tab</param>
         /// <returns>Customer navigation model</returns>
-        public virtual CustomerNavigationModel PrepareCustomerNavigationModel(int selectedTabId = 0)
+        public virtual CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, int selectedTabId = 0)
         {
             var model = new CustomerNavigationModel();
             var themeName = _themeContext.WorkingThemeName;
@@ -85,6 +85,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 ItemClass = "change-password",
                 ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-key.svg"
             });
+            if (isABuyer)
+            {
+                model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+                {
+                    RouteName = "CustomerNotifications",
+                    Title = "NOTIFICATIONS",
+                    Tab = CustomerNavigationEnum.NotificationPreferences,
+                    ItemClass = "customer-notifications",
+                    ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-notifications.svg"
+                });
+            }
 
 
             model.SelectedTab = (CustomerNavigationEnum)selectedTabId;
@@ -106,7 +117,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-           
+
             //form fields
             model.FirstNameEnabled = _customerSettings.FirstNameEnabled;
             model.LastNameEnabled = _customerSettings.LastNameEnabled;
@@ -122,6 +133,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.EnteringEmailTwice = _customerSettings.EnteringEmailTwice;
 
             return model;
-    }
+        }
     }
 }

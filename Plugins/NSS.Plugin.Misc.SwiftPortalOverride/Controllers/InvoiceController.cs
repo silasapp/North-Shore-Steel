@@ -3,8 +3,10 @@ using Nop.Core;
 using Nop.Services.Customers;
 using Nop.Web.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -15,16 +17,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkContext _workContext;
         private readonly ICustomerService _customerService;
         private readonly IInvoiceModelFactory _invoiceModelFactory;
+        private readonly ICustomerCompanyService _customerCompanyService;
 
         #endregion
 
         #region Ctor
 
-        public InvoiceController(IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory)
+        public InvoiceController(IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory, ICustomerCompanyService customerCompanyService)
         {
             _workContext = workContext;
             _customerService = customerService;
             _invoiceModelFactory = invoiceModelFactory;
+            _customerCompanyService = customerCompanyService;
         }
 
         #endregion
@@ -34,6 +38,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpsRequirement]
         public IActionResult CompanyInvoices()
         {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP))
+                return AccessDeniedView();
+
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
@@ -42,13 +52,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View(model);
         }
 
+      
 
         [IgnoreAntiforgeryToken]
         public PartialViewResult SearchCompanyInvoices([FromBody]CompanyInvoiceListModel.SearchFilter filter)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
 
-            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP))
+                return (PartialViewResult)AccessDeniedView();
 
             var model = new CompanyInvoiceListModel();
 

@@ -13,9 +13,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Components
             _customerModelFactory = customerModelFactory;
         }
 
-        public IViewComponentResult Invoke(int selectedTabId = 0)
+        public IViewComponentResult Invoke(bool isABuyer, int selectedTabId = 0)
         {
-            var model = _customerModelFactory.PrepareCustomerNavigationModel(selectedTabId);
+            var model = _customerModelFactory.PrepareCustomerNavigationModel(isABuyer, selectedTabId);
             return View(model);
         }
     }

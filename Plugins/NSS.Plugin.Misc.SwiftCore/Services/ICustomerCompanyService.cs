@@ -1,5 +1,6 @@
 ﻿using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using System.Collections.Generic;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
@@ -16,5 +17,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         IEnumerable<CustomerCompany> GetCustomerCompanies(int customerId);
 
         void UpdateCustomerCompany(CustomerCompany customerCompany);
+
+        bool Authorize(int customerId, int ErpCompanyId, ERPRole role);
     }
 }
