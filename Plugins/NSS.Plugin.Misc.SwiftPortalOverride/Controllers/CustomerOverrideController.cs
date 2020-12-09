@@ -905,6 +905,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Challenge();
 
             string cellPhone = form["cell-phone"];
+            string pLocationId = form["preferred-location-id"];
+            int preferredLocationId = int.Parse(pLocationId);
 
             if (string.IsNullOrEmpty(cellPhone) && string.IsNullOrEmpty(model.Phone))
                 ModelState.AddModelError("", "Cell or Work Phone is required");
@@ -1073,6 +1075,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         LogGdpr(customer, oldCustomerModel, model, form);
 
                     _genericAttributeService.SaveAttribute(customer, Constants.CellAttribute, cellPhone);
+                    _genericAttributeService.SaveAttribute(customer, Constants.PreferredLocationIdAttribute, preferredLocationId);
 
                     var request = new ERPUpdateUserRequest
                     {
