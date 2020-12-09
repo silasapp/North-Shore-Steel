@@ -19,6 +19,7 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using System;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
 {
@@ -75,7 +76,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
 
             // log request
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> Customer Id: {id}", JsonConvert.SerializeObject(input));
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> Customer Id: {id}", JsonConvert.SerializeObject(input.Dto));
 
             Nop.Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
 
@@ -92,10 +93,13 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 {
                     ErpCompanyId = input.Dto.CompanyId,
                     Name = input.Dto.CompanyName,
-                    SalesContactEmail = input.Dto.SalesContact.Email,
-                    SalesContactLiveChatId = input.Dto.SalesContact.LiveChatId,
-                    SalesContactName = input.Dto.SalesContact.Name,
-                    SalesContactPhone = input.Dto.SalesContact.Phone
+                    SalesContactEmail = input.Dto.SalesContactEmail,
+                    //SalesContactLiveChatId = input.Dto.SalesContact.LiveChatId,
+                    SalesContactName = input.Dto.SalesContactName,
+                    SalesContactPhone = input.Dto.SalesContactPhone,
+                    SalesContactImageUrl = input.Dto.SalesContactImageUrl,
+                    CreatedOnUtc = DateTime.UtcNow,
+                    UpdatedOnUtc = DateTime.UtcNow,
                 };
 
                 _companyService.InsertCompany(company);

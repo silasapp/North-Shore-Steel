@@ -31,6 +31,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using Nop.Services.Common;
+using Nop.Services.Tax;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
 {
@@ -48,8 +49,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly IShapeService _shapeService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly CustomGenericAttributeService _genericAttributeService;
+        private readonly ITaxCategoryService _taxCategoryService;
 
-        public ProductsController(ISpecificationAttributeService specificationAttributeService, CustomGenericAttributeService genericAttributeService, IShapeService shapeService, IProductService productService, IProductApiService productApiService, IFactory<Product> factory,
+        public ProductsController(ITaxCategoryService taxCategoryService, ISpecificationAttributeService specificationAttributeService, CustomGenericAttributeService genericAttributeService, IShapeService shapeService, IProductService productService, IProductApiService productApiService, IFactory<Product> factory,
             IManufacturerService manufacturerService, IProductTagService productTagService, IUrlRecordService urlRecordService,
             IProductAttributeService productAttributeService, ILogger logger, IDTOHelper dtoHelper,
             IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService,
@@ -69,6 +71,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _shapeService = shapeService;
             _genericAttributeService = genericAttributeService;
             _specificationAttributeService = specificationAttributeService;
+            _taxCategoryService = taxCategoryService;
         }
 
         [HttpPost]
@@ -131,10 +134,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             var product = _factory.Initialize();
 
             product.Name = erpProductDelta.Dto.itemName;
-            product.Length = erpProductDelta.Dto.length ?? (decimal)0.00;
-            product.Height = erpProductDelta.Dto.height ?? (decimal)0.00;
-            product.Width = erpProductDelta.Dto.width ?? (decimal)0.00;
-            product.Weight = erpProductDelta.Dto.weight ?? (decimal)0.00;
+            product.Length = erpProductDelta.Dto.lengthFt ?? decimal.Zero;
+            product.Height = erpProductDelta.Dto.height ?? decimal.Zero;
+            product.Width = erpProductDelta.Dto.width ?? decimal.Zero;
+            product.Weight = erpProductDelta.Dto.weight ?? decimal.Zero;
             product.Price = erpProductDelta.Dto.pricePerPiece ?? product.Price;
             product.Published = erpProductDelta.Dto.visible;
 
@@ -151,6 +154,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 product.ManageInventoryMethod = ManageInventoryMethod.DontManageStock;
                 product.OrderMaximumQuantity = erpProductDelta.Dto.quantity ?? 0;
             }
+
+            // associate to taxid
+            var taxCategories = _taxCategoryService.GetAllTaxCategories();
 
             _productService.InsertProduct(product);
 
@@ -262,9 +268,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
 
             product.Name = request.ContainsKey("itemName") ? erpProductDelta.Dto.itemName : product.Name;
-            product.Height = request.ContainsKey("height") ? erpProductDelta.Dto.height ?? (decimal)0.00 : product.Height;
-            product.Width = request.ContainsKey("width") ? erpProductDelta.Dto.width ?? (decimal)0.00 : product.Width;
-            product.Weight = request.ContainsKey("weight") ? erpProductDelta.Dto.weight ?? (decimal)0.00 : product.Weight;
+            product.Length = request.ContainsKey("lengthFt") ? erpProductDelta.Dto.lengthFt ?? decimal.Zero : product.Length;
+            product.Height = request.ContainsKey("height") ? erpProductDelta.Dto.height ?? decimal.Zero : product.Height;
+            product.Width = request.ContainsKey("width") ? erpProductDelta.Dto.width ?? decimal.Zero : product.Width;
+            product.Weight = request.ContainsKey("weight") ? erpProductDelta.Dto.weight ?? decimal.Zero : product.Weight;
             product.Price = request.ContainsKey("pricePerPiece") ? erpProductDelta.Dto.pricePerPiece ?? product.Price : product.Price;
             product.Published = request.ContainsKey("visible") ? erpProductDelta.Dto.visible : product.Published;
 

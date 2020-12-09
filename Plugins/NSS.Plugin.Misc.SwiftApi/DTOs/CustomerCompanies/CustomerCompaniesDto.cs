@@ -21,14 +21,57 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies
         /// <summary>
         /// Gets or sets the Company name
         /// </summary>
-        [JsonProperty("canCredit", Required = Required.Always)]
+        [JsonProperty("buyer", Required = Required.Always)]
+        public bool Buyer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Company name
+        /// </summary>
+        [JsonProperty("buyerCredit", Required = Required.Always)]
         public bool CanCredit { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Company name
+        /// </summary>
+        [JsonProperty("AP", Required = Required.Always)]
+        public bool AP { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Company name
+        /// </summary>
+        [JsonProperty("operations", Required = Required.Always)]
+        public bool Operations { get; set; }
 
         /// <summary>
         /// Gets or sets the Sales contact
         /// </summary>
-        [JsonProperty("salesContact")]
-        public SalesContact SalesContact { get; set; }
+        //[JsonProperty("salesContact")]
+        //public SalesContact SalesContact { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets a sales contact name
+        /// </summary>
+        [JsonProperty("salesContactName")]
+        public string SalesContactName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a sales contact email
+        /// </summary>
+        [JsonProperty("salesContactEmail")]
+        public string SalesContactEmail { get; set; }
+
+        /// <summary>
+        /// Gets or sets a sales contact phone
+        /// </summary>
+        [JsonProperty("salesContactPhone")]
+        public string SalesContactPhone { get; set; }
+
+        /// <summary>
+        /// Gets or sets a sales contact Image Url
+        /// </summary>
+        [JsonProperty("salesContactImageUrl")]
+        public string SalesContactImageUrl { get; set; }
     }
 
     public class SalesContact

@@ -11,6 +11,8 @@ using NSS.Plugin.Misc.SwiftApi.MappingExtensions;
 using NSS.Plugin.Misc.SwiftApi.DTOs.Shapes;
 using System.Linq;
 using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using NSS.Plugin.Misc.SwiftApi.DTOs.Companies;
 
 namespace NSS.Plugin.Misc.SwiftApi.AutoMapper
 {
@@ -21,6 +23,9 @@ namespace NSS.Plugin.Misc.SwiftApi.AutoMapper
             CreateMap<Language, LanguageDto>();
 
             CreateMap<CustomerRole, CustomerRoleDto>();
+
+            CreateMap<Company, CompanyDto>();
+            CreateMap<CompanyDto, Company>();
 
 
             AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<ShapeAttributeDto, ShapeAttribute>().IgnoreAllNonExisting();
@@ -65,7 +70,7 @@ namespace NSS.Plugin.Misc.SwiftApi.AutoMapper
 
         private void CreateCustomerToDTOMap()
         {
-            AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<Customer, CustomerDto>()
+            AutoMapperApiConfiguration.MapperConfigurationExpression.CreateMap<Nop.Core.Domain.Customers.Customer, CustomerDto>()
                                       .IgnoreAllNonExisting()
                                       .ForMember(x => x.Id, y => y.MapFrom(src => src.Id));
         }
