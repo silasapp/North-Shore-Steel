@@ -1080,7 +1080,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Phone = model.Phone,
-                        PreferredLocationId = 0
+                        PreferredLocationId = 0,
+                        Cell = cellPhone
                     };
 
                     #region BuildCustomAttributes
