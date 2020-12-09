@@ -16,7 +16,7 @@ namespace Nop.Web.Components
         public IViewComponentResult Invoke()
         {
             var model = _catalogModelFactory.PrepareSearchBoxModel();
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/Shared/Components/CustomSearchBox/Default.cshtml", model);
+            return View(model);
         }
     }
 }

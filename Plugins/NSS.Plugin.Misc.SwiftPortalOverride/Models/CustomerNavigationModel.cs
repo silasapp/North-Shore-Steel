@@ -39,6 +39,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         ProductReviews = 100,
         VendorInfo = 110,
         GdprTools = 120,
-        CheckGiftCardBalance = 130
+        CheckGiftCardBalance = 130,
+        NotificationPreferences = 140
     }
 }

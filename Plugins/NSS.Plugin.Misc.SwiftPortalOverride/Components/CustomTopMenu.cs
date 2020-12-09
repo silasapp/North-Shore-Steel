@@ -1,19 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
+using Nop.Web.Models.Catalog;
 
 namespace Nop.Web.Components
 {
-    public class AccountSelectorViewComponent : NopViewComponent
+    public class CustomTopMenuViewComponent : NopViewComponent
     {
-        public AccountSelectorViewComponent()
+        public CustomTopMenuViewComponent()
         {
 
         }
-
         public IViewComponentResult Invoke()
         {
-            return View();
+            var model = new TopMenuModel();
+            return View(model);
         }
     }
 }

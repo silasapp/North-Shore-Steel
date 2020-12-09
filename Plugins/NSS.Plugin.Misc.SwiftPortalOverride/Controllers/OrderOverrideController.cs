@@ -30,6 +30,8 @@ using Nop.Services.Vendors;
 using Nop.Web.Controllers;
 //using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
@@ -54,6 +56,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly IOrderModelFactory _orderModelFactory;
         private readonly ERPApiProvider _erpApiProvider;
+        private readonly ICustomerCompanyService _customerCompanyService;
 
         #endregion
 
@@ -70,7 +73,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IWebHelper webHelper,
             IWorkContext workContext,
             RewardPointsSettings rewardPointsSettings,
-            IOrderModelFactory orderModelFactory) : base(customerService, orderNopModelFactory, orderProcessingService, orderService, paymentService, pdfService, shipmentService, webHelper, workContext, rewardPointsSettings)
+            IOrderModelFactory orderModelFactory,
+            ICustomerCompanyService customerCompanyService) : base(customerService, orderNopModelFactory, orderProcessingService, orderService, paymentService, pdfService, shipmentService, webHelper, workContext, rewardPointsSettings)
         {
             _customerService = customerService;
             _orderNopModelFactory = orderNopModelFactory;
@@ -84,6 +88,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _rewardPointsSettings = rewardPointsSettings;
             _orderModelFactory = orderModelFactory;
             _erpApiProvider = erpApiProvider;
+            _customerCompanyService = customerCompanyService;
         }
 
         #endregion
@@ -95,8 +100,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public override IActionResult Details(int orderId)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
 
-            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations))
+                return AccessDeniedView();
+
 
             ERPGetOrderDetailsResponse orderDetailsResponse = null;
 
@@ -123,6 +131,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpsRequirement]
         public virtual IActionResult CompanyOrders()
         {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations))
+                return AccessDeniedView();
+
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
@@ -135,8 +149,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public PartialViewResult SearchCompanyOrders([FromBody]CompanyOrderListModel.SearchFilter filter)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
 
-            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations))
+                return (PartialViewResult)AccessDeniedView();
 
             var model = new CompanyOrderListModel();
 

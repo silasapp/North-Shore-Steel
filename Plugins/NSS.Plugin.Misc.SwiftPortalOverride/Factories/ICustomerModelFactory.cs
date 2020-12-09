@@ -17,7 +17,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// </summary>
         /// <param name="selectedTabId">Identifier of the selected tab</param>
         /// <returns>Customer navigation model</returns>
-        CustomerNavigationModel PrepareCustomerNavigationModel(int selectedTabId = 0);
+        CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, int selectedTabId = 0);
 
         /// <summary>
         /// Prepare the customer register model

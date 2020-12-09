@@ -18,5 +18,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
 
         [JsonProperty("preferredLocationId")]
         public int PreferredLocationId { get; set; }
+
+        [JsonProperty("cell")]
+        public string Cell { get; set; }
     }
 }

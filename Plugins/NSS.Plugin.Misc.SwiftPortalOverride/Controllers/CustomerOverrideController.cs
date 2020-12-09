@@ -904,6 +904,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
+            string cellPhone = form["cell-phone"];
+            string pLocationId = form["preferred-location-id"];
+            int preferredLocationId = int.Parse(pLocationId);
+
+            if (string.IsNullOrEmpty(cellPhone) && string.IsNullOrEmpty(model.Phone))
+                ModelState.AddModelError("", "Cell or Work Phone is required");
+
             var oldCustomerModel = new CustomerInfoModel();
 
             var customer = _workContext.CurrentCustomer;
@@ -1067,6 +1074,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     if (_gdprSettings.GdprEnabled)
                         LogGdpr(customer, oldCustomerModel, model, form);
 
+                    _genericAttributeService.SaveAttribute(customer, Constants.CellAttribute, cellPhone);
+                    _genericAttributeService.SaveAttribute(customer, Constants.PreferredLocationIdAttribute, preferredLocationId);
 
                     var request = new ERPUpdateUserRequest
                     {
@@ -1074,7 +1083,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Phone = model.Phone,
-                        PreferredLocationId = 0
+                        PreferredLocationId = 0,
+                        Cell = cellPhone
                     };
 
                     #region BuildCustomAttributes

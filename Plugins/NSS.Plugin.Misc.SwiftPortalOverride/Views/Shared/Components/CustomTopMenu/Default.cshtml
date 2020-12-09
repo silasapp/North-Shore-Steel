@@ -1,0 +1,118 @@
+﻿@using Nop.Web.Models.Catalog
+@using Nop.Core
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftCore.Services
+ 
+@inject ICustomerCompanyService customerCompanyService
+@inject IWorkContext workContext
+
+@model TopMenuModel
+
+@{
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    bool isAP = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
+    bool isOperations = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+}
+<style>
+    .active-tab {
+        text-decoration: underline;
+        color: #03175b !important;
+    }
+</style>
+<ul class="top-menu notmobile mb-0">
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
+    <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
+    @if (isBuyer)
+    {
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
+    }
+    @if (isOperations)
+    {
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
+    }
+    @if (isAP)
+    {
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
+    }
+    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
+</ul>
+@{
+    var rootCategoriesResponsive = Model.Categories.ToList();
+    //name it "Categories" if we have only categories. Otherwise, "Menu"
+    var responsiveMenuTitle = Model.HasOnlyCategories ? T("Categories") : T("Menu");
+    <div class="menu-toggle"></div>
+    <ul class="top-menu mobile">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
+        <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
+        @if (isBuyer)
+        {
+            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
+        }
+        @if (isOperations)
+        {
+            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
+        }
+        @if (isAP)
+        {
+            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
+        }
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
+    </ul>
+
+    @if (Model.UseAjaxMenu)
+    {
+        <script asp-location="Footer">
+        $(document).ready(function () {
+            $('.menu-toggle').on('click', function () {
+                $(this).siblings('.top-menu.mobile').slideToggle('slow');
+            });
+            var localized_data = {
+                AjaxFailure: "@T("MainMenu.AjaxFailure")"
+            };
+            mainMenu.init('@Url.RouteUrl("GetCatalogRoot")', '@Url.RouteUrl("GetCatalogSubCategories")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
+        });
+        </script>
+
+        Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.menu.js");
+
+    }
+    else
+    {
+        <script asp-location="Footer">
+            $(document).ready(function () {
+                $('.menu-toggle').on('click', function () {
+                    $(this).siblings('.top-menu.mobile').slideToggle('slow');
+                });
+                $('.top-menu.mobile .sublist-toggle').on('click', function () {
+                    $(this).siblings('.sublist').slideToggle('slow');
+                });
+            });
+        </script>
+
+    }
+
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        switch (window.location.pathname) {
+            case '/':
+                $('.dashboard').addClass('active-tab');
+                break;
+            case '/catalog':
+                $('.catalog').addClass('active-tab');
+                break;
+            case '/orders':
+                $('.orders').addClass('active-tab');
+                break;
+            case '/invoices':
+                $('.invoices').addClass('active-tab');
+                break;
+            default:
+            // code block
+        }
+    });
+</script>
