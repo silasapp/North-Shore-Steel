@@ -51,6 +51,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly CustomGenericAttributeService _genericAttributeService;
         private readonly ITaxCategoryService _taxCategoryService;
 
+        private const string MATERIAL_TAX_NAME = "PM020760";
+
         public ProductsController(ITaxCategoryService taxCategoryService, ISpecificationAttributeService specificationAttributeService, CustomGenericAttributeService genericAttributeService, IShapeService shapeService, IProductService productService, IProductApiService productApiService, IFactory<Product> factory,
             IManufacturerService manufacturerService, IProductTagService productTagService, IUrlRecordService urlRecordService,
             IProductAttributeService productAttributeService, ILogger logger, IDTOHelper dtoHelper,
@@ -155,8 +157,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 product.OrderMaximumQuantity = erpProductDelta.Dto.quantity ?? 0;
             }
 
-            // associate to taxid
+            // if an item is out of stock - unpublish
+            product.LowStockActivity = LowStockActivity.Unpublish;
+
+            // associate to material taxid
             var taxCategories = _taxCategoryService.GetAllTaxCategories();
+            var materialTaxCategory = taxCategories.FirstOrDefault(x => x.Name == MATERIAL_TAX_NAME);
+
+            product.TaxCategoryId = materialTaxCategory?.Id ?? 0;
 
             _productService.InsertProduct(product);
 
