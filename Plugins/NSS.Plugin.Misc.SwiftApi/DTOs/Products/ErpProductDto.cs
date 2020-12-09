@@ -72,6 +72,9 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Products
         [JsonProperty("length")]
         public decimal? length { get; set; }
 
+        [JsonProperty("lengthFt")]
+        public decimal? lengthFt { get; set; }
+
         [JsonProperty("displayWidth")]
         public string displayWidth { get; set; }
 

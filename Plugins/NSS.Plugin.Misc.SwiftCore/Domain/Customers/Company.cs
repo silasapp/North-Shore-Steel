@@ -1,4 +1,5 @@
 ﻿using Nop.Core;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -16,10 +17,10 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
         /// </summary>
         public int ErpCompanyId { get; set; }
 
-        /// <summary>
-        /// Gets or sets a sales contact live chat id
-        /// </summary>
-        public string SalesContactLiveChatId { get; set; }
+        ///// <summary>
+        ///// Gets or sets a sales contact live chat id
+        ///// </summary>
+        //public string SalesContactLiveChatId { get; set; }
 
         /// <summary>
         /// Gets or sets a sales contact name
@@ -35,6 +36,14 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
         /// Gets or sets a sales contact phone
         /// </summary>
         public string SalesContactPhone { get; set; }
+
+        public string SalesContactImageUrl { get; set; }
+
+        //public bool Deleted { get; set; }
+
+        public DateTime CreatedOnUtc { get; set; }
+
+        public DateTime UpdatedOnUtc { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Customer companies
