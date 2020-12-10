@@ -23,6 +23,10 @@
             color: #FFF;
         }
 
+    .e-dlg-header {
+        color: #fff !important;
+    }
+
     .nss-modal-title {
         color: #03175B;
         font-size: 0.85rem;
@@ -258,12 +262,28 @@
     }
 }
 
+@{
+
+    Func<object, object>
+    Content1 =
+    @<div id="openMTRModal">
+        <div class="">
+            <ejs-pdfviewer id="pdfviewer" enableTextSearch="false" enablePrint="false" enableAnnotation="false" enableTextSelection="false" enableThumbnail="false" enableBookmark="false"></ejs-pdfviewer>
+        </div>
+    </div>
+
+}
+
 
 <div id="_partialview">
     <div class="control-section">
         <div id="Grid"></div>
     </div>
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("MILL TEST REPORT PDF").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Height("45rem").Width("97rem").Target("body").Render();
+
 </div>
+
+
 
 @functions{
     @using Newtonsoft.Json.Serialization;
@@ -286,6 +306,22 @@
         return $"<script id='{columnName.ToLower()}Template' type='text/x-template'><div><label class='mv-title'>{ title }:</label><label class='mv-value'>${{{ columnName.ToLower() }}}</label></div></script>";
     }
 }
+
+<script type="text/javascript">
+    function onDialogCreated() {
+        openMTRModal = this;
+    }
+
+
+    function openMTR(mtrFile) {
+        console.log('mtr', mtrFile);
+        var pdfViewer = document.getElementById('pdfviewer').ej2_instances[0];
+        pdfViewer.serviceUrl = window.location.origin + '/api/PdfViewer';
+        console.log('serviceUrl', pdfViewer.serviceUrl);
+        pdfViewer.load(mtrFile, null);
+        openMTRModal.show();
+    }
+</script>
 
 <script>
     gridData = @Html.Raw(Serialize(ObjectData));
@@ -375,7 +411,7 @@
 </script>
 <script id="optionsTemplate" type="text/x-template">
     ${if(_mtr)}
-    <a class="table-action-button" style="text-decoration:none" href="${_mtr}" target="_blank">
+    <a class="table-action-button" style="text-decoration:none" onclick="openMTR(`${_mtr}`)">
         <img src="Themes/SwiftPortal/Content/assets/invoice.svg" title="mtr report" width="20" height="20" alt="">
     </a>
     ${/if}
