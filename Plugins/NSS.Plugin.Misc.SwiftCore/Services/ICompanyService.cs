@@ -9,6 +9,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
     {
         Company GetCompanyEntityByErpEntityId(int id);
 
+        Company GetCompanyById(int id);
+
         IList<Company> GetCompanyList();
 
         void InsertCompany(Company company);

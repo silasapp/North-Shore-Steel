@@ -66,5 +66,12 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //event notification
             _eventPublisher.EntityInserted(company);
         }
+
+        public Company GetCompanyById(int id)
+        {
+            var company = _companyRepository.Table.FirstOrDefault(c => c.Id == id);
+
+            return company;
+        }
     }
 }

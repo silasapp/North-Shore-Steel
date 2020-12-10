@@ -119,7 +119,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             };
 
             //insert user
-            InsertUser(userReg, customer, password, wintrixId);
+            InsertCustomer(userReg, customer, password, wintrixId);
 
             //insert company
             InsertCompany(companyId, companyName, salesContactEmail, salesContactName, salesContactPhone);
@@ -133,7 +133,26 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             return cc;
         }
 
-        private void InsertUser(UserRegistration reg, Nop.Core.Domain.Customers.Customer customer, string password, int wintrixId)
+        public Nop.Core.Domain.Customers.Customer CreateCustomer(UserRegistration userReg, string password, int wintrixId)
+        {
+            var customer = new Nop.Core.Domain.Customers.Customer
+            {
+                RegisteredInStoreId = _storeContext.CurrentStore.Id,
+                CustomerGuid = Guid.NewGuid(),
+                CreatedOnUtc = DateTime.UtcNow,
+                LastActivityDateUtc = DateTime.UtcNow,
+                Active = true,
+                Username = userReg.WorkEmail,
+                Email = userReg.WorkEmail
+            };
+
+            //insert user
+            InsertCustomer(userReg, customer, password, wintrixId);
+
+            return customer;
+        }
+
+        private void InsertCustomer(UserRegistration reg, Nop.Core.Domain.Customers.Customer customer, string password, int wintrixId)
         {
             _customerService.InsertCustomer(customer);
 
