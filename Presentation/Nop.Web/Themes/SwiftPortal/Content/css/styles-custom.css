@@ -1941,6 +1941,16 @@ table input {
     opacity: 1;
 }
 
+.customer-info:hover {
+    background: #0076b4 0% 0% no-repeat padding-box !important;
+    opacity: 1;
+}
+
+.customer-info > a:hover {
+    color: white !important;
+    text-decoration: none;
+}
+
 .side-2.account-page-card {
     padding: 15px;
 }
