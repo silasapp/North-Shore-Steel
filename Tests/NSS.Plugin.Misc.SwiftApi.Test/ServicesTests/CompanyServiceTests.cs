@@ -2,6 +2,7 @@
 using System.Linq;
 using Moq;
 using Nop.Data;
+using Nop.Services.Events;
 using NSS.Plugin.Misc.SwiftApi.Services;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using NSS.Plugin.Misc.SwiftCore.Services;
@@ -18,6 +19,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Tests.ServicesTests.Companies
         public new void SetUp()
         {
             var companyRepository = new Mock<IRepository<Company>>();
+            var _eventPublisher = new Mock<IEventPublisher>();
             companyRepository.Setup(c => c.Table).Returns(new List<Company>()
                     {
                         new Company()
@@ -26,7 +28,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Tests.ServicesTests.Companies
                             ErpCompanyId = 100,
                             Name = "Test 1",
                             SalesContactEmail = "Contact@teest.com",
-                            SalesContactLiveChatId = "ChatId1",
+                            //SalesContactLiveChatId = "ChatId1",
                             SalesContactName = "Contact Test",
                             SalesContactPhone = "1234567890"
                         },
@@ -36,14 +38,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Tests.ServicesTests.Companies
                             ErpCompanyId = 2,
                             Name = "Test 2",
                             SalesContactEmail = "Contact2@teest.com",
-                            SalesContactLiveChatId = "ChatId2",
+                            //SalesContactLiveChatId = "ChatId2",
                             SalesContactName = "Contact2 Test",
                             SalesContactPhone = "1234567891"
                         }
 
                     }.AsQueryable());
 
-            _companyApiService = new CompanyService(companyRepository.Object);
+            _companyApiService = new CompanyService(companyRepository.Object, _eventPublisher.Object);
         }
 
         [Test]
@@ -55,7 +57,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Tests.ServicesTests.Companies
             Assert.AreEqual(1, companyResult.Id);
             Assert.AreEqual("Test 1", companyResult.Name);
             Assert.AreEqual("Contact@teest.com", companyResult.SalesContactEmail);
-            Assert.AreEqual("ChatId1", companyResult.SalesContactLiveChatId);
+            //Assert.AreEqual("ChatId1", companyResult.SalesContactLiveChatId);
             Assert.AreEqual("Contact Test", companyResult.SalesContactName);
             Assert.AreEqual("1234567890", companyResult.SalesContactPhone);
         }
