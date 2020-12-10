@@ -40,6 +40,7 @@
     <None Remove="Views\CustomerOverride\Addresses.cshtml" />
     <None Remove="Views\CustomerOverride\ChangePassword.cshtml" />
     <None Remove="Views\CustomerOverride\ChangePasswordFirstTimeLogin.cshtml" />
+    <None Remove="Views\CustomerOverride\Notifications.cshtml" />
     <None Remove="Views\CustomerOverride\Register.cshtml" />
     <None Remove="Views\CustomOrder\CustomerOrders.cshtml" />
     <None Remove="Views\CustomOrder\Details.cshtml" />
@@ -141,6 +142,11 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\CustomerOverride\Notifications.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Views\CustomerOverride\Info.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

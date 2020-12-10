@@ -336,10 +336,14 @@ a:not([href]):not([class]) {
     min-width: auto !important;
 }
 
-    .buttons > input:hover,
-    .buttons > a > input:hover {
-        background-color: #0076b4 !important;
-    }
+.buttons > input:hover, .buttons > a > input:hover {
+    background-color: #0076b4 !important;
+}
+
+.register-button, .login-button {
+    background-color: #03175b !important;
+    color: #fff !important;
+}
 
 .buttons > .register-button,
 .terms-buttons > button,
@@ -1187,9 +1191,9 @@ table input {
     }
 
 
-.filter-tag > button:hover {
-    transform: translate(7px, 3px) scale(1.5);
-}
+        .filter-tag > button:hover {
+            transform: translate(7px, 3px) scale(1.5);
+        }
 
 .filter-tags {
     display: flex;
@@ -3005,6 +3009,7 @@ li {
     height: 42px;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
 }
+
 .nss-input {
     padding: 0.5rem;
     border: 1px solid #ddd;
@@ -3101,6 +3106,7 @@ and also iPads specifically.
         border: 0 !important;
         text-align: right !important;
     }
+
     .cart-total-left, .cart-total-right {
         line-height: normal !important;
         padding: 5px 0 !important;
@@ -3109,6 +3115,7 @@ and also iPads specifically.
         text-align: right !important;
         display: inline-table !important;
     }
+
     .cart-total > tbody > tr {
         padding: 0px 20px !important;
     }
@@ -3141,11 +3148,12 @@ and also iPads specifically.
     tr > .quantity, .catalog-page td:nth-last-child(2) {
         float: left;
     }
+
     .cart-table td:nth-last-child(2) {
         float: right;
     }
 
-    
+
 
     .datepicker-days thead tr {
         position: unset !important;
@@ -3158,6 +3166,7 @@ and also iPads specifically.
     .datepicker-days td {
         display: table-cell !important;
     }
+
     .cart-qty-input {
         width: 70px;
         height: 30px
