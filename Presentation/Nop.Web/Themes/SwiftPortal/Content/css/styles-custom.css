@@ -329,7 +329,7 @@ a:not([href]):not([class]) {
 
 .buttons > input,
 .buttons > a > input {
-    background-color: #03175b !important;
+    /*background-color: #03175b !important;*/
     text-transform: none !important;
     color: #ffffff;
     padding: 8px 16px !important;
@@ -348,7 +348,7 @@ a:not([href]):not([class]) {
 .buttons > .button-2 {
     /*background-color: #f6f6f6 !important;*/
     text-transform: none !important;
-    color: #fff;
+    color: #000;
     border: none;
 }
 
