@@ -68,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-person.svg"
             });
 
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
             {
                 RouteName = "CustomerAddresses",
                 Title = "ADDRESSES",
@@ -87,7 +87,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             });
             if (isABuyer)
             {
-                model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+                model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
                 {
                     RouteName = "CustomerNotifications",
                     Title = "NOTIFICATIONS",
