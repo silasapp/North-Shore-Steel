@@ -10,8 +10,8 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
     [JsonObject(Title = "user")]
     public class UserDto : BaseDto
     {
-        [JsonProperty("registrationId")]
-        public int RegistrationId { get; set; }
+        [JsonProperty("registrationId", NullValueHandling = NullValueHandling.Ignore)]
+        public int? RegistrationId { get; set; }
 
         [JsonProperty("wintrixId")]
         public int WintrixId { get; set; }
@@ -31,8 +31,8 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
         [JsonProperty("phone")]
         public string Phone { get; set; }
 
-        [JsonProperty("companyName")]
-        public string CompanyName { get; set; }
+        //[JsonProperty("companyName")]
+        //public string CompanyName { get; set; }
 
         [JsonProperty("isExistingCustomer")]
         public bool IsExistingCustomer { get; set; }

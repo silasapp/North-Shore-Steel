@@ -223,9 +223,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             try
             {
-                // save customer as no NSSApproved by default
-                _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, false);
-
                 // prepare request for create api call
 
                 var request = new ERPCreateUserRequest
