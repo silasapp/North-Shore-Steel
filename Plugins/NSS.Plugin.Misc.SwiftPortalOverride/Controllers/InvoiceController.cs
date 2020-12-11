@@ -7,6 +7,8 @@ using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
+using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -18,17 +20,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICustomerService _customerService;
         private readonly IInvoiceModelFactory _invoiceModelFactory;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly SwiftCoreSettings _swiftCoreSettings;
+        private readonly ERPApiProvider _eRPApiProvider;
 
         #endregion
 
         #region Ctor
 
-        public InvoiceController(IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory, ICustomerCompanyService customerCompanyService)
+        public InvoiceController(IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory, ICustomerCompanyService customerCompanyService, SwiftCoreSettings swiftCoreSettings, ERPApiProvider eRPApiProvider)
         {
             _workContext = workContext;
             _customerService = customerService;
             _invoiceModelFactory = invoiceModelFactory;
             _customerCompanyService = customerCompanyService;
+            _swiftCoreSettings = swiftCoreSettings;
+            _eRPApiProvider = eRPApiProvider;
         }
 
         #endregion
@@ -47,13 +53,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
-            var model = new CompanyInvoiceListModel();
+            // get credit summary
+            var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
+            var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
+            {
+                ApplyForCreditUrl = _swiftCoreSettings.ApplyForCreditUrl ?? "https://www.nssco.com/assets/files/newaccountform.pdf",
+                CanCredit = customerCompany?.CanCredit ?? false
+            };
+
+            if (creditSummary.CanCredit)
+            {
+                var creditResposne = _eRPApiProvider.GetCompanyCreditBalance(eRPCompanyId);
+
+                creditSummary.CreditAmount = creditResposne?.CreditAmount ?? decimal.Zero;
+                creditSummary.CreditLimit = creditResposne?.CreditLimit ?? decimal.Zero;
+                creditSummary.OpenInvoiceAmount = creditResposne?.OpenInvoiceAmount ?? decimal.Zero;
+                creditSummary.PastDueAmount = creditResposne?.PastDueAmount ?? decimal.Zero;
+            }
+
+            var model = new CompanyInvoiceListModel
+            {
+                CreditSummary = creditSummary
+            };
 
             return View(model);
         }
 
       
-
         [IgnoreAntiforgeryToken]
         public PartialViewResult SearchCompanyInvoices([FromBody]CompanyInvoiceListModel.SearchFilter filter)
         {
