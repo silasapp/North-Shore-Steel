@@ -85,17 +85,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 ItemClass = "change-password",
                 ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-key.svg"
             });
-            if (isABuyer)
-            {
-                model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
-                {
-                    RouteName = "CustomerNotifications",
-                    Title = "NOTIFICATIONS",
-                    Tab = CustomerNavigationEnum.NotificationPreferences,
-                    ItemClass = "customer-notifications",
-                    ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-notifications.svg"
-                });
-            }
+            //if (isABuyer)
+            //{
+            //    model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
+            //    {
+            //        RouteName = "CustomerNotifications",
+            //        Title = "NOTIFICATIONS",
+            //        Tab = CustomerNavigationEnum.NotificationPreferences,
+            //        ItemClass = "customer-notifications",
+            //        ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-notifications.svg"
+            //    });
+            //}
 
 
             model.SelectedTab = (CustomerNavigationEnum)selectedTabId;
