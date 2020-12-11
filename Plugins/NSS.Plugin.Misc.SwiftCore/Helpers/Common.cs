@@ -63,6 +63,18 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 
             return new string(chars.ToArray());
         }
+
+        /// <summary>
+        /// Gets ERPCompanyId From Cookies
+        /// </summary>
+        /// <param name="requestKey">A request key to
+        /// search for.</param>
+        /// <returns>ERPCompanyId</returns>
+        public static int GetSavedERPCompanyIdFromCookies(string requestKey)
+        {
+            int.TryParse(requestKey, out int eRPCompanyId);
+            return eRPCompanyId;
+        }
     }
 }
 

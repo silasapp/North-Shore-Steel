@@ -8,14 +8,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public CustomerNavigationModel()
         {
             CustomerNavigationItems = new List<CustomerNavigationItemModel>();
+            CompanyNavigationItems = new List<CompanyNavigationItemModel>();
         }
 
         public IList<CustomerNavigationItemModel> CustomerNavigationItems { get; set; }
+        public IList<CompanyNavigationItemModel> CompanyNavigationItems { get; set; }
 
         public CustomerNavigationEnum SelectedTab { get; set; }
     }
 
     public class CustomerNavigationItemModel : BaseNopModel
+    {
+        public string RouteName { get; set; }
+        public string Title { get; set; }
+        public CustomerNavigationEnum Tab { get; set; }
+        public string ItemClass { get; set; }
+        public string ItemLogo { get; set; }
+    }
+
+    public class CompanyNavigationItemModel : BaseNopModel
     {
         public string RouteName { get; set; }
         public string Title { get; set; }
@@ -39,6 +50,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         ProductReviews = 100,
         VendorInfo = 110,
         GdprTools = 120,
-        CheckGiftCardBalance = 130
+        CheckGiftCardBalance = 130,
+        NotificationPreferences = 140
     }
 }

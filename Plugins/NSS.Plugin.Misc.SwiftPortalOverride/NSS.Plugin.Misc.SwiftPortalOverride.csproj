@@ -40,6 +40,7 @@
     <None Remove="Views\CustomerOverride\Addresses.cshtml" />
     <None Remove="Views\CustomerOverride\ChangePassword.cshtml" />
     <None Remove="Views\CustomerOverride\ChangePasswordFirstTimeLogin.cshtml" />
+    <None Remove="Views\CustomerOverride\Notifications.cshtml" />
     <None Remove="Views\CustomerOverride\Register.cshtml" />
     <None Remove="Views\CustomOrder\CustomerOrders.cshtml" />
     <None Remove="Views\CustomOrder\Details.cshtml" />
@@ -62,6 +63,7 @@
     <None Remove="Views\HomeIndex.cshtml" />
     <None Remove="Views\SelectAccount.cshtml" />
     <None Remove="Views\Shared\Components\CustomSearchBox\Default.cshtml" />
+    <None Remove="Views\Shared\Components\CustomHeaderLinks\Default.cshtml" />
     <None Remove="Views\Shared\_ExternalAuthentication.Errors.cshtml" />
     <None Remove="Views\TermsOfService.cshtml" />
     <None Remove="Views\_ViewImports.cshtml" />
@@ -141,9 +143,17 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\CustomerOverride\Notifications.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="Views\CustomerOverride\Info.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Shared\Components\CustomHeaderLinks\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\UserRegistration\ConfirmRegistration.cshtml">
@@ -205,7 +215,7 @@
     <Content Include="Views\CustomCatalog\CustomCatalogIndex.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\CustomTopMenu\CustomTopMenu.cshtml">
+    <Content Include="Views\Shared\Components\CustomTopMenu\Default.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\SelectAccount.cshtml">
@@ -261,6 +271,7 @@
     <PackageReference Include="PayPalCheckoutSdk" Version="1.0.3" />
     <PackageReference Include="PayPalHttp" Version="1.0.0" />
     <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.3.0.40" />
+    <PackageReference Include="Syncfusion.EJ2.PdfViewer.AspNet.Core.Windows" Version="18.3.0.40" />
   </ItemGroup>
 
   <ItemGroup>

@@ -36,6 +36,7 @@ using Nop.Services.Discounts;
 using Nop.Web.Models.Common;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -141,6 +142,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region Methods
         public override IActionResult Index()
         {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
             //validation
             if (_orderSettings.CheckoutDisabled)
                 return RedirectToRoute("ShoppingCart");
@@ -211,6 +218,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public override IActionResult OnePageCheckout()
         {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
             //validation
             if (_orderSettings.CheckoutDisabled)
                 return RedirectToRoute("ShoppingCart");
@@ -269,6 +282,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public override IActionResult Completed(int? orderId)
         {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
             //validation
             if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
                 return Challenge();
@@ -303,7 +322,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         public virtual IActionResult Rejected()
-        {            
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
             return View();
         }
 
@@ -901,7 +926,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private (int companyId, CustomerCompany customerCompany) GetCustomerCompanyDetails()
         {
             string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int.TryParse(Request.Cookies[erpCompIdCookieKey], out int ERPCompanyId);
+            int ERPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[erpCompIdCookieKey]);
 
             var customerCompany = new CustomerCompany();
 

@@ -1,4 +1,10 @@
-﻿@using Nop.Web.Models.Customer
+﻿@using Nop.Core
+@using Nop.Web.Models.Customer
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
 @model CustomerAddressEditModel
 @{
     Layout = "_ColumnsTwo";
@@ -9,9 +15,16 @@
     Html.AppendPageCssClassParts("html-account-page");
     Html.AppendPageCssClassParts("html-address-edit-page");
 }
+
+@{
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+}
+
 @section left
 {
-    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses })
+    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses, isABuyer = isBuyer })
 }
 <form asp-route="CustomerAddressEdit" method="post">
     <div class="page account-page">

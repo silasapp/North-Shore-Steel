@@ -2,11 +2,30 @@
 @model CustomerNavigationModel
 
 <div class="account-page-card">
+    <h6>My Preferences</h6>
     <div class="block block-account-navigation">
         <div class="listbox">
             <ul class="list">
                 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationBefore })
                 @foreach (var item in Model.CustomerNavigationItems)
+                {
+                    <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")">
+                        <a href="@Url.RouteUrl(item.RouteName)">
+                            <img src="@item.ItemLogo" alt="">@(item.Title)
+                        </a>
+                    </li>
+                }
+                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationAfter })
+            </ul>
+        </div>
+    </div>
+
+    <div class="block block-account-navigation pt-5">
+        <h6>Company Preferences</h6>
+        <div class="listbox">
+            <ul class="list">
+                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationBefore })
+                @foreach (var item in Model.CompanyNavigationItems)
                 {
                     <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")">
                         <a href="@Url.RouteUrl(item.RouteName)">

@@ -81,12 +81,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICountryService _countryService;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly ICustomerActivityService _customerActivityService;
+        private readonly ICustomerCompanyService _customerCompanyService;
 
         #endregion
 
         #region Constructor
 
-        public CustomerOverrideController(AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, ERPApiProvider nSSApiProvider, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
+        public CustomerOverrideController(ICustomerCompanyService customerCompanyService, AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, ERPApiProvider nSSApiProvider, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
         {
             _customerSettings = customerSettings;
             _customerModelFactory = customerModelFactory;
@@ -120,6 +121,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _forumSettings = forumSettings;
             _shoppingCartService = shoppingCartService;
             _customerActivityService = customerActivityService;
+            _customerCompanyService = customerCompanyService;
         }
 
         #endregion
@@ -223,9 +225,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             try
             {
-                // save customer as no NSSApproved by default
-                _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, false);
-
                 // prepare request for create api call
 
                 var request = new ERPCreateUserRequest
@@ -882,6 +881,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpsRequirement]
+        public IActionResult Notifications()
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
+            return View();
+
+        }
+
+        [HttpsRequirement]
+        [IgnoreAntiforgeryToken]
+        public IActionResult UpdateNotifications([FromBody]  NSS.Plugin.Misc.SwiftPortalOverride.Models.Notification notifications)
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
+            
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Notifications.cshtml", notifications);
+        }
+
+        [HttpsRequirement]
         public override IActionResult AddressAdd()
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
@@ -903,6 +929,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
+
+            string cellPhone = form["cell-phone"];
+            string pLocationId = form["preferred-location-id"];
+            int preferredLocationId = int.Parse(pLocationId);
+
+            if (string.IsNullOrEmpty(cellPhone) && string.IsNullOrEmpty(model.Phone))
+                ModelState.AddModelError("", "Cell or Work Phone is required");
 
             var oldCustomerModel = new CustomerInfoModel();
 
@@ -1067,6 +1100,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     if (_gdprSettings.GdprEnabled)
                         LogGdpr(customer, oldCustomerModel, model, form);
 
+                    _genericAttributeService.SaveAttribute(customer, Constants.CellAttribute, cellPhone);
+                    _genericAttributeService.SaveAttribute(customer, Constants.PreferredLocationIdAttribute, preferredLocationId);
 
                     var request = new ERPUpdateUserRequest
                     {
@@ -1074,7 +1109,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Phone = model.Phone,
-                        PreferredLocationId = 0
+                        PreferredLocationId = 0,
+                        Cell = cellPhone
                     };
 
                     #region BuildCustomAttributes

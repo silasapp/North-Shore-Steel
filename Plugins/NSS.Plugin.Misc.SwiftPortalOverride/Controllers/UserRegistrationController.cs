@@ -1,38 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
+﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
-using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Gdpr;
-using Nop.Core.Domain.Localization;
-using Nop.Core.Domain.Tax;
-using NSS.Plugin.Misc.SwiftPortalOverride.Requests;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Authentication;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Events;
-using Nop.Services.Gdpr;
-using Nop.Services.Helpers;
-using Nop.Services.Localization;
-using Nop.Services.Logging;
-using Nop.Services.Messages;
-using Nop.Services.Tax;
 using Nop.Web.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using ICustomerModelFactory = NSS.Plugin.Misc.SwiftPortalOverride.Factories.ICustomerModelFactory;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
-using Nop.Core.Domain.Common;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
-using System.Net;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
@@ -148,10 +131,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 warnings.Add("Please Enter Last Name");
             if (String.IsNullOrEmpty(model.Email))
                 warnings.Add("Please Enter Work Email");
-            if (String.IsNullOrEmpty(model.CellPhone))
-                warnings.Add("Please Enter Cell Phone");
-            if (String.IsNullOrEmpty(model.Phone))
-                warnings.Add("Please Enter Work Phone");
+            if (String.IsNullOrEmpty(model.CellPhone) && String.IsNullOrEmpty(model.Phone))
+                warnings.Add("Work or Cell phone is required");
             if (String.IsNullOrEmpty(model.Company))
                 warnings.Add("Please Enter Company Name");
             if (String.IsNullOrEmpty(model.HearAboutUs.ToString()))

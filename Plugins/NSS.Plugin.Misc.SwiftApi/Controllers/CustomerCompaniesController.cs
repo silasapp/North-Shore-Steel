@@ -19,6 +19,7 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using System;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
 {
@@ -27,11 +28,13 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly ICompanyService _companyService;
         private readonly ICustomerService _customerService;
         private readonly ICustomerCompanyService _customerCompanyService;
-        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly CustomGenericAttributeService _genericAttributeService;
         private readonly ICustomerCompanyProductService _customerCompanyProductService;
         private readonly ILogger _logger;
+        private readonly ICustomerApiService _customerApiService;
 
         public CustomerCompaniesController(
+            ICustomerApiService customerApiService,
             IJsonFieldsSerializer jsonFieldsSerializer,
             IAclService aclService,
             ICustomerService customerService,
@@ -43,7 +46,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             IPictureService pictureService, 
             ICompanyService companyService,
             ICustomerCompanyService customerCompanyService,
-            IGenericAttributeService genericAttributeService,
+            CustomGenericAttributeService genericAttributeService,
             ICustomerCompanyProductService customerCompanyProductService,
             ILogger logger) :
             base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService,
@@ -55,6 +58,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _genericAttributeService = genericAttributeService;
             _customerCompanyProductService = customerCompanyProductService;
             _logger = logger;
+            _customerApiService = customerApiService;
         }
 
         [HttpPost]
@@ -74,14 +78,16 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
-            // log request
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> Customer Id: {id}", JsonConvert.SerializeObject(input));
+            int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, id.ToString(), nameof(Customer))?.EntityId ?? 0;
 
-            Nop.Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
+            // log request
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> Customer Id: {customerId}", JsonConvert.SerializeObject(input.Dto));
+
+            Nop.Core.Domain.Customers.Customer customer = _customerApiService.GetCustomerEntityById(customerId);
 
             if (customer == null)
             {
-                return NotFound();
+                return Error(HttpStatusCode.NotFound, "userCompany", "user not found");
             }
 
             Company company = _companyService.GetCompanyEntityByErpEntityId(input.Dto.CompanyId);
@@ -92,10 +98,13 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 {
                     ErpCompanyId = input.Dto.CompanyId,
                     Name = input.Dto.CompanyName,
-                    SalesContactEmail = input.Dto.SalesContact.Email,
-                    SalesContactLiveChatId = input.Dto.SalesContact.LiveChatId,
-                    SalesContactName = input.Dto.SalesContact.Name,
-                    SalesContactPhone = input.Dto.SalesContact.Phone
+                    SalesContactEmail = input.Dto.SalesContactEmail,
+                    //SalesContactLiveChatId = input.Dto.SalesContact.LiveChatId,
+                    SalesContactName = input.Dto.SalesContactName,
+                    SalesContactPhone = input.Dto.SalesContactPhone,
+                    SalesContactImageUrl = input.Dto.SalesContactImageUrl,
+                    CreatedOnUtc = DateTime.UtcNow,
+                    UpdatedOnUtc = DateTime.UtcNow,
                 };
 
                 _companyService.InsertCompany(company);
@@ -103,29 +112,27 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             CustomerCompany customerCompany = new CustomerCompany
             {
-                CustomerId = customer.Id,
                 CompanyId = company.Id,
-                CanCredit = input.Dto.CanCredit
+                CustomerId = customer.Id,
+                Buyer = input.Dto.Buyer,
+                CanCredit = input.Dto.CanCredit,
+                AP = input.Dto.AP,
+                Operations = input.Dto.Operations,
             };
 
             CustomerCompany cc = _customerCompanyService.GetCustomerCompany(customerCompany.CustomerId, customerCompany.CompanyId);
             if (cc != null)
             {
-                _customerCompanyService.UpdateCustomerCompany(customerCompany);
+                cc.AP = customerCompany.AP;
+                cc.Buyer = customerCompany.Buyer;
+                cc.CanCredit = customerCompany.CanCredit;
+                cc.Operations = customerCompany.Operations;
+
+                _customerCompanyService.UpdateCustomerCompany(cc);
             } else
             {
                 _customerCompanyService.InsertCustomerCompany(customerCompany);
             }
-
-
-            // update customer as NSS Approved
-            _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, true);
-
-            #region Log Approved Status
-            var approvedStatus = _genericAttributeService.GetAttribute<bool>(customer, Constants.NSSApprovedAttribute);
-            // log nssapproved status
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> {customer.Email} approval status = '{approvedStatus}'");
-            #endregion
 
             return Ok();
         }
@@ -141,20 +148,18 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             int companyId
             )
         {
+            int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, id.ToString(), nameof(Customer))?.EntityId ?? 0;
+
             Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
 
-            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(id, company.Id);
+            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(customerId, company.Id);
 
             if (customerCompany == null)
             {
-                return NotFound();
+                return Error(HttpStatusCode.NotFound, "userCompany", "not found");
             }
 
             _customerCompanyService.DeleteCustomerCompany(customerCompany);
-
-            Nop.Core.Domain.Customers.Customer customer = _customerService.GetCustomerById(id);
-
-            _genericAttributeService.SaveAttribute(customer, Constants.NSSApprovedAttribute, false);
 
             return Ok();
         }
