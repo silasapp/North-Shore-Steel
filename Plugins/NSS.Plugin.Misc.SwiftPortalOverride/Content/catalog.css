@@ -1,410 +1,201 @@
-﻿.card-body {
-    padding: 0.5rem 0 0.5rem 1.25rem;
+﻿
+
+/* #region FILTERS */
+
+#drawerPane {
+    z-index: 1070;
 }
 
-.e-treeview .e-ul {
-    padding: 0 0 0 12px !important;
-}
-
-.chip {
-    display: inline-block;
-    padding: 0 1rem;
-    height: 1.5rem;
-    font-size: 12px;
-    line-height: 1.6rem;
-    border-radius: 25px;
-    background-color: #f1f1f1
-}
-
-.spinner {
-    height: 60px;
-    width: 60px;
-    margin: auto;
-    display: flex;
-    position: absolute;
-    -webkit-animation: rotation .6s infinite linear;
-    -moz-animation: rotation .6s infinite linear;
-    -o-animation: rotation .6s infinite linear;
-    animation: rotation .6s infinite linear;
-    border-left: 6px solid rgba(0, 174, 239, .15);
-    border-right: 6px solid rgba(0, 174, 239, .15);
-    border-bottom: 6px solid rgba(0, 174, 239, .15);
-    border-top: 6px solid rgba(0, 174, 239, .8);
-    border-radius: 100%;
-}
-
-@@-webkit-keyframes rotation {
-    from {
-        -webkit-transform: rotate(0deg);
-    }
-
-    to {
-        -webkit-transform: rotate(359deg);
-    }
-}
-
-@@-moz-keyframes rotation {
-    from {
-        -moz-transform: rotate(0deg);
-    }
-
-    to {
-        -moz-transform: rotate(359deg);
-    }
-}
-
-@@-o-keyframes rotation {
-    from {
-        -o-transform: rotate(0deg);
-    }
-
-    to {
-        -o-transform: rotate(359deg);
-    }
-}
-
-@@keyframes rotation {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(359deg);
-    }
-}
-
-#overlay {
-    position: absolute;
+.overlay-off-canvas {
     display: none;
+    position: fixed;
     top: 0;
     left: 0;
-    right: 0;
     bottom: 0;
-    /*background-color: rgba(0,0,0,0.5);*/
-    z-index: 2;
-}
-
-.chip-closebtn:hover {
-    color: #666666;
-}
-
-/*checkbox*/
-.pure-material-checkbox {
-    z-index: 0;
-    position: relative;
-    display: inline-block;
-    color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.87);
-    font-family: var(--pure-material-font, "Roboto", "Segoe UI", BlinkMacSystemFont, system-ui, -apple-system);
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-    /* Input */
-    .pure-material-checkbox > input {
-        appearance: none;
-        -moz-appearance: none;
-        -webkit-appearance: none;
-        z-index: -1;
-        position: absolute;
-        left: -10px;
-        top: -8px;
-        display: block;
-        margin: 0;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        background-color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.6);
-        box-shadow: none;
-        outline: none;
-        opacity: 0;
-        transform: scale(1);
-        pointer-events: none;
-        transition: opacity 0.3s, transform 0.2s;
-    }
-
-    /* Span */
-    .pure-material-checkbox > span {
-        display: inline-block;
-        width: 100%;
-        cursor: pointer;
-    }
-
-        /* Box */
-        .pure-material-checkbox > span::before {
-            content: "";
-            display: inline-block;
-            box-sizing: border-box;
-            margin: 3px 11px 3px 1px;
-            border: solid 2px; /* Safari */
-            border-color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.6);
-            border-radius: 2px;
-            width: 18px;
-            height: 18px;
-            vertical-align: top;
-            transition: border-color 0.2s, background-color 0.2s;
-        }
-
-        /* Checkmark */
-        .pure-material-checkbox > span::after {
-            content: "";
-            display: block;
-            position: absolute;
-            top: 5px;
-            left: 1px;
-            width: 12px;
-            height: 5px;
-            border: solid 2px transparent;
-            border-right: none;
-            border-top: none;
-            transform: translate(3px, 4px) rotate(-45deg);
-        }
-
-    /* Checked, Indeterminate */
-    .pure-material-checkbox > input:checked,
-    .pure-material-checkbox > input:indeterminate {
-        background-color: #e3165b;
-    }
-
-        .pure-material-checkbox > input:checked + span::before,
-        .pure-material-checkbox > input:indeterminate + span::before {
-            border-color: transparent;
-            background-color: #e3165b;
-        }
-
-        .pure-material-checkbox > input:checked + span::after,
-        .pure-material-checkbox > input:indeterminate + span::after {
-            border-color: rgb(var(--pure-material-onprimary-rgb, 255, 255, 255));
-        }
-
-        .pure-material-checkbox > input:indeterminate + span::after {
-            border-left: none;
-            transform: translate(4px, 3px);
-        }
-
-
-
-.filter-tag {
-    background-color: #F6F6F6;
-    border-radius: 20px;
-    padding: 0 5px;
-    margin-right: 10px;
-    display: flex;
-    align-items: center;
-}
-
-    .filter-tag > button, .filter-tag > .sort-button:focus, .clear-filter, .clear-filter:focus {
-        background: none;
-        border: none;
-        display: flex;
-        align-items: center;
-        box-shadow: none;
-        outline: none;
-    }
-/* Table sort indicators */
-
-th.sortable {
-    position: relative;
-    cursor: pointer;
-}
-
-    th.sortable::after {
-        font-family: FontAwesome;
-        content: url(sort-az.svg);
-        position: absolute;
-        right: 8px;
-        color: #999;
-    }
-
-    th.sortable.asc::after {
-        content: url(sort-za.svg);
-    }
-
-    th.sortable.desc::after {
-        content: url(sort-az.svg);
-    }
-
-    th.sortable:hover::after {
-        color: #333;
-    }
-
-
-.catalog-table {
-    border: 2px solid #ffffff !important;
-    margin-bottom: 50px;
-}
-
-    .catalog-table thead > tr > th {
-        background-color: #DEDEDE !important;
-    }
-
-.table-action-button, .table-action-button:focus {
-    background: none;
-    border: none;
-    box-shadow: none;
-    outline: none;
-    padding: 1px;
-}
-
-.sort-button, .sort-button:focus {
-    background: none;
-    border: none;
-    box-shadow: none;
-    outline: none;
-}
-
-.no-backgroud-button {
-    border: none;
-    background-color: transparent;
-}
-
-    .no-backgroud-button > img {
-        margin-right: 3px;
-        height: 20px;
-        width: 20px;
-    }
-
-.cart-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 50px;
-}
-
-.detail-container {
-    display: flex;
-    justify-content: space-between;
-}
-
-.discount, .cart-summary {
-    background-color: #F6F6F6;
-    padding: 15px;
-    margin-bottom: 15px;
-}
-
-    .discount > label {
-        font-size: 14px;
-        font-weight: 500;
-        margin-bottom: 10px;
-    }
-
-.left-detail {
-    min-width: 30%;
-}
-
-.discount > div > input {
-    border: none;
-    font-style: italic;
-    font-size: 14;
-    box-shadow: 0px 0px 3px 1px #e7e5e5;
-    padding: 5px;
-    margin-right: 10px;
     width: 100%;
+    height: 100%;
+    background: rgba(221,221,221,.6);
+    z-index: 1010;
+    -webkit-transition: background .3s ease-in-out;
+    transition: background .3s ease-in-out;
 }
 
-.discount > div > button {
-    border: none;
-    background-color: #DEDEDE;
-    font-weight: 500;
-    padding: 0 15px;
+.filter-options {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 0 15px rgba(0,0,0,.2);
+    font-size: 0;
+    z-index: 1000;
+    background: white;
 }
 
-.pickup-options > div {
-    display: flex;
-    align-items: center;
-}
-
-    .pickup-options > div > label {
-        font-size: 14px;
-        margin-left: 5px;
+    .filter-options label {
+        font-size: 16px;
+        margin-bottom: 0px;
+        font: normal normal normal 16px/24px "Exo 2";
+        color: #03175B;
     }
 
-    .pickup-options > div > input {
-        height: 15px;
-        width: 15px;
+    .filter-options div {
+        position: relative;
     }
 
-.price-summary {
-    display: flex;
-    justify-content: space-between;
-}
-
-    .price-summary > .title {
-        color: #B1B1B1;
-        font-size: 14px;
-        margin: 2px 0;
-    }
-
-    .price-summary > .amount {
-        color: #000000;
-        font-size: 14px;
-        margin: 2px 0;
-        font-weight: 500;
-    }
-
-    .price-summary > .total {
-        color: #000000;
-        font-size: 24px;
-        margin: 5px 0 0 0;
-        font-weight: 500;
-    }
-
-.right-detail {
-    min-width: 50%;
-}
-
-.agree-terms {
-    display: flex;
-    align-items: center;
-}
-
-    .agree-terms > label {
-        font-size: 14px;
-        margin-left: 5px;
-    }
-
-    .agree-terms > a {
-        font-size: 14px;
-        color: #858585;
-    }
-
-    .agree-terms > input {
-        width: 15px;
-        height: 15px;
-    }
-
-.check-out {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 30px;
-}
-
-    .check-out > button {
-        border: none;
-        background-color: #DEDEDE;
-        color: #585858;
-        font-size: 18px;
-        font-weight: 500;
-        padding: 5px 15px;
-    }
-
-        .check-out > button:hover {
-            background-color: #585858;
-            color: #ffffff;
+        .filter-options div select {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
         }
 
-.chipsStyle {
-    display: flex;
-    margin: 0 20px 12px 0;
+/* #endregion*/
+
+/* #region BOOTSTRAP MEDIA QUERIES */
+
+/*// Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) {
 }
 
-.e-treeview .e-list-item.e-active > .e-text-content .e-list-text {
-    color: black !important;
+/*// Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+    td > input[type=number]::placeholder {
+        color: #FFF;
+    }
 }
 
-/*specfication filters*/
-
-.nss-iSpec {
-    position: relative !important;
-    right: 2px !important;
-    display: inline-block !important;
-    padding-top: 3px !important;
+/*// Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) {
 }
+
+/*// Extra large devices (large desktops, 1200px and up)*/
+@media (min-width: 1200px) {
+    .cat-side-drawer {
+        width: auto !important;
+    }
+
+    .filter-options, .overlay-off-canvas {
+        display: none !important;
+    }
+}
+
+/*// Small devices (landscape phones, less than 768px)*/
+@media (max-width: 767.98px) {
+    .nss-container {
+        padding: 0px;
+    }
+
+    .h2-primary {
+        font: normal normal bold 26px/24px "Teko";
+        letter-spacing: 0.21px;
+        color: #03175b;
+    }
+
+    .fs12-default, .fs12-default-exo, .fs12-primary {
+        font-weight: bold;
+    }
+
+    .product-sm {
+        background-color: #F6F6F6;
+        padding: 16px;
+    }
+
+    .product-action-sm {
+        cursor: pointer;
+        margin-right: 20px;
+    }
+
+    .btn-sm-step {
+        background: #FFFFFF;
+        border: 0.5px solid #DEDEDE;
+        padding: 0px 16px;
+        padding-bottom: 2px;
+        font: normal normal bold 16px/24px 'Exo 2';
+        letter-spacing: 0px;
+        color: #242424;
+    }
+
+        .btn-sm-step:focus {
+            outline: 5px auto #03175b;
+        }
+
+    .form-control-sm {
+        width: 64px;
+        background: #FFFFFF 0% 0% no-repeat padding-box;
+        border: 0.5px solid #DEDEDE;
+        text-align: center;
+        font: normal normal normal 16px/24px 'Exo 2';
+        color: #242424;
+        margin: 0px 8px;
+    }
+
+    .btn-sm-add-to-cart {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        background-color: #03175b;
+        width: 100%;
+        padding: 10px;
+        font: normal normal normal 16px/24px 'Exo 2';
+        letter-spacing: 0px;
+        color: #FFFFFF;
+    }
+
+        .btn-sm-add-to-cart:focus {
+            outline: none;
+        }
+
+        .btn-sm-add-to-cart .product-action-sm {
+            margin-right: 7px;
+        }
+}
+
+/*// Medium devices (tablets, less than 992px)*/
+@media (max-width: 991.98px) {
+}
+
+/*// Large devices (desktops, less than 1200px)*/
+@media (max-width: 1199.98px) {
+    .cat-side-drawer {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #ffffff;
+        overflow-x: hidden;
+        transition: 0.5s;
+    }
+
+    #accordion {
+        text-align: left;
+        overflow: hidden;
+    }
+
+        #accordion .e-treeview .e-ul {
+            overflow-x: hidden !important;
+        }
+
+        #accordion li, accordion label {
+            display: block;
+        }
+
+    .card-header {
+        display: block;
+        white-space: nowrap;
+    }
+
+    #accordion .pure-material-checkbox {
+        display: block;
+        white-space: nowrap;
+    }
+}
+
+/* #endregion */

@@ -9,6 +9,7 @@
 
     //page class
     Html.AppendPageCssClassParts("html-home-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
 }
 
 <div id="app" class="page catalog-page">
@@ -18,8 +19,10 @@
 
                 <div class="cat-side-drawer" id="drawerPane">
                     <div class="d-xl-none">
-                        <div class="d-flex flex-row justify-content-end">
-                            <img class="bg-primary my-2 mx-2" src="Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close filter" v-on:click="closeFiltersDrawer()" width="24">
+                        <div class="bg-primary d-flex flex-row justify-content-center py-4 px-3">
+                            <label class="h2-white text-center mb-0 flex-fill">FILTERS</label>
+                            <img src="Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close filter"
+                                 v-on:click="closeFiltersDrawer" width="24">
                         </div>
                     </div>
                     <div id="accordion">
@@ -90,17 +93,8 @@
 
     <div class="filter-options d-flex flex-row justify-content-around">
         <div class="d-flex flex-row flex-fill p-3 align-items-center justify-content-center" v-on:click="openFiltersDrawer">
-            <img src="Themes/SwiftPortal/Content/images/filter.svg" alt="" width="24">
-            <label class="ml-1">FILTERS</label>
-        </div>
-        <div class="d-flex flex-row flex-fill p-3 align-items-center justify-content-center">
-            <img src="Themes/SwiftPortal/Content/images/sort.svg" alt="" width="24">
-            <label class="">SORT</label>
-            <select aria-label="Select product sort order" v-model="sortOption" v-on:change="handleSortChanged">
-                <option v-for="option in sortOptions" v-bind:key="option.code" v-bind:value="option">
-                    {{ option.name }}
-                </option>
-            </select>
+            <img src="Themes/SwiftPortal/Content/assets/icn-filter.svg" alt="" width="20">
+            <label class="ml-1">Filters</label>
         </div>
     </div>
 
@@ -438,9 +432,9 @@
             openFiltersDrawer: function () {
                 console.log("opening filters...");
                 const drawer = document.getElementById("drawerPane");
-                drawer.style.width = 'auto';
-                drawer.style.maxWidth = '70%';
-                drawer.style.minWidth = '240px';
+                drawer.style.width = '351px';
+                drawer.style.maxWidth = '90%';
+                drawer.style.minWidth = '30%';
                 drawer.style.transform = 'translateX(0)';
                 this.isFilterOpen = true;
             },

@@ -160,6 +160,7 @@
 }
 
 @{List<object> ObjectData = new List<object>(); }
+@{List<string> CustomScripts = new List<string>();}
 
 @if (Model.Products != null && Model.Products.Count > 0)
 {
@@ -232,15 +233,16 @@
             var Code = _isSerialized == "True" ? "itemTagNo" : "itemNo";
             itemCode = itemCode == "itemNo" ? Code : itemCode;
             productRowData.Add(it.Code.ToLower(), item.ProductCustomAttributes.FirstOrDefault(x => x.Key == itemCode)?.Value);
-            @Html.Raw(buildGridScript(it.DisplayName, it.Code));
+            if (!CustomScripts.Any(x => x == it.Code))
+            {
+                @Html.Raw(buildColumnScript(it.Code));
+                CustomScripts.Add(it.Code);
+            }
             if (it.Code != it.Sort)
             {
                 double value = 0;
                 double.TryParse((item.ProductCustomAttributes.FirstOrDefault(x => x.Key == it.Sort)?.Value), out value);
                 productRowData.Add($"{it.Sort.ToLower()}", value);
-
-                var script = buildDisplayScript(it.Code);
-                @Html.Raw(script);
             }
         }
 
@@ -259,9 +261,45 @@
 }
 
 
-<div id="_partialview">
-    <div class="control-section">
-        <div id="Grid"></div>
+<div id="gridView">
+    <div>
+        <div class="d-none d-md-block">
+            <div id="Grid"></div>
+        </div>
+        <div class="d-md-none">
+            <div class="product-sm d-flex flex-column align-items-start mb-2" v-for="data in gridData">
+                <label class="fs12-primary mb-1">Item: {{ data.itemno }}</label>
+                <label class="h2-primary my-2">{{ data.itemname }}</label>
+                <div class="d-flex flex-row">
+                    <label class="fs12-default mr-3 mb-0">Height(in): {{ data.height }}</label>
+                    <label class="fs12-default mr-3 mb-0">Length(ft): {{ data.length }}</label>
+                    <label class="fs12-default mr-3 mb-0">Weight(lb): {{ data.weight }}</label>
+                </div>
+                <div class="d-flex flex-row justify-content-between w-100 my-3">
+                    <div class="d-flex flex-row align-items-center">
+                        <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="product-action-sm"
+                             v-on:click="handleAddToWishList(data)" title="add to wishlist" width="24" height="24" alt="">
+
+                        <img v-if="data._sawOption == 'true'" src="Themes/SwiftPortal/Content/assets/saw-blade.svg" class="product-action-sm" width="24" height="24" alt=""
+                             v-on:click="handleSawOption(data)">
+
+                        <a v-if="data._mtr" class="table-action-button" style="text-decoration: none" v-bind:href="data._mtr" target="_blank">
+                            <img class="product-action-sm" src="Themes/SwiftPortal/Content/assets/invoice.svg" title="mtr report" width="24" height="24" alt="">
+                        </a>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <button type="button" class="btn-sm-step" v-on:click="handleDecrementQuantity(data._itemId)">-</button>
+                        <input class="form-control-sm" type="number" min="1" name="quantity" v-bind:id="'qty' + data._itemId" value="1"
+                               oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">
+                        <button type="button" class="btn-sm-step" v-on:click="handleIncrementQuantity(data._itemId)">+</button>
+                    </div>
+                </div>
+                <button type="button" class="btn-sm-add-to-cart" v-on:click="handleAddToCart(data)">
+                    <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" class="product-action-sm" width="24" height="24" alt="">
+                    Add to cart
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -278,13 +316,7 @@
         });
     }
 
-    string buildDisplayScript(string columnName) => $@"<script id='{columnName.ToLower()}Template' type='text/x-template'>
-    <label class='{(isDefaultColumn(columnName) ? "non-default-column" : "")}>${{{ columnName.ToLower() }}}</label></script>";
-
-    string buildGridScript(string title, string columnName) => $@"<script id='{columnName.ToLower()}Template' type='text/x-template'>
-    <div class='{(!isDefaultColumn(columnName) ? "non-default-column" : "")}'><label class='mv-title'>{ title }:</label><label>${{{ columnName.ToLower() }}}</label></div></script>";
-
-    bool isDefaultColumn(string columnName) => columnName.ToLower() == "itemno" || columnName.ToLower() == "itemname" || columnName.ToLower() == "itemtagno";
+    string buildColumnScript(string columnName) => $@"<script id='{columnName.ToLower()}Template' type='text/x-template'><label>${{{ columnName.ToLower() }}}</label></script>";
 }
 
 <script>
@@ -296,9 +328,11 @@
     console.log("gridColumns: ", gridColumns);
 
     var gridVm = new Vue({
-        el: '_partialview',
+        el: '#gridView',
         data: {
+            dataFalse: false,
             grid: null,
+            gridColumns,
             gridData,
         },
         mounted: function() {
@@ -347,13 +381,35 @@
                 });
                 this.grid.appendTo('#Grid');
             },
+            handleDecrementQuantity: function (itemId) {
+                const quantityEl = $('#qty' + itemId);
+                const quantity = Number(quantityEl.val());
+                quantityEl.val(quantity && quantity - 1 > 1 ? quantity - 1 : 1);
+                console.log("handleDecrementQuantity: ", quantity && quantity - 1 > 1 ? quantity - 1 : 1);
+            },
+
+            handleIncrementQuantity: function (itemId) {
+                const quantityEl = $('#qty' + itemId);
+                const quantity = Number(quantityEl.val());
+                $('#qty' + itemId).val(quantity ? quantity + 1 : 1);
+                console.log("handleIncrementQuantity: ", quantity ? quantity + 1 : 1);
+            },
+
+            handleAddToWishList: function(data) {
+                getInputQuantity(data._itemId, data._wishListId);
+            },
+            handleAddToCart: function (data) {
+                getInputQuantity(data._itemId, data._cartId);
+            },
+            handleSawOption: function (data) {
+                handleSawOption(data._itemId, data._productAttributes, data._productName)
+            },
         },
     });
 </script>
 
 <script>
     function getInputQuantity(itemId, cartId) {
-        event.preventDefault();
         let qty = $('#qty' + itemId).val();
         if (!qty)
             qty = 1;
@@ -371,7 +427,7 @@
     ${if(_isSerialized == "true")}
     <label style="width: 40px" for="">1</label>
     ${else}
-    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}" placeholder="Qty"
+    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}"
            oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">
     ${/if}
 </script>

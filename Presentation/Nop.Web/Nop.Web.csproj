@@ -191,6 +191,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-error-red.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-error.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-expand.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-filter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-invoice-dark.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-invoice.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-key.svg" />
