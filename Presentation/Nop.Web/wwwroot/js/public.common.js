@@ -19,10 +19,12 @@ function setLocation(url) {
 
 function displayAjaxLoading(display) {
     if (display) {
-        $('.ajax-loading-block-window').show();
+        //$('.ajax-loading-block-window').show();
+        $('#custom-loading').show();
     }
     else {
-        $('.ajax-loading-block-window').hide('slow');
+        //$('.ajax-loading-block-window').hide('slow');
+        $('#custom-loading').hide();
     }
 }
 
