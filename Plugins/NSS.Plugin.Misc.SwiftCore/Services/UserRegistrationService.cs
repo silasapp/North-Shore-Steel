@@ -79,7 +79,9 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                     Name = companyName,
                     SalesContactEmail = salesContactEmail,
                     SalesContactName = salesContactName,
-                    SalesContactPhone = salesContactPhone
+                    SalesContactPhone = salesContactPhone,
+                    CreatedOnUtc = DateTime.UtcNow,
+                    UpdatedOnUtc = DateTime.UtcNow
                 };
 
                 _companyService.InsertCompany(company);
