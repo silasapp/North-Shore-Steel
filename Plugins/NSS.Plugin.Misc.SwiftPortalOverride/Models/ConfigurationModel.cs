@@ -58,5 +58,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl")]
         public string MarketingVideoUrl { get; set; }
         public bool MarketingVideoUrl_OverrideForStore { get; set; }
+
+        [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.ApplyForCreditUrl")]
+        public string ApplyForCreditUrl { get; set; }
+        public bool ApplyForCreditUrl_OverrideForStore { get; set; }
     }
 }

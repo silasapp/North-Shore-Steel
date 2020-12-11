@@ -73,7 +73,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             _settingService.SaveSetting(
                 new SwiftCoreSettings
                 {
-                    StorageContainerName = "swiftportal-container"
+                    StorageContainerName = "swiftportal-container",
+                    ApplyForCreditUrl = "https://www.nssco.com/assets/files/newaccountform.pdf"
                 }
             );
 
@@ -107,6 +108,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                 ["Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey.Hint"] = "Enter PayPal Secret Key.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl"] = "Marketing Video Url",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.MarketingVideoUrl.Hint"] = "Enter marketing video url that will be embedded when a customer signs up.",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.ApplyForCreditUrl"] = "Apply For Credit Url",
+                ["Plugins.Misc.SwiftPortalOverride.Fields.ApplyForCreditUrl.Hint"] = "Enter apply for credit link url to be used on invoice screen.",
                 ["Plugins.Misc.SwiftPortalOverride.Fields.NewCustomerWelcomeMessage.Text"] = @"
                     <p>
                         Thank you for registering as a new customer.

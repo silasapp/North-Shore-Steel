@@ -268,7 +268,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (customerCompany != null && customerCompany.CanCredit)
             {
                 var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
-                creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult.CreditAmount ?? (decimal)0.00 };
+                creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero};
             }
 
             model.AccountCreditModel = creditModel;
@@ -756,8 +756,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 //nss get credit amount
                 var (erpCompId, _) = GetCustomerCompanyDetails();
-                var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
-                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult.CreditAmount ?? decimal.Zero);
+                var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId);
+                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult?.CreditAmount ?? decimal.Zero);
             }
 
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
