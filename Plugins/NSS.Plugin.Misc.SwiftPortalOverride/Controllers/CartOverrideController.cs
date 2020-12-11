@@ -421,7 +421,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //but we do not display attribute and gift card warnings here. let's do it on the product details page
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    success = false,
+                    message = addToCartWarnings.ToArray()
+                    //redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
                 });
             }
 
@@ -635,7 +637,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //but we do not display attribute and gift card warnings here. let's do it on the product details page
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    success = false,
+                    message = addToCartWarnings.ToArray()
+                    //redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
                 });
             }
 
