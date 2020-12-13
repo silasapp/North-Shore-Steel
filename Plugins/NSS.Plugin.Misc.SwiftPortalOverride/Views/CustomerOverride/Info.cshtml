@@ -12,6 +12,7 @@
 
 @{
     Layout = "_ColumnsTwo";
+    Html.AppendScriptParts("~/Themes/SwiftPortal/Content/js/custom.mask.js");
 
     //title
     Html.AddTitleParts(T("PageTitle.Account").Text);
@@ -69,13 +70,13 @@
 
                     <div class="">
                         <label asp-for="Phone">Work Phone</label>
-                        <input asp-for="Phone" class="form-control custom-input" />
+                        <input asp-for="Phone" id="work-phone" class="form-control custom-input phone-number" />
                         <span asp-validation-for="Phone"></span>
                     </div>
 
                     <div class="">
                         <label asp-for="Phone">Cell Phone</label>
-                        <input name="cell-phone" id="cell-phone" class="form-control custom-input" value="@CellPhone" />
+                        <input name="cell-phone" id="cell-phone" class="form-control custom-input phone-number" value="@CellPhone" />
                         <span asp-validation-for="Phone"></span>
                     </div>
 
@@ -104,7 +105,7 @@
 
                 </div>
                 <div class="buttons save-customer-info-button">
-                    <input type=submit id=save-info-button value='Save Changes' name=save-info-button class="button-2 ">
+                    <input type=submit id=save-info-button value='Save Changes' onClick="return validatePhoneNumbers();" name="save-info-button" class="button-2 ">
                 </div>
             </div>
         </form>
@@ -132,5 +133,28 @@
             });
         }
         return false;
+    }
+
+    $(document).ready(function () {
+
+        const cellPhoneElement = document.getElementById('cell-phone');
+        const workPhoneElement = document.getElementById('work-phone');
+        cellPhoneElement.addEventListener('keydown', enforceFormat);
+        cellPhoneElement.addEventListener('keyup', formatToPhone);
+        workPhoneElement.addEventListener('keydown', enforceFormat);
+        workPhoneElement.addEventListener('keyup', formatToPhone);
+    });
+
+    function validatePhoneNumbers() {
+        var elements = document.getElementsByClassName("phone-number");
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].value != "") {
+                re = /^[(]\d{3}[)][\s.-]\d{3}[\s.-]\d{4}$/igm;
+                if (!re.test(elements[i].value)) {
+                    alert('Please enter a valid phone number.');
+                    return false;
+                }
+            }
+        }
     }
 </script>
