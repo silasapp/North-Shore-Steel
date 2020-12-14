@@ -35,4 +35,7 @@
     }
     //add jQuery UI css file
     Html.AppendCssFileParts("~/lib/jquery-ui/jquery-ui-1.12.1.custom/jquery-ui.min.css");
+
+    //add Vue filters
+    Html.AppendScriptParts($"~/Themes/{themeName}/Content/js/filters.js");
 }

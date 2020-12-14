@@ -250,43 +250,44 @@
                                                     }
                                                 </td>
                                                 <td style="text-align:left" class="d-flex flex-row ">
-                                                    @if (!string.IsNullOrEmpty(mtr))
-                                                    {
-                                                        <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" width="20" height="20" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                                <title>invoice</title>
-                                                                <path d="M13 16H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2zm-4-6h2a1 1 0 0 0 0-2H9a1 1 0 0 0 0 2zm12 2h-3V3a1 1 0 0 0-.5-.87a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0A1 1 0 0 0 2 3v16a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-6a1 1 0 0 0-1-1zM5 20a1 1 0 0 1-1-1V4.73l2 1.14a1.08 1.08 0 0 0 1 0l3-1.72l3 1.72a1.08 1.08 0 0 0 1 0l2-1.14V19a3 3 0 0 0 .18 1zm15-1a1 1 0 0 1-2 0v-5h2zm-7-7H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2z" />
-                                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                            </svg>
-                                                        </a>
-                                                    }
-                                                    @if (hasSawOption)
-                                                    {
-                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))" width="20" height="20" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                            <title>saw options</title>
-                                                            <path d="M20 15s-1.4 1.3 1.1 2l-2.8 2.8h-2.8s-1.9-.1-.5 2.2h-4l-2-2s-1.3-1.4-2 1.1l-2.8-2.8v-2.8s.1-1.9-2.2-.5v-4l2-2s1.4-1.3-1.2-1.9l2.8-2.9h2.9s1.9.1.5-2.2h4l2 2s1.3 1.4 2-1.2l2.8 2.8v2.9s-.1 1.9 2.2.5v4l-2 2m-6-3a2 2 0 0 0-2-2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2z" />
-                                                            <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                        </svg>
-                                                    }
-                                                    @if (eRPCompanyIdExist)
-                                                    {
-                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" width="20" height="20" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                            <title>add to cart</title>
-                                                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
-                                                            <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                        </svg>
-                                                    }
                                                     <div class="table-action-button">
                                                         <label class="mb-0">
                                                             <span style="cursor:pointer">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" aria-hidden="true" focusable="false" width="20" height="20" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
-                                                                    <title>remove from wishlist</title>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" aria-hidden="true" focusable="false" width="24" height="24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+                                                                    <title>Remove favorite</title>
                                                                     <path d="M2.808 1.393l18.384 18.385l-1.414 1.414l-3.747-3.747L12 21.485l-8.48-8.492a6 6 0 0 1 .034-8.023L1.393 2.808l1.415-1.415zm17.435 3.364a6 6 0 0 1 .236 8.236l-1.635 1.636L7.26 3.046a5.986 5.986 0 0 1 4.741 1.483a5.998 5.998 0 0 1 8.242.228z" />
                                                                 </svg>
                                                             </span>
                                                             <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
                                                         </label>
                                                     </div>
+                                                    @if (eRPCompanyIdExist)
+                                                    {
+                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                            <title>Add to cart</title>
+                                                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
+                                                            <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                        </svg>
+                                                    }
+                                                    @if (hasSawOption)
+                                                    {
+                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                            <title>Saw Options</title>
+                                                            <path d="M20 15s-1.4 1.3 1.1 2l-2.8 2.8h-2.8s-1.9-.1-.5 2.2h-4l-2-2s-1.3-1.4-2 1.1l-2.8-2.8v-2.8s.1-1.9-2.2-.5v-4l2-2s1.4-1.3-1.2-1.9l2.8-2.9h2.9s1.9.1.5-2.2h4l2 2s1.3 1.4 2-1.2l2.8 2.8v2.9s-.1 1.9 2.2.5v4l-2 2m-6-3a2 2 0 0 0-2-2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2z" />
+                                                            <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                        </svg>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(mtr))
+                                                    {
+                                                        <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon  mx-1" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                                <title>View MTRs</title>
+                                                                <path d="M13 16H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2zm-4-6h2a1 1 0 0 0 0-2H9a1 1 0 0 0 0 2zm12 2h-3V3a1 1 0 0 0-.5-.87a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0A1 1 0 0 0 2 3v16a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-6a1 1 0 0 0-1-1zM5 20a1 1 0 0 1-1-1V4.73l2 1.14a1.08 1.08 0 0 0 1 0l3-1.72l3 1.72a1.08 1.08 0 0 0 1 0l2-1.14V19a3 3 0 0 0 .18 1zm15-1a1 1 0 0 1-2 0v-5h2zm-7-7H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2z" />
+                                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                            </svg>
+                                                        </a>
+                                                    }
+
                                                     @if (string.IsNullOrEmpty(mtr))
                                                     {
                                                         <div class=""></div>
