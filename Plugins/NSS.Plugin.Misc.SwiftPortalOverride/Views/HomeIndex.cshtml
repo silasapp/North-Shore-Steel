@@ -1,7 +1,6 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @model TransactionModel
 @using Nop.Web.Framework.Themes
-@using Syncfusion.EJ2
 @inject IThemeContext themeContext
 @{
     Layout = "_ColumnsOne";
@@ -33,32 +32,86 @@
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
                         <div class="responsive-table-container tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                            <ejs-grid id="OrderGrid" dataSource="@Model.RecentOrders" allowPaging="true" allowFiltering="false">
-                                <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
-                                <e-grid-columns>
-                                    <e-grid-column template="#orderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="Weight" headerText="Tot. Weight (lb)" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="OrderTotal" headerText="Order Amount" format="C2" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="PONo" headerText="PO #" minWidth="80" width="100"></e-grid-column>
-                                    <e-grid-column field="EstDeliveryDate" headerText="Est. Delivery" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                    <e-grid-column field="OrderStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
-                                </e-grid-columns>
-                            </ejs-grid>
+                            <table class="table table-striped w3-animate-left nss-table">
+                                <thead class="thead-default">
+                                    <tr>
+                                        <td scope="col">Order #</td>
+                                        <td scope="col">Weight (lb)</td>
+                                        <td scope="col">Order Amt.</td>
+                                        <td scope="col">PO #</td>
+                                        <td scope="col">Est. Delivery</td>
+                                        <td scope="col">Status</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentOrders != null && Model.RecentOrders.Count > 0)
+                                    {
+                                        foreach (Order order in Model.RecentOrders)
+                                        {
+                                            <tr>
+                                                <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
+                                                <td>@DoFormat(order.Weight)</td>
+                                                <td>$@DoFormat(order.OrderTotal)</td>
+                                                <td>@order.PONo</td>
+                                                <td>@order.EstDeliveryDate?.ToString("MM/dd/yyyy")</td>
+                                                <td>@order.OrderStatusName</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td scope="row">You have not placed any orders in the last 30 days, <a href="/catalog">Shop now</a></td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
                         </div>
                         <div class="responsive-table-container tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                            <ejs-grid id="InvoiceGrid" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false">
-                                <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
-                                <e-grid-columns>
-                                    <e-grid-column field="InvoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                    <e-grid-column template="#invoiceStatus" headerText="Status" minWidth="110" width="70"></e-grid-column>
-                                </e-grid-columns>
-                            </ejs-grid>
+                            <table class="table table-striped w3-animate-left nss-table">
+                                <thead class="thead-default">
+                                    <tr>
+                                        <td scope="col">Invoice #</td>
+                                        <td scope="col">Order #</td>
+                                        <td scope="col">Invoice Amt.</td>
+                                        <td scope="col">Invoice Date</td>
+                                        <td scope="col">Due Date</td>
+                                        <td scope="col">Status</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.RecentInvoices != null && Model.RecentInvoices.Count > 0)
+                                    {
+                                        foreach (Invoice invoice in Model.RecentInvoices)
+                                        {
+                                            <tr>
+                                                <th scope="row">@invoice.InvoiceId</th>
+                                                <td><a href="/orders/@invoice.OrderNo" scope="row">@invoice.OrderNo</a></td>
+                                                <td>$@DoFormat(invoice.InvoiceAmount)</td>
+                                                <td>@invoice.InvoiceDate.ToString("MM/dd/yyyy")</td>
+                                                <td>@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</td>
+                                                @if (@invoice.InvoiceStatusName.IndexOf("Past") > -1)
+                                                {
+                                                    <td style="color: red;">@invoice.InvoiceStatusName</td>
+                                                }
+                                                else
+                                                {
+                                                    <td>@invoice.InvoiceStatusName</td>
+                                                }
+                                            </tr>
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td scope="row">You have not placed any orders in the last 30 days, <a href="/catalog">Shop now</a></td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -102,18 +155,12 @@
         </div>
     </div>
 </div>
-<script id="orderNo" type="text/x-template">
-    <a href="/orders/${OrderId}">${OrderId}</a>
-</script>
-<script id="invoiceOrderNo" type="text/x-template">
-    <a href="/orders/${OrderNo}">${OrderNo}</a>
-</script>
 
-<script id="invoiceStatus" type="text/x-template">
-    ${if(InvoiceStatusName.indexOf("Past"))}
-    <span>${InvoiceStatusName}</span>
-    ${else}
-    <span style="color: red;">${InvoiceStatusName}</span>
-    ${/if}
-</script>
-<ejs-scripts></ejs-scripts>
+@functions{
+    string DoFormat(double myNumber)
+    {
+        var s = string.Format("{0:N2}", myNumber);
+
+        return s;
+    }
+}
