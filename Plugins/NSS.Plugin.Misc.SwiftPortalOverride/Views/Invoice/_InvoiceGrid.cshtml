@@ -16,10 +16,10 @@
             <e-grid-column template="#invoiceNo" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
             <e-grid-column template="#orderNo" headerText="Order #" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
             <e-grid-column field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
-            <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
             @if (!Model.IsClosed)
             {
-                <e-grid-column template="#balanceAmount" headerText="Balance Amount" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="BalanceAmount" headerText="Balance Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
             }
             <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
             @if (Model.IsClosed)
@@ -49,10 +49,10 @@
     }
 
     function excelQueryCellInfo(args) {
-        if (args.column.headerText == "Invoice #" && args.value.length === 0) {args.value = args.data.InvoiceId;}
-        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderNo;}
-        if (args.column.headerText == "Invoice Amount" && args.value.length === 0) {args.value = args.data.InvoiceAmount;}
-        if (args.column.headerText == "Balance Amount" && args.value.length === 0) { args.value = args.data.BalanceAmount;}
+        if (args.column.headerText == "Invoice #" && args.value.length === 0) { args.value = args.data.InvoiceId; }
+        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderNo; }
+        if (args.column.headerText == "Invoice Amount" && args.value.length === 0) { args.value = args.data.InvoiceAmount; }
+        if (args.column.headerText == "Balance Amount" && args.value.length === 0) { args.value = args.data.BalanceAmount; }
     }
 
 </script>
@@ -62,11 +62,5 @@
 </script>
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderNo}">${OrderNo}</a>
-</script>
-<script id="invoiceAmount" type="text/x-template">
-    $${InvoiceAmount}
-</script>
-<script id="balanceAmount" type="text/x-template">
-    $${BalanceAmount}
 </script>
 <ejs-scripts></ejs-scripts>

@@ -39,7 +39,7 @@
                                 <e-grid-columns>
                                     <e-grid-column template="#orderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
                                     <e-grid-column field="Weight" headerText="Tot. Weight (lb)" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column template="#orderTotal" headerText="Order Amt." minWidth="120" width="70"></e-grid-column>
+                                    <e-grid-column field="OrderTotal" headerText="Order Amount" format="C2" minWidth="120" width="70"></e-grid-column>
                                     <e-grid-column field="PONo" headerText="PO #" minWidth="80" width="100"></e-grid-column>
                                     <e-grid-column field="EstDeliveryDate" headerText="Est. Delivery" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
                                     <e-grid-column field="OrderStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
@@ -53,7 +53,7 @@
                                 <e-grid-columns>
                                     <e-grid-column field="InvoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
                                     <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column template="#invoiceAmount" headerText="Invoice Amt." minWidth="120" width="70"></e-grid-column>
+                                    <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" minWidth="120" width="70"></e-grid-column>
                                     <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
                                     <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
                                     <e-grid-column template="#invoiceStatus" headerText="Status" minWidth="110" width="70"></e-grid-column>
@@ -107,13 +107,6 @@
 </script>
 <script id="invoiceOrderNo" type="text/x-template">
     <a href="/orders/${OrderNo}">${OrderNo}</a>
-</script>
-<script id="orderTotal" type="text/x-template">
-    $${OrderTotal}
-</script>
-
-<script id="invoiceAmount" type="text/x-template">
-    $${InvoiceAmount}
 </script>
 
 <script id="invoiceStatus" type="text/x-template">
