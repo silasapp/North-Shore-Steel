@@ -16,7 +16,7 @@
             <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
             <e-grid-column field="PoNo" headerText="PO#" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
             <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" minWidth="120" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
-            <e-grid-column template="#orderTotal" headerText="Order Amount" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="OrderTotal" headerText="Order Amount" minWidth="110" width="120" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
             <e-grid-column field="OrderDate" headerText="Order Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
             <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
             @if (Model.IsClosed)
@@ -57,9 +57,6 @@
 
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderId}">${OrderId}</a>
-</script>
-<script id="orderTotal" type="text/x-template">
-    $${OrderTotal}
 </script>
 <script id="viewTicket" type="text/x-template">
     <a href="">View Ticket</a>

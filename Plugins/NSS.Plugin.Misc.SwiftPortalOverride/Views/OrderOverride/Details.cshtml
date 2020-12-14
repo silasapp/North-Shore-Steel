@@ -353,8 +353,8 @@
                         <td class="sku">@item.LineNo</td>
                         <td class="product">@item.Description</td>
                         <td>@item.CustomerPartNo</td>
-                        <td>@item.UnitPrice</td>
-                        <td>@item.TotalPrice</td>
+                        <td>$@DoFormat(item.UnitPrice)</td>
+                        <td>$@DoFormat(item.TotalPrice)</td>
                         <td>@item.TotalWeight</td>
                         <td>@Model.PoNo</td>
                         <td>@item.Quantity</td>
@@ -373,7 +373,7 @@
                         <label class="mb-0">@T("Order.SubTotal"):</label>
                     </td>
                     <td class="cart-total-right">
-                        <span>@Model.LineItemTotal</span>
+                        <span>@DoFormat(Model.LineItemTotal)</span>
                     </td>
                 </tr>
                 <tr>
@@ -389,7 +389,7 @@
                         <label class="h2-default-teko text-uppercase">Total</label>
                     </td>
                     <td class="cart-total-right">
-                        <span class="h2-default-teko">$@Model.OrderTotal</span>
+                        <span class="h2-default-teko">$@DoFormat(Model.OrderTotal)</span>
                     </td>
                 </tr>
             </tbody>
@@ -414,6 +414,16 @@
         Formatting = Formatting.None
     });
 }
+
+@functions{
+    string DoFormat(decimal myNumber)
+    {
+        var s = string.Format("{0:N2}", myNumber);
+
+        return s;
+    }
+}
+
 <script>
     function onDialogCreated() {
         viewMtrModal = this;

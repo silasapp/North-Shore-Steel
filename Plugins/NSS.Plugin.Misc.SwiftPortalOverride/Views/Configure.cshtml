@@ -142,6 +142,16 @@
                         <span asp-validation-for="MarketingVideoUrl"></span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="ApplyForCreditUrl_OverrideForStore" asp-input="ApplyForCreditUrl" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="ApplyForCreditUrl" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="ApplyForCreditUrl" asp-required="true" asp-value="@Model.ApplyForCreditUrl" />
+                        <span asp-validation-for="ApplyForCreditUrl"></span>
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <div class="col-md-9 col-md-offset-3">

@@ -5,7 +5,8 @@
 @model RegisterModel
 @{
     Layout = "";
-    //Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/customstyle.css");
+    Html.AppendScriptParts("~/Themes/SwiftPortal/Content/js/custom.mask.js");
+
 
 }
 @{
@@ -250,20 +251,19 @@
 
                         <div class="form-group row">
 
-                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <label asp-for="CellPhone">Cell Phone</label>
-                                <nop-required />
-                                <input asp-for="CellPhone" placeholder="Enter cell phone number" class="form-control custom-input" />
-                                <span asp-validation-for="CellPhone" style="display:flex;"></span>
-                            </div>
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                 <label asp-for="Phone">Work Phone</label>
                                 <nop-required />
-                                <input asp-for="Phone" placeholder="Enter work phone number" class="form-control custom-input" />
+                                <input asp-for="Phone" id="work-phone" placeholder="Enter work phone number" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="Phone" style="display:flex;"></span>
                             </div>
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="CellPhone">Cell Phone</label>
+                                <nop-required />
+                                <input asp-for="CellPhone" id="cell-phone" placeholder="Enter cell phone number" class="form-control custom-input phone-number" />
+                                <span asp-validation-for="CellPhone" style="display:flex;"></span>
+                            </div>
                         </div>
-
                         <div class="form-group row">
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="Company">Company Name</label>
@@ -298,12 +298,9 @@
                             </div>
 
                         </div>
-
-
                     </div>
                 </div>
             </div>
-
             <div class="fieldset">
                 <div class="form-fields">
                     <div class="title">
@@ -366,6 +363,7 @@
                                         } else {
                                             $("#found-us-text-error").css("display", "none")
                                         }
+                                        validatePhoneNumbers();
                                         if ($('#accept-consent').is(':checked')) {
                                             //do some stuff
                                             return true;
@@ -411,7 +409,6 @@
         </div>
     </div>
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render();
-
 </div>
 
 
@@ -426,6 +423,13 @@
     }
 
     $(document).ready(function () {
+        const cellPhoneElement = document.getElementById('cell-phone');
+        const workPhoneElement = document.getElementById('work-phone');
+        cellPhoneElement.addEventListener('keydown', enforceFormat);
+        cellPhoneElement.addEventListener('keyup', formatToPhone);
+        workPhoneElement.addEventListener('keydown', enforceFormat);
+        workPhoneElement.addEventListener('keyup', formatToPhone);
+
         var hearAboutUsContainer = $(".about-us");
         if (hearAboutUsContainer.children("option:selected")[0].label == "Other") {
             $("#found-us-container").css("display", "block")
@@ -449,6 +453,19 @@
             document.getElementById("user_roles").style.display = "block";
         } else {
             document.getElementById("user_roles").style.display = "none";
+        }
+    }
+
+    function validatePhoneNumbers() {
+        var elements = document.getElementsByClassName("phone-number");
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].value != "") {
+                re = /^[(]\d{3}[)][\s.-]\d{3}[\s.-]\d{4}$/igm;
+                if (!re.test(elements[i].value)) {
+                    alert('Please enter a valid phone number.');
+                    return false;
+                }
+            }
         }
     }
 

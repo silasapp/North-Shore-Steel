@@ -70,5 +70,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Configuration
         #endregion
 
         public string MarketingVideoUrl { get; set; }
+        public string ApplyForCreditUrl { get; set; }
     }
 }
