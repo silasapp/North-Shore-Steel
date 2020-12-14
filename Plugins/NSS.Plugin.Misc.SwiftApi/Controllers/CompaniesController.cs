@@ -117,6 +117,30 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             return new RawJsonActionResult(JsonConvert.SerializeObject(companyDto));
         }
 
+        [HttpGet]
+        [Route("/api/companies/{id}")]
+        [ProducesResponseType(typeof(CompanyDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorsRootObject), 422)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
+        public IActionResult RetrieveCompanyDetails(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Error();
+            }
+
+            var currentCompany = _companyService.GetCompanyEntityByErpEntityId(id);
+
+            if (currentCompany == null)
+            {
+                return Error(HttpStatusCode.NotFound, "company", "not found");
+            }
+
+            var companyDto = currentCompany.ToDto();
+
+            return new RawJsonActionResult(JsonConvert.SerializeObject(companyDto));
+        }
+
         [HttpDelete]
         [Route("/api/companies/{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
