@@ -63,4 +63,11 @@
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderNo}">${OrderNo}</a>
 </script>
+<script id="invoiceStatusName" type="text/x-template">
+    ${if(InvoiceStatusName.indexOf("Past"))}
+    <span style="color: red;">${InvoiceStatusName}</span>
+    ${else}
+    <span>${InvoiceStatusName}</span>
+    ${/if}
+</script>
 <ejs-scripts></ejs-scripts>
