@@ -25,19 +25,19 @@
                 <div class="d-flex flex-row flex-wrap flex-fill justify-content-around invoice-summary-content">
                     <div class="d-flex flex-column mx-3 my-1">
                         <label class="fs12-default mb-2">Credit Limit</label>
-                        <label class="h5-default mb-0 ml-2">$@Model.CreditSummary.CreditLimit</label>
+                        <label class="h5-default mb-0 ml-2">$@DoFormat(Model.CreditSummary.CreditLimit)</label>
                     </div>
                     <div class="d-flex flex-column mx-3 my-1">
                         <label class="fs12-default mb-2">Total Open Invoices</label>
-                        <label class="h5-default mb-0 ml-2">$@Model.CreditSummary.OpenInvoiceAmount</label>
+                        <label class="h5-default mb-0 ml-2">$@DoFormat(Model.CreditSummary.OpenInvoiceAmount)</label>
                     </div>
                     <div class="d-flex flex-column mx-3 my-1">
                         <label class="fs12-default mb-2">Total Past Due</label>
-                        <label class="h5-danger mb-0 ml-2">$@Model.CreditSummary.PastDueAmount</label>
+                        <label class="h5-danger mb-0 ml-2">$@DoFormat(Model.CreditSummary.PastDueAmount)</label>
                     </div>
                     <div class="d-flex flex-column mx-3 my-1">
                         <label class="fs12-default mb-2">Open Credit</label>
-                        <label class="h5-default mb-0 ml-2">$@Model.CreditSummary.CreditAmount</label>
+                        <label class="h5-default mb-0 ml-2">$@DoFormat(Model.CreditSummary.CreditAmount)</label>
                     </div>
                 </div>
 
@@ -46,7 +46,7 @@
         else
         {
             <div class="mb-2 p-2 text-right">
-                <a href="@Model.CreditSummary.ApplyForCreditUrl"> Apply For Credit</a>
+                <a href="@Model.CreditSummary.ApplyForCreditUrl" target="_blank"> Apply For Credit</a>
             </div>
         }
 
@@ -117,7 +117,12 @@
     </div>
 </div>
 @functions{
+    string DoFormat(decimal myNumber)
+    {
+        var s = string.Format("{0:N2}", myNumber);
 
+        return s;
+    }
 }
 
 <script>
