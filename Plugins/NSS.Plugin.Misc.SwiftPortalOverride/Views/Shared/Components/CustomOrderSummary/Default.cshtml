@@ -77,6 +77,10 @@
     .e-dialog .e-dlg-header {
         width: 93% !important;
     }
+
+    .mv-title {
+        display: none !important;
+    }
 </style>
 
 <!-- Modal -->
@@ -139,7 +143,7 @@
 
                     </div>
                     <div class="cart-filter-menu">
-                        <label for="estimated-date">Delivery Date</label>
+                        <label for="estimated-date">Promise Date</label>
                         <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
                     </div>
                 </div>
@@ -150,7 +154,7 @@
                         @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
                             <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
                         <div class="cart-action-btn">
-                            <input style="z-index: 1;" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")" class="button-2 continue-shopping-button" />
+                            <input style="z-index: 1;" type="submit" name="continueshopping" value="Continue Shopping" class="button-2 continue-shopping-button" />
 
                             <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/return.svg" width="20" height="20" alt="">
                         </div>
@@ -182,9 +186,9 @@
                             <th style="background-color: transparent !important; border: none !important" scope="col">Total Price</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Weight (lb)</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Length (ft)</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Quantity</th>
-                            <th style="background-color: transparent !important; border: none !important;" scope="col">Notes</th>
-                            <th style="background-color: transparent !important; border: none !important;" scope="col">Remove</th>
+                            <th style="background-color: transparent !important; border: none !important" scope="col" class="text-center">Qty.</th>
+                            <th style="background-color: transparent !important; border: none !important;" scope="col" class="text-center">Notes</th>
+                            <th style="background-color: transparent !important; border: none !important;" scope="col" class="text-center">Remove</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -275,10 +279,10 @@
                                 <td id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
                                 <td><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></div></td>
                                 <td><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>
-                                <td>
-                                    <input style="height: 24px;" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" type="number" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" style="width: 100px; height: 30px" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+                                <td class="text-center">
+                                    <input style="height: 24px;" class="text-center" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @if (noteAttr != null)
                                     {
                                         var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
@@ -292,7 +296,7 @@
                                         <input type="hidden" id=@controlId name="@controlId" value="@noteAttr.DefaultValue" />
                                     }
                                 </td>
-                                <td class="remove-from-cart">
+                                <td class="remove-from-cart text-center">
                                     <label class="pure-material-checkbox">
                                         <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" style=" position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
 
@@ -440,7 +444,7 @@
                                 else
                                 {
                                     <button type="submit" id="checkout" name="checkout" value="checkout" class="button-1 checkout-button">
-                                        @T("Checkout.Button")
+                                        PROCEED TO CHECKOUT
                                     </button>
                                 }
                             }
