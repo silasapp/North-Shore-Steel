@@ -9,7 +9,7 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Companies
     [JsonObject(Title = "company")]
     public class CompanyDto : BaseDto
     {
-        [JsonProperty("erpCompanyId")]
+        [JsonProperty("companyId")]
         public int ErpCompanyId { get; set; }
 
         [JsonProperty("name")]
