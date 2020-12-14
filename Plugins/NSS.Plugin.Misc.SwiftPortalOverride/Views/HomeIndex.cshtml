@@ -10,6 +10,7 @@
     Html.AddTitleParts("Home");
     //page class
     Html.AppendPageCssClassParts("html-home-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/home.css");
 }
 
 @{
@@ -17,12 +18,26 @@
 }
 
 
-<div class="page home-page">
-    <div class="page-body">
-        <div>
-            <div class="row">
-                <div class="col-md-9">
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
 
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
+
+
+<div id="app" class="page home-page">
+    <div class="page-body">
+        <div class="d-none d-md-block">
+            <div class="row">
+                <div class="col-sm-12 col-md-9">
                     <ul class="nav nav-pills mb-1 " id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation" style="margin-right: 0.3em">
                             <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Recent Orders</a>
@@ -31,36 +46,40 @@
                             <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Recent Invoices</a>
                         </li>
                     </ul>
-                    <div class="tab-content" id="pills-tabContent">
-                        <div class="responsive-table-container tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                            <ejs-grid id="OrderGrid" dataSource="@Model.RecentOrders" allowPaging="true" allowFiltering="false">
-                                <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
-                                <e-grid-columns>
-                                    <e-grid-column template="#orderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column template="#orderTotal" headerText="Order Amount" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="PONo" headerText="PO#" minWidth="80" width="100"></e-grid-column>
-                                    <e-grid-column field="EstDeliveryDate" headerText="Est. Delivery" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                    <e-grid-column field="OrderStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
-                                </e-grid-columns>
-                            </ejs-grid>
-                        </div>
-                        <div class="responsive-table-container tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                            <ejs-grid id="InvoiceGrid" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false">
-                                <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
-                                <e-grid-columns>
-                                    <e-grid-column field="InvoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" minWidth="120" width="70"></e-grid-column>
-                                    <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                    <e-grid-column template="#invoiceStatus" headerText="Status" minWidth="110" width="70"></e-grid-column>
-                                </e-grid-columns>
-                            </ejs-grid>
+                    <div>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="responsive-table-container tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                                <ejs-grid id="OrderGrid" dataSource="@Model.RecentOrders" allowPaging="true" allowFiltering="false">
+                                    <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+                                    <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
+                                    <e-grid-columns>
+                                        <e-grid-column template="#orderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column template="#orderTotal" headerText="Order Amount" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column field="PONo" headerText="PO#" minWidth="80" width="100"></e-grid-column>
+                                        <e-grid-column field="EstDeliveryDate" headerText="Est. Delivery" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
+                                        <e-grid-column field="OrderStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
+                                    </e-grid-columns>
+                                </ejs-grid>
+                            </div>
+                            <div class="responsive-table-container tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                <ejs-grid id="InvoiceGrid" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false">
+                                    <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+                                    <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
+                                    <e-grid-columns>
+                                        <e-grid-column field="InvoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
+                                        <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
+                                        <e-grid-column template="#invoiceStatus" headerText="Status" minWidth="110" width="70"></e-grid-column>
+                                    </e-grid-columns>
+                                </ejs-grid>
+                            </div>
                         </div>
                     </div>
+
+
                 </div>
 
                 <div class="col-md-3 contact-block">
@@ -100,8 +119,210 @@
                 </div>
             </div>
         </div>
+
+        <div class="d-md-none">
+            <ul class="nav nav-pills mb-1 " id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation" style="margin-right: 0.3em" v-on:click="showRecentOrders = true;">
+                    <a class="nav-link" v-bind:class="{'active': showRecentOrders}">Recent Orders</a>
+                </li>
+                <li class="nav-item" role="presentation" v-on:click="showRecentOrders = false;">
+                    <a class="nav-link" v-bind:class="{'active': !showRecentOrders}">Recent Invoices</a>
+                </li>
+            </ul>
+
+            <div class="mt-2">
+                <div v-if="showRecentOrders">
+                    <div v-for="order in recentOrders" class="d-flex flex-column bg-white-shadow mb-3">
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Order #</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Tot. Weight (lbs)</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.weight }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Order Amt.</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">${{ order.orderTotal }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">PO #</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.poNo }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Est. Delivery</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.estDeliveryDate | date }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Status</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.orderStatusName }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="!showRecentOrders">
+                    <div v-for="invoice in recentInvoices" class="d-flex flex-column bg-white-shadow mb-3">
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Invoice #</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <a class="fs12-link">{{ invoice.invoiceId }}</a>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Order #</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <a v-bind:href="'/invoices/' + invoice.orderNo" class="fs12-link">{{ invoice.orderNo }}</a>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Invoice Amt.</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">${{ invoice.invoiceAmount }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Invoice Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ invoice.invoiceDate | date }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Due Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ invoice.invoiceDueDate | date }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Status</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0" v-bind:style="{'color': invoice.invoiceStatusName.includes('Past') ? 'red' : '' }">
+                                    {{ invoice.invoiceStatusName }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="customer-service-section-sm d-flex flex-column justify-content-center align-items-center">
+                <div class="avatar-block">
+                    <div></div>
+                    <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/assets/headset.svg" alt="profile-default" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
+                    <div v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen"></div>
+                </div>
+                <div class="bg-white d-flex flex-column w-100 align-items-center pb-2" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
+                    <label class="title">Outstanding Customer Service</label>
+                    <img src="~/Themes/@(themeName)/Content/assets/icn-arrow-up.svg" v-bind:style="{'transform': isCustomerServiceOpen ? 'rotate(180deg)' : ''}" alt="arrow up" width="28">
+
+                    <div v-if="isCustomerServiceOpen">
+                        <div class="d-flex flex-column align-items-center justify-content-center my-2">
+                            <div class="d-flex flex-row w-100">
+                                <label class="h5-primary-600-sans w-40 text-right mr-3">Sun</label>
+                                <label class="h5-primary-600-sans">Closed</label>
+                            </div>
+                            <div class="d-flex flex-row w-100">
+                                <label class="h5-primary-600-sans w-40 text-right mr-3">Mon</label>
+                                <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                            </div>
+                            <div class="d-flex flex-row w-100">
+                                <label class="h5-primary-600-sans w-40 text-right mr-3">Tue</label>
+                                <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                            </div>
+                            <div class="d-flex flex-row w-100">
+                                <label class="h5-primary-600-sans w-40 text-right mr-3">Wed</label>
+                                <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                            </div>
+                            <div class="d-flex flex-row w-100">
+                                <label class="h5-primary-600-sans w-40 text-right mr-3">Thur</label>
+                                <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                            </div>
+                            <div class="d-flex flex-row w-100">
+                                <label class="h5-primary-600-sans w-40 text-right mr-3">Fri</label>
+                                <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                            </div>
+                            <div class="d-flex flex-row w-100">
+                                <label class="h5-primary-600-sans w-40 text-right mr-3">Sat</label>
+                                <label class="h5-primary-600-sans">Closed</label>
+                            </div>
+                        </div>
+
+                        <label class="h5-default my-2 mx-5">I'm here to provide you with exceptional customer service.</label>
+
+                        <div class="d-flex flex-row justify-content-center">
+                            <label class="h4-primary mr-3">Call Us</label>
+                            <label class="h4-primary">Email Us</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
 </div>
+
+<script>
+    // for mobile view
+    let recentOrders = @Html.Raw(Serialize(Model.RecentOrders));
+    let recentInvoices = @Html.Raw(Serialize(Model.RecentInvoices));
+
+    console.log("recentOrders: ", recentOrders);
+    console.log("recentInvoices: ", recentInvoices);
+
+    new Vue({
+        el: '#app',
+        data: {
+            recentOrders,
+            recentInvoices,
+            showRecentOrders: true,
+            isCustomerServiceOpen: false,
+        },
+        mounted: function () {
+
+        },
+        methods: function () {
+
+        },
+    });
+
+
+</script>
+
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderId}">${OrderId}</a>
 </script>

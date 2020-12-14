@@ -73,8 +73,9 @@
                 </div>
             </div>
             <div class="col-lg-12 col-xl-9">
-                <div class="d-flex flex-row mb-1 flex-wrap" v-if="filterTags.length > 0">
-                    <div v-for="(tag, i) in filterTags" class="d-flex flex-row my-1" V-bind:class="{'mr-1': i == (filterTags.length - 1) }">
+                <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
+                    <label class="h5-default-normal mb-0 mr-3">Applied Filters:</label>
+                    <div v-for="(tag, i) in filterTags" class="d-flex flex-row my-1" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
                         <span class="filter-tag">
                             {{ tag.text }}
                             <button v-on:click='removeFilter(tag)'>
@@ -82,7 +83,10 @@
                             </button>
                         </span>
                     </div>
-                    <button v-on:click="clearFilters" class="clear-filter my-1">Clear filters</button>
+                    <div v-if="filterTags.length === 0" class="d-flex flex-row my-1">
+                        <span class="filter-tag">None</span>
+                    </div>
+                    <button v-if="filterTags.length > 0" v-on:click="clearFilters" class="clear-filter my-1">Clear filters</button>
                 </div>
                 <div id="partialview"></div>
                 <div id="dialog"></div>

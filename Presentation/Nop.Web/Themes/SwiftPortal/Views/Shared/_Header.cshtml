@@ -9,24 +9,36 @@
 
 @if (!isGuestCustomer)
 {
-    <div class="header-upper nss-nav-bar">
-        <div class="master-wrapper-content nav-bar-content d-flex flex-row align-items-center">
-            <div class="header-logo">
-                @await Component.InvokeAsync("Logo")
-            </div>
-            <div class="nav-bar-search">
-                @await Component.InvokeAsync("CustomSearchBox")
-            </div>
-            @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })*@
-            @*<div class="header-selectors-wrapper">
+    <div class="d-none d-md-block">
+        <div class="header-upper nss-nav-bar">
+            <div class="master-wrapper-content nav-bar-content d-flex flex-row align-items-center">
+                <div class="header-logo">
+                    @await Component.InvokeAsync("Logo")
+                </div>
+                <div class="nav-bar-search">
+                    @await Component.InvokeAsync("CustomSearchBox")
+                </div>
+                @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })*@
+                @*<div class="header-selectors-wrapper">
                     @await Component.InvokeAsync("TaxTypeSelector")
                     @await Component.InvokeAsync("CurrencySelector")
                     @await Component.InvokeAsync("LanguageSelector")
                     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderSelectors })
                 </div>*@
+                <div class="header-links-wrapper">
+                    @await Component.InvokeAsync("CustomHeaderLinks")
+                    @await Component.InvokeAsync("FlyoutShoppingCart")
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-md-none">
+        <div class="d-flex flex-row justify-content-between bg-blue">
+            <div class="header-logo">
+                @await Component.InvokeAsync("Logo")
+            </div>
             <div class="header-links-wrapper">
                 @await Component.InvokeAsync("CustomHeaderLinks")
-                @await Component.InvokeAsync("FlyoutShoppingCart")
             </div>
         </div>
     </div>

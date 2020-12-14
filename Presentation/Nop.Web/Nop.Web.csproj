@@ -183,6 +183,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\hamburger-menu.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\headset.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-add.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-arrow-up.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-cal-range.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-chevrons.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-delivery-ticket-dark.svg" />
@@ -223,6 +224,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\twitter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\youtube.svg" />
     <Content Remove="Themes\SwiftPortal\Content\css\styles-custom.css" />
+    <Content Remove="Themes\SwiftPortal\Content\js\filters.js" />
     <Content Remove="Themes\SwiftPortal\Content\images\filter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\images\sort.svg" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.css" />
@@ -484,7 +486,6 @@
 
   <ItemGroup>
     <Folder Include="Plugins\Misc.SwiftApi\" />
-    <Folder Include="Plugins\Misc.SwiftPortalOverride\Content\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\" />
   </ItemGroup>
