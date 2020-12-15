@@ -1,6 +1,11 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @model CustomerNavigationModel
 
+<style>
+    .clickable {
+        width: -webkit-fill-available;
+    }
+</style>
 <div class="account-page-card">
     <h6>My Preferences</h6>
     <div class="block block-account-navigation">
@@ -10,7 +15,7 @@
                 @foreach (var item in Model.CustomerNavigationItems)
                 {
                     <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")">
-                        <a href="@Url.RouteUrl(item.RouteName)">
+                        <a href="@Url.RouteUrl(item.RouteName)" class="clickable">
                             <img src="@item.ItemLogo" alt="">@(item.Title)
                         </a>
                     </li>
@@ -28,7 +33,7 @@
                 @foreach (var item in Model.CompanyNavigationItems)
                 {
                     <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")">
-                        <a href="@Url.RouteUrl(item.RouteName)">
+                        <a href="@Url.RouteUrl(item.RouteName)" class="clickable">
                             <img src="@item.ItemLogo" alt="">@(item.Title)
                         </a>
                     </li>
