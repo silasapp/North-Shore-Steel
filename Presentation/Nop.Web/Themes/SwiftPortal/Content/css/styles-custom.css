@@ -645,7 +645,7 @@ a:not([href]):not([class]) {
 }
 
     .header-logo > a > img {
-        width: 166px;
+        width: 16rem;
         opacity: 1;
     }
 
