@@ -70,13 +70,13 @@
 
                     <div class="">
                         <label asp-for="Phone">Work Phone</label>
-                        <input asp-for="Phone" id="work-phone" class="form-control custom-input phone-number" />
+                        <input asp-for="Phone" id="work-phone" maxlength="14" class="form-control custom-input phone-number" />
                         <span asp-validation-for="Phone"></span>
                     </div>
 
                     <div class="">
                         <label asp-for="Phone">Cell Phone</label>
-                        <input name="cell-phone" id="cell-phone" class="form-control custom-input phone-number" value="@CellPhone" />
+                        <input name="cell-phone" id="cell-phone" maxlength="14" class="form-control custom-input phone-number" value="@CellPhone" />
                         <span asp-validation-for="Phone"></span>
                     </div>
 

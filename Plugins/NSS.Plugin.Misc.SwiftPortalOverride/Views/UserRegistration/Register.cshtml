@@ -254,13 +254,13 @@
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left">
                                 <label asp-for="Phone">Work Phone</label>
                                 <nop-required />
-                                <input asp-for="Phone" id="work-phone" placeholder="Enter work phone number" class="form-control custom-input phone-number" />
+                                <input asp-for="Phone" id="work-phone" placeholder="Enter work phone number" maxlength="14" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="Phone" style="display:flex;"></span>
                             </div>
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="CellPhone">Cell Phone</label>
                                 <nop-required />
-                                <input asp-for="CellPhone" id="cell-phone" placeholder="Enter cell phone number" class="form-control custom-input phone-number" />
+                                <input asp-for="CellPhone" id="cell-phone" placeholder="Enter cell phone number" maxlength="14" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="CellPhone" style="display:flex;"></span>
                             </div>
                         </div>

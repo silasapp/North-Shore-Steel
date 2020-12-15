@@ -2327,7 +2327,7 @@ table input {
 }
 /*custom container*/
 .nss-container {
-    padding: 30px 136px;
+    padding: 12px 136px 30px;
 }
 /*
 .custom-input {
