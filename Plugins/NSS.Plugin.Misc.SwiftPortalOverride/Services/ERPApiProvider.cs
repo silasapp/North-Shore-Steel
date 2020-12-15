@@ -595,7 +595,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.CreateOrder -> {request.OrderId}", ex);
+                _logger.Error($"NSS.CreateOrder -> {request.OrderId}, request ==> {JsonConvert.SerializeObject(request)}", ex);
                 throw;
             }
 
@@ -1094,7 +1094,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"NSS.CreateUserRegistration -> {request.SwiftRegistrationId}", ex);
+                _logger.Error($"NSS.CreateUserRegistration -> {request.SwiftRegistrationId}, request ==> {JsonConvert.SerializeObject(request)}", ex);
                 return (retVal, error);
             }
 
