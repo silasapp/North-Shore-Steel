@@ -39,25 +39,14 @@
                         <strong>RETURNING CUSTOMER</strong>
                     </div>
                     <div class="form-fields">
-                        @if (Model.UsernamesEnabled)
-                        {
-                            <div class="inputs">
-                                <label asp-for="Username" asp-postfix=":" class="text-left"></label>
-                                <input asp-for="Username" class="username user-input-field" autofocus="autofocus" />
-                                <span asp-validation-for="Username"></span>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="inputs">
-                                <label asp-for="Email" class="text-left">Email Address:</label>
-                                <input asp-for="Email" class="email user-input-field" autofocus="autofocus" />
-                                <span asp-validation-for="Email"></span>
-                            </div>
-                        }
+                        <div class="inputs">
+                            <label asp-for="Email" class="text-left">Email Address:</label>
+                            <input asp-for="Email" class="email user-input-field" placeholder="Enter email address" autofocus="autofocus" />
+                            <span asp-validation-for="Email"></span>
+                        </div>
                         <div class="inputs">
                             <label asp-for="Password" asp-postfix=":" class="text-left"></label>
-                            <input asp-for="Password" class="password user-input-field" />
+                            <input asp-for="Password" placeholder="Enter password" class="password user-input-field" />
                             <span asp-validation-for="Password"></span>
                         </div>
                         <div class="inputs reversed">
