@@ -225,8 +225,8 @@
                             //var unitPrice = "0.00";
 
                             <tr>
-                                <td><div><label class="mv-title">Item #:</label><label class="mv-value" style="margin:0;">@(iNo)</label></div></td>
-                                <td>
+                                <td class="align-middle"><div><label class="mv-title">Item #:</label><label class="mv-value" style="margin:0;">@(iNo)</label></div></td>
+                                <td class="align-middle">
                                     <div><label class="mv-title">Description:</label><label class="mv-value" style="margin:0;">@item.ProductName</label></div>
                                     @*<label style="margin:0;">
                                             @item.ProductName
@@ -249,7 +249,7 @@
                                         </div>
                                     }
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     @*//var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";*@
                                     <div> <label class="mv-title">Customer Part #:</label><input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" /></div>
                                 </td>
@@ -276,13 +276,13 @@
                                     </div>
 
                                 </td>
-                                <td id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
-                                <td><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></div></td>
-                                <td><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>
-                                <td class="text-center">
+                                <td class="align-middle" id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
+                                <td class="align-middle"><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></div></td>
+                                <td class="align-middle"><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>
+                                <td class="text-center align-middle">
                                     <input style="height: 24px;" class="text-center" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center align-middle">
                                     @if (noteAttr != null)
                                     {
                                         var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
@@ -296,7 +296,7 @@
                                         <input type="hidden" id=@controlId name="@controlId" value="@noteAttr.DefaultValue" />
                                     }
                                 </td>
-                                <td class="remove-from-cart text-center">
+                                <td class="remove-from-cart text-center align-middle">
                                     <label class="pure-material-checkbox">
                                         <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" style=" position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
 

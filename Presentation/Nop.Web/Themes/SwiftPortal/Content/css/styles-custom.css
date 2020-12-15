@@ -915,7 +915,7 @@ input:focus {
     }
 
 .hover-icon {
-    fill: #dedede;
+    fill: gray;
     cursor: pointer;
 }
 
