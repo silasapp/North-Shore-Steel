@@ -3,7 +3,7 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride
 @using NSS.Plugin.Misc.SwiftCore.Helpers
 @using NSS.Plugin.Misc.SwiftCore.Services
- 
+
 @inject ICustomerCompanyService customerCompanyService
 @inject IWorkContext workContext
 
@@ -22,79 +22,98 @@
         color: #03175b !important;
     }
 </style>
-<ul class="top-menu notmobile mb-0">
-    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
-    <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
-    @if (isBuyer)
-    {
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
-    }
-    @if (isOperations)
-    {
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
-    }
-    @if (isAP)
-    {
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
-    }
-    <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
-</ul>
-@{
-    var rootCategoriesResponsive = Model.Categories.ToList();
-    //name it "Categories" if we have only categories. Otherwise, "Menu"
-    var responsiveMenuTitle = Model.HasOnlyCategories ? T("Categories") : T("Menu");
-    <div class="menu-toggle"></div>
-    <ul class="top-menu mobile">
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
-        <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
+<div class="d-none d-lg-block flex-fill">
+    <ul class="top-menu d-flex flex-row justify-content-center flex-fill mb-0">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMenuBefore })
+        <li><a href="@Url.RouteUrl("Homepage")" class="dashboard px-3">DASHBOARD</a></li>
         @if (isBuyer)
         {
-            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
+            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog px-3">SHOP</a></li>
         }
         @if (isOperations)
         {
-            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
+            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders px-3">ORDERS</a></li>
         }
         @if (isAP)
         {
-            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
+            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices px-3">INVOICES</a></li>
         }
-        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
+        <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources px-3">RESOURCES</a></li>
     </ul>
+</div>
+<div class="top-menu d-lg-none d-flex flex-column justify-content-center mt-3">
+    <div class="d-flex justify-content-center">
+        <a href="@Url.RouteUrl("Homepage")" class="dashboard p-3">DASHBOARD</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog p-3">SHOP</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders p-3">ORDERS</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices p-3">INVOICES</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources p-3">RESOURCES</a>
+    </div>
+</div>
+@*@{
+        var rootCategoriesResponsive = Model.Categories.ToList();
+        //name it "Categories" if we have only categories. Otherwise, "Menu"
+        var responsiveMenuTitle = Model.HasOnlyCategories ? T("Categories") : T("Menu");
+        <div class="menu-toggle"></div>
+        <ul class="top-menu mobile">
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
+            <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
+            @if (isBuyer)
+            {
+                <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
+            }
+            @if (isOperations)
+            {
+                <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
+            }
+            @if (isAP)
+            {
+                <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
+            }
+            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
+        </ul>
 
-    @if (Model.UseAjaxMenu)
-    {
-        <script asp-location="Footer">
-        $(document).ready(function () {
-            $('.menu-toggle').on('click', function () {
-                $(this).siblings('.top-menu.mobile').slideToggle('slow');
-            });
-            var localized_data = {
-                AjaxFailure: "@T("MainMenu.AjaxFailure")"
-            };
-            mainMenu.init('@Url.RouteUrl("GetCatalogRoot")', '@Url.RouteUrl("GetCatalogSubCategories")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
-        });
-        </script>
-
-        Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.menu.js");
-
-    }
-    else
-    {
-        <script asp-location="Footer">
+        @if (Model.UseAjaxMenu)
+        {
+            <script asp-location="Footer">
             $(document).ready(function () {
                 $('.menu-toggle').on('click', function () {
                     $(this).siblings('.top-menu.mobile').slideToggle('slow');
                 });
-                $('.top-menu.mobile .sublist-toggle').on('click', function () {
-                    $(this).siblings('.sublist').slideToggle('slow');
-                });
+                var localized_data = {
+                    AjaxFailure: "@T("MainMenu.AjaxFailure")"
+                };
+                mainMenu.init('@Url.RouteUrl("GetCatalogRoot")', '@Url.RouteUrl("GetCatalogSubCategories")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
             });
-        </script>
+            </script>
 
-    }
+            Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.menu.js");
 
-}
+        }
+        else
+        {
+            <script asp-location="Footer">
+                $(document).ready(function () {
+                    $('.menu-toggle').on('click', function () {
+                        $(this).siblings('.top-menu.mobile').slideToggle('slow');
+                    });
+                    $('.top-menu.mobile .sublist-toggle').on('click', function () {
+                        $(this).siblings('.sublist').slideToggle('slow');
+                    });
+                });
+            </script>
+
+        }
+
+    }*@
 
 <script type="text/javascript">
     $(document).ready(function () {

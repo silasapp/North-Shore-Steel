@@ -2,7 +2,7 @@
 @using NSS.Plugin.Misc.SwiftCore.Helpers
 @using NSS.Plugin.Misc.SwiftPortalOverride
 @using NSS.Plugin.Misc.SwiftCore.Services
-@using Nop.Web.Models.Common 
+@using Nop.Web.Models.Common
 
 @model HeaderLinksModel
 @inject Nop.Core.IWebHelper webHelper
@@ -17,7 +17,9 @@
     bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
 }
 
-<div class="header-links">
+<div id="header-links" class="header-links">
+
+    <div class="overlay" v-bind:style="{'display': isDrawerOpen ? 'block' : 'none' }" v-on:click="closeDrawer"></div>
     <ul class="mb-0">
         @{ var themeName = themeContext.WorkingThemeName; }
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksBefore })
@@ -42,10 +44,13 @@
                     </a>
                 </li>
             }
-            <li>
+            <li class="d-none d-lg-block">
                 <a href="@Url.RouteUrl("Logout")" class="ico-wishlist">
                     <span class="wishlist-label"><img src="~/Themes/@(themeName)/Content/assets/logout.svg"></span>
                 </a>
+            </li>
+            <li class="d-lg-none">
+                <span v-on:click="openDrawer()"><img src="~/Themes/@(themeName)/Content/assets/hamburger-menu-white.svg" /></span>
             </li>
         }
         else
@@ -95,3 +100,34 @@
         </script>
     }
 </div>
+
+<script>
+    var headerLinksVm = new Vue({
+        el: '#header-links',
+        data: {
+            isDrawerOpen: false,
+        },
+        mounted: function () {
+            console.log("mounting...");
+        },
+        methods: {
+            openDrawer: function () {
+                console.log("opening drawer...");
+                const drawer = document.getElementById("top-menu-drawer");
+                drawer.style.width = '351px';
+                drawer.style.maxWidth = '90%';
+                drawer.style.minWidth = '30%';
+                drawer.style.transform = 'translateX(0)';
+                this.isDrawerOpen = true;
+            },
+            closeDrawer: function () {
+                console.log("closing drawer...");
+                const drawer = document.getElementById("top-menu-drawer");
+                drawer.style.width = '0px';
+                drawer.style.minWidth = '0px';
+                drawer.style.maxWidth = '100%';
+                this.isDrawerOpen = false;
+            },
+        }
+    });
+</script>
