@@ -8,7 +8,7 @@
     Layout = "_ColumnsOne";
 
     //title
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts("Orders");
     //page class
     Html.AppendPageCssClassParts("html-account-page");
     Html.AppendPageCssClassParts("html-order-list-page");
@@ -61,8 +61,8 @@
                 <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
                 <e-grid-columns>
                     <e-grid-column headerText="Order #" template="#template" width="60" allowFiltering="false"></e-grid-column>
-                    <e-grid-column field="PO" headerText="PO#" width="60" allowFiltering="false"></e-grid-column>
-                    <e-grid-column field="TotalWeight" headerText="Tot. Weight (lbs)" width="70" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="PO" headerText="PO #" width="60" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="TotalWeight" headerText="Weight (lb)" width="70" allowFiltering="false"></e-grid-column>
                     <e-grid-column field="OrderTotal" headerText="Order Amount" width="80" allowFiltering="false"></e-grid-column>
                     <e-grid-column field="CreatedOn" headerText="Order Date" width="90" format="yMd" allowFiltering="false"></e-grid-column>
                     <e-grid-column field="ShippingStatus" headerText="Shipped On" width="80" allowFiltering="false"></e-grid-column>

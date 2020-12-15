@@ -26,6 +26,8 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.IO;
 using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogModel;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftCore.Services;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -36,21 +38,29 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkContext _workContext;
         private readonly IWebHelper _webHelper;
         private readonly IStoreContext _storeContext;
+        private readonly ICustomerCompanyService _customerCompanyService;
 
         #region Constructor
-        public CatalogOverrideController(ICatalogModelFactory catalogModelFactory, IGenericAttributeService genericAttributeService, IWorkContext workContext, IWebHelper webHelper, IStoreContext storeContext)
+        public CatalogOverrideController(ICustomerCompanyService customerCompanyService, ICatalogModelFactory catalogModelFactory, IGenericAttributeService genericAttributeService, IWorkContext workContext, IWebHelper webHelper, IStoreContext storeContext)
         {
             _catalogModelFactory = catalogModelFactory;
             _genericAttributeService = genericAttributeService;
             _workContext = workContext;
             _webHelper = webHelper;
             _storeContext = storeContext;
+            _customerCompanyService = customerCompanyService;
         }
         #endregion
 
         [HttpsRequirement]
         public IActionResult Index()
         {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
             //'Continue shopping' URL
             _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
                 NopCustomerDefaults.LastContinueShoppingPageAttribute,

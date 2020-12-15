@@ -96,15 +96,11 @@
         customerCompany = new CustomerCompany();
 }
 
-@Html.Raw(Model.PaypalScript);
+@Html.Raw(Model.PaypalScript)
 <style>
     .paypal-button.paypal-button-color-blue, .paypal-button-row.paypal-button-color-blue .menu-button {
         background: red !important;
     }
-    /*
-    .nss-table tr > td {
-        white-space: inherit;
-    }*/
 </style>
 <div id="checkout" class="page home-page" v-cloak>
     <div class=page-title>
@@ -420,8 +416,8 @@
                                 <th scope="col">Customer Part #</th>
                                 <th scope="col">Unit Price</th>
                                 <th scope="col">Total Price</th>
-                                <th scope="col">Total Weight (lb)</th>
-                                <th scope="col">Qty.</th>
+                                <th scope="col">Weight (lb)</th>
+                                <th scope="col" class="text-center">Qty.</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -436,7 +432,7 @@
                                 var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
                                 var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
                                 var uom = "EA";
-                                if(mapping != null)
+                                if (mapping != null)
                                     uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
 
                                 var customerPathNo = "";
@@ -467,8 +463,8 @@
                                     <td>@customerPathNo</td>
                                     <td>@item.UnitPrice / @uom</td>
                                     <td>@item.SubTotal</td>
-                                    <td>@totalWeight</td>
-                                    <td>@item.Quantity</td>
+                                    <td>@DoFormat(totalWeight)</td>
+                                    <td class="text-center">@item.Quantity</td>
                                 </tr>
                             }
 
@@ -484,20 +480,20 @@
                     <div class="order-summary mt-2">
                         <div class="price-summary">
                             <label class="text-muted">Sub-Total:</label>
-                            <label class="text-black">{{ subTotal }}</label>
+                            <label class="text-black">${{ subTotal }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Shipping:</label>
-                            <label class="text-black">{{ formatMoney(shippingAmount) }}</label>
+                            <label class="text-black">${{ formatMoney(shippingAmount) }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Discount:</label>
-                            <label class="text-black">{{ formatMoney(discountAmount) }}</label>
+                            <label class="text-black">${{ formatMoney(discountAmount) }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Tax:</label>
                             <label class="text-black">
-                                {{ taxAmount }}
+                                ${{ taxAmount }}
                             </label>
                         </div>
                         <div class="price-summary">
@@ -521,7 +517,7 @@
 @functions{
     string DoFormat(double myNumber)
     {
-        var s = string.Format("{0:0.00}", myNumber);
+        var s = string.Format("{0:N2}", myNumber);
 
         return s;
     }

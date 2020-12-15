@@ -767,7 +767,7 @@ a:not([href]):not([class]) {
 }
 
     .header-logo > a > img {
-        width: 166px;
+        width: 16rem;
         opacity: 1;
     }
 
@@ -1076,7 +1076,7 @@ input:focus {
     }
 
 .hover-icon {
-    fill: #dedede;
+    fill: gray;
     cursor: pointer;
 }
 
