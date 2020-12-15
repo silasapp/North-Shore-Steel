@@ -378,9 +378,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                         _productAttributeService.InsertProductAttributeMapping(attributeMapping);
 
                         // options
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in half", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 1, IsPreSelected = true });
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in thirds", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 2 });
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in quarters", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 3 });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in half", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 1, IsPreSelected = true });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in thirds", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 2 });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Cut in quarters", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 3 });
                         _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Other", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 4 });
 
                     }
