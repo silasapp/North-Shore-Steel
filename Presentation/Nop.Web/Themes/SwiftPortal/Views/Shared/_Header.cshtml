@@ -9,36 +9,16 @@
 
 @if (!isGuestCustomer)
 {
-    <div class="d-none d-md-block">
-        <div class="header-upper nss-nav-bar">
-            <div class="master-wrapper-content nav-bar-content d-flex flex-row align-items-center">
-                <div class="header-logo">
-                    @await Component.InvokeAsync("Logo")
-                </div>
-                <div class="nav-bar-search">
-                    @await Component.InvokeAsync("CustomSearchBox")
-                </div>
-                @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderBefore })*@
-                @*<div class="header-selectors-wrapper">
-                    @await Component.InvokeAsync("TaxTypeSelector")
-                    @await Component.InvokeAsync("CurrencySelector")
-                    @await Component.InvokeAsync("LanguageSelector")
-                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderSelectors })
-                </div>*@
-                <div class="header-links-wrapper">
-                    @await Component.InvokeAsync("CustomHeaderLinks")
-                    @await Component.InvokeAsync("FlyoutShoppingCart")
-                </div>
-            </div>
+    <div class="d-flex flex-row flex-wrap flex-md-nowrap justify-content-between bg-blue px-0 px-lg-5">
+        <div class="header-logo order-0 px-3 px-lg-5 py-3 py-lg-4">
+            @await Component.InvokeAsync("Logo")
         </div>
-    </div>
-    <div class="d-md-none">
-        <div class="d-flex flex-row justify-content-between bg-blue">
-            <div class="header-logo">
-                @await Component.InvokeAsync("Logo")
-            </div>
-            <div class="header-links-wrapper">
-                @await Component.InvokeAsync("CustomHeaderLinks")
+        <div class="header-links-wrapper d-flex flex-row order-2 order-md-3 align-items-center px-3 px-lg-5 py-2">
+            @await Component.InvokeAsync("CustomHeaderLinks")
+        </div>
+        <div id="custom-search-box-container" class="d-flex flex-row flex-grow-1 order-3 order-md-2 align-items-center justify-content-center bg-primary bg-md-transparent py-2">
+            <div class="nav-bar-search">
+                @await Component.InvokeAsync("CustomSearchBox")
             </div>
         </div>
     </div>

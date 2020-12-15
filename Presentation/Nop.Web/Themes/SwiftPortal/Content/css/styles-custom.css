@@ -24,32 +24,6 @@ a:not([href]):not([class]) {
     flex-wrap: wrap;
 }
 
-.nav-bar-search {
-    /* flex-basis: 30%; */
-    width: 450px;
-    position: relative;
-}
-
-    .nav-bar-search > form > .search-box-text {
-        width: 100%;
-        background-color: #3391c3;
-        color: #ffffff;
-        border: none;
-        padding: 0 10px !important;
-        font-family: "Exo 2";
-    }
-
-    .nav-bar-search > form > .search-box-button {
-        position: absolute;
-        right: 0;
-        top: 0px;
-        width: 38px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
 .coupon-code {
     display: flex;
 }
@@ -89,7 +63,69 @@ a:not([href]):not([class]) {
     overflow: hidden;
 }
 
+/* Overlay Section */
+
+.header-links .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(221,221,221,.6);
+    z-index: 1010;
+    -webkit-transition: background .3s ease-in-out;
+    transition: background .3s ease-in-out;
+}
+
 /* #region HEADER MENU -- TOP MENU */
+
+.nav-bar-search input {
+    height: 40px;
+    width: 100%;
+    background-color: #3391c3;
+    color: #ffffff;
+    border: none;
+    padding: 0 10px !important;
+    font-family: "Exo 2";
+}
+
+.nav-bar-search .search-box-button {
+    position: absolute;
+    right: 0;
+    top: 0px;
+    width: 38px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#top-menu-drawer select {
+    border: none;
+    background: none;
+    z-index: 1;
+    font: normal normal 600 14px/16px "Exo 2";
+    letter-spacing: 0px;
+    color: #242424;
+}
+
+.header-links li a span:nth-of-type(2) {
+    position: absolute;
+    border: 2px solid #0076b4;
+    top: 0px;
+    left: 16px;
+    background: white;
+    border-radius: 50%;
+    height: 24px;
+    width: 24px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font: normal normal 600 14px/8px "Open Sans" !important;
+    color: #2f2f2f;
+}
 
 /*// Small devices (landscape phones, 576px and up)*/
 @media (min-width: 576px) {
@@ -97,14 +133,61 @@ a:not([href]):not([class]) {
 
 /*// Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
+    .header-links a img,
+    .header-links img {
+        width: 26px;
+        height: 26px;
+    }
+
+    .nav-bar-search {
+        width: 80%;
+        position: relative;
+    }
+
+    .header-links li a span:nth-of-type(2) {
+        top: 0px;
+    }
 }
 
 /*// Large devices (desktops, 992px and up)*/
 @media (min-width: 992px) {
+    .header-links .overlay {
+        display: none !important;
+    }
+
+    .header-links li a span:nth-of-type(2) {
+        top: 4px;
+    }
+
+    #top-menu-drawer {
+        width: 100% !important;
+    }
+
+    #top-menu-drawer > div {
+        background-color: white;
+        padding: 1rem 6rem !important;
+    }
+
+    #top-menu-drawer select {
+        max-width: 166px;
+        padding: 0px;
+    }
+
+    #top-menu-drawer ul {
+        margin-right: 15.7rem;
+    }
 }
 
 /*// Extra large devices (large desktops, 1200px and up)*/
 @media (min-width: 1200px) {
+    .nav-bar-search {
+        width: 52%;
+        position: relative;
+    }
+
+    .header-links li a span:nth-of-type(2) {
+        top: 6px;
+    }
 }
 
 /*// Small devices (landscape phones, less than 768px)*/
@@ -121,24 +204,75 @@ a:not([href]):not([class]) {
     }
 
     .header-links li a span:nth-of-type(2) {
-        position: absolute;
-        border: 2px solid #0076b4;
         top: -7px;
-        left: 16px;
-        background: white;
-        border-radius: 50%;
-        height: 24px;
-        width: 24px;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        font: normal normal 600 14px/8px "Open Sans";
-        color: #2f2f2f;
+    }
+
+    .header-links a img,
+    .header-links img {
+        width: 26px;
+        height: 26px;
+    }
+
+    .nav-bar-search {
+        width: 90%;
+        position: relative;
+    }
+
+    .nav-bar-search input {
+        height: 28px;
+        width: 100%;
+        background-color: #35457C;
+        opacity: 1;
+        color: #ffffff;
+        border: none;
+        padding: 0 10px !important;
+        font: normal normal normal 12px/15px 'Open Sans';
+    }
+
+    .nav-bar-search .search-box-button {
+        height: 28px;
+    }
+
+    #custom-search-box-container {
+        width: 100%;
     }
 }
 
 /*// Medium devices (tablets, less than 992px)*/
 @media (max-width: 991.98px) {
+    #top-menu-drawer {
+        height: 100%;
+        width: 0px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-x: hidden;
+        transition: 0.5s;
+        z-index: 1070;
+        background: #F6F6F6;
+        box-shadow: 16px 2px 16px #00000029;
+    }
+
+    #top-menu-drawer select {
+        position: relative;
+        text-align-last: center;
+        background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #242424;
+        -webkit-appearance: none;
+        background-position-x: 94.5%;
+        background-color: white;
+        padding-right: 2.4rem;
+        padding-left: 2.4rem;
+    }
+
+    .top-menu a {
+        font: normal normal 500 26px/24px 'Teko';
+        letter-spacing: 0.21px;
+        color: #AAAAAA;
+    }
+
+    .top-menu a.active-tab {
+        color: #0076b4 !important;
+    }
 }
 
 /*// Large devices (desktops, less than 1200px)*/
@@ -281,24 +415,12 @@ a:not([href]):not([class]) {
     font-size: 10px !important;
 }
 
-.ico-account img,
+/*.ico-account img,
 .ico-wishlist img,
 .ico-cart img {
     width: 20px;
     height: 20px;
-}
-
-.account-select {
-    position: absolute;
-    left: 0;
-    border: none;
-    background: none;
-    z-index: 1;
-    font: normal normal 600 14px/16px "Exo 2";
-    letter-spacing: 0px;
-    color: #242424;
-    opacity: 1;
-}
+}*/
 
 .master-wrapper-page {
     /* background-color: #fdfdfb !important; */
@@ -819,30 +941,6 @@ input:focus {
     border: none;
     box-shadow: 0px 0px 15px 3px #eeefef;
 }
-
-.avatar-block {
-    height: 120px;
-    position: relative;
-}
-
-    .avatar-block > div {
-        height: 60px;
-        background-color: #03175b;
-    }
-
-    .avatar-block > img {
-        position: absolute;
-        height: 80px;
-        width: 80px;
-        padding: 10px;
-        border: 2px solid #0076b4;
-        left: 0;
-        right: 0;
-        margin: auto;
-        top: 0;
-        bottom: 0;
-        background-color: #ffffff;
-    }
 
 .contact-card > .card-title {
     margin: 0;
@@ -2327,7 +2425,7 @@ table input {
 }
 /*custom container*/
 .nss-container {
-    padding: 12px 136px 30px;
+    padding: 2rem 6rem;
 }
 /*
 .custom-input {
@@ -2499,6 +2597,12 @@ table input {
     color: #ffffff;
 }
 
+.h2-white-500 {
+    font: normal normal 500 26px/24px "Teko";
+    letter-spacing: 0.21px;
+    color: #ffffff;
+}
+
 .h2-primary {
     font: normal normal 500 26px/24px "Teko";
     letter-spacing: 0.21px;
@@ -2566,6 +2670,13 @@ table input {
     font: normal normal 500 16px/24px "Exo 2";
     letter-spacing: 0px;
     color: #03175b;
+}
+
+.h4-primary-600-teko {
+    font: normal normal 600 16px/18px "Teko";
+    letter-spacing: 0.13px;
+    color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h5-default-sans {
@@ -2705,6 +2816,13 @@ fs12-link-exo {
 
 .bg-blue {
     background: #0076b4 !important;
+}
+
+/*// Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+    .bg-md-transparent {
+        background-color: transparent !important;
+    }
 }
 
 .lh-md {
@@ -2998,10 +3116,6 @@ and also iPads specifically.
 }
 
 @media all and (max-width: 800px) {
-    .account-select {
-        position: relative;
-    }
-
     .top-menu > li {
         background-color: transparent;
         border-bottom: 1px solid #f6f6f6 !important;

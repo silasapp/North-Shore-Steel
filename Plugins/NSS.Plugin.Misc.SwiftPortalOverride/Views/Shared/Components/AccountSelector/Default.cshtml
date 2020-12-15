@@ -3,7 +3,7 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
 @using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @using NSS.Plugin.Misc.SwiftCore.Services
-@using NSS.Plugin.Misc.SwiftCore.Helpers 
+@using NSS.Plugin.Misc.SwiftCore.Helpers
 @inject IWorkContext workContext
 @inject ICustomerCompanyService customerCompanyService
 @{
@@ -24,8 +24,12 @@
 }
 
 
-<div class="header-lower p-0">
-    <div class="header-menu bg-white py-3 mb-0">
+<div id="top-menu-drawer">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center mb-0">
+        <div class="d-lg-none d-flex flex-row align-items-center justify-content-center bg-primary px-3 py-4 flex-fill">
+            <label class="h2-white-500 text-center ml-3 mb-0 pt-1 flex-fill">MENU</label>
+            <img src="Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close menu" v-on:click="closeMenuDrawer" width="24">
+        </div>
         @if (selectAccountModel.Count > 1)
         {
             <select id="accountSelect" name="options" class="account-select" data-role="accountSelect" onchange="SelectCompany(this)">
@@ -41,7 +45,6 @@
 </div>
 
 
-
 <script type='text/javascript'>
         function SelectCompany(option) {
             let ErpId = option.options[option.selectedIndex].id;
@@ -55,6 +58,18 @@
         $(document).ready(function () {
             $('select[name="options"]').find('option[value='+erpCompId+']').attr("selected", true);
         });
+
+    new Vue({
+        el: '#top-menu-drawer',
+        data: {
+
+        },
+        methods: {
+            closeMenuDrawer: function () {
+                headerLinksVm.closeDrawer();
+            },
+        },
+    })
 
 </script>
 

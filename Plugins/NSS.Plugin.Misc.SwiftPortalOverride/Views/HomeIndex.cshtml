@@ -140,19 +140,57 @@
                             <div class="card-body text-center contact-card">
                                 <div class="avatar-block">
                                     <div></div>
-                                    <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/assets/headset.svg" alt="profile-default">
+                                    <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/images/call-avatar.png" alt="profile-default">
                                 </div>
-                                <h6 class=card-title>Outstanding customer service is our promise</h6>
-                                <p class=card-text>I'm here to provide you with exceptional customer service.</p>
-                                <h6 class="card-subtitle mb-2 text-muted">Business Hours</h6>
+                                <h6 class="h4-primary-600-teko mb-0 mt-2 mx-3">Outstanding customer service is our promise</h6>
+                                <p class="h5-default mx-3 my-3">I'm here to provide you with exceptional customer service.</p>
+                                <div class="d-flex flex-row align-items-center justify-content-center pb-2" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
+                                    <label class="fs12-default mb-0">Business Hours</label>
+                                    <img src="~/Themes/@(themeName)/Content/assets/icn-arrow-up.svg" class="ml-2" v-bind:style="{'transform': isCustomerServiceOpen ? '' : 'rotate(180deg)'}" alt="arrow up" width="20">
+                                </div>
+
+                                <div v-if="isCustomerServiceOpen">
+                                    <div class="d-flex flex-column align-items-center justify-content-center my-2">
+                                        <div class="d-flex flex-row w-100">
+                                            <label class="h5-primary-600-sans w-25 w-lg-40 text-right mr-3">Sun</label>
+                                            <label class="h5-primary-600-sans">Closed</label>
+                                        </div>
+                                        <div class="d-flex flex-row w-100">
+                                            <label class="h5-primary-600-sans w-25 w-lg-40 text-right mr-3">Mon</label>
+                                            <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                                        </div>
+                                        <div class="d-flex flex-row w-100">
+                                            <label class="h5-primary-600-sans w-25 w-lg-40 text-right mr-3">Tue</label>
+                                            <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                                        </div>
+                                        <div class="d-flex flex-row w-100">
+                                            <label class="h5-primary-600-sans w-25 w-lg-40 text-right mr-3">Wed</label>
+                                            <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                                        </div>
+                                        <div class="d-flex flex-row w-100">
+                                            <label class="h5-primary-600-sans w-25 w-lg-40 text-right mr-3">Thur</label>
+                                            <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                                        </div>
+                                        <div class="d-flex flex-row w-100">
+                                            <label class="h5-primary-600-sans w-25 w-lg-40 w-lg-40 text-right mr-3">Fri</label>
+                                            <label class="h5-primary-600-sans">8:00am - 5:00pm</label>
+                                        </div>
+                                        <div class="d-flex flex-row w-100">
+                                            <label class="h5-primary-600-sans w-25 w-lg-40 text-right mr-3">Sat</label>
+                                            <label class="h5-primary-600-sans">Closed</label>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 @*<h6 class="card-title">@Model.CompanyInfo.SalesContact?.Name</h6>*@
                                 <div class="contact-container">
                                     <a href=tel:@Model.CompanyInfo.SalesContact?.Phone class="btn contact-btn">
                                         <img src="~/Themes/@(themeName)/Content/assets/phone.svg" alt="">
+                                        <label class="fs12-default mb-0 ml-1">@Model.CompanyInfo.SalesContact?.Phone</label>
                                     </a>
                                     <a href=mailto:@Model.CompanyInfo.SalesContact?.Email class="btn contact-btn">
                                         <img src="~/Themes/@(themeName)/Content/assets/mail.svg" alt="">
+                                        <label class="fs12-default mb-0 ml-1">@Model.CompanyInfo.SalesContact?.Email</label>
                                     </a>
                                 </div>
                             </div>
@@ -173,7 +211,7 @@
 
 
         <div class="d-md-none">
-            <ul class="nav nav-pills mb-1 " id="pills-tab" role="tablist">
+            <ul class="nav nav-pills mb-1 mt-5 mx-4" id="pills-tab" role="tablist">
                 <li class="nav-item" role="presentation" style="margin-right: 0.3em" v-on:click="showRecentOrders = true;">
                     <a class="nav-link" v-bind:class="{'active': showRecentOrders}">Recent Orders</a>
                 </li>
@@ -182,7 +220,7 @@
                 </li>
             </ul>
 
-            <div class="mt-2">
+            <div class="mt-2 mx-4">
                 <div v-if="showRecentOrders">
                     <div v-for="order in recentOrders" class="d-flex flex-column bg-white-shadow mb-3">
                         <div class="d-flex flex-row">
@@ -294,7 +332,7 @@
             <div class="customer-service-section-sm d-flex flex-column justify-content-center align-items-center">
                 <div class="avatar-block">
                     <div></div>
-                    <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/assets/headset.svg" alt="profile-default" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
+                    <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/images/call-avatar.png" alt="profile-default" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
                     <div v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen"></div>
                 </div>
                 <div class="bg-white d-flex flex-column w-100 align-items-center pb-3 pt-1">
@@ -350,6 +388,8 @@
                     </div>
                 </div>
             </div>
+
+            <img src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%">
         </div>
 
     </div>
