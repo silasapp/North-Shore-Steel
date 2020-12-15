@@ -34,6 +34,11 @@
     var eRPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == compIdCookieKey);
 }
 
+<style>
+    .hover-icon {
+        margin-right: 0.5rem;
+    }
+</style>
 @{
     Func<object, object>
     Content1 =
@@ -128,8 +133,8 @@
                                             <td scope=col>Item #</td>
                                             <td scope=col class="product">Description</td>
                                             <td scope=col>Dimensions</td>
-                                            <td scope=col class="quantity">Quantity</td>
-                                            <td scope=col>Actions</td>
+                                            <td scope=col class="quantity text-center">Qty.</td>
+                                            <td scope=col style="width: 12rem">Actions</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -176,8 +181,8 @@
                                             }
 
                                             <tr>
-                                                <td>@iNo</td>
-                                                <td class="product">
+                                                <td class="align-middle">@iNo</td>
+                                                <td class="product align-middle">
                                                     @item.ProductName
                                                     @*<a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>*@
                                                     @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
@@ -218,8 +223,8 @@
                                                         </div>
                                                     }
                                                 </td>
-                                                <td>@dimensions</td>
-                                                <td class="quantity">
+                                                <td class="align-middle">@dimensions</td>
+                                                <td class="quantity text-center">
                                                     @if (Model.IsEditable)
                                                     {
                                                         if (item.AllowedQuantities.Count > 0)
@@ -249,7 +254,7 @@
                                                         <span class="product-quantity">@item.Quantity</span>
                                                     }
                                                 </td>
-                                                <td style="text-align:left" class="d-flex flex-row ">
+                                                <td style="text-align:left" class="d-flex flex-row">
                                                     @if (!string.IsNullOrEmpty(mtr))
                                                     {
                                                         <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
@@ -287,18 +292,18 @@
                                                             <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
                                                         </label>
                                                     </div>
-                                                    @if (string.IsNullOrEmpty(mtr))
-                                                    {
-                                                        <div class=""></div>
-                                                    }
-                                                    @if (!eRPCompanyIdExist)
-                                                    {
-                                                        <div class=""></div>
-                                                    }
-                                                    @if (!hasSawOption)
-                                                    {
-                                                        <div></div>
-                                                    }
+                                                    @*@if (string.IsNullOrEmpty(mtr))
+                                                        {
+                                                            <div class=""></div>
+                                                        }
+                                                        @if (!eRPCompanyIdExist)
+                                                        {
+                                                            <div class=""></div>
+                                                        }
+                                                        @if (!hasSawOption)
+                                                        {
+                                                            <div></div>
+                                                        }*@
                                                 </td>
                                             </tr>
                                         }
