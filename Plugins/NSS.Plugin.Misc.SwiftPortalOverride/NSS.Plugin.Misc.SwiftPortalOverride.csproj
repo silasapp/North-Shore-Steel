@@ -24,6 +24,7 @@
     <None Remove="Content\catalog.css" />
     <None Remove="Content\checkout.css" />
     <None Remove="Content\customstyle.css" />
+    <None Remove="Content\home.css" />
     <None Remove="Content\homepageStyle.css" />
     <None Remove="Domains\SQL\ProductLoadAllPagedSwiftPortal.sql" />
     <None Remove="logo.jpg" />
@@ -78,6 +79,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\catalog.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\home.css">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\homepageStyle.css">

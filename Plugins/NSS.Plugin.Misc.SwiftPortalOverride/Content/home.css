@@ -1,0 +1,114 @@
+﻿
+
+/* #region CUSTOMER SERVICE SECTION */
+
+.customer-service-section-sm {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /*    box-shadow: 0 0 15px rgba(0,0,0,.2);*/
+    font-size: 0;
+    z-index: 1000;
+    background: transparent;
+    width: 100%;
+}
+
+    .customer-service-section-sm .title {
+        text-align: center;
+        font: normal normal 600 16px/18px 'Teko';
+        letter-spacing: 0.13px;
+        color: #03175B;
+        margin-bottom: 0px;
+    }
+
+/* #endregion*/
+.home-table-sm-header {
+    width: 104px !important;
+    border-bottom: 0.1px solid white;
+}
+
+
+@media (min-width: 576px) {
+    .home-table-sm-header {
+        width: 150px !important;
+    }
+}
+
+/* #region BOOTSTRAP MEDIA QUERIES */
+/*// Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) {
+}
+
+/*// Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+}
+
+/*// Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) {
+}
+
+/*// Extra large devices (large desktops, 1200px and up)*/
+@media (min-width: 1200px) {
+}
+
+/*// Small devices (landscape phones, less than 768px)*/
+@media (max-width: 767.98px) {
+    .nss-container {
+        padding: 16px;
+    }
+
+    .avatar-block {
+        height: 50px;
+        position: relative;
+        width: 100%;
+    }
+
+        .avatar-block > div {
+            height: 23px;
+            background-color: transparent;
+        }
+
+            .avatar-block > div:nth-of-type(2) {
+                height: 28px;
+                background: white;
+                box-shadow: 0 -7px 7px -7px rgba(0,0,0,0.5);
+            }
+
+        .avatar-block > img {
+            position: absolute;
+            height: 46px;
+            width: 46px;
+            padding: 4px;
+            left: 0;
+            right: 0;
+            top: 0;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+}
+
+/*// Medium devices (tablets, less than 992px)*/
+@media (max-width: 991.98px) {
+    .nss-container {
+        padding: 16px 32px;
+    }
+}
+
+/*// Large devices (desktops, less than 1200px)*/
+@media (max-width: 1199.98px) {
+    .cat-side-drawer {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #ffffff;
+        overflow-x: hidden;
+        transition: 0.5s;
+    }
+}
+
+/* #endregion */
