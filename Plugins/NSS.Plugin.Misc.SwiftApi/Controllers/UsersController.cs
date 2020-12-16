@@ -228,78 +228,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             UpdateCustomerGenAttribute(currentCustomer, userDelta.Dto.FirstName, userDelta.Dto.LastName, userDelta.Dto.Phone, userDelta.Dto.Cell, userDelta.Dto.PreferredLocationId);
 
-            // associate user with 
-            // delete user from companies
-            if(userDelta.Dto.UserCompanies.Count > 0)
-            {
-                var customerCompanies = _customerCompanyService.GetCustomerCompanies(customerId);
+            // update customer status
+            currentCustomer.Active = userDelta.Dto.Active ?? currentCustomer.Active;
 
-                //var currentCompanies = customerCompanies.Where(x => userDelta.Dto.UserCompanies.Select(uc => uc.CompanyId).Contains(x.Company.ErpCompanyId));
-                var removedCompanies = customerCompanies.Where(x => !userDelta.Dto.UserCompanies.Select(uc => uc.CompanyId).Contains(x.Company.ErpCompanyId));
-
-                foreach (var customerCompany in removedCompanies)
-                {
-                    _customerCompanyService.DeleteCustomerCompany(customerCompany);
-                }
-
-                foreach (var userCompany in userDelta.Dto.UserCompanies)
-                {
-                    var company = _companyService.GetCompanyEntityByErpEntityId(userCompany.CompanyId);
-                    if (company == null)
-                    {
-                        company = new Company
-                        {
-                            ErpCompanyId = userCompany.CompanyId,
-                            Name = userCompany.CompanyName,
-                            SalesContactName = userCompany.SalesContactName,
-                            SalesContactEmail = userCompany.SalesContactEmail,
-                            SalesContactPhone = userCompany.SalesContactPhone,
-                            SalesContactImageUrl = userCompany.SalesContactImageUrl,
-                            CreatedOnUtc = DateTime.UtcNow,
-                            UpdatedOnUtc = DateTime.UtcNow
-                        };
-
-                        _companyService.InsertCompany(company);
-                    }
-                    else
-                    {
-                        company.Name ??= userCompany.CompanyName;
-                        company.SalesContactName ??= userCompany.SalesContactName;
-                        company.SalesContactEmail ??= userCompany.SalesContactEmail;
-                        company.SalesContactPhone ??= userCompany.SalesContactPhone;
-                        company.SalesContactImageUrl ??= userCompany.SalesContactImageUrl;
-
-                        company.UpdatedOnUtc = DateTime.UtcNow;
-
-                        _companyService.UpdateCompany(company);
-                    }
-
-                    var customerCompany = _customerCompanyService.GetCustomerCompany(currentCustomer.Id, company.Id);
-                    if (customerCompany == null)
-                    {
-                        customerCompany = new CustomerCompany
-                        {
-                            CompanyId = company.Id,
-                            CustomerId = currentCustomer.Id,
-                            Buyer = userCompany.Buyer,
-                            CanCredit = userCompany.CanCredit,
-                            AP = userCompany.AP,
-                            Operations = userCompany.Operations,
-                        };
-
-                        _customerCompanyService.InsertCustomerCompany(customerCompany);
-                    }
-                    else
-                    {
-                        customerCompany.AP = userCompany.AP;
-                        customerCompany.Buyer = userCompany.Buyer;
-                        customerCompany.CanCredit = userCompany.CanCredit;
-                        customerCompany.Operations = userCompany.Operations;
-
-                        _customerCompanyService.UpdateCustomerCompany(customerCompany);
-                    }
-                }
-            }
+            _customerService.UpdateCustomer(currentCustomer);
 
             return NoContent();
         }
@@ -362,6 +294,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 Other = customerAttributes.FirstOrDefault(x => x.Key == Constants.OtherAttribute)?.Value,
                 PreferredLocationId = int.TryParse(customerAttributes.FirstOrDefault(x => x.Key == Constants.PreferredLocationIdAttribute)?.Value, out int preferredLocationId) ? preferredLocationId : 0,
                 IsExistingCustomer = bool.TryParse(customerAttributes.FirstOrDefault(x => x.Key == Constants.IsExistingCustomerAttribute)?.Value, out bool isExisting) ? isExisting : false,
+                Active = customer.Active,
                 Id = customer.Id,
                 ItemsForNextProject = customerAttributes.FirstOrDefault(x => x.Key == Constants.ItemsForNextProjectAttribute)?.Value,
             };
