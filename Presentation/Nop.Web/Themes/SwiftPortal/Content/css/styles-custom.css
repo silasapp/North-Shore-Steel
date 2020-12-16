@@ -777,7 +777,8 @@ a:not([href]):not([class]) {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0;
+    padding: 0 !important;
+    padding-bottom: 1rem !important;
 }
 
     .page-title > h1 {
