@@ -185,6 +185,17 @@
     </div>;
 }
 
+@{
+
+    Func<object, object>
+    Content2 =
+    @<div id="acceptTOSModal">
+        <div class="">
+            <p class="pt-4">Please accept the terms of service before the next step.</p>
+        </div>
+    </div>;
+}
+
 <div class="page registration-page">
     <div class="page-title">
         <h1>REGISTER</h1>
@@ -368,8 +379,9 @@
                                             //do some stuff
                                             return true;
                                         } else {
+                                            handleAcceptTOSModal();
                                             //just show validation errors, don't post
-                                            alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Account.Fields.AcceptPrivacyPolicy.Required").Text))');
+                                            //alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Account.Fields.AcceptPrivacyPolicy.Required").Text))');
                                             return false;
                                         }
                                     });
@@ -409,6 +421,7 @@
         </div>
     </div>
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render();
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render();
 </div>
 
 
@@ -418,8 +431,16 @@
         viewTOSModal = this;
     }
 
+    function onAcceptCreated() {
+        acceptTOSModal = this;
+    }
+
     function handleTOSModal() {
         viewTOSModal.show();
+    }
+
+    function handleAcceptTOSModal() {
+        acceptTOSModal.show();
     }
 
     $(document).ready(function () {

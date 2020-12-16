@@ -96,6 +96,16 @@
         </div>
     </div>;
 }
+@{
+
+    Func<object, object>
+    Content2 =
+    @<div id="acceptTOSModal">
+        <div class="">
+            <p class="pt-4">Please accept the terms of service before the next step.</p>
+        </div>
+    </div>;
+}
 
 @*<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -425,7 +435,8 @@
                                             if ($('#termsofservice').length > 0) {
                                                 //terms of service element exists
                                                 if (!$('#termsofservice').is(':checked')) {
-                                                    $("#terms-of-service-warning-box").dialog();
+                                                    //$("#terms-of-service-warning-box").dialog();
+                                                    handleAcceptTOSModal();
                                                     termOfServiceOk = false;
                                                 } else {
                                                     termOfServiceOk = true;
@@ -472,7 +483,7 @@
         </div>
     }
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("500px").Target("body").Render()
-
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
 </div>
 
@@ -627,6 +638,15 @@
         viewNotesModal = this;
     }
 
+
+    function onAcceptCreated() {
+        acceptTOSModal = this;
+    }
+
+
+    function handleAcceptTOSModal() {
+        acceptTOSModal.show();
+    }
 
 
     let itemNoteId;
