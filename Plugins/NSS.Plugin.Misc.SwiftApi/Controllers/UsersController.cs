@@ -100,10 +100,19 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             if (userDelta.Dto.WorkEmail == null)
                 return Error(HttpStatusCode.BadRequest, "user", "work email required");
 
-            if (_customerService.GetCustomerByEmail(userDelta.Dto.WorkEmail) != null)
-                return Error(HttpStatusCode.BadRequest, "user", "email is already registered.");
+            if (userDelta.Dto.WintrixId == 0)
+                return Error(HttpStatusCode.BadRequest, "user", "wintrix id is required");
 
-            if(registration == null)
+            if (_customerService.GetCustomerByEmail(userDelta.Dto.WorkEmail) != null)
+                return Error(HttpStatusCode.BadRequest, "user", "email is already registered");
+
+            int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, userDelta.Dto.WintrixId.ToString(), nameof(Customer))?.EntityId ?? 0;
+            var customer = _customerApiService.GetCustomerEntityById(customerId);
+
+            if (customer != null)
+                return Error(HttpStatusCode.BadRequest, "user", "user with same wintrix id already exists");
+
+            if (registration == null)
             {
                 registration = new UserRegistration
                 {
@@ -128,7 +137,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             //generate password
             string password = Common.GenerateRandomPassword();
 
-            var customer = _userRegistrationService.CreateCustomer(
+            customer = _userRegistrationService.CreateCustomer(
                 registration,
                 password,
                 userDelta.Dto.WintrixId
