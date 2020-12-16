@@ -16,13 +16,13 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
         [JsonProperty("wintrixId")]
         public int WintrixId { get; set; }
 
-        [JsonProperty("firstName")]
+        [JsonProperty("firstName", Required = Required.DisallowNull)]
         public string FirstName { get; set; }
 
-        [JsonProperty("lastName")]
+        [JsonProperty("lastName", Required = Required.DisallowNull)]
         public string LastName { get; set; }
 
-        [JsonProperty("workEmail")]
+        [JsonProperty("workEmail", Required = Required.DisallowNull)]
         public string WorkEmail { get; set; }
 
         [JsonProperty("cell")]
@@ -40,16 +40,19 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
         [JsonProperty("preferredLocationId")]
         public int PreferredLocationId { get; set; }
 
-        [JsonProperty("hearAboutUs")]
+        [JsonProperty("hearAboutUs", Required = Required.DisallowNull)]
         public string HearAboutUs { get; set; }
 
         [JsonProperty("other", NullValueHandling = NullValueHandling.Ignore)]
         public string Other { get; set; }
 
-        [JsonProperty("itemsForNextProject")]
+        [JsonProperty("itemsForNextProject", Required = Required.DisallowNull)]
         public string ItemsForNextProject { get; set; }
 
-        [JsonProperty("companies", Required = Required.Always)]
+        [JsonProperty("active")]
+        public bool? Active { get; set; }
+
+        [JsonProperty("companies", Required = Required.DisallowNull)]
         public IList<CustomerCompaniesDto> UserCompanies { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies
         /// <summary>
         /// Gets or sets the Company name
         /// </summary>
-        [JsonProperty("companyName", Required = Required.Always)]
+        [JsonProperty("companyName", Required = Required.DisallowNull)]
         public string CompanyName { get; set; }
 
         /// <summary>
