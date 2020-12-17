@@ -195,7 +195,7 @@
                             <th style="background-color: transparent !important; border: none !important" scope="col">Unit Price</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Total Price</th>
                             <th style="background-color: transparent !important; border: none !important" scope="col">Weight (lb)</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Length (ft)</th>
+                            @*<th style="background-color: transparent !important; border: none !important" scope="col">Length (ft)</th>*@
                             <th style="background-color: transparent !important; border: none !important" scope="col" class="text-center">Qty.</th>
                             <th style="background-color: transparent !important; border: none !important;" scope="col" class="text-center">Notes</th>
                             <th style="background-color: transparent !important; border: none !important;" scope="col" class="text-center">Remove</th>
@@ -214,6 +214,9 @@
                             var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
                             var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
                             var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
+
+                            var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
+                            //var totalLength = (int)Math.Round(product.Length * item.Quantity);
 
                             var customerCompanyProduct = new CustomerCompanyProduct();
                             if (customerCompany != null)
@@ -272,7 +275,7 @@
 
                                             @if (purchaseUnitAttr != null)
                                             {
-                                                <select name="@(unitControlId)" id="@(unitControlId)" style="height: 24px;min-width: auto;margin: 0 !important;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
+                                                <select name="@(unitControlId)" id="@(unitControlId)" style="height: 24px;min-width: auto;margin: 0 !important;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")', '@(product.Weight)', '@(product.Length)')">
                                                     @foreach (var attributeValue in purchaseUnitAttr.Values)
                                                     {
                                                         if (attributeValue.Name == "EA" && string.IsNullOrEmpty(pricePerPiece) || attributeValue.Name == "CWT" && string.IsNullOrEmpty(pricePerCWT) || attributeValue.Name == "FT" && string.IsNullOrEmpty(pricePerFt))
@@ -287,10 +290,10 @@
 
                                 </td>
                                 <td class="align-middle" id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
-                                <td class="align-middle"><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></div></td>
-                                <td class="align-middle"><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>
+                                <td class="align-middle"><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@totalWeight</label></div></td>
+                                @*<td class="align-middle"><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>*@
                                 <td class="text-center align-middle">
-                                    <input style="height: 24px;" class="text-center" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
+                                    <input style="height: 24px;" class="text-center" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id, '@(product.Weight)', '@(product.Length)')" />
                                 </td>
                                 <td class="text-center align-middle">
                                     @if (noteAttr != null)
@@ -454,7 +457,7 @@
                                 }
                                 else
                                 {
-                                    <input type="submit" id="checkout" name="checkout" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset";/>
+                                    <input type="submit" id="checkout" name="checkout" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset" ; />
                                 }
                             }
                         </div>
@@ -659,7 +662,7 @@
         $(this).find("textarea").val('').end();
     });
 
-    function calculateItemTotalPrice(attrId, itemId) {
+    function calculateItemTotalPrice(attrId, itemId, weight, length) {
         var qty = parseInt(document.getElementById('itemquantity' + itemId).value, 10);
         var itemUnit;
         if (attrId == null) {
@@ -671,17 +674,21 @@
         }
 
         var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).innerHTML.replace(/\$/g, ''));
-        var length = parseFloat(document.getElementById('itemlength' + itemId).innerHTML);
-        var weight = parseFloat(document.getElementById('itemweight' + itemId).innerHTML);
-        var subtotal = document.getElementById('itemsubtotal' + itemId);
+
+        //var lengthCol = document.getElementById('itemlength' + itemId);
+        var weightCol = document.getElementById('itemweight' + itemId);
+        var subtotalCol = document.getElementById('itemsubtotal' + itemId);
+
         var totalPrice = 0.00;
+        var totalLength = evenRound(qty * length);
+        var totalWeight = evenRound(weight * qty);
 
         switch (itemUnit) {
             case 'FT':
-                totalPrice = evenRound(qty * length) * unitPrice;
+                totalPrice = totalLength * unitPrice;
                 break;
             case 'CWT':
-                totalPrice = (evenRound(weight * qty) / 100) * unitPrice;
+                totalPrice = (totalWeight / 100) * unitPrice;
                 break;
             case 'EA':
             default:
@@ -689,10 +696,13 @@
                 break;
         }
 
-        subtotal.innerHTML = `$${totalPrice.toFixed(2)}`;
+        subtotalCol.innerHTML = `$${totalPrice.toFixed(2)}`;
+        weightCol.innerHTML = totalWeight;
+        console.log('lengthFT', length);
+        //lengthCol.innerHTML = totalLength;
     }
 
-    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice) {
+    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice, weight, length) {
 
         var itemUnit;
         if (attrId == null) {
@@ -722,7 +732,7 @@
 
         unitPriceCtrl.innerHTML = `$${unitPrice}`;
 
-        calculateItemTotalPrice(attrId, itemId);
+        calculateItemTotalPrice(attrId, itemId, weight, length);
     }
 
     function evenRound(num, decimalPlaces) {
