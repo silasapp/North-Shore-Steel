@@ -93,6 +93,9 @@
     @<div id="viewNotesModal">
         <div class="modal-body">
             <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+            <div class="buttons float-right pt-3" id="saveNote">
+                <input type="button" class="button-1 register-button" value="Save Note" />
+            </div>
         </div>
     </div>;
 }
@@ -454,7 +457,7 @@
                                 }
                                 else
                                 {
-                                    <input type="submit" id="checkout" name="checkout" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset";/>
+                                    <input type="submit" id="checkout" name="checkout" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset" ; />
                                 }
                             }
                         </div>
@@ -654,9 +657,10 @@
         viewNotesModal.show();
     }
 
-    $('#noteModal').on('hidden.bs.modal', function () {
-        $(`#${itemNoteId}`).val($(this).find("textarea").val());
+    $('#saveNote').on('click', function () {
+        $(`#${itemNoteId}`).val($("#productNote").val());
         $(this).find("textarea").val('').end();
+        viewNotesModal.hide();
     });
 
     function calculateItemTotalPrice(attrId, itemId) {
