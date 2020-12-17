@@ -101,12 +101,18 @@
                             <text>,</text>
                         }
                     }
-                    @Model.BillingAddress.StateProvinceName
+                    @if (!string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName))
+                    {
+                        @Model.BillingAddress.StateProvinceName
+                        @if (!string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
+                        {
+                            <text>,</text>
+                        }
+                    }
                     @if (!string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
                     {
-                        <text>,</text>
+                        @Model.BillingAddress.ZipPostalCode
                     }
-                    @Model.BillingAddress.ZipPostalCode
                 </li>
 
                 @if (!string.IsNullOrEmpty(Model.BillingAddress.CountryName))
@@ -339,9 +345,9 @@
                     <th class="vendor">Customer Part #</th>
                     <th class="price">Unit Price</th>
                     <th class="quantity">Total Price</th>
-                    <th class="total">Total Weight (lbs)</th>
-                    <th>Purchase Order #</th>
-                    <th>QTY</th>
+                    <th class="total">Weight (lb)</th>
+                    <th>PO #</th>
+                    <th>Qty.</th>
                     <th>UOM</th>
                     <th>Actions</th>
                 </tr>
