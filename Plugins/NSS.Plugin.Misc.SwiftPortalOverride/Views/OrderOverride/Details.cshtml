@@ -347,8 +347,8 @@
                     <th class="quantity">Total Price</th>
                     <th class="total">Weight (lb)</th>
                     <th>PO #</th>
-                    <th>Qty.</th>
-                    <th>UOM</th>
+                    <th class="text-center">Qty.</th>
+                    <th class="text-center">UOM</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -361,10 +361,10 @@
                         <td>@item.CustomerPartNo</td>
                         <td>$@DoFormat(item.UnitPrice)</td>
                         <td>$@DoFormat(item.TotalPrice)</td>
-                        <td>@item.TotalWeight</td>
+                        <td>@DoFormat(item.TotalWeight)</td>
                         <td>@Model.PoNo</td>
-                        <td>@item.Quantity</td>
-                        <td>@item.UOM</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-center">@item.UOM</td>
                         <td></td>
                     </tr>
                 }

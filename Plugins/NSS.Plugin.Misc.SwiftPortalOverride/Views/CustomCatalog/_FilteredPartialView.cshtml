@@ -416,7 +416,7 @@
                     isResponsive: true,
                     columns: [
                         ...gridColumns,
-                        { headerText: 'Qty.', width: 120, template: '#quantityTemplate' },
+                        { headerText: 'Qty.', width: 120, textAlign: 'Center', template: '#quantityTemplate' },
                         { headerText: 'Actions', width: 130, template: '#optionsTemplate', tooltip: "#columnTip" },
                     ],
                     pageSettings: { pageSize: 100 },
@@ -480,9 +480,9 @@
 
 <script id="quantityTemplate" type="text/x-template">
     ${if(_isSerialized == "true")}
-    <label style="width: 40px" for="">1</label>
+    <label style="width: 40px" for="" class="text-center">1</label>
     ${else}
-    <input type="number" min="1" name="quantity" style="width: 40px" id="qty${_itemId}"
+    <input min="1" name="quantity" style="width: 40px" class="text-center" id="qty${_itemId}"
            oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">
     ${/if}
 </script>
