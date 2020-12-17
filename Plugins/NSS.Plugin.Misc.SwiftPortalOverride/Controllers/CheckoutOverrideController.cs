@@ -813,12 +813,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // discounts
             var discounts = new List<Discount>();
-            var discounUsagetList = _discountService.GetAllDiscountUsageHistory(customerId: _workContext.CurrentCustomer.Id, orderId: order.Id);
+            var discounUsagetList = _discountService.GetAllDiscountUsageHistory(orderId: order.Id);
             foreach (var item in discounUsagetList)
             {
-                var discount = _discountService.GetDiscountById(item.Id);
+                var discount = _discountService.GetDiscountById(item.DiscountId);
                 if (discount != null)
-                    discounts.Add(new Discount { Amount = discount.DiscountAmount, Code = discount.CouponCode, Description = discount.Name });
+                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderSubtotalExclTax), 2), Code = discount.CouponCode, Description = discount.Name });
             }
 
             // order items
