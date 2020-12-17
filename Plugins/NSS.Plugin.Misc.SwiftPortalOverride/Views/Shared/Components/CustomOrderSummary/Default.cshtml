@@ -117,11 +117,39 @@ Content1 =
     @<div id="viewNotesModal">
         <div class="modal-body">
             <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+            <div class="buttons float-right pt-3" id="saveNote">
+                <input type="button" class="button-1 register-button" value="Add" />
+            </div>
+        </div>
+    </div>;
+}
+@{
+
+    Func<object, object>
+    Content2 =
+    @<div id="acceptTOSModal">
+        <div class="">
+            <p class="pt-4">Please accept the terms of service before the next step.</p>
         </div>
     </div>;
 }
 
-<div id="cart-section" class="cart-summary-content card">
+@*<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#03175B; color: #fff">
+                    <span class="modal-title">NOTES</span>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+
+<div class="cart-summary-content card">
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
     @await Html.PartialAsync("_OrderReviewData", Model.OrderReviewData)
     <div>
@@ -539,6 +567,40 @@ Content1 =
                                 <label class="h5-default-500">Total Price</label>
                                 <label class="h2-primary">{{ item.subTotal }}</label>
                             </div>
+                        }
+                        <div class="checkout-buttons">
+                            @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
+                            {
+                                <script asp-location="Footer">
+                                    $(document).ready(function () {
+                                        $('#checkout').on('click', function () {
+                                            //terms of service
+                                            var termOfServiceOk = true;
+                                            if ($('#termsofservice').length > 0) {
+                                                //terms of service element exists
+                                                if (!$('#termsofservice').is(':checked')) {
+                                                    //$("#terms-of-service-warning-box").dialog();
+                                                    handleAcceptTOSModal();
+                                                    termOfServiceOk = false;
+                                                } else {
+                                                    termOfServiceOk = true;
+                                                }
+                                            }
+                                            return termOfServiceOk;
+                                        });
+                                    });
+                                </script>
+                                if (orderSettings.CheckoutDisabled)
+                                {
+                                    <div class="checkout-disabled">
+                                        @T("Checkout.Disabled")
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="submit" id="checkout" name="checkout" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset" ; />
+                                }
+                            }
                         </div>
 
                         <div class="d-flex flex-column bg-accent p-3">
@@ -560,6 +622,7 @@ Content1 =
     </div>
 
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("500px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
 </div>
 
@@ -794,6 +857,17 @@ Content1 =
         viewNotesModal = this;
     }
 
+
+    function onAcceptCreated() {
+        acceptTOSModal = this;
+    }
+
+
+    function handleAcceptTOSModal() {
+        acceptTOSModal.show();
+    }
+
+
     let itemNoteId;
     function handleNotesModal(itemId) {
         itemNoteId = itemId;
@@ -801,9 +875,10 @@ Content1 =
         viewNotesModal.show();
     }
 
-    $('#noteModal').on('hidden.bs.modal', function () {
-        $(`#${itemNoteId}`).val($(this).find("textarea").val());
+    $('#saveNote').on('click', function () {
+        $(`#${itemNoteId}`).val($("#productNote").val());
         $(this).find("textarea").val('').end();
+        viewNotesModal.hide();
     });
 
     function calculateItemTotalPrice(attrId, itemId) {

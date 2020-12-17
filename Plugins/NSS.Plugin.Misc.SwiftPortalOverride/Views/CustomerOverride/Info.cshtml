@@ -54,7 +54,7 @@
                         {
                             <nop-required />
                         }
-                        <input asp-for="FirstName" class="form-control custom-input" />
+                        <input asp-for="FirstName" placeholder="Enter first name" class="form-control custom-input" />
                         <span asp-validation-for="FirstName"></span>
                     </div>
 
@@ -64,19 +64,19 @@
                         {
                             <nop-required />
                         }
-                        <input asp-for="LastName" class="form-control custom-input" />
+                        <input asp-for="LastName" placeholder="Enter last name" class="form-control custom-input" />
                         <span asp-validation-for="LastName"></span>
                     </div>
 
                     <div class="">
                         <label asp-for="Phone">Work Phone</label>
-                        <input asp-for="Phone" id="work-phone" maxlength="14" class="form-control custom-input phone-number" />
+                        <input asp-for="Phone" id="work-phone" placeholder="Enter work phone" maxlength="14" class="form-control custom-input phone-number" />
                         <span asp-validation-for="Phone"></span>
                     </div>
 
                     <div class="">
                         <label asp-for="Phone">Cell Phone</label>
-                        <input name="cell-phone" id="cell-phone" maxlength="14" class="form-control custom-input phone-number" value="@CellPhone" />
+                        <input name="cell-phone" id="cell-phone" placeholder="Enter cell phone" maxlength="14" class="form-control custom-input phone-number" value="@CellPhone" />
                         <span asp-validation-for="Phone"></span>
                     </div>
 

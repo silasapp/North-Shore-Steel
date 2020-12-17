@@ -17,13 +17,13 @@
     <div class="" hidden>
         <label asp-for="FirstName" asp-postfix=":"></label>
         <nop-required />
-        <input asp-for="FirstName" class="form-control custom-input" value="@FirstName"/>
+        <input asp-for="FirstName" placeholder="Enter first name" class="form-control custom-input" value="@FirstName"/>
         <span asp-validation-for="FirstName"></span>
     </div>
     <div class="" hidden>
         <label asp-for="LastName" asp-postfix=":"></label>
         <nop-required />
-        <input asp-for="LastName" class="form-control custom-input" value="@LastName"/>
+        <input asp-for="LastName" placeholder="Enter last name" class="form-control custom-input" value="@LastName"/>
         <span asp-validation-for="LastName"></span>
     </div>
 
@@ -35,7 +35,7 @@
             {
                 <nop-required />
             }
-            <input asp-for="Address1" class="form-control custom-input" />
+            <input asp-for="Address1" placeholder="Enter address" class="form-control custom-input" />
             <span asp-validation-for="Address1"></span>
         </div>
     }
@@ -47,7 +47,7 @@
             {
                 <nop-required />
             }
-            <input asp-for="Address2" class="form-control custom-input" />
+            <input asp-for="Address2" placeholder="Enter address" class="form-control custom-input" />
             <span asp-validation-for="Address2"></span>
         </div>
     }
@@ -60,7 +60,7 @@
             {
                 <nop-required />
             }
-            <input asp-for="City" class="form-control custom-input" />
+            <input asp-for="City" placeholder="Enter city" class="form-control custom-input" />
             <span asp-validation-for="City"></span>
         </div>
     }
@@ -73,7 +73,7 @@
             {
                 <nop-required />
             }
-            <input asp-for="ZipPostalCode" class="form-control custom-input" />
+            <input asp-for="ZipPostalCode" placeholder="Enter zip/postal code" class="form-control custom-input" />
             <span asp-validation-for="ZipPostalCode"></span>
         </div>
     }
@@ -107,7 +107,7 @@
         <div class="">
             <label asp-for="Company" asp-postfix=":"></label>
             <nop-required />
-            <input asp-for="Company" class="form-control custom-input" />
+            <input asp-for="Company" placeholder="Enter company" class="form-control custom-input" />
             <span asp-validation-for="Company"></span>
         </div>
     }
@@ -116,7 +116,7 @@
     <div class="" hidden>
         <label asp-for="Email" asp-postfix=":"></label>
         <nop-required />
-        <input asp-for="Email" class="form-control custom-input" value="@Email"/>
+        <input asp-for="Email" placeholder="Enter email" class="form-control custom-input" value="@Email"/>
         <span asp-validation-for="Email"></span>
     </div>
 
@@ -125,7 +125,7 @@
         <div class="">
             <label asp-for="PhoneNumber" asp-postfix=":"></label>
             <nop-required />
-            <input asp-for="PhoneNumber" id="phone-number" maxlength="14" class="form-control custom-input" />
+            <input asp-for="PhoneNumber" id="phone-number" placeholder="Enter phone number" maxlength="14" class="form-control custom-input" />
             <span asp-validation-for="PhoneNumber"></span>
         </div>
     }

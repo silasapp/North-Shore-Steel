@@ -352,7 +352,7 @@ BEGIN
 	IF @shapeIdsCount > 0
 	BEGIN
 		SET @sql = @sql + '
-		AND pga.Id IN ('
+		AND (pga.Id IN ('
 		
 		SET @sql = @sql + + CAST(@ShapeIds AS nvarchar(max))
 
@@ -360,7 +360,7 @@ BEGIN
 
 		SET @sql = @sql + + CAST(@ShapeIds AS nvarchar(max))
 
-		SET @sql = @sql + ') '
+		SET @sql = @sql + ')) '
 	END
 	
 	--filter by category

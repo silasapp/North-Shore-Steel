@@ -101,12 +101,18 @@
                             <text>,</text>
                         }
                     }
-                    @Model.BillingAddress.StateProvinceName
+                    @if (!string.IsNullOrEmpty(Model.BillingAddress.StateProvinceName))
+                    {
+                        @Model.BillingAddress.StateProvinceName
+                        @if (!string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
+                        {
+                            <text>,</text>
+                        }
+                    }
                     @if (!string.IsNullOrEmpty(Model.BillingAddress.ZipPostalCode))
                     {
-                        <text>,</text>
+                        @Model.BillingAddress.ZipPostalCode
                     }
-                    @Model.BillingAddress.ZipPostalCode
                 </li>
 
                 @if (!string.IsNullOrEmpty(Model.BillingAddress.CountryName))
@@ -303,7 +309,7 @@
             @if (Model.MtrCount > 0)
             {
                 <div class="d-flex flex-row mt-4 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
-                    <img alt="MTR Icon" v-bind:src="isHoveringViewMTR ? '/Themes/@themeName/Content/assets/invoice.svg' : '/Themes/@themeName/Content/assets/invoice.svg'" />
+                    <img alt="MTR Icon" v-bind:src="isHoveringViewMTR ? '/Themes/@themeName/Content/assets/invoice-dark.svg' : '/Themes/@themeName/Content/assets/invoice.svg'" />
 
                     @if (Model.MtrCount == 1)
                     {
@@ -339,10 +345,10 @@
                     <th class="vendor">Customer Part #</th>
                     <th class="price">Unit Price</th>
                     <th class="quantity">Total Price</th>
-                    <th class="total">Total Weight (lbs)</th>
-                    <th>Purchase Order #</th>
-                    <th>QTY</th>
-                    <th>UOM</th>
+                    <th class="total">Weight (lb)</th>
+                    <th>PO #</th>
+                    <th class="text-center">Qty.</th>
+                    <th class="text-center">UOM</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -355,10 +361,10 @@
                         <td>@item.CustomerPartNo</td>
                         <td>$@DoFormat(item.UnitPrice)</td>
                         <td>$@DoFormat(item.TotalPrice)</td>
-                        <td>@item.TotalWeight</td>
+                        <td>@DoFormat(item.TotalWeight)</td>
                         <td>@Model.PoNo</td>
-                        <td>@item.Quantity</td>
-                        <td>@item.UOM</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-center">@item.UOM</td>
                         <td></td>
                     </tr>
                 }

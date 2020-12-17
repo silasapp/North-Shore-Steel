@@ -7,15 +7,19 @@
     .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
         padding-left: 0.6rem
     }
+
+    .colorRed {
+        color: red !important;
+    }
 </style>
 <div>
-    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" allowExcelExport="true" allowPaging="true" allowFiltering="true">
+    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
             <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
             <e-grid-column field="PoNo" headerText="PO #" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="Weight" headerText="Weight (lb)" minWidth="120" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
+            <e-grid-column field="Weight" headerText="Weight (lb)" minWidth="120" format="N2" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
             <e-grid-column field="OrderTotal" headerText="Order Amount" minWidth="110" width="120" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
             <e-grid-column field="OrderDate" headerText="Order Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
             <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
@@ -51,6 +55,14 @@
     function excelQueryCellInfo(args) {
         if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
         if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
+    }
+
+    function customiseCell(args) {
+        if (args.column.field === 'OrderStatusName') {
+            if (args.data['OrderStatusName'].indexOf("past due") > -1) {
+                args.cell.classList.add('colorRed');
+            }
+        }
     }
 
 </script>

@@ -7,9 +7,13 @@
     .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
         padding-left: 0.6rem
     }
+
+    .colorRed {
+        color: red !important;
+    }
 </style>
 <div>
-    <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo" allowExcelExport="true" allowPaging="true" allowFiltering="true">
+    <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
@@ -55,6 +59,14 @@
         if (args.column.headerText == "Balance Amount" && args.value.length === 0) { args.value = args.data.BalanceAmount; }
     }
 
+    function customiseCell(args) {
+        if (args.column.field === 'InvoiceStatusName') {
+            if (args.data['InvoiceStatusName'].indexOf("past due") > -1) {
+                args.cell.classList.add('colorRed');
+            }
+        }
+    }
+
 </script>
 
 <script id="invoiceNo" type="text/x-template">
@@ -62,12 +74,5 @@
 </script>
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderNo}">${OrderNo}</a>
-</script>
-<script id="invoiceStatusName" type="text/x-template">
-    ${if(InvoiceStatusName.indexOf("Past"))}
-    <span style="color: red;">${InvoiceStatusName}</span>
-    ${else}
-    <span>${InvoiceStatusName}</span>
-    ${/if}
 </script>
 <ejs-scripts></ejs-scripts>
