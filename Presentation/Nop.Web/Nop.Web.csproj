@@ -201,6 +201,8 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-notifications.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-payment.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-person.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-refresh-dark-blue.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\icn-refresh.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-remove-person.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-store-dark.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-users.svg" />
@@ -224,6 +226,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\twitter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\youtube.svg" />
     <Content Remove="Themes\SwiftPortal\Content\css\styles-custom.css" />
+    <Content Remove="Themes\SwiftPortal\Content\images\call-avatar.png" />
     <Content Remove="Themes\SwiftPortal\Content\js\filters.js" />
     <Content Remove="Themes\SwiftPortal\Content\images\filter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\images\sort.svg" />
@@ -236,6 +239,8 @@
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
     <None Remove="Themes\SwiftPortal\Content\assets\c-heart.svg" />
     <None Remove="Themes\SwiftPortal\Content\assets\close-white.svg" />
+    <None Remove="Themes\SwiftPortal\Content\assets\reload-dark-blue.svg" />
+    <None Remove="Themes\SwiftPortal\Content\assets\return-dark-blue.svg" />
     <None Remove="Themes\SwiftPortal\Views\Shared\_CreateOrUpdateAddress.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\_ExternalAuthentication.Errors.cshtml" />
     <None Remove="Themes\SwiftPortal\Views\Shared\Components\AdminHeaderLinks\Default.cshtml" />

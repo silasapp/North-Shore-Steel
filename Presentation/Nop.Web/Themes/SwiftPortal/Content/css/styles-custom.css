@@ -229,6 +229,11 @@ a:not([href]):not([class]) {
         font: normal normal normal 12px/15px 'Open Sans';
     }
 
+    .nav-bar-search input:focus {
+        border-color: none;
+        color: #ffffff;
+    }
+
     .nav-bar-search .search-box-button {
         height: 28px;
     }
@@ -1076,13 +1081,13 @@ input:focus {
     }
 
 .hover-icon {
-    fill: gray;
+    fill: #DEDEDE;
     cursor: pointer;
 }
 
-    .hover-icon:hover {
-        fill: #0076b4 !important;
-    }
+.hover-icon:hover {
+    fill: #03175B !important;
+}
 
 table a {
     color: #0076b4;
@@ -2587,6 +2592,11 @@ table input {
 
 /* #endregion */
 
+/* #region INPUTS */
+
+
+/* #endregion */
+
 /* #region LABEL */
 
 /* h2=24, */
@@ -2595,48 +2605,56 @@ table input {
     font: normal normal 400 26px/24px "Teko";
     letter-spacing: 0.21px;
     color: #ffffff;
+    margin-bottom: 0px;
 }
 
 .h2-white-500 {
     font: normal normal 500 26px/24px "Teko";
     letter-spacing: 0.21px;
     color: #ffffff;
+    margin-bottom: 0px;
 }
 
 .h2-primary {
     font: normal normal 500 26px/24px "Teko";
     letter-spacing: 0.21px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h2-primary-sans {
     font: normal normal bold 26px/24px "Open Sans";
     letter-spacing: 0.21px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h2-default-teko {
     font: normal normal 500 26px/24px "Teko";
     letter-spacing: 0.21px;
     color: #242424;
+    margin-bottom: 0px;
 }
 
 .h2-default-sans {
     font: normal normal 500 26px/24px "Open Sans";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h3-primary-sans {
     font: normal normal bold 18px/24px "Open Sans";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h3-primary-teko {
     font: normal normal bold 18px/24px "Teko";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h3-primary,
@@ -2644,12 +2662,14 @@ table input {
     font: normal normal bold 18px/24px "Exo 2";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h4-primary-teko {
     font: normal normal normal 16px/24px "Teko";
     letter-spacing: 0.13px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h4-primary,
@@ -2657,12 +2677,14 @@ table input {
     font: normal normal normal 16px/24px "Exo 2";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h4-primary-500-teko {
     font: normal normal 500 16px/24px "Teko";
     letter-spacing: 0.13px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h4-primary-500,
@@ -2670,6 +2692,7 @@ table input {
     font: normal normal 500 16px/24px "Exo 2";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .h4-primary-600-teko {
@@ -2679,16 +2702,32 @@ table input {
     margin-bottom: 0px;
 }
 
+.h4-default-500,
+.h4-default-500-exo {
+    font: normal normal 500 16px/24px "Exo 2";
+    letter-spacing: 0px;
+    color: #242424;
+}
+
+.h4-default-500-teko {
+    font: normal normal 500 16px/24px "Teko";
+    letter-spacing: 0px;
+    color: #242424;
+    margin-bottom: 0px;
+}
+
 .h5-default-sans {
     font: normal normal normal 14px/24px "Open Sans";
     letter-spacing: 0px;
     color: #242424;
+    margin-bottom: 0px;
 }
 
 .h5-default-teko {
     font: normal normal normal 14px/24px "Teko";
     letter-spacing: 0px;
     color: #242424;
+    margin-bottom: 0px;
 }
 
 .h5-default,
@@ -2696,12 +2735,22 @@ table input {
     font: normal normal 600 14px/24px "Exo 2";
     letter-spacing: 0px;
     color: #242424;
+    margin-bottom: 0px;
+}
+
+.h5-default-500,
+.h5-default-500-exo {
+    font: normal normal 500 14px/24px "Exo 2";
+    letter-spacing: 0px;
+    color: #242424;
+    margin-bottom: 0px;
 }
 
 .h5-default-normal {
     font: normal normal normal 14px/24px "Exo 2";
     letter-spacing: 0px;
     color: #242424;
+    margin-bottom: 0px;
 }
 
 .h5-primary-600-sans {
@@ -2726,24 +2775,12 @@ table input {
     margin-bottom: 0px;
 }
 
-.h4-default-500,
-.h4-default-500-exo {
-    font: normal normal 500 16px/24px "Exo 2";
-    letter-spacing: 0px;
-    color: #242424;
-}
-
-.h4-default-500-teko {
-    font: normal normal 500 16px/24px "Teko";
-    letter-spacing: 0px;
-    color: #242424;
-}
-
 .h5-danger,
 .h5-danger-exo {
     font: normal normal normal 14px/24px "Exo 2";
     letter-spacing: 0px;
     color: #db0606;
+    margin-bottom: 0px;
 }
 
 .fs12-default-sans {
@@ -2756,12 +2793,14 @@ table input {
     font: normal normal normal 12px/16px "Open Sans";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
 }
 
 .fs12-default-teko {
     font: normal normal normal 12px/16px "Teko";
     letter-spacing: 0px;
     color: #242424;
+    margin-bottom: 0px;
 }
 
 .fs12-default,
@@ -2769,28 +2808,57 @@ table input {
     font: normal normal normal 12px/16px "Exo 2";
     letter-spacing: 0px;
     color: #242424;
+    margin-bottom: 0px;
+}
+
+.fs12-default-500,
+.fs12-default-500-exo {
+    font: normal normal 500 12px/16px "Exo 2";
+    letter-spacing: 0px;
+    color: #242424;
+    margin-bottom: 0px;
 }
 
 .fs12-primary,
-fs12-primary-exo {
+.fs12-primary-exo {
     font: normal normal normal 12px/16px "Exo 2";
     letter-spacing: 0px;
     color: #03175b;
+    margin-bottom: 0px;
+}
+
+.fs12-primary-500,
+.fs12-primary-500-exo {
+    font: normal normal 500 12px/16px "Exo 2";
+    letter-spacing: 0px;
+    color: #03175b;
+    margin-bottom: 0px;
 }
 
 .fs12-white,
-fs12-white-exo {
+.fs12-white-exo {
     font: normal normal normal 12px/16px "Exo 2";
     letter-spacing: 0px;
     color: #ffffff;
+    margin-bottom: 0px;
 }
 
 .fs12-link,
-fs12-link-exo {
+.fs12-link-exo {
     font: normal normal normal 12px/16px "Exo 2";
     letter-spacing: 0px;
     color: #0076b4;
     text-decoration: underline;
+    margin-bottom: 0px;
+}
+
+.fs12-link-500,
+.fs12-link-500-exo {
+    font: normal normal 500 12px/16px "Exo 2";
+    letter-spacing: 0px;
+    color: #0076b4;
+    text-decoration: underline;
+    margin-bottom: 0px;
 }
 
 /* #endregion */
@@ -2818,10 +2886,29 @@ fs12-link-exo {
     background: #0076b4 !important;
 }
 
+.bg-accent {
+    background: #F6F6F6;
+}
+
+.box-shadow-none {
+    box-shadow: none;
+}
+
 /*// Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
     .bg-md-transparent {
         background-color: transparent !important;
+    }
+}
+
+/*// Small devices (landscape phones, less than 768px)*/
+@media (max-width: 767.98px) {
+    .bg-md-accent {
+        background-color: #F6F6F6 !important;
+    }
+
+    .box-shadow-md-none {
+        box-shadow: none !important;
     }
 }
 
@@ -2856,8 +2943,62 @@ hr {
 
 /* #endregion */
 
-/* #region SYNCFUSION GRID */
+/* #region BUTTONS */
 
+.nss-btn-white {
+    background: #FFFFFF;
+    color: #242424;
+    padding: 0.65rem 1rem;
+    font: normal normal 500 16px/24px 'Exo 2';
+    border: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.nss-btn-white:active,
+.nss-btn-white:focus,
+.nss-btn-white:hover {
+    outline: none;
+    background: #03175B;
+    color: #FFFFFF;
+}
+
+.nss-btn-white:hover img {
+    filter: brightness(0) invert(1);
+}
+
+/*// Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) {
+}
+
+/*// Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+}
+
+/*// Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) {
+}
+
+/*// Extra large devices (large desktops, 1200px and up)*/
+@media (min-width: 1200px) {
+}
+
+/*// Small devices (landscape phones, less than 768px)*/
+@media (max-width: 767.98px) {
+}
+
+/*// Medium devices (tablets, less than 992px)*/
+@media (max-width: 991.98px) {
+}
+
+/*// Large devices (desktops, less than 1200px)*/
+@media (max-width: 1199.98px) {
+}
+
+/* #endregion */
+
+/* #region SYNCFUSION GRID */
 #order-grid .e-grid .e-gridheader tr th:last-child,
 #invoice-grid .e-grid .e-gridheader tr th:last-child {
     background-color: white !important;
@@ -3103,7 +3244,7 @@ and also iPads specifically.
 
     /*custom container*/
     .nss-container {
-        padding: 30px 80px;
+/*        padding: 30px 80px;*/
     }
 
     .login-page .fieldset {
@@ -3122,7 +3263,7 @@ and also iPads specifically.
     }
     /*custom container*/
     .nss-container {
-        padding: 30px 36px;
+/*        padding: 30px 36px;*/
     }
 
     .footer-main > .footer-content {
@@ -3248,7 +3389,7 @@ and also iPads specifically.
     }
 
     .nss-container {
-        padding: 30px 20px;
+/*        padding: 30px 20px;*/
     }
 
     .login-page .fieldset {
