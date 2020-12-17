@@ -818,7 +818,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 var discount = _discountService.GetDiscountById(item.DiscountId);
                 if (discount != null)
-                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderSubtotalExclTax), 2), Code = discount.CouponCode, Description = discount.Name });
+                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderTotal), 2), Code = discount.CouponCode, Description = discount.Name });
             }
 
             // order items
@@ -868,8 +868,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     ItemId = (int.TryParse(genAttrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
                     CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? null) : null,
                     Quantity = item.Quantity,
-                    TotalPrice = item.PriceExclTax,
-                    UnitPrice = item.UnitPriceExclTax,
+                    TotalPrice = Math.Round(item.PriceExclTax, 2),
+                    UnitPrice = Math.Round(item.UnitPriceExclTax, 2),
                     TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int) Math.Round(weight * item.Quantity) : 0),
                     // product attr
                     Notes = notes,
