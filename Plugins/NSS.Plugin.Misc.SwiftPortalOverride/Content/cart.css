@@ -163,3 +163,193 @@
             background-color: #585858;
             color: #ffffff;
         }
+
+.modal-backdrop {
+    position: unset !important;
+}
+
+.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
+    width: 67rem !important;
+    margin: auto;
+    top: 0 !important;
+    bottom: 0;
+    right: 0;
+    height: fit-content !important;
+}
+
+.ui-dialog-content {
+    max-height: initial !important;
+}
+
+.button-2.update-cart-button {
+    min-width: 128px !important;
+}
+
+th {
+    white-space: nowrap;
+}
+
+.e-dlg-header {
+    color: #fff !important;
+    text-align: center;
+}
+
+.e-dialog .e-dlg-header {
+    width: 93% !important;
+}
+
+input:active {
+    border: none;
+    outline: none;
+}
+
+.coupon-box .hint {
+    display: none;
+}
+
+
+/* #region BOOTSTRAP MEDIA QUERIES */
+/*// Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) {
+}
+
+/*// Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+    .nss-container {
+        padding: 2rem 1rem;
+    }
+}
+
+/*// Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) {
+    .nss-container {
+        padding: 2rem 6rem;
+    }
+}
+
+/*// Extra large devices (large desktops, 1200px and up)*/
+@media (min-width: 1200px) {
+}
+
+/*// Small devices (landscape phones, less than 768px)*/
+@media (max-width: 767.98px) {
+    .nss-container {
+        padding: 0px;
+    }
+
+    .card {
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0px;
+        margin-bottom: 0px;
+    }
+
+    .pure-material-checkbox {
+        padding-right: 22px;
+        padding-left: 0px !important;
+        font: normal normal 500 12px/16px "Exo 2" !important;
+        color: #2F2F2F;
+    }
+
+        .pure-material-checkbox .checkmark {
+            background-color: #F6F6F6 !important;
+            border: 2px solid #DEDEDE !important;
+            height: 20px !important;
+            width: 20px !important;
+            left: auto;
+            right: 0;
+        }
+
+        .pure-material-checkbox input:checked ~ .checkmark {
+            background-color: #0076b4 !important;
+            border-color: transparent !important;
+        }
+
+    input.purchase-order {
+        padding: 0.5rem;
+        border: none;
+        outline: none;
+        background: #FFFFFF;
+        font: normal normal normal 14px/24px 'Exo 2';
+        letter-spacing: 0px;
+        color: #242424;
+        height: 32px;
+    }
+
+    .cart-qty-input {
+        background: #FFFFFF 0% 0% no-repeat padding-box;
+        border: 1px solid #03175B !important;
+        border-radius: 0 !important;
+        font: normal normal normal 16px/24px 'Exo 2';
+        letter-spacing: 0px;
+        color: #242424;
+        padding: 0.5rem !important;
+        text-align: center;
+        height: 32px !important;
+        width: 65px;
+    }
+
+    .cart-price-select {
+        background: #FFFFFF 0% 0% no-repeat padding-box;
+        border: 1px solid #03175B !important;
+        border-radius: 0 !important;
+        font: normal normal normal 16px/24px 'Exo 2';
+        letter-spacing: 0px;
+        color: #242424;
+        text-align: center;
+        padding: 0.25rem 0.5rem !important;
+        height: 32px;
+        width: 65px;
+        margin-left: 0px !important;
+    }
+
+    .coupon-box {
+        margin: 0px;
+        padding: 0px !important;
+        background: transparent;
+    }
+
+        .coupon-box .apply-discount-coupon-code-button {
+            background-color: #0076B4 !important;
+            color: #FFF !important;
+            font: normal normal 600 16px/24px 'Exo 2';
+            letter-spacing: 0px;
+            color: #FFFFFF;
+            padding: 0px 1rem !important;
+        }
+
+        .coupon-box .title > strong {
+            font: normal normal 600 16px/24px 'Teko';
+            letter-spacing: 0.13px;
+            color: #03175B;
+            text-transform: uppercase;
+            margin-bottom: 1rem !important;
+        }
+
+        .coupon-box .discount-coupon-code {
+            background: #FFFFFF 0% 0% no-repeat padding-box;
+            box-shadow: 0px 1px 4px #00000029;
+            border: 0.5px solid #DEDEDE;
+            width: 100% !important;
+            font: normal normal normal 16px/24px 'Exo 2' !important;
+        }
+
+            .coupon-box .discount-coupon-code::placeholder,
+            .coupon-box .discount-coupon-code::-webkit-input-placeholder,
+            .coupon-box .discount-coupon-code:-moz-placeholder,
+            .coupon-box .discount-coupon-code::-moz-placeholder,
+            .coupon-box .discount-coupon-code:-ms-input-placeholder {
+                font-style: italic !important;
+                color: red !important;
+            }
+}
+
+/*// Medium devices (tablets, less than 992px)*/
+@media (max-width: 991.98px) {
+}
+
+/*// Large devices (desktops, less than 1200px)*/
+@media (max-width: 1199.98px) {
+}
+
+/* #endregion */
