@@ -351,7 +351,7 @@ Content1 =
 
                                             </td>
                                             <td class="align-middle" id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
-                                            <td class="align-middle"><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@string.Format("{0:N0}", totalWeight)</label></div></td>
+                                            <td class="align-middle"><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@DoFormat(totalWeight)</label></div></td>
                                             @*<td class="align-middle"><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>*@
                                             <td class="text-center align-middle">
                                                 <input style="height: 24px;" class="text-center" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id, '@(product.Weight)', '@(product.Length)')" />
