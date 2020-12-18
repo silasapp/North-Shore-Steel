@@ -79,6 +79,7 @@
 
         var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == Constants.CustomerPartNoAttribute);
         var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+        var selectedPurchaseUnit = purchaseUnitAttr?.Values?.FirstOrDefault(x => x.IsPreSelected);
         var noteAttr = attributes.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
 
         var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}{item.Id}" : $"itemuom{item.Id}";
@@ -103,6 +104,7 @@
         _cartItem.Add("cartItem", Serialize(cartItem));
         _cartItem.Add("custPartNoAttr", Serialize(custPartNoAttr));
         _cartItem.Add("purchaseUnitAttr", Serialize(purchaseUnitAttr));
+        _cartItem.Add("selectedPurchaseUnit", selectedPurchaseUnit?.Id);
         _cartItem.Add("noteAttr", Serialize(noteAttr));
         _cartItem.Add("unitControlId", unitControlId);
         _cartItem.Add("controlId", controlId);
@@ -271,10 +273,10 @@ Content1 =
                                             <div>
                                                 <label style="margin:0; margin-right:8px;" v-bind:id="'itemunitprice' + item.id">{{ item.unitPrice }} /</label>
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
-                                                        v-on:change="toggleUnitPrice(item)" class="cart-price-select">
+                                                        v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                                     <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
                                                             v-for="attribute in item.purchaseUnitAttr.values"
-                                                            v-bind:selected="attribute.isPreSelected" v-bind:value="attribute.id">
+                                                            v-bind:value="attribute.id">
                                                         {{ attribute.name }}
                                                     </option>
                                                 </select>
@@ -332,6 +334,7 @@ Content1 =
                                 <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
                                 <label class="h5-default-500">Weight: {{ item.weightValue }}</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
+                                <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
 
                                 <div class="d-flex flex-row justify-content-between align-items-center">
                                     <label class="h5-default-500">Quantity</label>
@@ -344,11 +347,10 @@ Content1 =
                                     <div class="d-flex flex-row align-items-center">
                                         <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">{{ item.unitPrice }} / </label>
                                         <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
-                                                v-on:change="toggleUnitPrice(item)" class="cart-price-select">
+                                                v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                             <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
                                                 attribute.name === 'FT' && item.pricePerFt"
-                                                    v-for="attribute in item.purchaseUnitAttr.values"
-                                                    v-bind:selected="attribute.isPreSelected" v-bind:value="attribute.id">
+                                                    v-for="attribute in item.purchaseUnitAttr.values" v-bind:value="attribute.id">
                                                 {{ attribute.name }}
                                             </option>
                                         </select>
@@ -393,7 +395,6 @@ Content1 =
                                                         </label>
                                                     </div>
                                                 }
-
                                             }
                                             else
                                             {
@@ -691,7 +692,6 @@ Content1 =
     var pageModel = @Html.Raw(Serialize(Model));
     var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));
 
-    console.log("warnings: ", items.map(x => x.warnings));
 
     new Vue({
         el: '#cart-section',
@@ -714,9 +714,12 @@ Content1 =
         },
         mounted: function () {
             this.items.forEach(item => {
+                item.noteAttr = JSON.parse(item.noteAttr);
                 item.warnings = JSON.parse(item.warnings);
                 item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr)
             });
+            console.log("purchaseUnitAttr items: ", items.map(x => x.purchaseUnitAttr));
+            console.log("selectedPurchaseUnit items: ", items.map(x => x.selectedPurchaseUnit));
         },
         computed: {
             isMobile: function () {
@@ -729,8 +732,10 @@ Content1 =
                 this.window.height = window.innerHeight;
             },
             handleNotesModal: function ({ controlId }) {
-                $("#productNote").val($(`#${controlId}`).val());
-                viewNotesModal.show();
+                //$("#productNote").val($(`#${controlId}`).val());
+                //viewNotesModal.show();
+
+                handleNotesModal(controlId);
             },
             toggleUnitPrice: function (item) {
                 const { unitControlId, id, pricePerCWT, pricePerPiece, pricePerFt } = item;
