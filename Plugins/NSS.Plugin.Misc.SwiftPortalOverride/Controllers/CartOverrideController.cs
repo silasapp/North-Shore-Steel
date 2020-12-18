@@ -40,6 +40,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
@@ -696,6 +697,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         var updatetopcartsectionhtml = string.Format(_localizationService.GetResource("ShoppingCart.HeaderQuantity"),
                             shoppingCarts.Sum(item => item.Quantity));
 
+                       
+
+                        updatetopcartsectionhtml = Regex.Replace(updatetopcartsectionhtml, @"[()]+", "");
                         var updateflyoutcartsectionhtml = _shoppingCartSettings.MiniShoppingCartEnabled
                             ? RenderViewComponentToString("FlyoutShoppingCart")
                             : string.Empty;
