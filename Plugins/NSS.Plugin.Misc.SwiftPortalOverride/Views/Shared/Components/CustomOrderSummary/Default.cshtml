@@ -64,6 +64,7 @@
         var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
         double weight = 0.0;
         var weightValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out weight) ? DoFormat(weight) : "0.00";
+        var lengthValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00";
 
         var customerCompanyProduct = new CustomerCompanyProduct();
         if (customerCompany != null)
@@ -85,6 +86,7 @@
 
         _cartItem.Add("id", item.Id);
         _cartItem.Add("productName", item.ProductName);
+        _cartItem.Add("productId", item.ProductId);
         _cartItem.Add("unitPrice", item.UnitPrice);
         _cartItem.Add("quantity", item.Quantity);
         _cartItem.Add("subTotal", item.SubTotal);
@@ -96,6 +98,7 @@
         _cartItem.Add("pricePerCWT", pricePerCWT);
         _cartItem.Add("pricePerPiece", pricePerPiece);
         _cartItem.Add("weight", weightValue);
+        _cartItem.Add("length", lengthValue);
         _cartItem.Add("customerCompanyProduct", Serialize(customerCompanyProduct));
         _cartItem.Add("cartItem", Serialize(cartItem));
         _cartItem.Add("custPartNoAttr", Serialize(custPartNoAttr));
@@ -103,6 +106,7 @@
         _cartItem.Add("noteAttr", Serialize(noteAttr));
         _cartItem.Add("unitControlId", unitControlId);
         _cartItem.Add("controlId", controlId);
+        _cartItem.Add("warnings", Serialize(item.Warnings));
 
         items.Add(_cartItem);
     }
@@ -149,7 +153,7 @@ Content1 =
     </div>*@
 
 
-<div class="cart-summary-content card">
+<div id="cart-section" class="cart-summary-content card" v-cloak>
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
     @await Html.PartialAsync("_OrderReviewData", Model.OrderReviewData)
     <div>
@@ -168,300 +172,281 @@ Content1 =
             }
             @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
             <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
-                <div class="d-none d-md-block">
-                    <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
+                @*<div class="d-none d-md-block">
+                        <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
 
-                        <div class="col-md-5 cart-input-options">
-                            <div class="cart-filter-menu">
-                                <label for="purchase-order">Purchase Order #</label>
-                                @if (purchasechkattr != null)
-                                {
-                                    var controlId = $"checkout_attribute_{purchasechkattr.Id}";
-                                    <input type="text" name="@(controlId)" id="@(controlId)" value="@(purchasechkattr.DefaultValue)" placeholder="ENTER..." />
-                                }
+                            <div class="col-md-5 cart-input-options">
+                                <div class="cart-filter-menu">
+                                    <label for="purchase-order">Purchase Order #</label>
+                                    @if (purchasechkattr != null)
+                                    {
+                                        var controlId = $"checkout_attribute_{purchasechkattr.Id}";
+                                        <input type="text" name="@(controlId)" id="@(controlId)" value="@(purchasechkattr.DefaultValue)" placeholder="ENTER..." />
+                                    }
+                                </div>
+                                <div class="cart-filter-menu">
+                                    <label for="estimated-date">Promise Date</label>
+                                    <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
+                                </div>
                             </div>
-                            <div class="cart-filter-menu">
-                                <label for="estimated-date">Promise Date</label>
-                                <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
+
+                            @if (Model.IsEditable)
+                            {
+                                <div class="common-buttons col-md-5 cart-action-options">
+                                    <div class="cart-action-btn">
+                                        <input style="z-index: 1;" type="submit" name="continueshopping" value="Continue Shopping" class="button-2 continue-shopping-button" />
+
+                                        <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/return.svg" width="20" height="20" alt="">
+                                    </div>
+                                    <div class="cart-action-btn">
+                                        <input style="z-index: 1;" type="submit" name="updatecart" value="Update Cart" class="button-2 update-cart-button" />
+
+                                        <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/reload.svg" width="20" height="20" alt="">
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>*@
+
+                <div>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex flex-column flex-md-row justify-content-md-between">
+                            <div v-if="isEditable" class="d-flex flex-row bg-accent bg-md-white justify-content-around mb-3 p-3 p-md-0 order-0 order-md-1">
+                                <button type="submit" class="nss-btn-white mr-md-4" name="continueshopping">
+                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="">
+                                    {{ isMobile ? 'Keep Shopping' : 'Continue Shopping' }}
+                                </button>
+                                <button type="submit" class="nss-btn-white" name="updatecart">
+                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/icn-refresh-dark-blue.svg" width="24" height="24" alt="">
+                                    Update Cart
+                                </button>
+                            </div>
+
+                            <div class="d-flex flex-row bg-accent bg-md-white p-3 p-md-0 mb-3 order-1 order-md-0">
+                                <div class="d-flex flex-column mr-2 w-50 w-md-100">
+                                    <label class="fs12-default-500 mb-2">Purchase Order #</label>
+                                    <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
+                                           v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
+                                </div>
+                                <div class="d-flex flex-column ml-2 w-50 w-md-100">
+                                    <label class="fs12-default-500 mb-2">Estimated Delivery Date</label>
+                                    <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
+                                </div>
                             </div>
                         </div>
 
-                        @if (Model.IsEditable)
+                        @* Cart items - Web View *@
+                        <div v-if="!isMobile" class="table-wrapper">
+                            <table class="table table-bordered cart-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="10%">Item #</th>
+                                        <th scope="col">Description</th>
+                                        <th scope="col" width="10%">Customer Part #</th>
+                                        <th scope="col" width="12%">Unit Price</th>
+                                        <th scope="col" width="9%">Total Price</th>
+                                        <th scope="col" width="9%">Weight (lb)</th>
+                                        <th scope="col" width="9%">Length (ft)</th>
+                                        <th scope="col" width="8%" class="text-center">Qty.</th>
+                                        <th scope="col" width="5%" class="text-center">Notes</th>
+                                        <th scope="col" width="5%" class="text-center">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in items">
+                                        <td class="align-middle"><label style="margin:0;">{{ item.iNo }}</label></td>
+                                        <td class="align-middle">
+                                            <label class="mv-value" style="margin:0;">{{ item.productName }}</label>
+                                            <div class="message-error" v-if="item.warnings?.length > 0">
+                                                <ul>
+                                                    <li v-for="warning in item.warnings">{{ warning }}</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td class="">
+                                            <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
+                                                   v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
+                                        </td>
+                                        <td style="white-space: nowrap;" align="right">
+                                            <div>
+                                                <label style="margin:0; margin-right:8px;" v-bind:id="'itemunitprice' + item.id">{{ item.unitPrice }} /</label>
+                                                <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
+                                                        v-on:change="toggleUnitPrice(item)" class="cart-price-select">
+                                                    <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
+                                                            v-for="attribute in item.purchaseUnitAttr.values"
+                                                            v-bind:selected="attribute.isPreSelected" v-bind:value="attribute.id">
+                                                        {{ attribute.name }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td class="pt-3" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
+                                        <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ item.weight }}</label></td>
+                                        <td class="pt-3"><label v-bind:id="'itemlength' + item.id" style="margin:0;">{{ item.length }}</label></td>
+                                        <td class="text-center">
+                                            <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
+                                                   style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
+                                                   v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'"
+                                                   aria-label="@T("ShoppingCart.Quantity")"
+                                                   min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
+                                        </td>
+                                        <td class="text-center">
+                                            <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
+                                               v-on:click="handleNotesModal(item)" data-target="#noteModal">
+                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                     class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
+                                                     viewBox="0 0 24 24"
+                                                     style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #2F2F2F; opacity: 0.5;">
+                                                    <title>View note</title>
+                                                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
+                                                    <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                </svg>
+                                            </a>
+                                            <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
+                                        </td>
+                                        <td class="remove-from-cart text-center pt-3">
+                                            <label class="pure-material-checkbox">
+                                                <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
+                                                       v-bind:value="item.id" style=" position: unset !important;"
+                                                       aria-label="@T("ShoppingCart.Remove")" />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @* Cart items - Mobile View *@
+                        <div v-if="isMobile">
+                            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3" v-for="item in items">
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <label class="fs12-primary-500">Item: {{ item.iNo }}</label>
+                                    <label class="pure-material-checkbox">
+                                        Remove
+                                        <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
+                                               v-bind:value="item.id" style="position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
+                                <label class="h5-default-500">Weight: {{ item.weightValue }}</label>
+                                <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
+
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <label class="h5-default-500">Quantity</label>
+                                    <input class="cart-qty-input" type="text" v-bind:name="'itemquantity' + item.id" v-bind:id="'itemquantity' + item.id"
+                                           v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'" aria-label="@T("ShoppingCart.Quantity")"
+                                           min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
+                                </div>
+                                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                                    <label class="h5-default-500">Unit Price</label>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">{{ item.unitPrice }} / </label>
+                                        <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
+                                                v-on:change="toggleUnitPrice(item)" class="cart-price-select">
+                                            <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
+                                                attribute.name === 'FT' && item.pricePerFt"
+                                                    v-for="attribute in item.purchaseUnitAttr.values"
+                                                    v-bind:selected="attribute.isPreSelected" v-bind:value="attribute.id">
+                                                {{ attribute.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                                    <label class="h5-default-500">Total Price</label>
+                                    <label class="h2-primary">{{ item.subTotal }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
                         {
-                            <div class="common-buttons col-md-5 cart-action-options">
-                                @*<button class="no-backgroud-button" type="submit" name="updatecart" value="@T("ShoppingCart.UpdateCart")"><img src="Themes/SwiftPortal/Content/assets/reload.svg" alt=""> Update Cart</button>
-                                    <button class="no-backgroud-button" type="submit" name="continueshopping" value="@T("ShoppingCart.ContinueShopping")"><img src="Themes/SwiftPortal/Content/assets/return.svg" alt="">Continue Shopping</button>*@
-                                <div class="cart-action-btn">
-                                    <input style="z-index: 1;" type="submit" name="continueshopping" value="Continue Shopping" class="button-2 continue-shopping-button" />
-
-                                    <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/return.svg" width="20" height="20" alt="">
-                                </div>
-                                <div class="cart-action-btn">
-                                    <input style="z-index: 1;" type="submit" name="updatecart" value="Update Cart" class="button-2 update-cart-button" />
-
-                                    <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/reload.svg" width="20" height="20" alt="">
-                                </div>
-                                @*@await Component.InvokeAsync("ShoppingCartEstimateShipping")*@
+                            var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+                            //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+                            //of course, you can modify appropriate locales to include VAT info there
+                            <div class="tax-shipping-info">
+                                @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
                             </div>
                         }
-                        @*@if (Model.IsEditable)
+                        <div class="cart-footer row mt-0 mt-md-2">
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
+                            @if (Model.IsEditable)
                             {
-                                @await Html.PartialAsync("_CheckoutAttributes", Model)
-                            }*@
+                                <div class="cart-collaterals col-sm-12 col-md-5 col-lg-4 mx-0">
+                                    <div class="deals" style="width: 100%;max-width: 100%;">
+                                        @await Html.PartialAsync("_DiscountBox", Model.DiscountBox)
+                                        @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
 
-            </div>
-            @*@await Component.InvokeAsync("SelectedCheckoutAttributes")*@
-            <div class="table-wrapper">
-                <table class="table table-bordered cart-table">
-                    <thead>
-                        <tr>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Item #</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Description</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Customer Part #</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Unit Price</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Total Price</th>
-                            <th style="background-color: transparent !important; border: none !important" scope="col">Weight (lb)</th>
-                            @*<th style="background-color: transparent !important; border: none !important" scope="col">Length (ft)</th>*@
-                            <th style="background-color: transparent !important; border: none !important" scope="col" class="text-center">Qty.</th>
-                            <th style="background-color: transparent !important; border: none !important;" scope="col" class="text-center">Notes</th>
-                            <th style="background-color: transparent !important; border: none !important;" scope="col" class="text-center">Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Items)
-                        {
-                            var product = productService.GetProductById(item.ProductId);
-                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-
-
-                            var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
-                            //var totalLength = (int)Math.Round(product.Length * item.Quantity);
-
-                            var customerCompanyProduct = new CustomerCompanyProduct();
-                            if (customerCompany != null)
-                            {
-                                customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
-                            }
-
-                                    var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
-                                    var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
-                                    string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                                    var iNo = isSerialized == "True" ? itemTagNo : itemNo;
-                                    var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
-                                    var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
-                                    var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
-
-                                    var customerCompanyProduct = new CustomerCompanyProduct();
-                                    if (customerCompany != null)
-                                    {
-                                        customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
-                                    }
-
-                                    // get attribute
-
-                                    var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
-                                    var attributes = PrepareProductAttributeModels(product, cartItem);
-
-                                    var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == Constants.CustomerPartNoAttribute);
-                                    var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
-                                    var noteAttr = attributes.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
-
-                                    var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}{item.Id}" : $"itemuom{item.Id}";
-
-                                    //var unitPrice = "0.00";
-
-                                    <tr>
-                                        <td class="align-middle"><div><label class="mv-title">Item #:</label><label class="mv-value" style="margin:0;">@(iNo)</label></div></td>
-                                        <td class="align-middle">
-                                            <div><label class="mv-title">Description:</label><label class="mv-value" style="margin:0;">@item.ProductName</label></div>
-                                            @*<label style="margin:0;">
-                                                    @item.ProductName
-                                                </label>*@
-                                            @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                        <div class="pickup-options">
+                                            @if (deliverychkattr != null)
+                                            {
+                                                var controlId = $"checkout_attribute_{deliverychkattr.Id}";
+                                                @foreach (var attributeValue in deliverychkattr.Values)
                                                 {
-                                                    <div class="attributes">
-                                                        @Html.Raw(item.AttributeInfo)
+                                                    <div>
+                                                        <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label radio-button">
+                                                            <input id="@(controlId)_@(attributeValue.Id)" type="radio" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected">
+                                                            <span class="rad-checkmark"></span>
+                                                            @attributeValue.Name
+                                                        </label>
                                                     </div>
-                                                }*@
-                                            @if (item.Warnings.Count > 0)
-                                            {
-                                                <div class="message-error">
-                                                    <ul>
-                                                        @foreach (var warning in item.Warnings)
-                                                        {
-                                                            <li>@Html.Raw(warning)</li>
-                                                        }
-                                                    </ul>
-                                                </div>
+                                                }
+
                                             }
-                                        </td>
-                                        <td class="align-middle">
-                                            @*//var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{custPartNoAttr.Id}";*@
-                                            <div> <label class="mv-title">Customer Part #:</label><input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" name="customerpartNo@(item.ProductId)" id="no-@item.Id" value="@customerCompanyProduct?.CustomerPartNo" /></div>
-                                        </td>
-                                        <td style="white-space: nowrap;">
-                                            @*<input style="width: 70%;height: 24px;" disabled type="text" name="unit-price" id="itemunitprice@(item.Id)" value="@(item.UnitPrice)">*@
-                                            <div>
-                                                <label class="mv-title">Unit Price:</label>
-                                                <div>
-                                                    <label style="margin:0;margin-right:2px;" id="itemunitprice@(item.Id)">@item.UnitPrice</label> /
-
-                                            @if (purchaseUnitAttr != null)
-                                            {
-                                                <select name="@(unitControlId)" id="@(unitControlId)" style="height: 24px;min-width: auto;margin: 0 !important;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")', '@(product.Weight)', '@(product.Length)')">
-                                                    @foreach (var attributeValue in purchaseUnitAttr.Values)
-                                                    {
-                                                        <select name="@(unitControlId)" id="@(unitControlId)" style="height: 24px;min-width: auto;margin: 0 !important;" onchange="toggleUnitPrice(this, '@unitControlId', @item.Id, '@(pricePerCWT ?? "")', '@(pricePerPiece ?? "")', '@(pricePerFt ?? "")')">
-                                                            @foreach (var attributeValue in purchaseUnitAttr.Values)
-                                                            {
-                                                                if (attributeValue.Name == "EA" && string.IsNullOrEmpty(pricePerPiece) || attributeValue.Name == "CWT" && string.IsNullOrEmpty(pricePerCWT) || attributeValue.Name == "FT" && string.IsNullOrEmpty(pricePerFt))
-                                                                    continue;
-
-                                                                <option selected="@attributeValue.IsPreSelected" value="@attributeValue.Id">@attributeValue.Name</option>
-                                                            }
-                                                        </select>
-                                                    }
-                                                </div>
-                                            </div>
-
-                                        </td>
-                                        <td class="align-middle" id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
-                                        <td class="align-middle"><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out double weight) ? DoFormat(weight) : "0.00")</label></div></td>
-                                        <td class="align-middle"><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "length")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>
-                                        <td class="text-center align-middle">
-                                            <input style="height: 24px;" class="text-center" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id)" />
-                                        </td>
-                                        <td class="text-center align-middle">
-                                            @if (noteAttr != null)
-                                            {
-                                                var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
-                                                <a style="background: none; border: none;" data-toggle="modal" onclick="handleNotesModal('@controlId')" data-target="#noteModal">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" width="20" height="20" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                        <title>add note</title>
-                                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
-                                                        <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                    </svg>
-                                                </a>
-                                                <input type="hidden" id=@controlId name="@controlId" value="@noteAttr.DefaultValue" />
-                                            }
-                                        </td>
-                                        <td class="remove-from-cart text-center align-middle">
-                                            <label class="pure-material-checkbox">
-                                                <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" style=" position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
-
-                                </td>
-                                <td class="align-middle" id="itemsubtotal@(item.Id)"><div><label class="mv-title">Total Price:</label> <label style="margin:0;">@item.SubTotal</label></div></td>
-                                <td class="align-middle"><div><label class="mv-title">Weight (lb):</label> <label id="itemweight@(item.Id)" style="margin:0;">@totalWeight</label></div></td>
-                                @*<td class="align-middle"><div><label class="mv-title">Length (ft):</label><label id="itemlength@(item.Id)" style="margin:0;">@(double.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out double length) ? DoFormat(length) : "0.00")</label></div></td>*@
-                                <td class="text-center align-middle">
-                                    <input style="height: 24px;" class="text-center" name="itemquantity@(item.Id)" @(isSerialized?.ToLower() == "true" ? "disabled" : null) id="itemquantity@(item.Id)" min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" value="@(item.Quantity)" aria-label="@T("ShoppingCart.Quantity")" onchange="calculateItemTotalPrice('@unitControlId', @item.Id, '@(product.Weight)', '@(product.Length)')" />
-                                </td>
-                                <td class="text-center align-middle">
-                                    @if (noteAttr != null)
-                                    {
-                                        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
-                                        <a style="background: none; border: none;" data-toggle="modal" onclick="handleNotesModal('@controlId')" data-target="#noteModal">
-                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" width="20" height="20" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                <title>add note</title>
-                                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
-                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                            </svg>
-                                        </a>
-                                        <input type="hidden" id=@controlId name="@controlId" value="@noteAttr.DefaultValue" />
-                                    }
-                                </td>
-                                <td class="remove-from-cart text-center align-middle">
-                                    <label class="pure-material-checkbox">
-                                        <input type="checkbox" name="removefromcart" id="removefromcart@(item.Id)" value="@(item.Id)" style=" position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
-
-                    </div>
-                    @if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
-                    {
-                        var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
-                        //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
-                        //of course, you can modify appropriate locales to include VAT info there
-                        <div class="tax-shipping-info">
-                            @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
-                        </div>
-                    }
-                    <div class="cart-footer row">
-                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
-                        @if (Model.IsEditable)
-                        {
-                            <div class="cart-collaterals col-md-4 col-xs-12">
-                                <div class="deals" style="width: 100%;max-width: 100%;">
-                                    @await Html.PartialAsync("_DiscountBox", Model.DiscountBox)
-                                    @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
-
-
-                                    <div class="pickup-options">
-                                        @if (deliverychkattr != null)
-                                        {
-                                            var controlId = $"checkout_attribute_{deliverychkattr.Id}";
-                                            @foreach (var attributeValue in deliverychkattr.Values)
+                                            else
                                             {
                                                 <div>
-                                                    <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label radio-button">
-                                                        <input id="@(controlId)_@(attributeValue.Id)" type="radio" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected">
+                                                    <label for="pickup" class="radio control-label radio-button">
+                                                        <input type="radio" id="customer" name="ship" value="customer">
                                                         <span class="rad-checkmark"></span>
-                                                        @attributeValue.Name
+                                                        Ship to Customer
+                                                    </label>
+                                                </div>
+                                                <div>
+                                                    <label for="pickup" class="radio control-label radio-button">
+                                                        <input type="radio" id="pickup" name="ship" value="pickup">
+                                                        <span class="rad-checkmark"></span>
+                                                        Pickup from North Shore Steel
                                                     </label>
                                                 </div>
                                             }
 
-                                        }
-                                        else
-                                        {
-                                            <div>
-                                                <label for="pickup" class="radio control-label radio-button">
-                                                    <input type="radio" id="customer" name="ship" value="customer">
-                                                    <span class="rad-checkmark"></span>
-                                                    Ship to Customer
-                                                </label>
-                                            </div>
-                                            <div>
-                                                <label for="pickup" class="radio control-label radio-button">
-                                                    <input type="radio" id="pickup" name="ship" value="pickup">
-                                                    <span class="rad-checkmark"></span>
-                                                    Pickup from North Shore Steel
-                                                </label>
-                                            </div>
-                                        }
-
+                                        </div>
+                                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
                                     </div>
-                                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
                                 </div>
-                            </div>
-                        }
-                        <div class="totals col-md-7 col-xs-12" style="background: none; padding: 0;">
-                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
-                            @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.IsEditable })
-                            @if (Model.IsEditable)
-                            {
-                                if (!string.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
-                                {
-                                    <div class="min-amount-warning">
-                                        @Model.MinOrderSubtotalWarning
-                                    </div>
-                                }
                             }
-                            @if (Model.IsEditable)
-                            {
-                                if (Model.TermsOfServiceOnShoppingCartPage)
+                            <div class="totals col-sm-12 col-md-offset-1 col-md-6 col-lg-offset-2 col-lg-6 mx-0" style="background: none; padding: 0;">
+                                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
+                                @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.IsEditable })
+                                @if (Model.IsEditable)
                                 {
-                                    <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
-                                        <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
-                                    </div>
-                                    <div class="terms-of-service" style="display: flex;align-items: center;">
+                                    if (!string.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
+                                    {
+                                        <div class="min-amount-warning">
+                                            @Model.MinOrderSubtotalWarning
+                                        </div>
+                                    }
+                                }
+                                @if (Model.IsEditable)
+                                {
+                                    if (Model.TermsOfServiceOnShoppingCartPage)
+                                    {
+                                        <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
+                                            <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
+                                        </div>
+                                        <div class="terms-of-service" style="display: flex;align-items: center;">
 
-                                        <label class="pure-material-checkbox" style=" display: unset;">
-                                            <input id="termsofservice" type="checkbox" name="termsofservice" />
-                                            <span class="checkmark"></span>@T("Checkout.TermsOfService.IAccept")
+                                            <label class="pure-material-checkbox" style=" display: unset;">
+                                                <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                                <span class="checkmark"></span>@T("Checkout.TermsOfService.IAccept")
 
-                                            @if (Model.TermsOfServicePopup)
-                                            {
-                                                <a class="read" id="read-terms" style="margin-left: 5px !important;">@T("Checkout.TermsOfService.Read")</a>
-                                                <script asp-location="Footer">
+                                                @if (Model.TermsOfServicePopup)
+                                                {
+                                                    <a class="read" id="read-terms" style="margin-left: 5px !important;">@T("Checkout.TermsOfService.Read")</a>
+                                                    <script asp-location="Footer">
                                         $(document).ready(function() {
                                             $('#read-terms').on('click',
                                                 function(e) {
@@ -471,175 +456,66 @@ Content1 =
                                                         '@T("Checkout.TermsOfService")');
                                                 });
                                         });
-                                                </script>
+                                                    </script>
+                                                }
+                                                else
+                                                {
+                                                    <a class="read" id="read-terms" href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("conditionsofuse") })">@T("Checkout.TermsOfService.Read")</a>
+                                                }
+                                            </label>
+                                        </div>
+                                    }
+                                    <div class="checkout-buttons">
+                                        @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
+                                        {
+                                            <script asp-location="Footer">
+                                                $(document).ready(function () {
+                                                    $('#checkout').on('click', function () {
+                                                        //terms of service
+                                                        var termOfServiceOk = true;
+                                                        if ($('#termsofservice').length > 0) {
+                                                            //terms of service element exists
+                                                            if (!$('#termsofservice').is(':checked')) {
+                                                                $("#terms-of-service-warning-box").dialog();
+                                                                termOfServiceOk = false;
+                                                            } else {
+                                                                termOfServiceOk = true;
+                                                            }
+                                                        }
+                                                        return termOfServiceOk;
+                                                    });
+                                                });
+                                            </script>
+                                            if (orderSettings.CheckoutDisabled)
+                                            {
+                                                <div class="checkout-disabled">
+                                                    @T("Checkout.Disabled")
+                                                </div>
                                             }
                                             else
                                             {
-                                                <a class="read" id="read-terms" href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("conditionsofuse") })">@T("Checkout.TermsOfService.Read")</a>
+                                                <button type="submit" id="checkout" name="checkout" value="checkout" class="button-1 checkout-button">
+                                                    PROCEED TO CHECKOUT
+                                                </button>
                                             }
-                                        </label>
+                                        }
+                                    </div>
+                                    <div class="addon-buttons">
+                                        @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
+                                        @foreach (var pm in Model.ButtonPaymentMethodViewComponentNames)
+                                        {
+                                            @await Component.InvokeAsync(pm)
+                                        }
                                     </div>
                                 }
-                                <div class="checkout-buttons">
-                                    @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
-                                    {
-                                        <script asp-location="Footer">
-                                            $(document).ready(function () {
-                                                $('#checkout').on('click', function () {
-                                                    //terms of service
-                                                    var termOfServiceOk = true;
-                                                    if ($('#termsofservice').length > 0) {
-                                                        //terms of service element exists
-                                                        if (!$('#termsofservice').is(':checked')) {
-                                                            $("#terms-of-service-warning-box").dialog();
-                                                            termOfServiceOk = false;
-                                                        } else {
-                                                            termOfServiceOk = true;
-                                                        }
-                                                    }
-                                                    return termOfServiceOk;
-                                                });
-                                            });
-                                        </script>
-                                        if (orderSettings.CheckoutDisabled)
-                                        {
-                                            <div class="checkout-disabled">
-                                                @T("Checkout.Disabled")
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <button type="submit" id="checkout" name="checkout" value="checkout" class="button-1 checkout-button">
-                                                PROCEED TO CHECKOUT
-                                            </button>
-                                        }
-                                    }
-                                </div>
-                                <div class="addon-buttons">
-                                    @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
-                                    @foreach (var pm in Model.ButtonPaymentMethodViewComponentNames)
-                                    {
-                                        @await Component.InvokeAsync(pm)
-                                    }
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    @if (Model.IsEditable)
-                    {
-                        @await Component.InvokeAsync("CrossSellProducts")
-                    }
-                </div>
-
-                <div class="d-md-none">
-                    <div class="d-flex flex-column">
-                        <div v-if="isEditable" class="d-flex flex-row bg-accent justify-content-around mb-3 p-3">
-                            <button type="submit" class="nss-btn-white" name="continueshopping">
-                                <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="">
-                                Keep Shopping
-                            </button>
-                            <button type="submit" class="nss-btn-white" name="updatecart">
-                                <img class="mr-1" src="Themes/SwiftPortal/Content/assets/icn-refresh-dark-blue.svg" width="24" height="24" alt="">
-                                Update Cart
-                            </button>
-                        </div>
-
-                        <div class="d-flex flex-row bg-accent p-3 mb-3">
-                            <div class="d-flex flex-column mr-2 w-50">
-                                <label class="fs12-default-500 mb-2">Purchase Order #</label>
-                                <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
-                                       v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
-                            </div>
-                            <div class="d-flex flex-column ml-2 w-50">
-                                <label class="fs12-default-500 mb-2">Estimated Delivery Date</label>
-                                <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
                             </div>
                         </div>
-
-                        <div class="d-flex flex-column bg-accent p-3 mb-3" v-for="item in items">
-                            <div class="d-flex flex-row justify-content-between align-items-center">
-                                <label class="fs12-primary-500">Item: {{ item.iNo }}</label>
-                                <label class="pure-material-checkbox">
-                                    Remove
-                                    <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
-                                           v-bind:value="item.id" style="position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
-                            <label class="h5-default-500">Weight: {{ item.weightValue }}</label>
-                            <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
-
-                            <div class="d-flex flex-row justify-content-between align-items-center">
-                                <label class="h5-default-500">Quantity</label>
-                                <input class="cart-qty-input" type="text" v-bind:name="'itemquantity' + item.ProductId" v-bind:id="'itemquantity-' + item.id"
-                                       v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'" aria-label="@T("ShoppingCart.Quantity")"
-                                       min="1" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null"
-                                       v-on:change="calculateItemTotalPrice(item)" />
-                            </div>
-                            <div class="d-flex flex-row justify-content-between align-items-center my-2">
-                                <label class="h5-default-500">Unit Price</label>
-                                <div class="d-flex flex-row align-items-center">
-                                    <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">{{ item.unitPrice }} / </label>
-                                    <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
-                                            v-on:change="toggleUnitPrice(item)" class="cart-price-select">
-                                        <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
-                                                attribute.name === 'FT' && item.pricePerFt"
-                                                v-for="attribute in item.purchaseUnitAttr.values"
-                                                v-bind:selected="attribute.isPreSelected" v-bind:value="attribute.id">
-                                            {{ attribute.name }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-row justify-content-between align-items-center my-2">
-                                <label class="h5-default-500">Total Price</label>
-                                <label class="h2-primary">{{ item.subTotal }}</label>
-                            </div>
+                        @if (Model.IsEditable)
+                        {
+                            @await Component.InvokeAsync("CrossSellProducts")
                         }
-                        <div class="checkout-buttons">
-                            @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
-                            {
-                                <script asp-location="Footer">
-                                    $(document).ready(function () {
-                                        $('#checkout').on('click', function () {
-                                            //terms of service
-                                            var termOfServiceOk = true;
-                                            if ($('#termsofservice').length > 0) {
-                                                //terms of service element exists
-                                                if (!$('#termsofservice').is(':checked')) {
-                                                    //$("#terms-of-service-warning-box").dialog();
-                                                    handleAcceptTOSModal();
-                                                    termOfServiceOk = false;
-                                                } else {
-                                                    termOfServiceOk = true;
-                                                }
-                                            }
-                                            return termOfServiceOk;
-                                        });
-                                    });
-                                </script>
-                                if (orderSettings.CheckoutDisabled)
-                                {
-                                    <div class="checkout-disabled">
-                                        @T("Checkout.Disabled")
-                                    </div>
-                                }
-                                else
-                                {
-                                    <input type="submit" id="checkout" name="checkout" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset" ; />
-                                }
-                            }
-                        </div>
-
-                        <div class="d-flex flex-column bg-accent p-3">
-                            @await Html.PartialAsync("_DiscountBox", Model.DiscountBox)
-                        </div>
-
-                        <img src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%">
                     </div>
                 </div>
-
             </form>
         }
         else
@@ -815,8 +691,7 @@ Content1 =
     var pageModel = @Html.Raw(Serialize(Model));
     var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));
 
-    console.log("purchasechkattr: ", purchasechkattr);
-    console.log("items: ", items);
+    console.log("warnings: ", items.map(x => x.warnings));
 
     new Vue({
         el: '#cart-section',
@@ -825,30 +700,41 @@ Content1 =
             pageModel,
             isEditable: pageModel.isEditable,
             purchasechkattr,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
         },
         mounted: function () {
             this.items.forEach(item => {
-                item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr);
-                console.log("item item.purchaseUnitAttr: ", item.purchaseUnitAttr.values);
+                item.warnings = JSON.parse(item.warnings);
+                item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr)
             });
         },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
         methods: {
-            handleNotesModal: function (item) {
-                var controlId = `@NopCatalogDefaults.ProductAttributePrefix${item.noteAttr.id}${item.id}`;
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            handleNotesModal: function ({ controlId }) {
                 $("#productNote").val($(`#${controlId}`).val());
                 viewNotesModal.show();
             },
-            toJson: function (data) {
-                return JSON.parse(data);
-            },
-            toggleUnitPrice: function ({ unitControlId, id, pricePerCWT, pricePerPiece, pricePerFt }) {
-                toggleUnitPrice(null, unitControlId, id, pricePerCWT ? pricePerCWT : "", pricePerPiece ? pricePerPiece : "", pricePerFt ? pricePerFt : "");
-            },
-            arrayToList: function (arr) {
-                return arr.reduceRight((rest, value) => ({ value, rest }), null);
-            },
-            calculateItemTotalPrice: function ({ unitControlId, id }) {
-                var qty = parseInt(document.getElementById('itemquantity' + id).value, 10);
+            toggleUnitPrice: function (item) {
+                const { unitControlId, id, pricePerCWT, pricePerPiece, pricePerFt } = item;
+
                 var itemUnit;
                 if (unitControlId == null) {
                     itemUnit = document.getElementById('itemunit' + id).value;
@@ -858,26 +744,61 @@ Content1 =
                     itemUnit = el.options[el.selectedIndex].text;
                 }
 
-                var unitPrice = parseFloat(document.getElementById('itemunitprice' + id).innerHTML.replace(/\$/g, ''));
-                var length = parseFloat(document.getElementById('itemlength' + id).innerHTML);
-                var weight = parseFloat(document.getElementById('itemweight' + id).innerHTML);
-                var subtotal = document.getElementById('itemsubtotal' + id);
-                var totalPrice = 0.00;
+                var unitPriceCtrl = this.isMobile ? item.unitPrice : document.getElementById('itemunitprice' + id);
+                var unitPrice = 0.00;
+                switch (itemUnit) {
+                    case "EA":
+                        unitPrice = Number(pricePerPiece ? pricePerPiece : '').toFixed(2);
+                        break;
+                    case "FT":
+                        unitPrice = Number(pricePerFt ? pricePerFt : '').toFixed(2);
+                        break;
+                    case "CWT":
+                        unitPrice = Number(pricePerCWT ? pricePerCWT : '').toFixed(2);
+                        break;
+                    default:
+                        break;
+                }
+                unitPriceCtrl.innerHTML = `$${unitPrice}`;
+
+                this.calculateItemTotalPrice(item);
+            },
+            arrayToList: function (arr) {
+                return arr.reduceRight((rest, value) => ({ value, rest }), null);
+            },
+            calculateItemTotalPrice: function ({ unitControlId, id, length, weight, quantity }) {
+                let qty = this.isMobile ? quantity : parseInt(document.getElementById('itemquantity' + id).value, 10);
+                let itemUnit;
+                if (unitControlId == null) {
+                    itemUnit = document.getElementById('itemunit' + id).value;
+                }
+                else {
+                    const el = document.getElementById(unitControlId);
+                    itemUnit = el.options[el.selectedIndex].text;
+                }
+
+                const unitPrice = parseFloat(document.getElementById('itemunitprice' + id).innerHTML.replace(/\$/g, ''));
+                const _length = this.isMobile ? length : parseFloat(document.getElementById('itemlength' + id).innerHTML);
+                const _weight = this.isMobile ? weight : parseFloat(document.getElementById('itemweight' + id).innerHTML);
+                let totalPrice = 0.0;
 
                 switch (itemUnit) {
                     case 'FT':
-                        totalPrice = evenRound(qty * length) * unitPrice;
+                        totalPrice = evenRound(qty * _length) * unitPrice;
                         break;
                     case 'CWT':
-                        totalPrice = (evenRound(weight * qty) / 100) * unitPrice;
+                        totalPrice = (evenRound(_weight * qty) / 100) * unitPrice;
                         break;
                     case 'EA':
                     default:
                         totalPrice = qty * unitPrice;
                         break;
                 }
-
-                subtotal.innerHTML = `$${totalPrice.toFixed(2)}`;
+                this.items.forEach(item => {
+                    if (item.id === id) {
+                        item.subTotal = `$${totalPrice.toFixed(2)}`;
+                    }
+                });
             }
         },
     });
@@ -910,7 +831,7 @@ Content1 =
         viewNotesModal.hide();
     });
 
-    function calculateItemTotalPrice(attrId, itemId, weight, length) {
+    function calculateItemTotalPrice(attrId, itemId) {
         var qty = parseInt(document.getElementById('itemquantity' + itemId).value, 10);
         var itemUnit;
         if (attrId == null) {
@@ -922,21 +843,17 @@ Content1 =
         }
 
         var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).innerHTML.replace(/\$/g, ''));
-
-        //var lengthCol = document.getElementById('itemlength' + itemId);
-        var weightCol = document.getElementById('itemweight' + itemId);
-        var subtotalCol = document.getElementById('itemsubtotal' + itemId);
-
+        var length = parseFloat(document.getElementById('itemlength' + itemId).innerHTML);
+        var weight = parseFloat(document.getElementById('itemweight' + itemId).innerHTML);
+        var subtotal = document.getElementById('itemsubtotal' + itemId);
         var totalPrice = 0.00;
-        var totalLength = evenRound(qty * length);
-        var totalWeight = evenRound(weight * qty);
 
         switch (itemUnit) {
             case 'FT':
-                totalPrice = totalLength * unitPrice;
+                totalPrice = evenRound(qty * length) * unitPrice;
                 break;
             case 'CWT':
-                totalPrice = (totalWeight / 100) * unitPrice;
+                totalPrice = (evenRound(weight * qty) / 100) * unitPrice;
                 break;
             case 'EA':
             default:
@@ -944,13 +861,10 @@ Content1 =
                 break;
         }
 
-        subtotalCol.innerHTML = `$${totalPrice.toFixed(2)}`;
-        weightCol.innerHTML = totalWeight;
-        console.log('lengthFT', length);
-        //lengthCol.innerHTML = totalLength;
+        subtotal.innerHTML = `$${totalPrice.toFixed(2)}`;
     }
 
-    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice, weight, length) {
+    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice) {
 
         var itemUnit;
         if (attrId == null) {
@@ -980,7 +894,7 @@ Content1 =
 
         unitPriceCtrl.innerHTML = `$${unitPrice}`;
 
-        calculateItemTotalPrice(attrId, itemId, weight, length);
+        calculateItemTotalPrice(attrId, itemId);
     }
 
     function evenRound(num, decimalPlaces) {

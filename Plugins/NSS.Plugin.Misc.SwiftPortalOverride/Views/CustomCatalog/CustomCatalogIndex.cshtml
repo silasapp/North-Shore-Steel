@@ -85,10 +85,10 @@
             </div>
             <div class="col-lg-12 col-xl-9">
                 <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
-                    <label class="h5-default-normal mb-1 mr-3">Applied Filters:</label>
+                    <label class="h5-default-normal mb-2 mr-3">Applied Filters:</label>
                     <div v-for="(tag, i) in filterTags" class="d-flex flex-row mb-2" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
                         <span class="filter-tag">
-                            {{ tag.text }}
+                            {{ tag.type === 'query' ? `"${tag.text}"` : tag.text }}
                             <button v-on:click='removeFilter(tag)'>
                                 <img alt="close icon" src="Themes/SwiftPortal/Content/assets/close-filled.svg" width="15" height="15" />
                             </button>
@@ -225,6 +225,16 @@
         mounted: function () {
             this.getFilteredProduuts();
             this.buildDialog();
+
+            let query = getUrlParameter('q');
+            if (query) {
+                const tag = {
+                    id: query,
+                    text: query,
+                    type: 'query',
+                };
+                this.filterTags = [tag];
+            }
 
             ej.base.enableRipple(false);
 
@@ -380,6 +390,10 @@
                     this.toggleShape(shapeData);
                 } else if (type === 'spec') {
                     this.toggleSpec(data);
+                } else if (type === 'query') {
+                    this.filterTags = this.filterTags.filter(x => x.type !== 'query');
+                    window.history.pushState({}, document.title, window.location.pathname);
+                    this.getFilteredProduuts();
                 }
             },
             clearFilters: function () {

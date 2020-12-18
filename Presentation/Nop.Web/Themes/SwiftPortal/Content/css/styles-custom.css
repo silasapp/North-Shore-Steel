@@ -1416,10 +1416,6 @@ table input {
         font-family: "Exo 2";
     }
 
-        .filter-tag > button:hover {
-            transform: translate(7px, 3px) scale(1.5);
-        }
-
 .filter-tags {
     display: flex;
     align-items: baseline;
@@ -1597,15 +1593,17 @@ table input {
 
 .order-total > .cart-total-left {
     text-align: left;
-    font: normal normal 500 26px/24px "Teko" !important;
+    font: normal normal 600 26px/24px "Teko" !important;
     letter-spacing: 0.21px;
     color: #03175b !important;
     opacity: 1 !important;
+    text-transform: uppercase;
+    margin-top: .75rem;
 }
 
 .order-total > .cart-total-right {
     text-align: right;
-    font: normal normal 500 26px/24px "Teko" !important;
+    font: normal normal 600 26px/24px "Teko" !important;
     letter-spacing: 0.21px;
     color: #03175b !important;
     opacity: 1 !important;
@@ -2954,6 +2952,14 @@ table input {
 @media (min-width: 768px) {
     .bg-md-transparent {
         background-color: transparent !important;
+    }
+
+    .bg-md-white {
+        background: #FFFFFF !important;
+    }
+
+    .w-md-100 {
+        width: 100% !important;
     }
 }
 

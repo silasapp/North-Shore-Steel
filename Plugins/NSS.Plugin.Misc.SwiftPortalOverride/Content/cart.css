@@ -244,14 +244,14 @@ input:active {
         margin-bottom: 0px;
     }
 
-    .pure-material-checkbox {
+    .cart-item .pure-material-checkbox {
         padding-right: 22px;
         padding-left: 0px !important;
         font: normal normal 500 12px/16px "Exo 2" !important;
         color: #2F2F2F;
     }
 
-        .pure-material-checkbox .checkmark {
+        .cart-item .pure-material-checkbox .checkmark {
             background-color: #F6F6F6 !important;
             border: 2px solid #DEDEDE !important;
             height: 20px !important;
@@ -260,7 +260,7 @@ input:active {
             right: 0;
         }
 
-        .pure-material-checkbox input:checked ~ .checkmark {
+        .cart-item .pure-material-checkbox input:checked ~ .checkmark {
             background-color: #0076b4 !important;
             border-color: transparent !important;
         }
@@ -303,10 +303,20 @@ input:active {
         margin-left: 0px !important;
     }
 
+    .cart-footer {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+        .cart-footer .cart-collaterals {
+            margin: 0px !important;
+            width: 100% !important;
+        }
+
     .coupon-box {
         margin: 0px;
-        padding: 0px !important;
-        background: transparent;
+        background: #F6F6F6;
+        padding: 1rem !important;
     }
 
         .coupon-box .apply-discount-coupon-code-button {
@@ -326,7 +336,8 @@ input:active {
             margin-bottom: 1rem !important;
         }
 
-        .coupon-box .discount-coupon-code {
+        .coupon-box .discount-coupon-code,
+        .coupon-box .gift-card-coupon-code {
             background: #FFFFFF 0% 0% no-repeat padding-box;
             box-shadow: 0px 1px 4px #00000029;
             border: 0.5px solid #DEDEDE;
@@ -342,6 +353,109 @@ input:active {
                 font-style: italic !important;
                 color: red !important;
             }
+
+    .cart-collaterals .deals > div {
+        margin: 0 0 1rem;
+    }
+
+    .cart-collaterals > div {
+        margin-bottom: 0px;
+    }
+
+    .cart-footer .pickup-options {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        background-color: #F6F6F6;
+        padding: 1rem;
+        align-items: center;
+    }
+
+    .pickup-options > div > label {
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 0.5rem 2rem .5rem 0rem;
+    }
+
+    .pickup-options .radio-button {
+        padding-left: 1.7rem;
+    }
+
+    .pickup-options .rad-checkmark {
+        background-color: transparent;
+        border: 3px solid #AAAAAA;
+    }
+
+    .pickup-options .radio-button input:checked ~ .rad-checkmark {
+        background-color: #0076b4;
+        border: none;
+    }
+
+    .radio-button .rad-checkmark:after {
+        top: 2.5px;
+        left: 2.5px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #0076b4;
+        border: 3px solid #F6F6F6;
+    }
+
+    .cart-footer .totals {
+        width: 100%;
+        background-color: #F6F6F6 !important;
+        padding: 1rem !important;
+        margin-bottom: 0px;
+    }
+
+    .cart-footer .total-info {
+        padding: 0px !important;
+    }
+
+    .terms-of-service {
+        margin-bottom: .5rem;
+    }
+
+        .terms-of-service .pure-material-checkbox {
+            padding-left: 28px;
+        }
+
+            .terms-of-service .pure-material-checkbox .checkmark {
+                background-color: #F6F6F6 !important;
+                border: 2px solid #DEDEDE !important;
+                height: 20px !important;
+                width: 20px !important;
+            }
+
+            .terms-of-service .pure-material-checkbox input:checked ~ .checkmark {
+                background-color: #0076b4 !important;
+                border-color: transparent !important;
+            }
+
+    .cart-footer .addon-buttons {
+        margin: 0px;
+    }
+
+    .cart-footer .checkout-buttons {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        box-shadow: 0 0 15px rgba(0,0,0,.2);
+        font-size: 0;
+        z-index: 1000;
+        background: white;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .cart-footer .checkout-button {
+        padding: .5rem 1rem;
+        font: normal normal 500 16px/24px 'Exo 2';
+        color: #FFF;
+        text-transform: uppercase;
+    }
 }
 
 /*// Medium devices (tablets, less than 992px)*/
