@@ -95,7 +95,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 var existingProduct = _productApiService.GetProductById(attr.EntityId);
 
                 if (existingProduct != null)
-                    return Error(HttpStatusCode.BadRequest, "product", "duplicate product");
+                    return UpdateErpProduct(erpProductDelta, existingProduct);
             }
 
             // check if shapes exist and if required attributes have value
@@ -110,10 +110,22 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             foreach (var attribute in (shape.Parent == null ? shape.Atttributes : shape.Parent.Atttributes))
             {
                 if (!requestData.TryGetValue(attribute.Sort, out var value))
+                {
                     ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
+                }
                 else
-                    if (string.IsNullOrWhiteSpace(value?.ToString()))
-                    ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
+                {
+                    if (attribute.Sort?.ToLower() == "millname" || attribute.Sort?.ToLower() == "countryoforigin")
+                    {
+                        if (value == null)
+                            ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(value?.ToString()))
+                            ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
+                    }
+                }     
             }
 
             // serialized product field check
@@ -249,7 +261,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 return Error();
             }
-            CustomerActivityService.InsertActivity("APIService", "Starting Product Update", null);
 
             var product = new Product();
 
@@ -263,6 +274,13 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 return Error(HttpStatusCode.NotFound, "product", "not found");
             }
+
+            return UpdateErpProduct(erpProductDelta, product);
+        }
+
+        private IActionResult UpdateErpProduct(Delta<ErpProductDto> erpProductDelta, Product product)
+        {
+            CustomerActivityService.InsertActivity("APIService", "Starting Product Update", null);
 
             var request = (Dictionary<string, object>)erpProductDelta.ObjectPropertyNameValuePairs.FirstOrDefault().Value;
 

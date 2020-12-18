@@ -165,6 +165,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     };
 
                     _companyService.InsertCompany(company);
+
+                    CustomerActivityService.InsertActivity("APIService", LocalizationService.GetResource("ActivityLog.AddNewCompany"), company);
                 }
 
                 var customerCompany = _customerCompanyService.GetCustomerCompany(customer.Id, company.Id);
@@ -181,12 +183,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     };
 
                     _customerCompanyService.InsertCustomerCompany(customerCompany);
+                    CustomerActivityService.InsertActivity("APIService", LocalizationService.GetResource("ActivityLog.AddNewCustomerCompany"), customerCompany);
                 }
             }
 
             // send email
             _workFlowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
 
+            CustomerActivityService.InsertActivity("APIService", LocalizationService.GetResource("ActivityLog.AddNewCustomer"), customer);
 
             var userDto = GetUserDto(customer);
 
@@ -241,6 +245,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             currentCustomer.Active = userDelta.Dto.Active ?? currentCustomer.Active;
 
             _customerService.UpdateCustomer(currentCustomer);
+
+            CustomerActivityService.InsertActivity("APIService", LocalizationService.GetResource("ActivityLog.UpdateCustomer"), currentCustomer);
 
             return NoContent();
         }

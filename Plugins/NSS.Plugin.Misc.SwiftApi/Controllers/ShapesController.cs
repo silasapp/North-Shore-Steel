@@ -118,7 +118,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
 
             // create checkout attribute
-            if (!_checkoutAttributeService.GetAllCheckoutAttributes().Any(x => x.Name == "Purchase Order #"))
+            if (!_checkoutAttributeService.GetAllCheckoutAttributes().Any(x => x.Name == Constants.CheckoutPONoAttribute))
             {
                 var checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.TextBox, Name = Constants.CheckoutPONoAttribute };
                 _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
