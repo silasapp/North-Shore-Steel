@@ -355,18 +355,18 @@
             <tbody>
                 @foreach (var item in Model.OrderItems)
                 {
-                    <tr>
-                        <td class="sku">@item.LineNo</td>
-                        <td class="product">@item.Description</td>
-                        <td>@item.CustomerPartNo</td>
-                        <td>$@DoFormat(item.UnitPrice)</td>
-                        <td>$@DoFormat(item.TotalPrice)</td>
-                        <td>@DoFormat(item.TotalWeight)</td>
-                        <td>@Model.PoNo</td>
-                        <td class="text-center">@item.Quantity</td>
-                        <td class="text-center">@item.UOM</td>
-                        <td></td>
-                    </tr>
+                <tr>
+                    <td class="sku">@item.LineNo</td>
+                    <td class="product">@item.Description</td>
+                    <td>@item.CustomerPartNo</td>
+                    <td>$@DoFormat(item.UnitPrice)</td>
+                    <td>$@DoFormat(item.TotalPrice)</td>
+                    <td>@string.Format("{0:N0}", item.TotalWeight)</td>
+                    <td>@Model.PoNo</td>
+                    <td class="text-center">@item.Quantity</td>
+                    <td class="text-center">@item.UOM</td>
+                    <td></td>
+                </tr>
                 }
             </tbody>
         </table>
@@ -379,7 +379,7 @@
                         <label class="mb-0">@T("Order.SubTotal"):</label>
                     </td>
                     <td class="cart-total-right">
-                        <span>@DoFormat(Model.LineItemTotal)</span>
+                        <span>$@DoFormat(Model.LineItemTotal)</span>
                     </td>
                 </tr>
                 <tr>
@@ -387,7 +387,7 @@
                         <label>@T("Order.Tax"):</label>
                     </td>
                     <td class="cart-total-right">
-                        <span>@Model.TaxTotal</span>
+                        <span>$@DoFormat(Model.TaxTotal)</span>
                     </td>
                 </tr>
                 <tr>
