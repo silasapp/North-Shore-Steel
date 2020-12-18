@@ -126,7 +126,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.RadioList, IsRequired = true, Name = Constants.CheckoutDeliveryOptionAttribute };
                 _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
 
-                _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Ship to Customer", DisplayOrder = 1, IsPreSelected = true });
+                _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Ship to Me", DisplayOrder = 1, IsPreSelected = true });
                 _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Pickup from North Shore Steel", DisplayOrder = 2 });
             }
 
