@@ -31,6 +31,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string InvoiceFile { get; set; }
         public int MtrCount { get; set; }
 
+        public bool CanBuy { get; set; }
+
         public AddressModel ShippingAddress { get; set; }
         public AddressModel BillingAddress { get; set; }
         public AddressModel PickupAddress { get; set; }

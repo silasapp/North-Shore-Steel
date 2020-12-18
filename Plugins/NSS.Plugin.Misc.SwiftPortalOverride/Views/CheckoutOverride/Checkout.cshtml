@@ -81,7 +81,7 @@
     var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
     var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
     var shippingMethodsSelected = checkoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option")?.Values;
-    var isDelivery = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Ship to Customer")?.IsPreSelected ?? false;
+    var isDelivery = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Ship to Me")?.IsPreSelected ?? false;
     var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
 }
 
@@ -517,7 +517,7 @@
 @functions{
     string DoFormat(double myNumber)
     {
-        var s = string.Format("{0:N2}", myNumber);
+        var s = string.Format("{0:N0}", myNumber);
 
         return s;
     }
