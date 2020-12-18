@@ -1416,9 +1416,9 @@ table input {
         font-family: "Exo 2";
     }
 
-        .filter-tag > button:hover {
+        /*.filter-tag > button:hover {
             transform: translate(7px, 3px) scale(1.5);
-        }
+        }*/
 
 .filter-tags {
     display: flex;
