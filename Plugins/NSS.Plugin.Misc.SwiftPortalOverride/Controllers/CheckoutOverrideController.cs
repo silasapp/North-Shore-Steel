@@ -818,7 +818,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 var discount = _discountService.GetDiscountById(item.DiscountId);
                 if (discount != null)
-                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderTotal), 2), Code = discount.CouponCode, Description = discount.Name });
+                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderTotal), 2), Code = discount.CouponCode ?? discount.Name?.Replace("'", "''") ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
             }
 
             // order items
@@ -838,10 +838,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 {
                     if (mapping != null)
                     {
-                        var noteAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.WorkOrderInstructionsAttribute);
-                        var sawOptionAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CutOptionsAttribute);
-                        var sawToleranceAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.LengthToleranceCutAttribute);
-                        var uomAttr = attrs.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.PurchaseUnitAttribute);
+                        var noteAttr = attrs.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
+                        var sawOptionAttr = attrs.FirstOrDefault(x => x.Name == Constants.CutOptionsAttribute);
+                        var sawToleranceAttr = attrs.FirstOrDefault(x => x.Name == Constants.LengthToleranceCutAttribute);
+                        var uomAttr = attrs.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
 
                         if (mapping.ProductAttributeId == noteAttr?.Id)
                         {
@@ -864,18 +864,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 orderItems.Add(new DTOs.Requests.OrderItem
                 {
-                    Description = genAttrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
+                    Description = genAttrs.FirstOrDefault(x => x.Key == "itemName")?.Value?.Replace("'", "''"),
                     ItemId = (int.TryParse(genAttrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
-                    CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? null) : null,
+                    CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? string.Empty) : string.Empty,
                     Quantity = item.Quantity,
                     TotalPrice = Math.Round(item.PriceExclTax, 2),
                     UnitPrice = Math.Round(item.UnitPriceExclTax, 2),
                     TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int) Math.Round(weight * item.Quantity) : 0),
                     // product attr
-                    Notes = notes,
-                    SawOptions = sawoptions,
-                    SawTolerance = sawTolerance,
-                    Uom = uom
+                    Notes = notes ?? string.Empty,
+                    SawOptions = sawoptions ?? string.Empty,
+                    SawTolerance = sawTolerance ?? string.Empty,
+                    Uom = uom ?? string.Empty
                 });
             }
 
