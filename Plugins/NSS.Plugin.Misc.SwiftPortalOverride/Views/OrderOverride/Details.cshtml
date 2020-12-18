@@ -46,10 +46,13 @@
         <label class="h3-primary-sans my-3">ORDER NUMBER: @Model.OrderId</label>
         @if (Model.SysOrderId != null)
         {
-            <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')">
-                <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
-                Order Again
-            </div>
+            @if (Model.CanBuy)
+            {
+                <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')">
+                    <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
+                    Order Again
+                </div>
+            }
         }
 
     </div>
@@ -355,18 +358,18 @@
             <tbody>
                 @foreach (var item in Model.OrderItems)
                 {
-                <tr>
-                    <td class="sku">@item.LineNo</td>
-                    <td class="product">@item.Description</td>
-                    <td>@item.CustomerPartNo</td>
-                    <td>$@DoFormat(item.UnitPrice)</td>
-                    <td>$@DoFormat(item.TotalPrice)</td>
-                    <td>@string.Format("{0:N0}", item.TotalWeight)</td>
-                    <td>@Model.PoNo</td>
-                    <td class="text-center">@item.Quantity</td>
-                    <td class="text-center">@item.UOM</td>
-                    <td></td>
-                </tr>
+                    <tr>
+                        <td class="sku">@item.LineNo</td>
+                        <td class="product">@item.Description</td>
+                        <td>@item.CustomerPartNo</td>
+                        <td>$@DoFormat(item.UnitPrice)</td>
+                        <td>$@DoFormat(item.TotalPrice)</td>
+                        <td>@string.Format("{0:N0}", item.TotalWeight)</td>
+                        <td>@Model.PoNo</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-center">@item.UOM</td>
+                        <td></td>
+                    </tr>
                 }
             </tbody>
         </table>
