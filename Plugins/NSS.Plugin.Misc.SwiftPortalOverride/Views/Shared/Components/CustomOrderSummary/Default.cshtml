@@ -231,7 +231,7 @@ Content1 =
                                            v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
                                 </div>
                                 <div class="d-flex flex-column ml-2 w-50 w-md-100">
-                                    <label class="fs12-default-500 mb-2">Estimated Delivery Date</label>
+                                    <label class="fs12-default-500 mb-2">Promise Date</label>
                                     <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
                                 </div>
                             </div>
@@ -248,7 +248,6 @@ Content1 =
                                         <th scope="col" width="12%">Unit Price</th>
                                         <th scope="col" width="9%">Total Price</th>
                                         <th scope="col" width="9%">Weight (lb)</th>
-                                        <th scope="col" width="9%">Length (ft)</th>
                                         <th scope="col" width="8%" class="text-center">Qty.</th>
                                         <th scope="col" width="5%" class="text-center">Notes</th>
                                         <th scope="col" width="5%" class="text-center">Remove</th>
@@ -284,7 +283,6 @@ Content1 =
                                         </td>
                                         <td class="pt-3" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
                                         <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ item.weight }}</label></td>
-                                        <td class="pt-3"><label v-bind:id="'itemlength' + item.id" style="margin:0;">{{ item.length }}</label></td>
                                         <td class="text-center">
                                             <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
                                                    style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
@@ -358,7 +356,7 @@ Content1 =
                                 </div>
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Total Price</label>
-                                    <label class="h2-primary">{{ item.subTotal }}</label>
+                                    <label class="h2-primary" v-bind:id="'itemsubtotal' + item.id">{{ item.subTotal }}</label>
                                 </div>
                             </div>
                         </div>
@@ -748,8 +746,7 @@ Content1 =
                     var el = document.getElementById(unitControlId);
                     itemUnit = el.options[el.selectedIndex].text;
                 }
-
-                var unitPriceCtrl = this.isMobile ? item.unitPrice : document.getElementById('itemunitprice' + id);
+                var unitPriceCtrl = document.getElementById('itemunitprice' + id);
                 var unitPrice = 0.00;
                 switch (itemUnit) {
                     case "EA":
@@ -764,41 +761,48 @@ Content1 =
                     default:
                         break;
                 }
-                unitPriceCtrl.innerHTML = `$${unitPrice}`;
-
+                //unitPriceCtrl.innerHTML = `$${unitPrice}`;
+                this.items.forEach(item => {
+                    if (item.id === id) {
+                        item.unitPrice = `$${unitPrice}`;
+                    }
+                });
                 this.calculateItemTotalPrice(item);
             },
             arrayToList: function (arr) {
                 return arr.reduceRight((rest, value) => ({ value, rest }), null);
             },
             calculateItemTotalPrice: function ({ unitControlId, id, length, weight, quantity }) {
-                let qty = this.isMobile ? quantity : parseInt(document.getElementById('itemquantity' + id).value, 10);
-                let itemUnit;
-                if (unitControlId == null) {
+                var itemUnit;
+                if (!unitControlId) {
                     itemUnit = document.getElementById('itemunit' + id).value;
                 }
                 else {
-                    const el = document.getElementById(unitControlId);
+                    var el = document.getElementById(unitControlId);
                     itemUnit = el.options[el.selectedIndex].text;
                 }
-
-                const unitPrice = parseFloat(document.getElementById('itemunitprice' + id).innerHTML.replace(/\$/g, ''));
-                const _length = this.isMobile ? length : parseFloat(document.getElementById('itemlength' + id).innerHTML);
-                const _weight = this.isMobile ? weight : parseFloat(document.getElementById('itemweight' + id).innerHTML);
-                let totalPrice = 0.0;
+                var unitPrice = parseFloat(document.getElementById('itemunitprice' + id).innerHTML.replace(/\$/g, ''));
+                var weightCol = this.isMobile ? weight : document.getElementById('itemweight' + id);
+                var subtotalCol = document.getElementById('itemsubtotal' + id);
+                var totalPrice = 0.00;
+                var totalLength = evenRound(quantity * length);
+                var totalWeight = evenRound(weight * quantity);
 
                 switch (itemUnit) {
                     case 'FT':
-                        totalPrice = evenRound(qty * _length) * unitPrice;
+                        totalPrice = totalLength * unitPrice;
                         break;
                     case 'CWT':
-                        totalPrice = (evenRound(_weight * qty) / 100) * unitPrice;
+                        totalPrice = (totalWeight / 100) * unitPrice;
                         break;
                     case 'EA':
                     default:
-                        totalPrice = qty * unitPrice;
+                        totalPrice = quantity * unitPrice;
                         break;
                 }
+                subtotalCol.innerHTML = `$${totalPrice.toFixed(2)}`;
+                if (this.isMobile)
+                    weightCol.innerHTML = totalWeight;
                 this.items.forEach(item => {
                     if (item.id === id) {
                         item.subTotal = `$${totalPrice.toFixed(2)}`;
@@ -822,7 +826,6 @@ Content1 =
         acceptTOSModal.show();
     }
 
-
     let itemNoteId;
     function handleNotesModal(itemId) {
         itemNoteId = itemId;
@@ -836,7 +839,7 @@ Content1 =
         viewNotesModal.hide();
     });
 
-    function calculateItemTotalPrice(attrId, itemId) {
+    function calculateItemTotalPrice(attrId, itemId, weight, length) {
         var qty = parseInt(document.getElementById('itemquantity' + itemId).value, 10);
         var itemUnit;
         if (attrId == null) {
@@ -846,31 +849,29 @@ Content1 =
             var el = document.getElementById(attrId);
             itemUnit = el.options[el.selectedIndex].text;
         }
-
         var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).innerHTML.replace(/\$/g, ''));
-        var length = parseFloat(document.getElementById('itemlength' + itemId).innerHTML);
-        var weight = parseFloat(document.getElementById('itemweight' + itemId).innerHTML);
-        var subtotal = document.getElementById('itemsubtotal' + itemId);
+        var weightCol = document.getElementById('itemweight' + itemId);
+        var subtotalCol = document.getElementById('itemsubtotal' + itemId);
         var totalPrice = 0.00;
+        var totalLength = evenRound(qty * length);
+        var totalWeight = evenRound(weight * qty);
 
         switch (itemUnit) {
             case 'FT':
-                totalPrice = evenRound(qty * length) * unitPrice;
+                totalPrice = totalLength * unitPrice;
                 break;
             case 'CWT':
-                totalPrice = (evenRound(weight * qty) / 100) * unitPrice;
+                totalPrice = (totalWeight / 100) * unitPrice;
                 break;
             case 'EA':
             default:
                 totalPrice = qty * unitPrice;
                 break;
         }
-
-        subtotal.innerHTML = `$${totalPrice.toFixed(2)}`;
+        subtotalCol.innerHTML = `$${totalPrice.toFixed(2)}`;
+        weightCol.innerHTML = totalWeight;
     }
-
-    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice) {
-
+    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice, weight, length) {
         var itemUnit;
         if (attrId == null) {
             itemUnit = document.getElementById('itemunit' + itemId).value;
@@ -880,7 +881,6 @@ Content1 =
             console.log(el);
             itemUnit = el.options[el.selectedIndex].text;
         }
-
         var unitPriceCtrl = document.getElementById('itemunitprice' + itemId);
         var unitPrice = 0.00;
         switch (itemUnit) {
@@ -896,10 +896,8 @@ Content1 =
             default:
                 break;
         }
-
         unitPriceCtrl.innerHTML = `$${unitPrice}`;
-
-        calculateItemTotalPrice(attrId, itemId);
+        calculateItemTotalPrice(attrId, itemId, weight, length);
     }
 
     function evenRound(num, decimalPlaces) {
