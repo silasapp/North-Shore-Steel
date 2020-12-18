@@ -818,7 +818,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 var discount = _discountService.GetDiscountById(item.DiscountId);
                 if (discount != null)
-                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderTotal), 2), Code = discount.CouponCode ?? discount.Name?.Replace("'", "''") ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
+                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderSubtotalInclTax), 2), Code = discount.CouponCode ?? discount.Name?.Replace("'", "''") ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
             }
 
             // order items
