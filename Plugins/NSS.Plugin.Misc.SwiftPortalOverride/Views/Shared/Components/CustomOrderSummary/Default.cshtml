@@ -63,8 +63,8 @@
         var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
         var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
         double weight = 0.0;
-        var weightValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out weight) ? DoFormat(weight) : "0.00";
-        var lengthValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out double length) ? DoFormat(length) : "0.00";
+        //var weightValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out weight) ? DoFormat(weight) : "0.00";
+        //var lengthValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out double length) ? DoFormat(length) : "0.00";
 
         var customerCompanyProduct = new CustomerCompanyProduct();
         if (customerCompany != null)
@@ -98,8 +98,8 @@
         _cartItem.Add("pricePerFt", pricePerFt);
         _cartItem.Add("pricePerCWT", pricePerCWT);
         _cartItem.Add("pricePerPiece", pricePerPiece);
-        _cartItem.Add("weight", weightValue);
-        _cartItem.Add("length", lengthValue);
+        _cartItem.Add("weight", product.Weight);
+        _cartItem.Add("length", product.Length);
         _cartItem.Add("customerCompanyProduct", Serialize(customerCompanyProduct));
         _cartItem.Add("cartItem", Serialize(cartItem));
         _cartItem.Add("custPartNoAttr", Serialize(custPartNoAttr));
@@ -282,7 +282,7 @@ Content1 =
                                             </div>
                                         </td>
                                         <td class="pt-3" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
-                                        <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ item.weight }}</label></td>
+                                        <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ evenRound(item.weight * item.quantity) }}</label></td>
                                         <td class="text-center">
                                             <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
                                                    style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
@@ -330,7 +330,7 @@ Content1 =
                                     </label>
                                 </div>
                                 <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
-                                <label class="h5-default-500">Weight: {{ item.weightValue }}</label>
+                                <label class="h5-default-500">Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
                                 <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
 
