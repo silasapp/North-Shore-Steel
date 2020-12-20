@@ -1140,7 +1140,7 @@ input:focus {
     }
 
 .hover-icon {
-    fill: #DEDEDE;
+    fill: gray;
     cursor: pointer;
 }
 
