@@ -270,7 +270,7 @@ Content1 =
                                         </td>
                                         <td style="white-space: nowrap;" align="right">
                                             <div>
-                                                <label style="margin:0; margin-right:8px;" v-bind:id="'itemunitprice' + item.id">${{ trimDollar(item.unitPrice) }} /</label>
+                                                <label style="margin:0; margin-right:8px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                         v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                                     <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
@@ -282,7 +282,7 @@ Content1 =
                                             </div>
                                         </td>
                                         <td class="pt-3" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
-                                        <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ evenRound(item.weight * item.quantity) }}</label></td>
+                                        <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
                                         <td class="text-center">
                                             <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
                                                    style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
@@ -343,7 +343,7 @@ Content1 =
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Unit Price</label>
                                     <div class="d-flex flex-row align-items-center">
-                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ trimDollar(item.unitPrice) }} / </label>
+                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice | amount(0) }} / </label>
                                         <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                 v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                             <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
@@ -712,6 +712,7 @@ Content1 =
         },
         mounted: function () {
             this.items.forEach(item => {
+                item.unitPrice = item.unitPrice?.replace('$', '');
                 item.noteAttr = JSON.parse(item.noteAttr);
                 item.warnings = JSON.parse(item.warnings);
                 item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr)
@@ -725,9 +726,6 @@ Content1 =
             },
         },
         methods: {
-            trimDollar: function (val) {
-                return val.replace('$', '');
-            },
             handleResize: function () {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
@@ -792,7 +790,7 @@ Content1 =
                 console.log("calculateItemTotalPrice: ", itemUnit, " => length: ", length, ", weight: ", weight, ", quantity: ", quantity, ', unitPrice: ', unitPrice);
                 this.items.forEach(item => {
                     if (item.id === id) {
-                        item.subTotal = `$${totalPrice.toFixed(2)}`;
+                        item.subTotal = `$${totalPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;
                     }
                 });
             }

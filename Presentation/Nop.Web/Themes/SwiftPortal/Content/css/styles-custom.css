@@ -108,6 +108,16 @@ a:not([href]):not([class]) {
     justify-content: center;
 }
 
+.nav-bar-search .search-box-button:active,
+.nav-bar-search .search-box-button:focus {
+    outline: none;
+}
+
+.nav-bar-search input:focus {
+    border-color: none;
+    color: #ffffff;
+}
+
 #top-menu-drawer select {
     border: none;
     background: none;
