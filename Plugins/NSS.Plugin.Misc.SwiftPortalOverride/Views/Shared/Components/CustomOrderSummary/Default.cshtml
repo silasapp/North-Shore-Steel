@@ -270,7 +270,7 @@ Content1 =
                                         </td>
                                         <td style="white-space: nowrap;" align="right">
                                             <div>
-                                                <label style="margin:0; margin-right:8px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
+                                                <label style="margin:0; margin-right:8px;" v-bind:id="'itemunitprice' + item.id">${{ trimDollar(item.unitPrice) }} /</label>
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                         v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                                     <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
@@ -343,7 +343,7 @@ Content1 =
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Unit Price</label>
                                     <div class="d-flex flex-row align-items-center">
-                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice }} / </label>
+                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ trimDollar(item.unitPrice) }} / </label>
                                         <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                 v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                             <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
@@ -725,6 +725,9 @@ Content1 =
             },
         },
         methods: {
+            trimDollar: function (val) {
+                return val.replace('$', '');
+            },
             handleResize: function () {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
@@ -822,68 +825,6 @@ Content1 =
         $(this).find("textarea").val('').end();
         viewNotesModal.hide();
     });
-
-    function calculateItemTotalPrice(attrId, itemId, weight, length) {
-        var qty = parseInt(document.getElementById('itemquantity' + itemId).value, 10);
-        var itemUnit;
-        if (attrId == null) {
-            itemUnit = document.getElementById('itemunit' + itemId).value;
-        }
-        else {
-            var el = document.getElementById(attrId);
-            itemUnit = el.options[el.selectedIndex].text;
-        }
-        var unitPrice = parseFloat(document.getElementById('itemunitprice' + itemId).innerHTML.replace(/\$/g, ''));
-        var weightCol = document.getElementById('itemweight' + itemId);
-        var subtotalCol = document.getElementById('itemsubtotal' + itemId);
-        var totalPrice = 0.00;
-        var totalLength = evenRound(qty * length);
-        var totalWeight = evenRound(weight * qty);
-
-        switch (itemUnit) {
-            case 'FT':
-                totalPrice = totalLength * unitPrice;
-                break;
-            case 'CWT':
-                totalPrice = (totalWeight / 100) * unitPrice;
-                break;
-            case 'EA':
-            default:
-                totalPrice = qty * unitPrice;
-                break;
-        }
-        subtotalCol.innerHTML = `$${totalPrice.toFixed(2)}`;
-        weightCol.innerHTML = totalWeight;
-    }
-    function toggleUnitPrice(sel, attrId, itemId, weightPrice, piecePrice, ftPrice, weight, length) {
-        var itemUnit;
-        if (attrId == null) {
-            itemUnit = document.getElementById('itemunit' + itemId).value;
-        }
-        else {
-            var el = document.getElementById(attrId);
-            console.log(el);
-            itemUnit = el.options[el.selectedIndex].text;
-        }
-        var unitPriceCtrl = document.getElementById('itemunitprice' + itemId);
-        var unitPrice = 0.00;
-        switch (itemUnit) {
-            case "EA":
-                unitPrice = Number(piecePrice).toFixed(2);
-                break;
-            case "FT":
-                unitPrice = Number(ftPrice).toFixed(2);
-                break;
-            case "CWT":
-                unitPrice = Number(weightPrice).toFixed(2);
-                break;
-            default:
-                break;
-        }
-        unitPriceCtrl.innerHTML = `$${unitPrice}`;
-        calculateItemTotalPrice(attrId, itemId, weight, length);
-    }
-
     function evenRound(num, decimalPlaces) {
         var d = decimalPlaces || 0;
         var m = Math.pow(10, d);

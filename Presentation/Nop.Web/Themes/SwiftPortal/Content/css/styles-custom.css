@@ -187,7 +187,7 @@ a:not([href]):not([class]) {
     }
 
     #top-menu-drawer select {
-        max-width: 14rem;
+        width: 14rem;
         padding: 0px;
     }
 
@@ -216,7 +216,7 @@ a:not([href]):not([class]) {
     }
 
     #top-menu-drawer select {
-        max-width: 16rem;
+        width: 16rem;
         padding: 0px;
     }
 
@@ -1145,7 +1145,7 @@ input:focus {
 }
 
 .hover-icon:hover {
-    fill: #03175B !important;
+    fill: #0076B4 !important;
 }
 
 table a {
