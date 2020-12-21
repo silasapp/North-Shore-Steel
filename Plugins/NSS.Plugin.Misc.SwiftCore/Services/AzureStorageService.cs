@@ -27,7 +27,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             // Upload stream file
             using (Stream stream = new MemoryStream(content))
             {
-                blob.Upload(stream);
+                blob.Upload(stream, overwrite: true);
             }
 
             var blobSasUri = GetBlobSasUri(container, blobName, credential);
