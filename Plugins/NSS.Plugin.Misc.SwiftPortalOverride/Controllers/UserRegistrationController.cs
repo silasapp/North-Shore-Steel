@@ -124,23 +124,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             customer.RegisteredInStoreId = _storeContext.CurrentStore.Id;
 
             var warnings = new List<string>();
-
+            if (model.Email != model.ConfirmEmail)
+                warnings.Add("Emails does not match");
             if (String.IsNullOrEmpty(model.FirstName))
-                warnings.Add("Please Enter First Name");
+                warnings.Add("Please enter First Name");
             if (String.IsNullOrEmpty(model.LastName))
-                warnings.Add("Please Enter Last Name");
+                warnings.Add("Please enter Last Name");
             if (String.IsNullOrEmpty(model.Email))
-                warnings.Add("Please Enter Work Email");
+                warnings.Add("Please enter Work Email");
             if (String.IsNullOrEmpty(model.CellPhone) && String.IsNullOrEmpty(model.Phone))
                 warnings.Add("Work or Cell phone is required");
             if (String.IsNullOrEmpty(model.Company))
-                warnings.Add("Please Enter Company Name");
+                warnings.Add("Please enter Company Name");
             if (String.IsNullOrEmpty(model.HearAboutUs.ToString()))
-                warnings.Add("Please Enter How did you hear about us");
+                warnings.Add("Please enter how did you hear about us");
             if (String.IsNullOrEmpty(model.ItemsForNextProject))
-                warnings.Add("Please Enter How we can help");
+                warnings.Add("Please enter how we can help");
             if (String.IsNullOrEmpty(model.PreferredPickupLocationId.ToString()))
-                warnings.Add("Please Enter Preferred Pickup Location");
+                warnings.Add("Please enter preferred pickup location");
 
 
 
