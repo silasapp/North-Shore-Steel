@@ -880,32 +880,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View(model);
         }
 
-        //[HttpsRequirement]
-        //public IActionResult Notifications()
-        //{
-        //    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-        //    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+        [HttpsRequirement]
+        public IActionResult Notifications()
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
 
-        //    if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
-        //        return AccessDeniedView();
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
 
-        //    return View();
+            return View();
 
-        //}
+        }
 
-        //[HttpsRequirement]
-        //[IgnoreAntiforgeryToken]
-        //public IActionResult UpdateNotifications([FromBody]  NSS.Plugin.Misc.SwiftPortalOverride.Models.Notification notifications)
-        //{
-        //    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-        //    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+        [HttpsRequirement]
+        [IgnoreAntiforgeryToken]
+        public IActionResult UpdateNotifications([FromBody] NSS.Plugin.Misc.SwiftPortalOverride.Models.Notification notifications)
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
 
-        //    if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
-        //        return AccessDeniedView();
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
 
-            
-        //    return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Notifications.cshtml", notifications);
-        //}
+
+            return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Notifications.cshtml", notifications);
+        }
 
         [HttpsRequirement]
         public override IActionResult AddressAdd()
