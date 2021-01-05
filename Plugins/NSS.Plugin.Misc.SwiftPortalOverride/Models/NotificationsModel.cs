@@ -8,7 +8,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     {
         public NotificationsModel()
         {
-            NotificationContext = new NotificationModel();
+            Notifications = new List<NotificationItemModel>();
         }
         public bool HasError
         { 
@@ -16,19 +16,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             set { HasError = value; } 
         }
         public string Error { get; set; }
-        public NotificationModel NotificationContext { get; set; }
+        public IList<NotificationItemModel> Notifications { get; set; }
 
 
         #region Nested Classes
 
-        public class NotificationModel
-        {
-            public NotificationModel()
-            {
-                Notifications = new List<NotificationItemModel>();
-            }
-            public IList<NotificationItemModel> Notifications { get; set; }
-        }
+        //public class NotificationModel
+        //{
+        //    public NotificationModel()
+        //    {
+        //        Notifications = new List<NotificationItemModel>();
+        //    }
+        //    public IList<NotificationItemModel> Notifications { get; set; }
+        //}
 
         public class NotificationItemModel
         {

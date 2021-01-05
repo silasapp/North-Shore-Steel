@@ -31,6 +31,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
             string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false);
 
-        NotificationsModel PrepareNotificationsModel(string error, ERPGetNotificationPreferencesResponse notifications);
+        NotificationsModel PrepareNotificationsModel(string error, IDictionary<string, bool> notifications);
     }
 }

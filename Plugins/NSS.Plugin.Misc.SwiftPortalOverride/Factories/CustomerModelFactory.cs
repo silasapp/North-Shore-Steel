@@ -104,74 +104,73 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-        public NotificationsModel PrepareNotificationsModel(string error, ERPGetNotificationPreferencesResponse notifications)
+        public NotificationsModel PrepareNotificationsModel(string error, IDictionary<string, bool> notifications)
         {
             var model = new NotificationsModel
             {
                 Error = error
             };
 
-            if (notifications != null && notifications.NotificationPreferences != null && notifications.NotificationPreferences.Count > 0)
+            if (notifications != null && notifications.Count > 0)
             {
-                foreach (var keyValue in notifications.NotificationPreferences)
+                foreach (var keyValue in notifications)
                 {
-                    var itemModel = new NotificationsModel.NotificationItemModel();
-
-                    if (model.NotificationContext.Notifications.Any(x => x.Preferences.Any(y => y.Key == keyValue.Key)))
-                        itemModel = model.NotificationContext.Notifications.FirstOrDefault(x => x.Preferences.Any(y => y.Key == keyValue.Key));
-
                     switch (keyValue.Key)
                     {
                         case "my-order-confirmed-company-email":
                         case "my-order-confirmed-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When my order has been confirmed (offline orders only)" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
                             break;
                         case "my-order-schedule-date-change-company-email":
                         case "my-order-schedule-date-change-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When my order has a scheduled date change" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When my order has a scheduled date change", ref model);
                             break;
                         case "my-order-promise-date-change-company-email":
                         case "my-order-promise-date-change-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When my order has a promise date change" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When my order has a promise date change", ref model);
                             break;
                         case "my-order-ready-company-email":
                         case "my-order-ready-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When my order is ready" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When my order is ready", ref model);
                             break;
                         case "my-order-loading-company-email":
                         case "my-order-loading-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When my order is loading" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When my order is loading", ref model);
                             break;
                         case "my-order-shipped-company-email":
                         case "my-order-shipped-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When my order has shipped" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When my order has shipped", ref model);
                             break;
                         case "any-order-confirmed-company-email":
                         case "any-order-confirmed-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When any order has been confirmed" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When any order has been confirmed", ref model);
                             break;
                         case "any-order-shipped-company-email":
                         case "any-order-shipped-personal-sms":
-                            itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? "When any order has shipped" : itemModel.Title;
-                            itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                            AddPreference(keyValue, "When any order has shipped", ref model);
                             break;
                         default:
                             break;  
                     }
-
-                    model.NotificationContext.Notifications.Add(itemModel);
                 }
  
             }
 
             return model;
+        }
+
+        private static void AddPreference(KeyValuePair<string, bool> keyValue, string title, ref NotificationsModel model)
+        {
+            if (model.Notifications.Any(x => x.Title == title))
+                model.Notifications.FirstOrDefault(x => x.Title == title).Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+            else
+            {
+                var itemModel = new NotificationsModel.NotificationItemModel();
+                itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? title : itemModel.Title;
+                itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+
+                model.Notifications.Add(itemModel);
+            } 
         }
 
 

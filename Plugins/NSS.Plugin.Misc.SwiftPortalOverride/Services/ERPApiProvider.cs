@@ -954,16 +954,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public (ERPGetNotificationPreferencesResponse, string) GetCompanyNotificationPreferences(int userId, int companyId)
+        public (Dictionary<string, bool>, string) GetCompanyNotificationPreferences(int userId, int companyId)
         {
             string error = string.Empty;
-            ERPGetNotificationPreferencesResponse result;
+            var result = new Dictionary<string, bool>();
 
-            // replace with logic
-            result = new ERPGetNotificationPreferencesResponse();
-
-            //initialize
-            var retVal = new ERPCalculateShippingResponse();
             var respContent = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -1004,7 +999,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     // throw error if not successful
                     if (response.IsSuccessStatusCode)
-                        retVal = JsonConvert.DeserializeObject<ERPCalculateShippingResponse>(respContent);
+                        result = ERPGetNotificationPreferencesResponse.FromJson(respContent);
                     else
                         throw new NopException($"An error occured when getting user company notification preferences : {respContent}", respContent);
 
@@ -1022,13 +1017,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return (result, error);
         }
 
-        public (ERPGetNotificationPreferencesResponse, string) UpdateCompanyNotificationPreferences(int userId, int companyId, IDictionary<string, bool> preferences)
+        public (Dictionary<string, bool>, string) UpdateCompanyNotificationPreferences(int userId, int companyId, IDictionary<string, bool> preferences)
         {
             string error = string.Empty;
-            ERPGetNotificationPreferencesResponse result;
-
-            // replace with logic
-            result = new ERPGetNotificationPreferencesResponse();
+            var result = new Dictionary<string, bool>();
 
             //initialize
             var respContent = string.Empty;
@@ -1073,7 +1065,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                     // throw error if not successful
                     if (response.IsSuccessStatusCode)
-                        result = JsonConvert.DeserializeObject<ERPGetNotificationPreferencesResponse>(respContent);
+                        result = ERPGetNotificationPreferencesResponse.FromJson(respContent);
                     else
                         throw new NopException($"An error occured when updating user company notification preferences : api status => {response.StatusCode}, message => {respContent}", respContent);
 
