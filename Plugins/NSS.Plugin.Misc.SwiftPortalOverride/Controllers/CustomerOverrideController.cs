@@ -887,6 +887,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpsRequirement]
         public IActionResult Notifications()
         {
+            return View();
+
+        }
+
+        [HttpsRequirement]
+        public IActionResult GetNotifications()
+        {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
 
@@ -899,9 +906,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var model = _overrideCustomerModelFactory.PrepareNotificationsModel(error, result);
 
-            return View(model);
-
+            return Json(new { model });
         }
+
+
 
         [HttpsRequirement]
         [IgnoreAntiforgeryToken]
