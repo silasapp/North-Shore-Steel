@@ -52,138 +52,19 @@
                         <p>SMS</p>
                     </div>
                 </div>
-                <div class="notification">
-                    <p>Notify me when my order has been confirmed (offline orders only)</p>
+                <div class="notification" v-for="preference in preferences">
+                    <p>{{preference.title}}</p>
                     <div class="notification-actions">
                         <div>
                             <label>
-                                <input type="checkbox" hidden v-model="isMyOrderConfirmedEmail" :value="isMyOrderConfirmedEmail" name="Test">
-                                <img v-bind:src="isMyOrderConfirmedEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
+                                <input type="checkbox" hidden v-model="preference.isEmail">
+                                <img :src="preference.isEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
                             </label>
                         </div>
                         <div>
                             <label>
-                                <input type="checkbox" hidden v-model="isMyOrderConfirmedSms" :value="isMyOrderConfirmedSms" name="Test">
-                                <img v-bind:src="isMyOrderConfirmedSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification">
-                    <p>Notify me when my order has a scheduled date change</p>
-                    <div class="notification-actions">
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderScheduledDateEmail" :value="isMyOrderScheduledDateEmail" name="Test">
-                                <img v-bind:src="isMyOrderScheduledDateEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderScheduledDateSms" :value="isMyOrderScheduledDateSms" name="Test">
-                                <img v-bind:src="isMyOrderScheduledDateSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification">
-                    <p>Notify me when my order promise date change </p>
-                    <div class="notification-actions">
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderPromiseDateEmail" :value="isMyOrderPromiseDateEmail" name="Test">
-                                <img v-bind:src="isMyOrderPromiseDateEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderPromiseDateSms" :value="isMyOrderPromiseDateSms" name="Test">
-                                <img v-bind:src="isMyOrderPromiseDateSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification">
-                    <p>Notify me when my order is ready</p>
-                    <div class="notification-actions">
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderReadyEmail" :value="isMyOrderReadyEmail" name="Test">
-                                <img v-bind:src="isMyOrderReadyEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderReadySms" :value="isMyOrderReadySms" name="Test">
-                                <img v-bind:src="isMyOrderReadySms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification">
-                    <p>Notify me when my order is loading</p>
-                    <div class="notification-actions">
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderLoadingEmail" :value="isMyOrderLoadingEmail" name="Test">
-                                <img v-bind:src="isMyOrderLoadingEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderLoadingSms" :value="isMyOrderLoadingSms" name="Test">
-                                <img v-bind:src="isMyOrderLoadingSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification">
-                    <p>Notify me when my order has shipped</p>
-                    <div class="notification-actions">
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderShippedEmail" :value="isMyOrderShippedEmail" name="Test">
-                                <img v-bind:src="isMyOrderShippedEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isMyOrderShippedSms" :value="isMyOrderShippedSms" name="Test">
-                                <img v-bind:src="isMyOrderShippedSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification">
-                    <p>Notify me when any order has been confirmed</p>
-                    <div class="notification-actions">
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isAnyOrderConfirmedEmail" :value="isAnyOrderConfirmedEmail" name="Test">
-                                <img v-bind:src="isAnyOrderConfirmedEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isAnyOrderConfirmedSms" :value="isAnyOrderConfirmedSms" name="Test">
-                                <img v-bind:src="isAnyOrderConfirmedSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification">
-                    <p>Notify me when any order is shipped</p>
-                    <div class="notification-actions">
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isAnyOrderShippedEmail" :value="isAnyOrderShippedEmail" name="Test">
-                                <img v-bind:src="isAnyOrderShippedEmail ? '/Themes/@themeName/Content/assets/mail-dark.svg' : '/Themes/@themeName/Content/assets/mail.svg'" alt="mail-icon">
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" hidden v-model="isAnyOrderShippedSms" :value="isAnyOrderShippedSms" name="Test">
-                                <img v-bind:src="isAnyOrderShippedSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
+                                <input type="checkbox" hidden v-model="preference.isSms">
+                                <img :src="preference.isSms ? '/Themes/@themeName/Content/assets/mobile-phone-dark.svg' : '/Themes/@themeName/Content/assets/mobile-phone.svg'" alt="sms-icon">
                             </label>
                         </div>
                     </div>
@@ -202,22 +83,7 @@
     var vm = new Vue({
         el: '#notifications',
         data: {
-            isMyOrderConfirmedEmail: false,
-            isMyOrderConfirmedSms: false,
-            isMyOrderScheduledDateEmail: false,
-            isMyOrderScheduledDateSms: false,
-            isMyOrderPromiseDateEmail: false,
-            isMyOrderPromiseDateSms: false,
-            isMyOrderReadyEmail: false,
-            isMyOrderReadySms: false,
-            isMyOrderLoadingEmail: false,
-            isMyOrderLoadingSms: false,
-            isMyOrderShippedEmail: false,
-            isMyOrderShippedSms: false,
-            isAnyOrderConfirmedEmail: false,
-            isAnyOrderConfirmedSms: false,
-            isAnyOrderShippedEmail: false,
-            isAnyOrderShippedSms: false
+            preferences: []
         },
         mounted: function () {
             this.updatePreferences();
@@ -228,28 +94,10 @@
             hideLoading: function () {
             },
             updatePreferences: function () {
-                const request = {
-                    isMyOrderConfirmedEmail: this.isMyOrderConfirmedEmail,
-                    isMyOrderConfirmedSms: this.isMyOrderConfirmedSms,
-                    isMyOrderScheduledDateEmail: this.isMyOrderScheduledDateEmail,
-                    isMyOrderScheduledDateSms: this.isMyOrderScheduledDateSms,
-                    isMyOrderPromiseDateEmail: this.isMyOrderPromiseDateEmail,
-                    isMyOrderPromiseDateSms: this.isMyOrderPromiseDateSms,
-                    isMyOrderReadyEmail: this.isMyOrderReadyEmail,
-                    isMyOrderReadySms: this.isMyOrderReadySms,
-                    isMyOrderLoadingEmail: this.isMyOrderLoadingEmail,
-                    isMyOrderLoadingSms: this.isMyOrderLoadingSms,
-                    isMyOrderShippedEmail: this.isMyOrderShippedEmail,
-                    isMyOrderShippedSms: this.isMyOrderShippedSms,
-                    isAnyOrderConfirmedEmail: this.isAnyOrderConfirmedEmail,
-                    isAnyOrderConfirmedSms: this.isAnyOrderConfirmedSms,
-                    isAnyOrderShippedEmail: this.isAnyOrderShippedEmail,
-                    isAnyOrderShippedSms: this.isAnyOrderShippedSms
-                };
+                console.log('request', this.preferences);
+                const request = this.preferences;
                 this.showLoading();
                 $("#overlay").css("display", "flex");
-
-                console.log('request', request);
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("UpdateNotifications", "CustomerOverride")",
@@ -258,7 +106,30 @@
                     data: JSON.stringify(request),
                     success: function (data) {
                         self.hideLoading();
-                        console.log('success-data', data);
+                        self.preferences = [
+                            {
+                                title: "Notify me when my order has been confirmed (offline orders only)",
+                                isEmail: true,
+                                isSms: false
+
+                            },
+                            {
+                                title: "Notify me when my order has a scheduled date change",
+                                isEmail: true,
+                                isSms: true
+                            },
+                            {
+                                title: "Notify me when my order promise date change",
+                                isEmail: false,
+                                isSms: true
+                            },
+                            {
+                                title: "Notify me when my order is ready",
+                                isEmail: false,
+                                isSms: false
+                            }
+                        ]
+                        console.log('success-data', self.preferences);
                     },
                     error: function (xhr, thrownError) {
                         self.hideLoading();
@@ -268,40 +139,11 @@
                 });
             },
             enableAllNotifications: function () {
-                this.isMyOrderConfirmedEmail = true;
-                this.isMyOrderConfirmedSms = true;
-                this.isMyOrderScheduledDateEmail = true;
-                this.isMyOrderScheduledDateSms = true;
-                this.isMyOrderPromiseDateEmail = true;
-                this.isMyOrderPromiseDateSms = true;
-                this.isMyOrderReadyEmail = true;
-                this.isMyOrderReadySms = true;
-                this.isMyOrderLoadingEmail = true;
-                this.isMyOrderLoadingSms = true;
-                this.isMyOrderShippedEmail = true;
-                this.isMyOrderShippedSms = true;
-                this.isAnyOrderConfirmedEmail = true;
-                this.isAnyOrderConfirmedSms = true;
-                this.isAnyOrderShippedEmail = true;
-                this.isAnyOrderShippedSms = true;
-
+                this.preferences.forEach(function (item) {
+                    item.isEmail = true;
+                    item.isSms = true;
+                })
                 const request = {
-                    isMyOrderConfirmedEmail: this.isMyOrderConfirmedEmail,
-                    isMyOrderConfirmedSms: this.isMyOrderConfirmedSms,
-                    isMyOrderScheduledDateEmail: this.isMyOrderScheduledDateEmail,
-                    isMyOrderScheduledDateSms: this.isMyOrderScheduledDateSms,
-                    isMyOrderPromiseDateEmail: this.isMyOrderPromiseDateEmail,
-                    isMyOrderPromiseDateSms: this.isMyOrderPromiseDateSms,
-                    isMyOrderReadyEmail: this.isMyOrderReadyEmail,
-                    isMyOrderReadySms: this.isMyOrderReadySms,
-                    isMyOrderLoadingEmail: this.isMyOrderLoadingEmail,
-                    isMyOrderLoadingSms: this.isMyOrderLoadingSms,
-                    isMyOrderShippedEmail: this.isMyOrderShippedEmail,
-                    isMyOrderShippedSms: this.isMyOrderShippedSms,
-                    isAnyOrderConfirmedEmail: this.isAnyOrderConfirmedEmail,
-                    isAnyOrderConfirmedSms: this.isAnyOrderConfirmedSms,
-                    isAnyOrderShippedEmail: this.isAnyOrderShippedEmail,
-                    isAnyOrderShippedSms: this.isAnyOrderShippedSms
                 };
                 this.showLoading();
                 $("#overlay").css("display", "flex");
@@ -315,7 +157,7 @@
                     data: JSON.stringify(request),
                     success: function (data) {
                         self.hideLoading();
-                        console.log('success-data', data);
+                        //console.log('success-data', data);
                         //self.isMyOrderConfirmedEmail = data.isMyOrderConfirmedEmail;
                     },
                     error: function (xhr, thrownError) {
