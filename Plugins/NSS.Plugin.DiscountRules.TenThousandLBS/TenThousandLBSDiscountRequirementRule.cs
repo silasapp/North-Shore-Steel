@@ -77,12 +77,12 @@ namespace NSS.Plugin.DiscountRules.TenThousandLBS
             //result is valid if customer has no order
             var cartItems = _shoppingCartService.GetShoppingCart(request.Customer, Nop.Core.Domain.Orders.ShoppingCartType.ShoppingCart);
 
-            decimal totalWeight = cartItems.Select(item => 
+            int totalWeight = cartItems.Sum(item => 
             {
                 var product = _productService.GetProductById(item.ProductId);
                 
-                return (product?.Weight ?? decimal.Zero * item.Quantity);
-            }).Sum();
+                return (int)Math.Round((product?.Weight ?? decimal.Zero) * item.Quantity);
+            });
 
             result.IsValid = totalWeight >= 10000 && totalWeight < 20000;
 

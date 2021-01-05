@@ -67,12 +67,13 @@ namespace NSS.Plugin.DiscountRules.FortyThousandLBS.Controllers
                 return Content("Failed to load requirement.");
 
             //try to get previously saved restricted customer role identifier
-            var restrictedRoleId = _settingService.GetSettingByKey<int>(string.Format(DiscountRequirementDefaults.SettingsKey, discountRequirementId ?? 0));
+            var isApplied = _settingService.GetSettingByKey<bool>(string.Format(DiscountRequirementDefaults.SettingsKey, discountRequirementId ?? 0));
 
             var model = new RequirementModel
             {
                 RequirementId = discountRequirementId ?? 0,
                 DiscountId = discountId,
+                IsApplied = isApplied
             };
 
             //set the HTML field prefix

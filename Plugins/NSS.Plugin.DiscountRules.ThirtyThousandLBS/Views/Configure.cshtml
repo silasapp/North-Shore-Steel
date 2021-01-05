@@ -3,16 +3,17 @@
     Layout = "";
 }
 
-    <script>
+<script>
     $(document).ready(function () {
         $('#savethirtythousandlbsrequirement@(Model.RequirementId)').click(function () {
             var discountId = @Model.DiscountId;
             var requirementId = @Model.RequirementId;
+            var isApplied = true;
 
             var postData = {
                 DiscountId: discountId,
                 RequirementId: requirementId,
-                IsApplied: true
+                IsApplied: isApplied
             };
             addAntiForgeryToken(postData);
 
@@ -50,9 +51,16 @@
             });
         });
     });
-    </script>
+</script>
 
-
+<div class="form-group">
+    <div class="col-md-3"></div>
+    <div class="col-md-9 requirement-data-col">
+        <div class="requirement-data-buttons">
+            <input type="button" id="savethirtythousandlbsrequirement@(Model.RequirementId)" class="btn btn-primary" value="@T("Admin.Common.Save")" />
+        </div>
+    </div>
+</div>
 <div class="form-group">
     <div class="col-md-offset-3 col-md-9 requirement-messages-col">
         <div id="pnl-save-requirement-result@(Model.RequirementId)" style="display: none;" class="text-green margin-t-5">
