@@ -236,6 +236,7 @@
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.min.css.map" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\_GiftCardBox.cshtml" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\_DiscountBox.cshtml" />
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
     <None Remove="Themes\SwiftPortal\Content\assets\c-heart.svg" />
     <None Remove="Themes\SwiftPortal\Content\assets\close-white.svg" />
