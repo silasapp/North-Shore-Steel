@@ -40,13 +40,13 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
         [JsonProperty("preferredLocationId")]
         public int PreferredLocationId { get; set; }
 
-        [JsonProperty("hearAboutUs", Required = Required.DisallowNull)]
+        [JsonProperty("hearAboutUs")]
         public string HearAboutUs { get; set; }
 
         [JsonProperty("other", NullValueHandling = NullValueHandling.Ignore)]
         public string Other { get; set; }
 
-        [JsonProperty("itemsForNextProject", Required = Required.DisallowNull)]
+        [JsonProperty("itemsForNextProject")]
         public string ItemsForNextProject { get; set; }
 
         [JsonProperty("active")]

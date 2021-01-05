@@ -141,7 +141,7 @@
                             <label id="purchaseOrder" class="p-2 text-black" style="min-height: 30px">{{ purchaseOrder }}</label>
                         </div>
                         <div class="d-flex flex-column">
-                            <label for="deliveryDate" class="fs-13 text-black">Estimated Delivery Date</label>
+                            <label for="deliveryDate" class="fs-13 text-black">Promise Date</label>
                             <label id="deliveryDate" class="p-2 text-black">{{ deliveryDate ?? 'N/A' }}</label>
                         </div>
                         <button class="h6 text-primary" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
@@ -177,7 +177,7 @@
                             </select>
                             <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline"
                                     v-if="!showNewShippingAddress" v-on:click="showNewShippingAddress = true; shippingAddressId = null">
-                                Enter a new shiping address
+                                Enter a new shipping address
                             </button>
                         </div>
                         <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required</label>

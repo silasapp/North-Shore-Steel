@@ -30,6 +30,7 @@ using Nop.Web.Framework.Themes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using Nop.Core.Domain.Customers;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -101,6 +102,75 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.SelectedTab = (CustomerNavigationEnum)selectedTabId;
 
             return model;
+        }
+
+        public NotificationsModel PrepareNotificationsModel(string error, IDictionary<string, bool> notifications)
+        {
+            var model = new NotificationsModel
+            {
+                Error = error
+            };
+
+            if (notifications != null && notifications.Count > 0)
+            {
+                foreach (var keyValue in notifications)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case "my-order-confirmed-company-email":
+                        case "my-order-confirmed-personal-sms":
+                            AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
+                            break;
+                        case "my-order-schedule-date-change-company-email":
+                        case "my-order-schedule-date-change-personal-sms":
+                            AddPreference(keyValue, "When my order has a scheduled date change", ref model);
+                            break;
+                        case "my-order-promise-date-change-company-email":
+                        case "my-order-promise-date-change-personal-sms":
+                            AddPreference(keyValue, "When my order has a promise date change", ref model);
+                            break;
+                        case "my-order-ready-company-email":
+                        case "my-order-ready-personal-sms":
+                            AddPreference(keyValue, "When my order is ready", ref model);
+                            break;
+                        case "my-order-loading-company-email":
+                        case "my-order-loading-personal-sms":
+                            AddPreference(keyValue, "When my order is loading", ref model);
+                            break;
+                        case "my-order-shipped-company-email":
+                        case "my-order-shipped-personal-sms":
+                            AddPreference(keyValue, "When my order has shipped", ref model);
+                            break;
+                        case "any-order-confirmed-company-email":
+                        case "any-order-confirmed-personal-sms":
+                            AddPreference(keyValue, "When any order has been confirmed", ref model);
+                            break;
+                        case "any-order-shipped-company-email":
+                        case "any-order-shipped-personal-sms":
+                            AddPreference(keyValue, "When any order has shipped", ref model);
+                            break;
+                        default:
+                            break;  
+                    }
+                }
+ 
+            }
+
+            return model;
+        }
+
+        private static void AddPreference(KeyValuePair<string, bool> keyValue, string title, ref NotificationsModel model)
+        {
+            if (model.Notifications.Any(x => x.Title == title))
+                model.Notifications.FirstOrDefault(x => x.Title == title).Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+            else
+            {
+                var itemModel = new NotificationsModel.NotificationItemModel();
+                itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? title : itemModel.Title;
+                itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+
+                model.Notifications.Add(itemModel);
+            } 
         }
 
 

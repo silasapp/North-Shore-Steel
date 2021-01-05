@@ -143,18 +143,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     // nC orderId
                     model.SysOrderId = order.Id;
 
-                    // billing address
-                    var billingAddress = _addressService.GetAddressById(order.BillingAddressId);
-
-                    //billing info
-                    _addressModelFactory.PrepareAddressModel(model.BillingAddress,
-                        address: billingAddress,
-                        excludeProperties: false,
-                        addressSettings: _addressSettings);
-
-                    // shipping address
-                    // from client api
-
                     // pickup address
                     if (order.PickupAddressId.HasValue && _addressService.GetAddressById(order.PickupAddressId.Value) is Address pickupAddress)
                     {
@@ -169,18 +157,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         };
                     }
                 }
-                else
+
+                model.BillingAddress = new AddressModel
                 {
-                    // billing address
-                    model.BillingAddress = new AddressModel
-                    {
-                        Address1 = orderDetailsResponse.BillingAddressLine1,
-                        Address2 = orderDetailsResponse.BillingAddressLine2,
-                        StateProvinceName = orderDetailsResponse.BillingState,
-                        City = orderDetailsResponse.BillingCity,
-                        ZipPostalCode = orderDetailsResponse.BillingPostalCode
-                    };
-                }
+                    Address1 = orderDetailsResponse.BillingAddressLine1,
+                    Address2 = orderDetailsResponse.BillingAddressLine2,
+                    StateProvinceName = orderDetailsResponse.BillingState,
+                    City = orderDetailsResponse.BillingCity,
+                    ZipPostalCode = orderDetailsResponse.BillingPostalCode
+                };
 
                 // shipping address
                 model.ShippingAddress = new AddressModel

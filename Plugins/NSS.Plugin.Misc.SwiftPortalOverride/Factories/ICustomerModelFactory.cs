@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
@@ -29,5 +30,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// <returns>Customer register model</returns>
         RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
             string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false);
+
+        NotificationsModel PrepareNotificationsModel(string error, IDictionary<string, bool> notifications);
     }
 }
