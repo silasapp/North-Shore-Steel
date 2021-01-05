@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Discount requirements",
+  "FriendlyName": "Must have cart total weight greater than 40,000 LBS",
+  "SystemName": "DiscountRequirement.MustBeFortyThousandLBS",
+  "Version": "1.00",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "Chaione team",
+  "DisplayOrder": 1,
+  "FileName": "NSS.Plugin.DiscountRules.FortyThousandLBS.dll",
+  "Description": "This plugin allows you to configure discounts for cart with total weight greater or equal to 40,000 LBS"
+}
