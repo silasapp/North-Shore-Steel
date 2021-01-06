@@ -45,7 +45,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             foreach (var item in allTopics)
             {
-                slugs.Add(_urlRecordService.GetSeName(item.Id, item.SystemName));
+                slugs.Add(_urlRecordService.GetSeName(item.Id, "Topic"));
             }
 
             return View();
