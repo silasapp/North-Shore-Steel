@@ -22,16 +22,19 @@ a:not([href]):not([class]) {
     order: 6;
     justify-content: center;
 }
+
 .nss-nav-bar {
     background-color: #0076b4;
     padding-top: 24px;
     padding-bottom: 24px;
     z-index: 0 !important;
 }
+
 .partners-logo > img {
     width: 25%;
     padding: 0 10px;
 }
+
 .nav-bar-content {
     display: flex;
     justify-content: space-between;
@@ -740,7 +743,7 @@ a:not([href]):not([class]) {
 
 .form-fields,
 .new-wrapper .text {
-    background-color:transparent !important;
+    background-color: transparent !important;
     border: none !important;
 }
 
@@ -800,7 +803,7 @@ a:not([href]):not([class]) {
 .custom-input {
     width: 100% !important;
     font-size: 14px;
-    background: #f6f6f6 0% 0% no-repeat padding-box ;
+    background: #f6f6f6 0% 0% no-repeat padding-box;
     font: normal normal normal 14px/24px "Exo 2" !important;
     opacity: 1;
     border: none;
@@ -2558,9 +2561,11 @@ table input {
     padding: 24px;
     margin-bottom: 70px;
 }
-.login-page .returning-wrapper .buttons{
+
+.login-page .returning-wrapper .buttons {
     background-color: transparent !important;
 }
+
 .cancel-button {
     text-align: center;
     text-decoration: underline;
@@ -3362,28 +3367,88 @@ and also iPads specifically.
     }
 }
 
+.p-o-text-mob {
+    display: none;
+}
+.place-order-button {
+    padding: .5rem 1rem;
+    font: normal normal 500 16px/24px 'Exo 2';
+    color: #FFF;
+    text-transform: uppercase;
+    background-color: #03175b !important;
+    border: none;
+}
+
+    .place-order-button:hover {
+        background-color: #0076B4 !important;
+    }
+
 @media all and (max-width: 600px) {
-    .partners-logo {
+    .check-out-card {
+        padding: 0 !important;
+    }
+
+    .partners-logo, .check-out-info {
         display: flex;
+        align-items: flex-start;
     }
-    .part-logo {
-        display:none;
+    .edit-shop-container {
+        background-color: #F6F6F6;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
     }
+   
+        .place-order-buttons {
+            display: block;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-shadow: 0 0 15px rgba(0,0,0,.2);
+            font-size: 0;
+            z-index: 1000;
+            background: white;
+            text-align: center;
+            padding: 1rem;
+        }
+    .edit-shop-mob {
+        background-color: #fff;
+        padding: 10px;
+    }
+    .part-logo, .edit-shop, .p-o-text {
+        display: none;
+    }
+
     .nss-container {
         padding: 0 !important;
     }
-    .fieldset {
+
+    .p-o-text-mob {
+        display: block;
+    }
+
+    .fieldset, .card-mod {
         background-color: #f6f6f6 !important;
         width: auto !important;
         box-shadow: 0px 1px 16px #0000001a;
     }
-    .custom-input {
+    .checkout-shipping-label {
+        text-align: left;
+    }
+
+    .custom-input, .address-dropdown, .shipping-tab, .nss-form-control {
         background: #fff !important;
         background-color: #fff !important;
     }
-    .footer {
-        display: none;
-    }
+        .shipping-tab.active {
+            background-color: #0076B4 !important;
+            color: #FFF;
+        }
+        .footer {
+            display: none;
+        }
 
         .footer li, .login-footer li {
             justify-content: center;
@@ -3564,7 +3629,7 @@ and also iPads specifically.
         margin-bottom: 10px !important;
     }
 
-    .checkout-card-1 > div,
+    /*.checkout-card-1 > div,*/
     .address-dropdown,
     .address-dropdown + button,
     .address-dropdown + label,

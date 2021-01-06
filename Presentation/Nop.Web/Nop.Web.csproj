@@ -498,6 +498,10 @@
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Validators\theme.json" />
+  </ItemGroup>
+
   <!-- This target execute after "Build" target.
     We use it to clean up folder with plugins from unnecessary and obsolete libraries. -->
   <Target Name="NopTarget" AfterTargets="Build">
