@@ -128,6 +128,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                );
 
+            // resources
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Resources", "resources/",
+               new { controller = "Resource", action = "Index" },
+               new { },
+               new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+               );
+
             // cart
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Catalog", "cart/",
                new { controller = "CartOverride", action = "Cart" },
