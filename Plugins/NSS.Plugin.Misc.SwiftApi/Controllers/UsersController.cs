@@ -90,8 +90,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 if (registration == null)
                     return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
 
-                if (registration.StatusId != (int)UserRegistrationStatus.Pending)
-                    return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is approved or rejected");
+                if (registration.StatusId != (int)UserRegistrationStatus.Rejected)
+                    return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is rejected");
 
                 if (_customerService.GetCustomerByEmail(registration.WorkEmail) != null)
                     return Error(HttpStatusCode.BadRequest, "userRegistration", "email is already registered");
