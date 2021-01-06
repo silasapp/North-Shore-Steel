@@ -127,16 +127,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs);
             model.CanBuy = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
 
-            var deliveryTicketFile = model.DeliveryTicketFile;
-            var invoiceFile = model.InvoiceFile;
+            var dTF = model.DeliveryTicketFile;
+            var iF = model.InvoiceFile;
 
-            deliveryTicketFile = deliveryTicketFile.Substring(deliveryTicketFile.LastIndexOf('/') + 1);
-            invoiceFile = invoiceFile.Substring(invoiceFile.LastIndexOf('/') + 1);
+            var deliveryTicketFile = dTF.Substring(dTF.LastIndexOf('/') + 1);
+            var invoiceFile = iF.Substring(iF.LastIndexOf('/') + 1);
 
             model.DeliveryTicketFileNo = deliveryTicketFile.Remove(deliveryTicketFile.LastIndexOf("?"));
             model.InvoiceFileNo = invoiceFile.Remove(invoiceFile.LastIndexOf("?"));
-            model.DeliveryTicketFile = $"{deliveryTicketFile}{token}";
-            model.InvoiceFile = $"{invoiceFile}{token}";
+            model.DeliveryTicketFile = $"{dTF}{token}";
+            model.InvoiceFile = $"{iF}{token}";
 
             return View(model);
         }
