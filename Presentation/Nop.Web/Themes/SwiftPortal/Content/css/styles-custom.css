@@ -16,6 +16,7 @@ a:not([href]):not([class]) {
     background-repeat: no-repeat;
     background-size: cover;
 }
+
 .nss-nav-bar {
     background-color: #0076b4;
     padding-top: 24px;
@@ -113,10 +114,10 @@ a:not([href]):not([class]) {
     justify-content: center;
 }
 
-.nav-bar-search .search-box-button:active,
-.nav-bar-search .search-box-button:focus {
-    outline: none;
-}
+    .nav-bar-search .search-box-button:active,
+    .nav-bar-search .search-box-button:focus {
+        outline: none;
+    }
 
 .nav-bar-search input:focus {
     border-color: none;
@@ -196,19 +197,19 @@ a:not([href]):not([class]) {
         width: 100% !important;
     }
 
-    #top-menu-drawer > div {
-        background-color: white;
-        padding: 1rem 1rem !important;
-    }
+        #top-menu-drawer > div {
+            background-color: white;
+            padding: 1rem 1rem !important;
+        }
 
-    #top-menu-drawer select {
-        width: 14rem;
-        padding: 0px;
-    }
+        #top-menu-drawer select {
+            width: 14rem;
+            padding: 0px;
+        }
 
-    #top-menu-drawer ul {
-        margin-right: 19.5rem;
-    }
+        #top-menu-drawer ul {
+            margin-right: 19.5rem;
+        }
 }
 
 /*// Extra large devices (large desktops, 1200px and up)*/
@@ -216,6 +217,7 @@ a:not([href]):not([class]) {
     .header-logo > a > img {
         width: 16rem;
     }
+
     .nav-bar-search {
         width: 28rem;
         position: relative;
@@ -342,16 +344,16 @@ a:not([href]):not([class]) {
         box-shadow: 16px 2px 16px #00000029;
     }
 
-    #top-menu-drawer select {
-        position: relative;
-        text-align-last: center;
-        background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #242424;
-        -webkit-appearance: none;
-        background-position-x: 94.5%;
-        background-color: white;
-        padding-right: 2.4rem;
-        padding-left: 2.4rem;
-    }
+        #top-menu-drawer select {
+            position: relative;
+            text-align-last: center;
+            background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #242424;
+            -webkit-appearance: none;
+            background-position-x: 94.5%;
+            background-color: white;
+            padding-right: 2.4rem;
+            padding-left: 2.4rem;
+        }
 
     .top-menu a {
         font: normal normal 500 26px/24px 'Teko';
@@ -359,9 +361,9 @@ a:not([href]):not([class]) {
         color: #AAAAAA;
     }
 
-    .top-menu a.active-tab {
-        color: #0076b4 !important;
-    }
+        .top-menu a.active-tab {
+            color: #0076b4 !important;
+        }
 }
 
 /*// Large devices (desktops, less than 1200px)*/
@@ -1149,9 +1151,9 @@ input:focus {
     cursor: pointer;
 }
 
-.hover-icon:hover {
-    fill: #0076B4 !important;
-}
+    .hover-icon:hover {
+        fill: #0076B4 !important;
+    }
 
 table a {
     color: #0076b4;
@@ -1839,18 +1841,18 @@ table input {
         opacity: 1;
     }
 
-.footer {
+.footer, .login-footer {
     background: #f6f6f6 0% 0% no-repeat padding-box;
     opacity: 1;
     border-top: 2.5px solid #0076b4;
     padding: 40px 0;
 }
 
-    .footer .title {
+    .footer .title, .login-footer title {
         text-align: left;
     }
 
-        .footer .title > strong {
+        .footer .title > strong, .login-footer .title > strong {
             text-align: left;
             font: normal normal 500 16px/24px "Teko";
             letter-spacing: 0.13px;
@@ -1858,7 +1860,7 @@ table input {
             opacity: 1;
         }
 
-    .footer a {
+    .footer a, .login-footer a {
         text-align: left;
         font: normal normal 500 13px/24px "Exo 2";
         letter-spacing: 0.1px;
@@ -1866,14 +1868,14 @@ table input {
         opacity: 1;
     }
 
-        .footer a:hover {
+        .footer a:hover, .login-footer a:hover {
             color: #0076b4;
         }
 
 .footer-main {
     flex-wrap: wrap;
     border-bottom: none;
-    padding: 0;
+    /*padding: 0;*/
     margin-bottom: 30px;
 }
 
@@ -1885,7 +1887,7 @@ table input {
         flex-direction: column;
         text-align: left;
         padding: 0;
-        flex-basis: 17%;
+        /*flex-basis: 17%;*/
     }
 
 .footer-content > img {
@@ -1893,20 +1895,25 @@ table input {
     max-width: 100%;
 }
 
-.footer li > a:hover {
+.footer li > a:hover, .login-footer li > a:hover {
     text-decoration: none;
     color: #0076b4;
+}
+.footer li > a, .login-footer li > a {
+    order: 2;
 }
 
 .footer-list-icon {
     visibility: hidden;
     height: 15px !important;
     width: 15px;
+    margin-left: -22px;
+    order: 1;
 }
 
-.footer li:hover > .footer-list-icon {
-    visibility: visible;
-}
+    .footer li > a:hover + .footer-list-icon, .login-footer li > a:hover + .footer-list-icon {
+        visibility: visible;
+    }
 
 .footer-main:after {
     content: none !important;
@@ -3023,17 +3030,17 @@ hr {
     align-items: center;
 }
 
-.nss-btn-white:active,
-.nss-btn-white:focus,
-.nss-btn-white:hover {
-    outline: none;
-    background: #03175B;
-    color: #FFFFFF;
-}
+    .nss-btn-white:active,
+    .nss-btn-white:focus,
+    .nss-btn-white:hover {
+        outline: none;
+        background: #03175B;
+        color: #FFFFFF;
+    }
 
-.nss-btn-white:hover img {
-    filter: brightness(0) invert(1);
-}
+        .nss-btn-white:hover img {
+            filter: brightness(0) invert(1);
+        }
 
 /*// Small devices (landscape phones, 576px and up)*/
 @media (min-width: 576px) {
@@ -3339,6 +3346,13 @@ and also iPads specifically.
 }
 
 @media all and (max-width: 600px) {
+    .footer {
+        display: none;
+    }
+
+        .footer li, .login-footer li {
+            justify-content: center;
+        }
     #invoiceSearchField > div {
         display: grid;
         grid-template-columns: repeat(2, minmax(200px, 1fr));
@@ -3437,15 +3451,32 @@ and also iPads specifically.
     .nav-bar-content > .header-links-wrapper {
         order: 2;
     }
+    .footer-main, .sales-dept {
+        padding: 0;
+    }
 
     .footer-main > .footer-content {
-        flex-basis: 48%;
+        flex-basis: 100%;
+        align-items: center;
+        text-align: center;
+    }
+    .products{
+        order: 2;
+    }
+    .info{
+        order:3;
     }
 
     .footer-logo {
         flex-basis: 100% !important;
+        order: 1;
     }
-
+    .follow-us {
+        order: 4;
+    }
+    .sales-dept {
+        order: 5;
+    }
     .login-page .fieldset {
         padding: 24px 20px;
     }
