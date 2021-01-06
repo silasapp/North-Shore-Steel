@@ -129,15 +129,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var dTF = model.DeliveryTicketFile;
             var iF = model.InvoiceFile;
-
-            var deliveryTicketFile = dTF.Substring(dTF.LastIndexOf('/') + 1);
-            var invoiceFile = iF.Substring(iF.LastIndexOf('/') + 1);
-
-            model.DeliveryTicketFileNo = deliveryTicketFile.Remove(deliveryTicketFile.LastIndexOf("?"));
-            model.InvoiceFileNo = invoiceFile.Remove(invoiceFile.LastIndexOf("?"));
-            model.DeliveryTicketFile = $"{dTF}{token}";
-            model.InvoiceFile = $"{iF}{token}";
-
+            if (!string.IsNullOrEmpty(dTF))
+            {
+                var deliveryTicketFile = dTF.Substring(dTF.LastIndexOf('/') + 1);
+                model.DeliveryTicketFileNo = deliveryTicketFile.Remove(deliveryTicketFile.LastIndexOf("?"));
+                model.DeliveryTicketFile = $"{dTF}{token}";
+            }
+            if (!string.IsNullOrEmpty(iF))
+            {
+                var invoiceFile = iF.Substring(iF.LastIndexOf('/') + 1);
+                model.InvoiceFileNo = invoiceFile.Remove(invoiceFile.LastIndexOf("?"));
+                model.InvoiceFile = $"{iF}{token}";
+            }
             return View(model);
         }
 

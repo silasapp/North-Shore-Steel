@@ -300,19 +300,25 @@
 
         </div>
         <div class="col-md-4 col-sm-6 d-flex flex-column align-items-center align-items-md-start">
-            <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
-                <div class="d-flex flex-row mb-4 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
-                    <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
-                    <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice @Model.InvoiceFileNo</label>
-                </div>
-            </a>
-            <a href="@Model.DeliveryTicketFile" target="_blank" class="text-decoration-none">
-                <div class="d-flex flex-row cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
-                    <img alt="Ticket Icon"
-                         v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
-                    <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket @Model.DeliveryTicketFileNo</label>
-                </div>
-            </a>
+            @if (Model.InvoiceFile != null)
+            {
+                <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
+                    <div class="d-flex flex-row mb-4 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
+                        <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice @Model.InvoiceFileNo</label>
+                    </div>
+                </a>
+            }
+            @if (Model.DeliveryTicketFile != null)
+            {
+                <a href="@Model.DeliveryTicketFile" target="_blank" class="text-decoration-none">
+                    <div class="d-flex flex-row cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
+                        <img alt="Ticket Icon"
+                             v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket @Model.DeliveryTicketFileNo</label>
+                    </div>
+                </a>
+            }
             @if (Model.MtrCount > 0)
             {
                 <div class="d-flex flex-row mt-4 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
