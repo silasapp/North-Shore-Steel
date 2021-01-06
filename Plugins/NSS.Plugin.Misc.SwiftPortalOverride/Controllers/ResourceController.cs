@@ -4,6 +4,7 @@ using Nop.Services.Seo;
 using Nop.Services.Topics;
 using Nop.Web.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,20 +42,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
 
             var allTopics = _topicService.GetAllTopics(_storeContext.CurrentStore.Id);
-            var slugs = new List<string>();
+            List<UrlRecordData> urlRecordData = new List<UrlRecordData>();
 
             foreach (var item in allTopics)
             {
-                slugs.Add(_urlRecordService.GetSeName(item.Id, "Topic"));
+                var urlRecord = new UrlRecordData
+                {
+                    Slug = _urlRecordService.GetSeName(item.Id, "Topic"),
+                    Title = item.Title
+                };
+                urlRecordData.Add(urlRecord);
             }
-
+            ViewBag.UrlRecords = urlRecordData;
             return View();
         }
 
-        
+
+        public class UrlRecordData
+        {
+            public string Slug { get; set; }
+            public string Title { get; set; }
+        }
+
+
         #endregion
 
-       
+
 
     }
 }
