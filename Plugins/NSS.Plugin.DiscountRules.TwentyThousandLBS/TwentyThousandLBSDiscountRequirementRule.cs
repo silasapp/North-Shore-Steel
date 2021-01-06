@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Nop.Core;
+using Nop.Services.Catalog;
 using Nop.Services.Configuration;
 using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Plugins;
 
-namespace NSS.Plugin.DiscountRules.FirstTimeBuyer
+namespace NSS.Plugin.DiscountRules.TwentyThousandLBS
 {
-    public partial class FirstTimeBuyerDiscountRequirementRule : BasePlugin, IDiscountRequirementRule
+    public partial class TwentyThousandLBSDiscountRequirementRule : BasePlugin, IDiscountRequirementRule
     {
         #region Fields
 
@@ -22,19 +23,21 @@ namespace NSS.Plugin.DiscountRules.FirstTimeBuyer
         private readonly ISettingService _settingService;
         private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly IWebHelper _webHelper;
-        private readonly IOrderService _orderService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IProductService _productService;
 
         #endregion
 
         #region Ctor
 
-        public FirstTimeBuyerDiscountRequirementRule(IActionContextAccessor actionContextAccessor,
+        public TwentyThousandLBSDiscountRequirementRule(IActionContextAccessor actionContextAccessor,
             IDiscountService discountService,
             ILocalizationService localizationService,
             ISettingService settingService,
             IUrlHelperFactory urlHelperFactory,
             IWebHelper webHelper,
-            IOrderService orderService)
+            IShoppingCartService shoppingCartService,
+            IProductService productService)
         {
             _actionContextAccessor = actionContextAccessor;
             _discountService = discountService;
@@ -42,7 +45,8 @@ namespace NSS.Plugin.DiscountRules.FirstTimeBuyer
             _settingService = settingService;
             _urlHelperFactory = urlHelperFactory;
             _webHelper = webHelper;
-            _orderService = orderService;
+            _shoppingCartService = shoppingCartService;
+            _productService = productService;
         }
 
         #endregion
@@ -71,8 +75,16 @@ namespace NSS.Plugin.DiscountRules.FirstTimeBuyer
                 return result;
 
             //result is valid if customer has no order
-            var orders = _orderService.SearchOrders(storeId: request.Store.Id, customerId: request.Customer.Id);
-            result.IsValid = orders?.Count == 0 ? true : false;
+            var cartItems = _shoppingCartService.GetShoppingCart(request.Customer, Nop.Core.Domain.Orders.ShoppingCartType.ShoppingCart);
+
+            int totalWeight = cartItems.Sum(item =>
+            {
+                var product = _productService.GetProductById(item.ProductId);
+
+                return (int)Math.Round((product?.Weight ?? decimal.Zero) * item.Quantity);
+            });
+
+            result.IsValid = totalWeight >= 20000 && totalWeight < 30000;
 
             return result;
         }
@@ -87,7 +99,7 @@ namespace NSS.Plugin.DiscountRules.FirstTimeBuyer
         {
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
-            return urlHelper.Action("Configure", "DiscountRulesFirstTimeBuyer",
+            return urlHelper.Action("Configure", "DiscountRulesTwentyThousandLBS",
                 new { discountId = discountId, discountRequirementId = discountRequirementId }, _webHelper.CurrentRequestProtocol);
         }
 

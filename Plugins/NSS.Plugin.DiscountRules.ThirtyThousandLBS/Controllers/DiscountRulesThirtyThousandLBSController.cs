@@ -13,15 +13,15 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
-using NSS.Plugin.DiscountRules.FirstTimeBuyer;
-using NSS.Plugin.DiscountRules.FirstTimeBuyer.Models;
+using NSS.Plugin.DiscountRules.ThirtyThousandLBS;
+using NSS.Plugin.DiscountRules.ThirtyThousandLBS.Models;
 
-namespace NSS.Plugin.FirstTimeBuyer.CustomerRoles.Controllers
+namespace NSS.Plugin.DiscountRules.ThirtyThousandLBS.Controllers
 {
     [AuthorizeAdmin]
     [Area(AreaNames.Admin)]
     [AutoValidateAntiforgeryToken]
-    public class DiscountRulesFirstTimeBuyerController : BasePluginController
+    public class DiscountRulesThirtyThousandLBSController : BasePluginController
     {
         #region Fields
 
@@ -35,7 +35,7 @@ namespace NSS.Plugin.FirstTimeBuyer.CustomerRoles.Controllers
 
         #region Ctor
 
-        public DiscountRulesFirstTimeBuyerController(ICustomerService customerService,
+        public DiscountRulesThirtyThousandLBSController(ICustomerService customerService,
             IDiscountService discountService,
             ILocalizationService localizationService,
             IPermissionService permissionService,
@@ -79,7 +79,7 @@ namespace NSS.Plugin.FirstTimeBuyer.CustomerRoles.Controllers
             //set the HTML field prefix
             ViewData.TemplateInfo.HtmlFieldPrefix = string.Format(DiscountRequirementDefaults.HtmlFieldPrefix, discountRequirementId ?? 0);
 
-            return View("~/Plugins/DiscountRules.FirstTimeBuyer/Views/Configure.cshtml", model);
+            return View("~/Plugins/DiscountRules.ThirtyThousandLBS/Views/Configure.cshtml", model);
         }
 
         [HttpPost]        

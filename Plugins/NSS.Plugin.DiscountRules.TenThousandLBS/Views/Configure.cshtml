@@ -1,11 +1,11 @@
-﻿@model NSS.Plugin.DiscountRules.FirstTimeBuyer.Models.RequirementModel
+﻿@model NSS.Plugin.DiscountRules.TenThousandLBS.Models.RequirementModel
 @{
     Layout = "";
 }
 
-<script>
+    <script>
     $(document).ready(function () {
-        $('#savefirsttimebuyerrequirement@(Model.RequirementId)').click(function () {
+        $('#savetenthousandlbsrequirement@(Model.RequirementId)').click(function () {
             var discountId = @Model.DiscountId;
             var requirementId = @Model.RequirementId;
             var isApplied = true;
@@ -20,7 +20,7 @@
             $.ajax({
                 cache: false,
                 type: "POST",
-                url: "@(Url.Action("Configure", "DiscountRulesFirstTimeBuyer"))",
+                url: "@(Url.Action("Configure", "DiscountRulesTenThousandLBS"))",
                 data: postData,
                 success: function (data, textStatus, jqXHR) {
                     $('#pnl-save-requirement-result@(Model.RequirementId)').fadeIn("slow").delay(1000).fadeOut("slow");
@@ -31,7 +31,7 @@
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    var $alertInfoEl = $("#savefirsttimebuyerrequirementAlert-info");
+                    var $alertInfoEl = $("#savetenthousandlbsrequirementAlert-info");
                     let response = jqXHR.responseJSON;
                     if (response instanceof Object && response.hasOwnProperty('Errors')) {
                         var errorMessages = '';
@@ -46,26 +46,26 @@
                         $alertInfoEl.html('@T("Admin.Promotions.Discounts.Requirements.FailedToSave")');
                     }
 
-                    $("#savefirsttimebuyerrequirementAlert").click();
+                    $("#savetenthousandlbsrequirementAlert").click();
                 }
             });
         });
     });
-</script>
+    </script>
 
-<div class="form-group">
-    <div class="col-md-3"></div>
-    <div class="col-md-9 requirement-data-col">
-        <div class="requirement-data-buttons">
-            <input type="button" id="savefirsttimebuyerrequirement@(Model.RequirementId)" class="btn btn-primary" value="@T("Admin.Common.Save")" />
+    <div class="form-group">
+        <div class="col-md-3"></div>
+        <div class="col-md-9 requirement-data-col">
+            <div class="requirement-data-buttons">
+                <input type="button" id="savetenthousandlbsrequirement@(Model.RequirementId)" class="btn btn-primary" value="@T("Admin.Common.Save")" />
+            </div>
         </div>
     </div>
-</div>
-<div class="form-group">
-    <div class="col-md-offset-3 col-md-9 requirement-messages-col">
-        <div id="pnl-save-requirement-result@(Model.RequirementId)" style="display: none;" class="text-green margin-t-5">
-            @T("Admin.Promotions.Discounts.Requirements.Saved")
+    <div class="form-group">
+        <div class="col-md-offset-3 col-md-9 requirement-messages-col">
+            <div id="pnl-save-requirement-result@(Model.RequirementId)" style="display: none;" class="text-green margin-t-5">
+                @T("Admin.Promotions.Discounts.Requirements.Saved")
+            </div>
         </div>
     </div>
-</div>
-<nop-alert asp-alert-id="savefirsttimebuyerrequirementAlert" />
+<nop-alert asp-alert-id="savetenthousandlbsrequirementAlert" />

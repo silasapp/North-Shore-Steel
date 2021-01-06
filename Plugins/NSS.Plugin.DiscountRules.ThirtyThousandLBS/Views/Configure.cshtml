@@ -1,11 +1,11 @@
-﻿@model NSS.Plugin.DiscountRules.FirstTimeBuyer.Models.RequirementModel
+﻿@model NSS.Plugin.DiscountRules.ThirtyThousandLBS.Models.RequirementModel
 @{
     Layout = "";
 }
 
 <script>
     $(document).ready(function () {
-        $('#savefirsttimebuyerrequirement@(Model.RequirementId)').click(function () {
+        $('#savethirtythousandlbsrequirement@(Model.RequirementId)').click(function () {
             var discountId = @Model.DiscountId;
             var requirementId = @Model.RequirementId;
             var isApplied = true;
@@ -20,7 +20,7 @@
             $.ajax({
                 cache: false,
                 type: "POST",
-                url: "@(Url.Action("Configure", "DiscountRulesFirstTimeBuyer"))",
+                url: "@(Url.Action("Configure", "DiscountRulesThirtyThousandLBS"))",
                 data: postData,
                 success: function (data, textStatus, jqXHR) {
                     $('#pnl-save-requirement-result@(Model.RequirementId)').fadeIn("slow").delay(1000).fadeOut("slow");
@@ -31,7 +31,7 @@
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    var $alertInfoEl = $("#savefirsttimebuyerrequirementAlert-info");
+                    var $alertInfoEl = $("#savethirtythousandlbsrequirementAlert-info");
                     let response = jqXHR.responseJSON;
                     if (response instanceof Object && response.hasOwnProperty('Errors')) {
                         var errorMessages = '';
@@ -46,7 +46,7 @@
                         $alertInfoEl.html('@T("Admin.Promotions.Discounts.Requirements.FailedToSave")');
                     }
 
-                    $("#savefirsttimebuyerrequirementAlert").click();
+                    $("#savethirtythousandlbsrequirementAlert").click();
                 }
             });
         });
@@ -57,7 +57,7 @@
     <div class="col-md-3"></div>
     <div class="col-md-9 requirement-data-col">
         <div class="requirement-data-buttons">
-            <input type="button" id="savefirsttimebuyerrequirement@(Model.RequirementId)" class="btn btn-primary" value="@T("Admin.Common.Save")" />
+            <input type="button" id="savethirtythousandlbsrequirement@(Model.RequirementId)" class="btn btn-primary" value="@T("Admin.Common.Save")" />
         </div>
     </div>
 </div>
@@ -68,4 +68,4 @@
         </div>
     </div>
 </div>
-<nop-alert asp-alert-id="savefirsttimebuyerrequirementAlert" />
+<nop-alert asp-alert-id="savethirtythousandlbsrequirementAlert" />
