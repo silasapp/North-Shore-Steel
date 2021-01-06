@@ -11,6 +11,11 @@ a:not([href]):not([class]) {
     color: #03175b !important;
 }
 
+.navbar-bg {
+    background-image: url(./../assets/top_bar_background.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
 .nss-nav-bar {
     background-color: #0076b4;
     padding-top: 24px;
@@ -985,18 +990,8 @@ input:focus {
 }
 
 /*date picker end*/
-.linda-block {
-    height: 400px;
-    background-image: url(./../assets/no-photo.png);
-    background-size: contain;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #ffffff;
-    font-family: "Teko";
-    letter-spacing: 1px;
-    font-size: 28px;
-    text-align: center;
+.linda-block > img {
+    width: 100%;
 }
 
 .external-authentication {
