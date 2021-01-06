@@ -43,7 +43,7 @@
                     <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/metal-processes/">METAL PROCESSES</a></li>
                     <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/industries-served/">INDUSTRIES SERVED</a></li>
                 </ul>
-                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
+                <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
             </div>
             <div class="footer-content info">
                 <ul class="list">
@@ -54,7 +54,7 @@
                     <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/careers">CAREERS</a></li>
                     <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/why-north-shore-steel/">WHY NORTH SHORE STEEL?</a></li>
                 </ul>
-                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
+                <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
             </div>
             <div class="follow-us footer-content">
                 <div>
@@ -81,7 +81,7 @@
                         </a>
                     </ul>
                 </div>
-                <img src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
+                <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
             </div>
             <div class="sales-dept footer-content">
                 <div class="title"><strong>SALES DEPARTMENTS</strong></div>
@@ -109,89 +109,101 @@
                     <p style="font-size:12px">HOUSTON, TX 77015</p>
                     <p style="font-size:12px"> 713-453-3533</p>
                 </div>
+            </div>
+
+            <div class="partners-logo">
+                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
+                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
+                <img src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
             </div>
         </div>
 
     </div>      }
 @if (routeUrl.Contains("login"))
 {<div class="login-footer">
-        <div class="nss-container d-flex justify-content-between footer-main">
-            <div class="footer-content">
-                <ul class="list">
-                    <div class="title"><strong>PRODUCTS</strong></div>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/structural-steel/">STRCUTURAL STEEL</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/fittings-flanges/">FITTINGS & FLANGES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/metal-processes/">METAL PROCESSES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/industries-served/">INDUSTRIES SERVED</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                </ul>
-                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
-            </div>
-            <div class="footer-content">
-                <ul class="list">
-                    <div class="title"><strong>INFO</strong></div>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/resources/">RESOURCES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/sister-companies/">SISTER COMPANIES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                    <li class="d-flex align-items-center"><a href="https://swift.nssco.com/">SWIFT&#8482;</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/careers">CAREERS</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/why-north-shore-steel/">WHY NORTH SHORE STEEL?</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
-                </ul>
-                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
-            </div>
-            <div class="follow-us footer-content">
-                <div>
-                    <div class="title"><strong>FOLLOW US</strong></div>
-                    <ul class="networks">
+     <div class="nss-container d-flex justify-content-between footer-main">
+         <div class="footer-content products">
+             <ul class="list">
+                 <div class="title"><strong>PRODUCTS</strong></div>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/structural-steel/">STRCUTURAL STEEL</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/fittings-flanges/">FITTINGS & FLANGES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/metal-processes/">METAL PROCESSES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/industries-served/">INDUSTRIES SERVED</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+             </ul>
+             <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
+         </div>
+         <div class="footer-content info">
+             <ul class="list">
+                 <div class="title"><strong>INFO</strong></div>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/resources/">RESOURCES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/sister-companies/">SISTER COMPANIES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="https://swift.nssco.com/">SWIFT&#8482;</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/careers">CAREERS</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/why-north-shore-steel/">WHY NORTH SHORE STEEL?</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+             </ul>
+             <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
+         </div>
+         <div class="follow-us footer-content">
+             <div>
+                 <div class="title"><strong>FOLLOW US</strong></div>
+                 <ul class="networks">
 
-                        <a href="https://www.facebook.com/NorthShoreSteel/" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/facebook.svg" alt="">
-                        </a>
-                        <a href="https://www.linkedin.com/company/north-shore-steel/" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/linkedin.svg"
-                                 alt="">
-                        </a>
+                     <a href="https://www.facebook.com/NorthShoreSteel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/facebook.svg" alt="">
+                     </a>
+                     <a href="https://www.linkedin.com/company/north-shore-steel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/linkedin.svg"
+                              alt="">
+                     </a>
 
 
-                        <a href="https://www.youtube.com/channel/UCJ_fcBkyfnCJAUUZ1U6k18g" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/youtube.svg" alt="">
-                        </a>
-                        <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/instagram.svg" alt="">
-                        </a>
-                        <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
-                            <img src="~/Themes/@(themeName)/Content/assets/twitter.svg" alt="">
-                        </a>
-                    </ul>
-                </div>
-                <img src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
-            </div>
-            <div class="sales-dept footer-content">
-                <div class="title"><strong>SALES DEPARTMENTS</strong></div>
-                <ul class="list">
-                    <li>Structural Steel </li>
-                    <li>713-980-5872 </li>
-                </ul>
-                <ul class="list">
-                    <li>Fittings & Flanges </li>
-                    <li>713-980-5873 </li>
-                </ul>
-                <ul class="list">
-                    <li>Plate Processing </li>
-                    <li>713-980-5874 </li>
-                </ul>
-                <ul class="list">
-                    <li>Beaumont </li>
-                    <li>713-980-5875 </li>
-                </ul>
-            </div>
-            <div class="footer-content footer-logo">
-                <div>
-                    <img src="~/Themes/@(themeName)/Content/assets/logo-old.png" alt="">
-                    <p style="font-size:12px">1566 MILES ST. </p>
-                    <p style="font-size:12px">HOUSTON, TX 77015</p>
-                    <p style="font-size:12px"> 713-453-3533</p>
-                </div>
-            </div>
-        </div>
+                     <a href="https://www.youtube.com/channel/UCJ_fcBkyfnCJAUUZ1U6k18g" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/youtube.svg" alt="">
+                     </a>
+                     <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/instagram.svg" alt="">
+                     </a>
+                     <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/twitter.svg" alt="">
+                     </a>
+                 </ul>
+             </div>
+             <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
+         </div>
+         <div class="sales-dept footer-content">
+             <div class="title"><strong>SALES DEPARTMENTS</strong></div>
+             <ul class="list">
+                 <li>Structural Steel </li>
+                 <li>713-980-5872 </li>
+             </ul>
+             <ul class="list">
+                 <li>Fittings & Flanges </li>
+                 <li>713-980-5873 </li>
+             </ul>
+             <ul class="list">
+                 <li>Plate Processing </li>
+                 <li>713-980-5874 </li>
+             </ul>
+             <ul class="list">
+                 <li>Beaumont </li>
+                 <li>713-980-5875 </li>
+             </ul>
+         </div>
+         <div class="footer-content footer-logo">
+             <div>
+                 <img src="~/Themes/@(themeName)/Content/assets/logo-old.png" alt="">
+                 <p style="font-size:12px">1566 MILES ST. </p>
+                 <p style="font-size:12px">HOUSTON, TX 77015</p>
+                 <p style="font-size:12px"> 713-453-3533</p>
+             </div>
+         </div>
+
+         <div class="partners-logo">
+             <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
+             <img class="" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
+             <img src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
+         </div>
+     </div>
 
     </div>      }
 <span class="footer-disclaimer">NORTH SHORE STEEL © 2020 ALL RIGHTS RESERVED</span>

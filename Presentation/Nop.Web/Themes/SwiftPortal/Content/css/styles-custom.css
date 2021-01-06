@@ -17,13 +17,21 @@ a:not([href]):not([class]) {
     background-size: cover;
 }
 
+.partners-logo {
+    display: none;
+    order: 6;
+    justify-content: center;
+}
 .nss-nav-bar {
     background-color: #0076b4;
     padding-top: 24px;
     padding-bottom: 24px;
     z-index: 0 !important;
 }
-
+.partners-logo > img {
+    width: 25%;
+    padding: 0 10px;
+}
 .nav-bar-content {
     display: flex;
     justify-content: space-between;
@@ -732,7 +740,7 @@ a:not([href]):not([class]) {
 
 .form-fields,
 .new-wrapper .text {
-    background-color: #ffffff !important;
+    background-color:transparent !important;
     border: none !important;
 }
 
@@ -787,11 +795,12 @@ a:not([href]):not([class]) {
 .inputs > select,
 .inputs > textarea,
 .text-left > input,
+.user-input-field,
 .input-with-icon > input,
 .custom-input {
     width: 100% !important;
     font-size: 14px;
-    background: #f6f6f6 0% 0% no-repeat padding-box !important;
+    background: #f6f6f6 0% 0% no-repeat padding-box ;
     font: normal normal normal 14px/24px "Exo 2" !important;
     opacity: 1;
     border: none;
@@ -1899,6 +1908,7 @@ table input {
     text-decoration: none;
     color: #0076b4;
 }
+
 .footer li > a, .login-footer li > a {
     order: 2;
 }
@@ -1911,9 +1921,9 @@ table input {
     order: 1;
 }
 
-    .footer li > a:hover + .footer-list-icon, .login-footer li > a:hover + .footer-list-icon {
-        visibility: visible;
-    }
+.footer li > a:hover + .footer-list-icon, .login-footer li > a:hover + .footer-list-icon {
+    visibility: visible;
+}
 
 .footer-main:after {
     content: none !important;
@@ -2548,7 +2558,9 @@ table input {
     padding: 24px;
     margin-bottom: 70px;
 }
-
+.login-page .returning-wrapper .buttons{
+    background-color: transparent !important;
+}
 .cancel-button {
     text-align: center;
     text-decoration: underline;
@@ -3274,6 +3286,11 @@ li {
     padding: 2rem;
 }
 
+.white-input {
+    background: none !important;
+    background-color: white !important;
+    background: #fff 0% 0% no-repeat padding-box !important;
+}
 /* #endregion */
 
 /* 
@@ -3346,6 +3363,24 @@ and also iPads specifically.
 }
 
 @media all and (max-width: 600px) {
+    .partners-logo {
+        display: flex;
+    }
+    .part-logo {
+        display:none;
+    }
+    .nss-container {
+        padding: 0 !important;
+    }
+    .fieldset {
+        background-color: #f6f6f6 !important;
+        width: auto !important;
+        box-shadow: 0px 1px 16px #0000001a;
+    }
+    .custom-input {
+        background: #fff !important;
+        background-color: #fff !important;
+    }
     .footer {
         display: none;
     }
@@ -3353,6 +3388,7 @@ and also iPads specifically.
         .footer li, .login-footer li {
             justify-content: center;
         }
+
     #invoiceSearchField > div {
         display: grid;
         grid-template-columns: repeat(2, minmax(200px, 1fr));
@@ -3451,32 +3487,38 @@ and also iPads specifically.
     .nav-bar-content > .header-links-wrapper {
         order: 2;
     }
-    .footer-main, .sales-dept {
-        padding: 0;
+
+    .footer-main, .sales-dept, .sales-dept {
+        padding: 0 !important;
     }
 
-    .footer-main > .footer-content {
-        flex-basis: 100%;
-        align-items: center;
-        text-align: center;
-    }
-    .products{
+        .footer-main > .footer-content {
+            flex-basis: 100%;
+            align-items: center;
+            text-align: center;
+        }
+
+    .products {
         order: 2;
     }
-    .info{
-        order:3;
+
+    .info {
+        order: 3;
     }
 
     .footer-logo {
         flex-basis: 100% !important;
         order: 1;
     }
+
     .follow-us {
         order: 4;
     }
+
     .sales-dept {
         order: 5;
     }
+
     .login-page .fieldset {
         padding: 24px 20px;
     }
