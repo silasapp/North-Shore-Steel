@@ -46,12 +46,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             foreach (var item in allTopics)
             {
-                var urlRecord = new UrlRecordData
+                if(item.SystemName != "PageNotFound")
                 {
-                    Slug = _urlRecordService.GetSeName(item.Id, "Topic"),
-                    Title = item.Title
-                };
-                urlRecordData.Add(urlRecord);
+                    var urlRecord = new UrlRecordData
+                    {
+                        Slug = _urlRecordService.GetSeName(item.Id, "Topic"),
+                        Title = item.Title
+                    };
+                    urlRecordData.Add(urlRecord);
+                }
             }
             ViewBag.UrlRecords = urlRecordData;
             return View();

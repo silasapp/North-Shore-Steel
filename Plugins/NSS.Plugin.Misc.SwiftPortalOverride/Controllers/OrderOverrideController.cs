@@ -107,10 +107,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
             ERPGetOrderDetailsResponse orderDetailsResponse = null;
+            var token = string.Empty;
 
             // call api
             if (eRPCompanyId > 0 && orderId > 0)
-                orderDetailsResponse = _erpApiProvider.GetOrderDetails(eRPCompanyId, orderId);
+                (token, orderDetailsResponse) = _erpApiProvider.GetOrderDetails(eRPCompanyId, orderId);
 
             if (orderDetailsResponse == null)
                 return Challenge();
@@ -121,11 +122,26 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 orderMTRs = _erpApiProvider.GetOrderMTRs(eRPCompanyId, orderId);
             }
+            
+
             var model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs);
             model.CanBuy = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
 
+            var deliveryTicketFile = model.DeliveryTicketFile;
+            var invoiceFile = model.InvoiceFile;
+
+            deliveryTicketFile = deliveryTicketFile.Substring(deliveryTicketFile.LastIndexOf('/') + 1);
+            invoiceFile = invoiceFile.Substring(invoiceFile.LastIndexOf('/') + 1);
+
+            model.DeliveryTicketFileNo = deliveryTicketFile.Remove(deliveryTicketFile.LastIndexOf("?"));
+            model.InvoiceFileNo = invoiceFile.Remove(invoiceFile.LastIndexOf("?"));
+            model.DeliveryTicketFile = $"{deliveryTicketFile}{token}";
+            model.InvoiceFile = $"{invoiceFile}{token}";
+
             return View(model);
         }
+
+
 
         //My account / Orders
         [HttpsRequirement]

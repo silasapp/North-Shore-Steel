@@ -511,18 +511,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public ERPGetOrderDetailsResponse GetOrderDetails(int companyId, int erpOrderId)
+        public (string, ERPGetOrderDetailsResponse) GetOrderDetails(int companyId, int erpOrderId)
         {
             //initialize
             ERPGetOrderDetailsResponse retVal = null;
             var respContent = string.Empty;
             string error = string.Empty;
+            var token = string.Empty;
 
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
                 _logger.Warning("Swift Api provider - GetOrderDetails", new Exception("NSS API attributes not configured correctly."));
-                return retVal;
+                return ("", retVal);
+
             }
 
             //create swift user
@@ -536,12 +538,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
 
                     //get token
-                    var token = GetNSSToken(httpClient);
+                    token = GetNSSToken(httpClient);
 
                     if (string.IsNullOrEmpty(token))
                     {
                         _logger.Warning($"NSS.GetOrderDetails companyId -> {companyId}, orderId -> {erpOrderId}", new Exception("NSS token returned empty"));
-                        return retVal;
+                        return ("", retVal);
                     }
 
                     //httpClient.DefaultRequestHeaders.Authorization =
@@ -574,7 +576,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             // log request & resp
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetOrderDetails => companyId: {companyId}, orderId: {erpOrderId}", $"resp content ==> {respContent ?? "empty"}");
 
-            return retVal;
+            return (token, retVal);
         }
 
         public List<ERPGetOrderMTRResponse> GetOrderMTRs(int companyId, int erpOrderId, int? lineItemId = null)
