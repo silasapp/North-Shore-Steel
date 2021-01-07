@@ -213,6 +213,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\icn-users.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\icon-arrow-up-white.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\instagram.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\linda_experience_banner.jpg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\linkedin.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\list.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\logo-nasa.png" />
@@ -227,6 +228,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\phone.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\search.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\smile.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\assets\top_bar_background.jpg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\truck.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\twitter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\youtube.svg" />
@@ -500,6 +502,10 @@
     <Folder Include="Plugins\Misc.SwiftApi\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\" />
     <Folder Include="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Validators\theme.json" />
   </ItemGroup>
 
   <!-- This target execute after "Build" target.

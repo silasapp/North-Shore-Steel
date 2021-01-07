@@ -13,7 +13,9 @@
     }
 </style>
 <div>
-    <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true">
+    <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo"
+              queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true"
+              rowSelected="onRowSelected" rowDeselected="onRowDeselected">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
@@ -45,11 +47,13 @@
     function toolbarClick() {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
-        var exportProperties = {
-            dataSource: exceldata,
-            fileName: "InvoiceExport.xlsx"
-        };
-        gridObj.excelExport(exportProperties);
+        if (exceldata.length > 0) {
+            var exportProperties = {
+                dataSource: exceldata,
+                fileName: "InvoiceExport.xlsx"
+            };
+            gridObj.excelExport(exportProperties);
+        }
     }
 
     function excelQueryCellInfo(args) {
@@ -57,6 +61,20 @@
         if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderNo; }
         if (args.column.headerText == "Invoice Amount" && args.value.length === 0) { args.value = args.data.InvoiceAmount; }
         if (args.column.headerText == "Balance Amount" && args.value.length === 0) { args.value = args.data.BalanceAmount; }
+    }
+
+    function onRowSelected(args) {
+        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        console.log("onRowSelected: ", exceldata.length);
+        vm.selectedRowCount = exceldata.length;
+    }
+
+    function onRowDeselected(args) {
+        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        console.log("onRowDeselected: ", exceldata.length);
+        vm.selectedRowCount = exceldata.length;
     }
 
     function customiseCell(args) {
