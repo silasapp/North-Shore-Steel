@@ -13,7 +13,8 @@
     }
 </style>
 <div>
-    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true">
+    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true"
+              allowPaging="true" allowFiltering="true" rowSelected="onRowSelected" rowDeselected="onRowDeselected">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
         <e-grid-columns>
@@ -41,20 +42,31 @@
 <script>
     function toolbarClick() {
         var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
-        //if (args.item.id === 'OrderGrid_excelexport') {
         var exceldata = gridObj.getSelectedRecords();
-        var exportProperties = {
-            dataSource: exceldata,
-            fileName: "OrdersExport.xlsx"
-        };
-        console.log(exportProperties);
-        gridObj.excelExport(exportProperties);
-        //}
+        if (exceldata.length > 0) {
+            var exportProperties = {
+                dataSource: exceldata,
+                fileName: "OrdersExport.xlsx"
+            };
+            gridObj.excelExport(exportProperties);
+        }
     }
 
     function excelQueryCellInfo(args) {
         if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
         if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
+    }
+
+    function onRowSelected(args) {
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        vm.selectedRowCount = exceldata.length;
+    }
+
+    function onRowDeselected(args) {
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        vm.selectedRowCount = exceldata.length;
     }
 
     function customiseCell(args) {

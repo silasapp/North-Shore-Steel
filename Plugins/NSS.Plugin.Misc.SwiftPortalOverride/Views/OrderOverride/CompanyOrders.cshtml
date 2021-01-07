@@ -30,8 +30,9 @@
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
-                        @*<input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="startDate" placeholder="From (mm/dd/yyyy)" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control"
+                               data-date-format="mm/dd/yyyy" id="startDate" placeholder="From (mm/dd/yyyy)" maxlength="10" onpaste="return false;"
+                               v-on:change="!$event.target.value ? (fromDate = null) : null">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -39,8 +40,9 @@
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
-                        @*<input class=nss-form-control type="text" v-model="toDate" id="datepicker2" autocomplete="off" placeholder="To">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="endDate" placeholder="To (mm/dd/yyyy)" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy"
+                               id="endDate" placeholder="To (mm/dd/yyyy)" maxlength="10" onpaste="return false;"
+                               v-on:change="!$event.target.value ? (toDate = null) : null">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -64,14 +66,14 @@
                     <li class=nav-item role="presentation" style=margin-right:.3em>
                         <a class="nav-link active" id=pills-home-tab data-toggle=pill
                            href=#pills-home role=tab aria-controls=pills-home
-                           aria-selected=true v-on:click="isClosed = false; searchOrders();">Open Orders</a>
+                           aria-selected=true v-on:click="isClosed = false; searchOrders(); selectedRowCount = 0;">Open Orders</a>
                     <li class=nav-item role="presentation">
                         <a class=nav-link id=pills-profile-tab
                            data-toggle=pill href=#pills-profile role=tab
-                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchOrders();">Closed Orders</a>
+                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchOrders(); selectedRowCount = 0;">Closed Orders</a>
                 </ul>
             </div>
-            <button class="nss-btn-default ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+            <button v-bind:disabled="selectedRowCount === 0" class="nss-btn-default ml-lg-5 mb-2 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
         </div>
         <div class="d-flex flex-column p-4 bg-white-shadow">
 
@@ -90,6 +92,7 @@
             fromDate: null,
             toDate: null,
             poNo: null,
+            selectedRowCount: 0,
         },
         mounted: function () {
             this.searchOrders();
@@ -110,7 +113,7 @@
                     isClosed: this.isClosed,
                 };
                 this.showLoading();
-                console.log('request', request);
+                this.selectedRowCount = 0;
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("SearchCompanyOrders", "OrderOverride")",
@@ -137,18 +140,19 @@
 <script>
 
     $.fn.datepicker.defaults.format = "mm/dd/yyyy";
-    $('#startDate').datepicker();
-    $('#endDate').datepicker();
+    $('#startDate').datepicker({
+        endDate: '+0d',
+        autoclose: true
+    }).on('changeDate', function (e) {
+        vm.fromDate = $(this).val();
+    });
 
-    $('#startDate').datepicker()
-        .on('changeDate', function (e) {
-            vm.fromDate = $(this).val();
-        });
-
-    $('#endDate').datepicker()
-        .on('changeDate', function (e) {
-            vm.toDate = $(this).val();
-        });
+    $('#endDate').datepicker({
+        endDate: '+0d',
+        autoclose: true
+    }).on('changeDate', function (e) {
+        vm.toDate = $(this).val();
+    });
 
 
 

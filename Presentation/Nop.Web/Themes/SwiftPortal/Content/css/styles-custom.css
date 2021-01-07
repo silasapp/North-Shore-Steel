@@ -793,6 +793,10 @@ a:not([href]):not([class]) {
     opacity: 1;
 }
 
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px #f6f6f6 inset !important;
+}
+
 .datepicker {
     color: #242424 !important;
     font: normal normal normal 14px/24px "Exo 2" !important;
@@ -3261,11 +3265,24 @@ li {
     color: #000;
     font-size: 16px;
     line-height: 1;
+    cursor: pointer;
 }
 
     .nss-btn-default:hover {
         background: #0076b4;
         color: #fff;
+    }
+
+    .nss-btn-default:active {
+        outline: none !important;
+    }
+
+    .nss-btn-default:hover img {
+        filter: brightness(0) invert(1);
+    }
+
+    .nss-btn-default:disabled {
+        cursor: not-allowed;
     }
 
 .e-footer-content {
