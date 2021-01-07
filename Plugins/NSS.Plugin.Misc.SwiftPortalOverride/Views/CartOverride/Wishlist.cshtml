@@ -323,8 +323,10 @@
             }
             else
             {
-                <div class="no-data">
-                    @T("Wishlist.CartIsEmpty")
+                <div class="tab-content p-0">
+                    <div class="no-data mx-4 my-4">
+                        @T("Wishlist.CartIsEmpty")
+                    </div>
                 </div>
             }
             @*@if (Model.IsEditable && Model.Items.Count > 0)
