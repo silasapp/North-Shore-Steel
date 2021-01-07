@@ -13,7 +13,7 @@
 @if (routeUrl.Contains("login") || routeUrl.Contains("register") || routeUrl.Contains("passwordrecovery"))
 {
     <div class="linda-block">
-        [CUSTOMER EXPERIENCE / LINDA EXPERIENCE MARKETING COPY HERE]
+        <img src="~/Themes/@(themeName)/Content/assets/linda_experience_banner.jpg" />
     </div>
 }
 @if (routeUrl.Contains("catalog"))
@@ -31,214 +31,311 @@
         <img src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%">
     </div>
 }
-<div class="footer">
-    <div class="nss-container d-flex justify-content-between footer-main">
-        <div class="footer-content">
-            <ul class="list">
-                <div class="title pl-4"><strong>PRODUCTS</strong></div>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/structural-steel/">STRCUTURAL STEEL</a></li>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/fittings-flanges/">FITTINGS & FLANGES</a></li>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/metal-processes/">METAL PROCESSES</a></li>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/industries-served/">INDUSTRIES SERVED</a></li>
-            </ul>
-            <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
-        </div>
-        <div class="footer-content">
-            <ul class="list">
-                <div class="title pl-4"><strong>INFO</strong></div>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/resources/">RESOURCES</a></li>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/sister-companies/">SISTER COMPANIES</a></li>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="https://swift.nssco.com/">SWIFT&#8482;</a></li>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/careers">CAREERS</a></li>
-                <li class="d-flex align-items-center"><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""><a href="http://northshoresteel.topspotims.modxcloud.com/why-north-shore-steel/">WHY NORTH SHORE STEEL?</a></li>
-            </ul>
-            <img class="" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
-        </div>
-        <div class="follow-us footer-content">
-            <div>
-                <div class="title"><strong>FOLLOW US</strong></div>
-                <ul class="networks">
-
-                    <a href="https://www.facebook.com/NorthShoreSteel/" target="_blank">
-                        <img src="~/Themes/@(themeName)/Content/assets/facebook.svg" alt="">
-                    </a>
-                    <a href="https://www.linkedin.com/company/north-shore-steel/" target="_blank">
-                        <img src="~/Themes/@(themeName)/Content/assets/linkedin.svg"
-                             alt="">
-                    </a>
-
-
-                    <a href="https://www.youtube.com/channel/UCJ_fcBkyfnCJAUUZ1U6k18g" target="_blank">
-                        <img src="~/Themes/@(themeName)/Content/assets/youtube.svg" alt="">
-                    </a>
-                    <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
-                        <img src="~/Themes/@(themeName)/Content/assets/instagram.svg" alt="">
-                    </a>
-                    <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
-                        <img src="~/Themes/@(themeName)/Content/assets/twitter.svg" alt="">
-                    </a>
-                </ul>
-            </div>
-            <img src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
-        </div>
-        <div class="sales-dept footer-content">
-            <div class="title"><strong>SALES DEPARTMENTS</strong></div>
-            <ul class="list">
-                <li>Structural Steel </li>
-                <li>713-980-5872 </li>
-            </ul>
-            <ul class="list">
-                <li>Fittings & Flanges </li>
-                <li>713-980-5873 </li>
-            </ul>
-            <ul class="list">
-                <li>Plate Processing </li>
-                <li>713-980-5874 </li>
-            </ul>
-            <ul class="list">
-                <li>Beaumont </li>
-                <li>713-980-5875 </li>
-            </ul>
-        </div>
-        <div class="footer-content footer-logo">
-            <div>
-                <img src="~/Themes/@(themeName)/Content/assets/logo-old.png" alt="">
-                <p style="font-size:12px">1566 MILES ST. </p>
-                <p style="font-size:12px">HOUSTON, TX 77015</p>
-                <p style="font-size:12px"> 713-453-3533</p>
-            </div>
-        </div>
-    </div>
-    <span class="footer-disclaimer">NORTH SHORE STEEL © 2020 ALL RIGHTS RESERVED</span>
-    @*<div class="footer-block information">
-                <div class="title">
-                    <strong>@T("Footer.Information")</strong>
-                </div>
+@if (!routeUrl.Contains("login"))
+{
+    <div class="footer">
+        <div class="nss-container d-flex justify-content-between footer-main">
+            <div class="footer-content products">
                 <ul class="list">
-                    @if (Model.SitemapEnabled && Model.DisplaySitemapFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("Sitemap")">@T("Sitemap")</a></li>
-                    }
-                    @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn1).ToList())
-                    {
-                        <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
-                    }
-                    @if (Model.DisplayContactUsFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
-                    }
+                    <div class="title"><strong>PRODUCTS</strong></div>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/structural-steel/">STRCUTURAL STEEL</a></li>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/fittings-flanges/">FITTINGS & FLANGES</a></li>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/metal-processes/">METAL PROCESSES</a></li>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/industries-served/">INDUSTRIES SERVED</a></li>
                 </ul>
+                <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
             </div>
-            <div class="footer-block customer-service">
-                <div class="title">
-                    <strong>@T("Footer.CustomerService")</strong>
-                </div>
+            <div class="footer-content info">
                 <ul class="list">
-                    @if (Model.DisplayProductSearchFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a> </li>
-                    }
-                    @if (Model.NewsEnabled && Model.DisplayNewsFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("NewsArchive")">@T("News")</a></li>
-                    }
-                    @if (Model.BlogEnabled && Model.DisplayBlogFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
-                    }
-                    @if (Model.ForumEnabled && Model.DisplayForumsFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
-                    }
-                    @if (Model.RecentlyViewedProductsEnabled && Model.DisplayRecentlyViewedProductsFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("RecentlyViewedProducts")">@T("Products.RecentlyViewedProducts")</a></li>
-                    }
-                    @if (Model.CompareProductsEnabled && Model.DisplayCompareProductsFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("CompareProducts")">@T("Products.Compare.List")</a></li>
-                    }
-                    @if (Model.NewProductsEnabled && Model.DisplayNewProductsFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("NewProducts")">@T("Products.NewProducts")</a></li>
-                    }
-                    @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn2).ToList())
-                    {
-                        <li><a href="@Url.RouteUrl("Topic", new {SeName = topic.SeName})">@topic.Name</a></li>
-                    }
-                    @if (Model.AllowCustomersToCheckGiftCardBalance)
-                    {
-                        <li><a href="@Url.RouteUrl("CheckGiftCardBalance")">@T("CheckGiftCardBalance")</a></li>
-                    }
+                    <div class="title"><strong>INFO</strong></div>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/resources/">RESOURCES</a></li>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/sister-companies/">SISTER COMPANIES</a></li>
+                    <li class="d-flex align-items-center"><a href="https://swift.nssco.com/">SWIFT&#8482;</a></li>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/careers">CAREERS</a></li>
+                    <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/why-north-shore-steel/">WHY NORTH SHORE STEEL?</a></li>
                 </ul>
+                <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
             </div>
-            <div class="footer-block my-account">
-                <div class="title">
-                    <strong>@T("Footer.MyAccount")</strong>
+            <div class="follow-us footer-content">
+                <div>
+                    <div class="title"><strong>FOLLOW US</strong></div>
+                    <ul class="networks">
+
+                        <a href="https://www.facebook.com/NorthShoreSteel/" target="_blank">
+                            <img src="~/Themes/@(themeName)/Content/assets/facebook.svg" alt="">
+                        </a>
+                        <a href="https://www.linkedin.com/company/north-shore-steel/" target="_blank">
+                            <img src="~/Themes/@(themeName)/Content/assets/linkedin.svg"
+                                 alt="">
+                        </a>
+
+
+                        <a href="https://www.youtube.com/channel/UCJ_fcBkyfnCJAUUZ1U6k18g" target="_blank">
+                            <img src="~/Themes/@(themeName)/Content/assets/youtube.svg" alt="">
+                        </a>
+                        <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
+                            <img src="~/Themes/@(themeName)/Content/assets/instagram.svg" alt="">
+                        </a>
+                        <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
+                            <img src="~/Themes/@(themeName)/Content/assets/twitter.svg" alt="">
+                        </a>
+                    </ul>
                 </div>
+                <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
+            </div>
+            <div class="sales-dept footer-content">
+                <div class="title"><strong>SALES DEPARTMENTS</strong></div>
                 <ul class="list">
-                    @if (Model.DisplayCustomerInfoFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
-                    }
-                    @if (Model.DisplayCustomerOrdersFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("CustomerOrders")">@T("Account.CustomerOrders")</a></li>
-                    }
-                    @if (Model.DisplayCustomerAddressesFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("CustomerAddresses")">@T("Account.CustomerAddresses")</a></li>
-                    }
-                    @if (Model.ShoppingCartEnabled && Model.DisplayShoppingCartFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("ShoppingCart")">@T("ShoppingCart")</a></li>
-                    }
-                    @if (Model.WishlistEnabled && Model.DisplayWishlistFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("Wishlist")">@T("Wishlist")</a></li>
-                    }
-                    @if (Model.AllowCustomersToApplyForVendorAccount && Model.DisplayApplyVendorAccountFooterItem)
-                    {
-                        <li><a href="@Url.RouteUrl("ApplyVendorAccount")">@T("Vendors.ApplyAccount")</a></li>
-                    }
-                    @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn3).ToList())
-                    {
-                        <li><a href="@Url.RouteUrl("Topic", new {SeName = topic.SeName})">@topic.Name</a></li>
-                    }
+                    <li>Structural Steel </li>
+                    <li>713-980-5872 </li>
+                </ul>
+                <ul class="list">
+                    <li>Fittings & Flanges </li>
+                    <li>713-980-5873 </li>
+                </ul>
+                <ul class="list">
+                    <li>Plate Processing </li>
+                    <li>713-980-5874 </li>
+                </ul>
+                <ul class="list">
+                    <li>Beaumont </li>
+                    <li>713-980-5875 </li>
                 </ul>
             </div>
-            <div class="footer-block follow-us">
-                <div class="social">
-                    <div class="title">
-                        <strong>@T("Footer.FollowUs")</strong>
-                    </div>
-                    @await Component.InvokeAsync("SocialButtons")
+            <div class="footer-content footer-logo">
+                <div>
+                    <img src="~/Themes/@(themeName)/Content/assets/logo-old.png" alt="">
+                    <p style="font-size:12px">1566 MILES ST. </p>
+                    <p style="font-size:12px">HOUSTON, TX 77015</p>
+                    <p style="font-size:12px"> 713-453-3533</p>
                 </div>
-                @await Component.InvokeAsync("NewsletterBox")
             </div>
-        </div>*@
-    @*<div class="footer-lower">
-            <div class="footer-info">
-                <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
-                @if (Model.DisplayTaxShippingInfoFooter)
+
+            <div class="partners-logo">
+                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
+                <img class="" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
+                <img src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
+            </div>
+        </div>
+
+    </div>      }
+@if (routeUrl.Contains("login"))
+{<div class="login-footer">
+     <div class="nss-container d-flex justify-content-between footer-main">
+         <div class="footer-content products">
+             <ul class="list">
+                 <div class="title"><strong>PRODUCTS</strong></div>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/structural-steel/">STRCUTURAL STEEL</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/fittings-flanges/">FITTINGS & FLANGES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/metal-processes/">METAL PROCESSES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/industries-served/">INDUSTRIES SERVED</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+             </ul>
+             <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
+         </div>
+         <div class="footer-content info">
+             <ul class="list">
+                 <div class="title"><strong>INFO</strong></div>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/resources/">RESOURCES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/sister-companies/">SISTER COMPANIES</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="https://swift.nssco.com/">SWIFT&#8482;</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/careers">CAREERS</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+                 <li class="d-flex align-items-center"><a href="http://northshoresteel.topspotims.modxcloud.com/why-north-shore-steel/">WHY NORTH SHORE STEEL?</a><img src="~/Themes/@(themeName)/Content/assets/list.svg" class="mr-2 footer-list-icon" alt=""></li>
+             </ul>
+             <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
+         </div>
+         <div class="follow-us footer-content">
+             <div>
+                 <div class="title"><strong>FOLLOW US</strong></div>
+                 <ul class="networks">
+
+                     <a href="https://www.facebook.com/NorthShoreSteel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/facebook.svg" alt="">
+                     </a>
+                     <a href="https://www.linkedin.com/company/north-shore-steel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/linkedin.svg"
+                              alt="">
+                     </a>
+
+
+                     <a href="https://www.youtube.com/channel/UCJ_fcBkyfnCJAUUZ1U6k18g" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/youtube.svg" alt="">
+                     </a>
+                     <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/instagram.svg" alt="">
+                     </a>
+                     <a href="https://www.instagram.com/gonorthshoresteel/" target="_blank">
+                         <img src="~/Themes/@(themeName)/Content/assets/twitter.svg" alt="">
+                     </a>
+                 </ul>
+             </div>
+             <img class="part-logo" src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
+         </div>
+         <div class="sales-dept footer-content">
+             <div class="title"><strong>SALES DEPARTMENTS</strong></div>
+             <ul class="list">
+                 <li>Structural Steel </li>
+                 <li>713-980-5872 </li>
+             </ul>
+             <ul class="list">
+                 <li>Fittings & Flanges </li>
+                 <li>713-980-5873 </li>
+             </ul>
+             <ul class="list">
+                 <li>Plate Processing </li>
+                 <li>713-980-5874 </li>
+             </ul>
+             <ul class="list">
+                 <li>Beaumont </li>
+                 <li>713-980-5875 </li>
+             </ul>
+         </div>
+         <div class="footer-content footer-logo">
+             <div>
+                 <img src="~/Themes/@(themeName)/Content/assets/logo-old.png" alt="">
+                 <p style="font-size:12px">1566 MILES ST. </p>
+                 <p style="font-size:12px">HOUSTON, TX 77015</p>
+                 <p style="font-size:12px"> 713-453-3533</p>
+             </div>
+         </div>
+
+         <div class="partners-logo">
+             <img class="" src="~/Themes/@(themeName)/Content/assets/logo-nasa.png" alt="">
+             <img class="" src="~/Themes/@(themeName)/Content/assets/logo-abma.png" alt="">
+             <img src="~/Themes/@(themeName)/Content/assets/logo-awmi.png" alt="">
+         </div>
+     </div>
+
+    </div>      }
+<span class="footer-disclaimer">NORTH SHORE STEEL © 2020 ALL RIGHTS RESERVED</span>
+@*<div class="footer-block information">
+            <div class="title">
+                <strong>@T("Footer.Information")</strong>
+            </div>
+            <ul class="list">
+                @if (Model.SitemapEnabled && Model.DisplaySitemapFooterItem)
                 {
-                    var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
-                    <span class="footer-tax-shipping">
-                        @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
-                    </span>
+                    <li><a href="@Url.RouteUrl("Sitemap")">@T("Sitemap")</a></li>
                 }
+                @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn1).ToList())
+                {
+                    <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
+                }
+                @if (Model.DisplayContactUsFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+                }
+            </ul>
+        </div>
+        <div class="footer-block customer-service">
+            <div class="title">
+                <strong>@T("Footer.CustomerService")</strong>
             </div>
-            @if (!Model.HidePoweredByNopCommerce)
-            {
-                <div class="footer-powered-by">
-                   *Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
-                        Please find more info at https://www.nopcommerce.com/nopcommerce-copyright-removal-key
-                    Powered by <a href="https://www.nopcommerce.com/">nopCommerce</a>
+            <ul class="list">
+                @if (Model.DisplayProductSearchFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a> </li>
+                }
+                @if (Model.NewsEnabled && Model.DisplayNewsFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("NewsArchive")">@T("News")</a></li>
+                }
+                @if (Model.BlogEnabled && Model.DisplayBlogFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+                }
+                @if (Model.ForumEnabled && Model.DisplayForumsFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+                }
+                @if (Model.RecentlyViewedProductsEnabled && Model.DisplayRecentlyViewedProductsFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("RecentlyViewedProducts")">@T("Products.RecentlyViewedProducts")</a></li>
+                }
+                @if (Model.CompareProductsEnabled && Model.DisplayCompareProductsFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("CompareProducts")">@T("Products.Compare.List")</a></li>
+                }
+                @if (Model.NewProductsEnabled && Model.DisplayNewProductsFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("NewProducts")">@T("Products.NewProducts")</a></li>
+                }
+                @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn2).ToList())
+                {
+                    <li><a href="@Url.RouteUrl("Topic", new {SeName = topic.SeName})">@topic.Name</a></li>
+                }
+                @if (Model.AllowCustomersToCheckGiftCardBalance)
+                {
+                    <li><a href="@Url.RouteUrl("CheckGiftCardBalance")">@T("CheckGiftCardBalance")</a></li>
+                }
+            </ul>
+        </div>
+        <div class="footer-block my-account">
+            <div class="title">
+                <strong>@T("Footer.MyAccount")</strong>
+            </div>
+            <ul class="list">
+                @if (Model.DisplayCustomerInfoFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
+                }
+                @if (Model.DisplayCustomerOrdersFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("CustomerOrders")">@T("Account.CustomerOrders")</a></li>
+                }
+                @if (Model.DisplayCustomerAddressesFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("CustomerAddresses")">@T("Account.CustomerAddresses")</a></li>
+                }
+                @if (Model.ShoppingCartEnabled && Model.DisplayShoppingCartFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("ShoppingCart")">@T("ShoppingCart")</a></li>
+                }
+                @if (Model.WishlistEnabled && Model.DisplayWishlistFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("Wishlist")">@T("Wishlist")</a></li>
+                }
+                @if (Model.AllowCustomersToApplyForVendorAccount && Model.DisplayApplyVendorAccountFooterItem)
+                {
+                    <li><a href="@Url.RouteUrl("ApplyVendorAccount")">@T("Vendors.ApplyAccount")</a></li>
+                }
+                @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn3).ToList())
+                {
+                    <li><a href="@Url.RouteUrl("Topic", new {SeName = topic.SeName})">@topic.Name</a></li>
+                }
+            </ul>
+        </div>
+        <div class="footer-block follow-us">
+            <div class="social">
+                <div class="title">
+                    <strong>@T("Footer.FollowUs")</strong>
                 </div>
+                @await Component.InvokeAsync("SocialButtons")
+            </div>
+            @await Component.InvokeAsync("NewsletterBox")
+        </div>
+    </div>*@
+@*<div class="footer-lower">
+        <div class="footer-info">
+            <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
+            @if (Model.DisplayTaxShippingInfoFooter)
+            {
+                var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+                <span class="footer-tax-shipping">
+                    @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                </span>
             }
-            @await Component.InvokeAsync("StoreThemeSelector")
-        </div>*@
-    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Footer })
+        </div>
+        @if (!Model.HidePoweredByNopCommerce)
+        {
+            <div class="footer-powered-by">
+               *Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
+                    Please find more info at https://www.nopcommerce.com/nopcommerce-copyright-removal-key
+                Powered by <a href="https://www.nopcommerce.com/">nopCommerce</a>
+            </div>
+        }
+        @await Component.InvokeAsync("StoreThemeSelector")
+    </div>*@
+@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Footer })
 </div>
 <script asp-location="Footer">
     $(document).ready(function () {
