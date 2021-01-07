@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using System.Collections.Generic;
+using Nop.Services.Common;
+using Nop.Core.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -20,6 +22,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ICompanyService _companyService;
 
         #endregion
 
@@ -29,7 +33,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IStoreContext storeContext,
             ERPApiProvider nSSApiProvider,
             IWorkContext workContext,
-            ICustomerCompanyService customerCompanyService
+            ICustomerCompanyService customerCompanyService,
+            IGenericAttributeService genericAttributeService,
+            ICompanyService companyService
 
             )
         {
@@ -38,6 +44,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _nSSApiProvider = nSSApiProvider;
             _workContext = workContext;
             _customerCompanyService = customerCompanyService;
+            _genericAttributeService = genericAttributeService;
+            _companyService = companyService;
         }
         #endregion
 
@@ -45,7 +53,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public override IActionResult Index()
         {
             string ERPCId;
-            int customerId = _workContext.CurrentCustomer.Id;
+            var currentCustomer = _workContext.CurrentCustomer;
+            int customerId = currentCustomer.Id;
+            Company company = new Company();
+
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, customerId);
             TransactionModel model = new TransactionModel();
 
@@ -55,12 +66,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (Request.Cookies[compIdCookieKey] != null && (!string.IsNullOrEmpty(Request.Cookies[compIdCookieKey].ToString())))
             {
                 ERPCId = Request.Cookies[compIdCookieKey].ToString();
-
+                company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(ERPCId));
                 // check if customer still has access to previously selected company
                 IEnumerable<CustomerCompany> cc = customerCompanies.Where(x => x.Company.ErpCompanyId.ToString() == ERPCId);
                 if (cc.Count() > 0)
                 {
                     model = GetTransactions(ERPCId);
+                    _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company.Name);
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
                 }
 
@@ -72,8 +84,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (customerCompanies.Count() == 1)
             {
                 ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
+                company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(ERPCId));
                 Response.Cookies.Append(compIdCookieKey, ERPCId);
                 model = GetTransactions(ERPCId);
+                _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company.Name);
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }
             else if (customerCompanies.Count() > 1)

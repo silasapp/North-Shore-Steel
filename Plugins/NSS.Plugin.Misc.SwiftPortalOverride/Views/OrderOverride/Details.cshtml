@@ -305,7 +305,7 @@
                 <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
                     <div class="d-flex flex-row mb-4 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
                         <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice @Model.InvoiceFileNo</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice</label>
                     </div>
                 </a>
             }
@@ -315,7 +315,7 @@
                     <div class="d-flex flex-row cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
                         <img alt="Ticket Icon"
                              v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket @Model.DeliveryTicketFileNo</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket</label>
                     </div>
                 </a>
             }
