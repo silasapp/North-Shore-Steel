@@ -133,7 +133,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (String.IsNullOrEmpty(model.Email))
                 warnings.Add("Please enter Work Email.");
             if (String.IsNullOrEmpty(model.Phone))
-                warnings.Add("Work phone is required.");
+                warnings.Add("Please enter Work Phone.");
             if (String.IsNullOrEmpty(model.Company))
                 warnings.Add("Please enter Company Name.");
 

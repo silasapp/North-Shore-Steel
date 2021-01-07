@@ -27,9 +27,11 @@
                 <div class="d-flex flex-column mt-4 mb-2">
                     @foreach (var item in Model.MTRs)
                     {
-                        <div class="d-flex flex-row mt-4 cursor-pointer">
-                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
-                        </div>
+                        <a href="@item.MtrFile" target="_blank" class="text-decoration-none">
+                            <div class="d-flex flex-row mt-4 cursor-pointer">
+                                <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
+                            </div>
+                        </a>
                     }
                 </div>
             </div>
@@ -326,7 +328,9 @@
 
                     @if (Model.MtrCount == 1)
                     {
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
+                        <a href="@item.MtrFile" target="_blank" class="text-decoration-none">
+                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
+                        </a>
                     }
                     else if (Model.MtrCount > 1)
                     {
@@ -349,7 +353,6 @@
                 <col width="8%" />
                 <col width="5%" />
                 <col width="8%" />
-                <col width="10%" />
             </colgroup>
             <thead>
                 <tr>
@@ -362,7 +365,6 @@
                     <th>PO #</th>
                     <th class="text-center">Qty.</th>
                     <th class="text-center">UOM</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -378,7 +380,6 @@
                         <td>@Model.PoNo</td>
                         <td class="text-center">@item.Quantity</td>
                         <td class="text-center">@item.UOM</td>
-                        <td></td>
                     </tr>
                 }
             </tbody>
