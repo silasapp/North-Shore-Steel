@@ -486,9 +486,9 @@
                             <label class="text-muted">Shipping:</label>
                             <label class="text-black">${{ formatMoney(shippingAmount) }}</label>
                         </div>
-                        <div class="price-summary">
+                        <div class="price-summary" v-if="discountAmount">
                             <label class="text-muted">Discount:</label>
-                            <label class="text-black">${{ formatMoney(discountAmount) }}</label>
+                            <label class="text-black">{{ discountAmount }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Tax:</label>
@@ -548,6 +548,8 @@
     var isDelivery = '@isDelivery' === 'True';
 
     console.log("purchaseOrder: ", purchaseOrder);
+    console.log("orderTotals: ", orderTotals);
+    //console.log("ShoppingCartModel: ", @Html.Raw(Model.ShoppingCartModel));
 
     const store = {
         state: {
@@ -622,7 +624,7 @@
             dirty: false,
             subTotal: orderTotals.subTotal.replace("$", ""),
             shippingAmount: orderTotals.shipping.replace("$", ""),
-            discountAmount: orderTotals.subTotalDiscount ? orderTotals.subTotalDiscount : 0,
+            discountAmount: orderTotals.orderTotalDiscount,
             taxAmount: orderTotals.tax.replace("$", ""),
             orderTotal: orderTotals.orderTotal.replace("$", ""),
             disableSubmit: false,
@@ -639,10 +641,10 @@
         },
         methods: {
             showLoading: function () {
-                AjaxCart.setLoadWaiting(true);
+                $('#custom-loading').show();
             },
             hideLoading: function () {
-                AjaxCart.setLoadWaiting(false);
+                $('#custom-loading').hide();
             },
             formatMoney: function (input) {
                 return input.toLocaleString(undefined, {
@@ -697,7 +699,6 @@
                         console.log("GetShippingRate success: ", data);
                         self.disableSubmit = false;
                         self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
-                        self.discountAmount = data.orderDiscountAmount;
                         self.orderTotal = data.orderTotal;
                         self.deliveryDate = data.shippingCalculatorResponse.date ? data.shippingCalculatorResponse.date : 'N/A';
 
@@ -783,7 +784,8 @@
                 return orderId;
             },
             finalizeOrder: function () {
-                 const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
+                this.showLoading();
+                const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
                 let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
 
@@ -852,7 +854,9 @@
                         return false;
                 }
                 if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_CREDIT_CARD) {
-                    if (!this.paymentCard.cardHolderName)
+                    if (!this.paymentCard.cardHolderName ||
+                        (this.isDelivery && !this.shipToSameAddress && !this.showNewBillingAddress && !this.billingAddressId) ||
+                        (!this.isDelivery && !this.showNewBillingAddress && !this.billingAddressId))
                         return false;
                 }
                 return true;
@@ -894,6 +898,8 @@
                             if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD || !self.validate() ||
                                 self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
 
+                            console.log("We're good to go...");
+                            return;
                             self.errorType = self.shared.constants.ERROR_TYPE_NONE;
                             self.showLoading();
 
