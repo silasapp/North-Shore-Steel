@@ -30,6 +30,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
         [JsonProperty("invoiceDueDate")]
         public DateTimeOffset InvoiceDueDate { get; set; }
 
+
+        [JsonProperty("invoiceFile")]
+        public string InvoiceFile { get; set; }
+
         [JsonProperty("invoiceStatusName", NullValueHandling = NullValueHandling.Ignore)]
         public string InvoiceStatusName { get; set; }
 

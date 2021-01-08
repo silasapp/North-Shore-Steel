@@ -46,6 +46,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public DateTimeOffset InvoiceDueDate { get; set; }
             public string InvoiceStatusName { get; set; }
             public DateTimeOffset? InvoicePaidDate { get; set; }
+            public string InvoiceFile { get; set; }
         }
 
         public partial class SearchFilter

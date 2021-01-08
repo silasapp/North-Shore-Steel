@@ -33,6 +33,7 @@
     <Content Remove="obj\**" />
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
+    <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Remove="Themes\SwiftPortal\Views\Order\**" />
     <Content Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
@@ -46,6 +47,8 @@
 
     <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
 
+    <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
+
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
 
     <Compile Remove="Themes\SwiftPortal\Views\Order\**" />
@@ -57,6 +60,7 @@
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
+    <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <EmbeddedResource Remove="Themes\SwiftPortal\Views\Order\**" />
     <EmbeddedResource Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
@@ -65,16 +69,12 @@
     <None Remove="Plugins\**;Themes\**" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <None Remove="Themes\SwiftPortal\Views\Order\**" />
     <None Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
 
     <Content Include="Plugins\bin\placeholder.txt" CopyToPublishDirectory="PreserveNewest" />
-
-    <Content Include="Plugins\Misc.SwiftPortalOverride\Views\Topic\TopicDetails.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
 
     <Content Include="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
 
@@ -244,7 +244,6 @@
     <None Remove="Plugins\Misc.SwiftPortalOverride\Content\bootstrap.rtl.css" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CustomShoppingCart\_GiftCardBox.cshtml" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\_DiscountBox.cshtml" />
-    <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\TopicDetails.cshtml" />
     <None Remove="Themes\DefaultClean\Views\CustomerCustom\_CustomerAttributes.cshtml" />
     <None Remove="Themes\SwiftPortal\Content\assets\c-heart.svg" />
     <None Remove="Themes\SwiftPortal\Content\assets\close-white.svg" />
