@@ -269,7 +269,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 if (!string.IsNullOrEmpty(error))
                 {
-                    warnings.Add(error);
+                    ModelState.AddModelError("", error);
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
                 }
 
@@ -303,6 +303,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 // send email
                 //_workflowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
             }
+
+
+            // update user state and modified state 
+            _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Approved);
 
             userRegistration = GetRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
