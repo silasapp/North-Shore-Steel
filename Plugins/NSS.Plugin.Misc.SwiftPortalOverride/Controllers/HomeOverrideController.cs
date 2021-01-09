@@ -85,7 +85,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
                 company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(ERPCId));
-                Response.Cookies.Append(compIdCookieKey, ERPCId);
+                //Response.Cookies.Append(compIdCookieKey, ERPCId);
+                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.ERPCompanyId, ERPCId);
                 model = GetTransactions(ERPCId);
                 _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company.Name);
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
@@ -103,7 +104,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         }
 
+        public string SelectCompany(int ERPCompanyId)
+        {
+            var currentCustomer = _workContext.CurrentCustomer;
+            saveAttributeERPCompanyId(ERPCompanyId, currentCustomer);
+            return "Successful";
+        }
 
+        private void saveAttributeERPCompanyId(int ERPCompanyId, Nop.Core.Domain.Customers.Customer currentCustomer)
+        {
+            _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.ERPCompanyId, ERPCompanyId);
+        }
 
         private TransactionModel GetTransactions(string ERPCId)
         {
