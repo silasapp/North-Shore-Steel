@@ -36,6 +36,8 @@ using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
+using System;
+using Nop.Services.Common;
 using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
@@ -57,6 +59,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IOrderModelFactory _orderModelFactory;
         private readonly ERPApiProvider _erpApiProvider;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly IGenericAttributeService _genericAttributeService;
 
         #endregion
 
@@ -74,7 +77,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IWorkContext workContext,
             RewardPointsSettings rewardPointsSettings,
             IOrderModelFactory orderModelFactory,
-            ICustomerCompanyService customerCompanyService) : base(customerService, orderNopModelFactory, orderProcessingService, orderService, paymentService, pdfService, shipmentService, webHelper, workContext, rewardPointsSettings)
+            ICustomerCompanyService customerCompanyService,
+            IGenericAttributeService genericAttributeService) : base(customerService, orderNopModelFactory, orderProcessingService, orderService, paymentService, pdfService, shipmentService, webHelper, workContext, rewardPointsSettings)
         {
             _customerService = customerService;
             _orderNopModelFactory = orderNopModelFactory;
@@ -89,6 +93,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _orderModelFactory = orderModelFactory;
             _erpApiProvider = erpApiProvider;
             _customerCompanyService = customerCompanyService;
+            _genericAttributeService = genericAttributeService;
         }
 
         #endregion
@@ -100,7 +105,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public override IActionResult Details(int orderId)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations))
                 return AccessDeniedView();
@@ -137,7 +142,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public virtual IActionResult CompanyOrders()
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations))
                 return AccessDeniedView();
@@ -154,7 +159,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public PartialViewResult SearchCompanyOrders([FromBody]CompanyOrderListModel.SearchFilter filter)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations))
                 return (PartialViewResult)AccessDeniedView();

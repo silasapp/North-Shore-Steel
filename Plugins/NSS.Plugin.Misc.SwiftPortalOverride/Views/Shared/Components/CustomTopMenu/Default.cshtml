@@ -15,10 +15,10 @@
     var currentCustomer = workContext.CurrentCustomer;
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
     //int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
-    int eRPCompanyId = genericAttributeService.GetAttribute<int>(currentCustomer, SwiftPortalOverrideDefaults.ERPCompanyId);
-    bool isAP = customerCompanyService.Authorize(currentCustomer.Id, eRPCompanyId, ERPRole.AP);
-    bool isOperations = customerCompanyService.Authorize(currentCustomer.Id, eRPCompanyId, ERPRole.Operations);
-    bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+    string eRPCompanyId = genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
+    bool isAP = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.AP);
+    bool isOperations = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Operations);
+    bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
 }
 <style>
     .active-tab {

@@ -91,7 +91,7 @@
         location.href = "@Url.Action("Index")"
     }*@
 
-    function SelectCompany(ErpId) {
+    @*function SelectCompany(ErpId) {
         const request = {
             ERPCompanyId: ErpId
         }
@@ -107,6 +107,28 @@
             },
             error: function (xhr, thrownError) {
                 console.log(xhr, 'error-data', thrownError);
+            }
+        });
+    }*@
+
+    function SelectCompany(ErpId) {
+        const request = {
+            ERPCompanyId: ErpId
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("SelectCompany", "HomeOverride")",
+            data: request,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data, _, _) {
+                console.log('success-data', data)
+                location.href = "@Url.Action("Index")"
+            },
+            error: function (xhr, thrownError) {
+                console.log('error-data', xhr)
+                location.href = "@Url.Action("Index")"
             }
         });
     }
