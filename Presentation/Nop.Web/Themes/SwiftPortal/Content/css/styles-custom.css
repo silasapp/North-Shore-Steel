@@ -1105,6 +1105,14 @@ input:focus {
             padding: 10px 16px;
         }
 
+.swift-color-btn {
+    padding: 5px 10px;
+    border: none;
+    background: #033551;
+    color: #ffffff;
+    font-family: "Exo 2";
+}
+
 .white-btn {
     padding: 5px 10px;
     border: none;
