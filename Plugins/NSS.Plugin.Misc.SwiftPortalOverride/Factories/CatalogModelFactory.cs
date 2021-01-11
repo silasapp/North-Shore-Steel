@@ -124,7 +124,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     );
             }
 
-            model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).ToList();
+            model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).OrderBy(o => o.Sku).ToList();
 
             model.NoResults = !model.Products.Any();
 
