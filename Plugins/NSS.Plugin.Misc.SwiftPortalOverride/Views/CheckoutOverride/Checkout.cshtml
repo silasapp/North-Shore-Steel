@@ -320,10 +320,10 @@
 
                             <h1 class="h5 text-primary font-weight-bold mt-3">Billing Address</h1>
                             <div class="d-flex flex-column mt-2" v-if="!shipToSameAddress || !isDelivery">
-                                <div class="d-flex flex-row">
+                                <div class=" flex-row" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
                                     <select type="text" class="bg-accent text-black px-2 py-2 nss-form-control"
                                             id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddressId"
-                                            v-bind:class="{'w-100': showNewBillingAddress, 'w-75' : !showNewBillingAddress}">
+                                            v-bind:class="{'w-100': showNewBillingAddress || isMobile, 'w-75' : !showNewBillingAddress || !isMobile}">
                                         <option v-bind:value="null">-Select Address-</option>
                                         <option v-bind:value="address.id" v-for="address in shared.billingAddresses">
                                             {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
@@ -331,7 +331,7 @@
                                             {{ address.stateProvinceName }} {{ address.zipPostalCode }}
                                         </option>
                                     </select>
-                                    <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline"
+                                    <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
                                             v-if="!showNewBillingAddress" v-on:click="showNewBillingAddress = true; billingAddressId = null">
                                         Enter new billing address
                                     </button>
@@ -523,7 +523,7 @@
 
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
                 <div class="card card-mod">
                     <label class="fs-14 text-primary font-weight-bold text-center">ORDER SUMMARY</label>
                     <div class="order-summary mt-2">

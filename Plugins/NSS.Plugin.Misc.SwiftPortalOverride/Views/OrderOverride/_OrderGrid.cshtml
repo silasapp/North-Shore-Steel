@@ -14,6 +14,7 @@
 
     .home-table-sm-header {
         width: 110px !important;
+        background-color: #0076b4 !important;
         /* border-bottom: 0.1px solid white; */
     }
 </style>
@@ -42,10 +43,10 @@
             <e-grid-column type="checkbox" width="30"></e-grid-column>
         </e-grid-columns>
     </ejs-grid>
-    <div  v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
+    <div v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
         @foreach (var order in Model.Orders)
         {
-            <div v-if="isMobile" class="d-flex">
+            <div v-if="isMobile" class="d-flex" style="background-color: #ffffff;">
                 <label v-if="isExportMode" class="nss-checkbox mr-3">
                     <input type="checkbox"
                            v-on:change="onCheck(@order.OrderId)">
