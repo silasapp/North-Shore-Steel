@@ -666,7 +666,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
 
                         var updatetopwishlistsectionhtml = string.Format(_localizationService.GetResource("Wishlist.HeaderQuantity"),
-                            shoppingCarts.Sum(item => item.Quantity));
+                            shoppingCarts.Count);
                         return Json(new
                         {
                             success = true,
@@ -695,9 +695,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
                         var updatetopcartsectionhtml = string.Format(_localizationService.GetResource("ShoppingCart.HeaderQuantity"),
-                            shoppingCarts.Sum(item => item.Quantity));
+                            shoppingCarts.Count);
 
-                       
 
                         updatetopcartsectionhtml = Regex.Replace(updatetopcartsectionhtml, @"[()]+", "");
                         var updateflyoutcartsectionhtml = _shoppingCartSettings.MiniShoppingCartEnabled
