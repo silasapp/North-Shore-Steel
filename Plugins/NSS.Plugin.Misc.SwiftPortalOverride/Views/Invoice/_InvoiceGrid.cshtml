@@ -11,9 +11,14 @@
     .colorRed {
         color: red !important;
     }
+
+    .home-table-sm-header {
+        width: 110px !important;
+        /* border-bottom: 0.1px solid white; */
+    }
 </style>
-<div>
-    <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo"
+<div id="invoicesGrid">
+    <ejs-grid v-if="!isMobile" id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo"
               queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true"
               rowSelected="onRowSelected" rowDeselected="onRowDeselected">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
@@ -40,9 +45,142 @@
             <e-grid-column type="checkbox" width="30"></e-grid-column>
         </e-grid-columns>
     </ejs-grid>
+    <div  v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
+        @foreach (var invoice in Model.Invoices)
+        {
+            <div v-if="isMobile" class="d-flex">
+                <label v-if="isExportMode" class="nss-checkbox mr-3">
+                    <input type="checkbox"
+                           v-on:change="onCheck(@invoice.InvoiceId)">
+                    <span class="checkmark"></span>
+                </label>
+                <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
+
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Invoice #</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <a class="fs12-link">@invoice.InvoiceId</a>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Order #</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <a class="fs12-link" href="/orders/@invoice.OrderNo">@invoice.OrderNo</a>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Purchase Order #</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <a class="fs12-default">@invoice.PoNo</a>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Invoice Amount</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">@invoice.InvoiceAmount</label>
+                        </div>
+                    </div>
+
+
+                    @if (!Model.IsClosed)
+                    {
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Balance Amount</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">@invoice.BalanceAmount</label>
+                            </div>
+                        </div>
+
+                    }
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Invoice Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">@invoice.InvoiceDate</label>
+                        </div>
+                    </div>
+
+                    @if (Model.IsClosed)
+                    {
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Paid Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">@invoice.InvoicePaidDate</label>
+                            </div>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Due Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">@invoice.InvoiceDueDate</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Status</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">@invoice.InvoiceStatusName</label>
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+            </div>
+        }
+    </div>
 </div>
 
+<script>
+    var vm = new Vue({
+        el: '#invoicesGrid',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
 
+        },
+    });
+</script>
 <script>
     function toolbarClick() {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
@@ -88,7 +226,7 @@
 </script>
 
 <script id="invoiceNo" type="text/x-template">
-    <a href="${InvoiceFile}" target="_blank">${InvoiceId}</a>
+    ${InvoiceId}
 </script>
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderNo}">${OrderNo}</a>

@@ -1083,7 +1083,7 @@ input:focus {
 
 .discount-block {
     width: 100%;
-    /*margin-top: 100px;*/
+    margin-top: 100px;
 }
 
     .discount-block > img {
@@ -1104,14 +1104,6 @@ input:focus {
         .discount-block > .action > button {
             padding: 10px 16px;
         }
-
-.swift-color-btn {
-    padding: 5px 10px;
-    border: none;
-    background: #033551;
-    color: #ffffff;
-    font-family: "Exo 2";
-}
 
 .white-btn {
     padding: 5px 10px;
@@ -3444,7 +3436,7 @@ and also iPads specifically.
         padding-bottom: 10px;
         color: #ffffff;
     }
-    .place-order-buttons {
+    .place-order-buttons, .order-export-btn-container {
         display: block;
         position: fixed;
         bottom: 0;
@@ -3477,6 +3469,9 @@ and also iPads specifically.
         background-color: #f6f6f6 !important;
         width: auto !important;
         box-shadow: 0px 1px 16px #0000001a;
+    }
+    .checkout-card-1 {
+        align-items: baseline;
     }
     .checkout-shipping-label {
         text-align: left;
