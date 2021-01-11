@@ -1,15 +1,18 @@
 ﻿using Nop.Web.Framework.Models;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CompanyInvoiceListModel;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
     public class TransactionModel : BaseNopModel
     {
-        public List<Order> RecentOrders { get; set; }
+        public List<CompanyOrderListModel.OrderDetailsModel> OpenOrders { get; set; }
+        public List<CompanyOrderListModel.OrderDetailsModel> ClosedOrders { get; set; }
         public List<Invoice> RecentInvoices { get; set; }
-
+        public CreditSummaryModel CreditSummary { get; set; }
         public CompanyInfo CompanyInfo { get; set; }
     }
 
