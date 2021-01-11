@@ -107,8 +107,8 @@ a:not([href]):not([class]) {
 .nav-bar-search input {
     height: 40px;
     width: 100%;
-    background-color: #3391c3;
-    color: #ffffff;
+    background-color: #f6f6f6;
+    color: #242424;
     border: none;
     padding: 0 10px !important;
     font-family: "Exo 2";
@@ -181,7 +181,7 @@ a:not([href]):not([class]) {
     }
 
     .nav-bar-search {
-        width: 28rem;
+        width: 20rem;
         position: relative;
     }
 
@@ -230,7 +230,7 @@ a:not([href]):not([class]) {
     }
 
     .nav-bar-search {
-        width: 28rem;
+        width: 20rem;
         position: relative;
     }
 
@@ -471,9 +471,18 @@ a:not([href]):not([class]) {
     border: none !important;
 }
 
-    .nav-bar-search > input::placeholder {
-        color: #ffffff;
-    }
+.small-searchterms::placeholder {
+    color: #242424 !important;
+
+}
+.small-searchterms:focus {
+    color: #242424 !important;
+}
+.small-searchterms-mob:focus {
+    color: #ffffff;
+}.small-searchterms-mob::placeholder {
+    color: #ffffff;
+}
 
 .nav-bar-search > button {
     background-color: #3391c3;
