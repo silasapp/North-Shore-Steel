@@ -11,6 +11,7 @@ using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Services.Stores;
+using NSS.Plugin.Misc.SwiftApi.Attributes;
 using NSS.Plugin.Misc.SwiftApi.Delta;
 using NSS.Plugin.Misc.SwiftApi.DTO.Errors;
 using NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies;
@@ -73,7 +74,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorsRootObject), 422)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
-        public IActionResult CreateUser(UserDto userDelta)
+        [GetRequestsErrorInterceptorActionFilter]
+        public IActionResult CreateUser([ModelBinder(typeof(JsonModelBinder<UserDto>))] Delta<UserDto> userDelta)
         {
             if (!ModelState.IsValid)
             {
@@ -82,10 +84,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             UserRegistration registration = null;
 
-            if (userDelta.RegistrationId.HasValue && userDelta.RegistrationId > 0)
+            if (userDelta.Dto.RegistrationId.HasValue && userDelta.Dto.RegistrationId > 0)
             {
                 // call user registration create
-                registration = _userRegistrationService.GetById(userDelta.RegistrationId.Value);
+                registration = _userRegistrationService.GetById(userDelta.Dto.RegistrationId.Value);
 
                 if (registration == null)
                     return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
@@ -97,16 +99,16 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     return Error(HttpStatusCode.BadRequest, "userRegistration", "email is already registered");
             }
 
-            if (userDelta.WorkEmail == null)
+            if (userDelta.Dto.WorkEmail == null)
                 return Error(HttpStatusCode.BadRequest, "user", "work email required");
 
-            if (userDelta.WintrixId == 0)
+            if (userDelta.Dto.WintrixId == 0)
                 return Error(HttpStatusCode.BadRequest, "user", "wintrix id is required");
 
-            if (_customerService.GetCustomerByEmail(userDelta.WorkEmail) != null)
+            if (_customerService.GetCustomerByEmail(userDelta.Dto.WorkEmail) != null)
                 return Error(HttpStatusCode.BadRequest, "user", "email is already registered");
 
-            int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, userDelta.WintrixId.ToString(), nameof(Customer))?.EntityId ?? 0;
+            int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, userDelta.Dto.WintrixId.ToString(), nameof(Customer))?.EntityId ?? 0;
             var customer = _customerApiService.GetCustomerEntityById(customerId);
 
             if (customer != null)
@@ -116,17 +118,17 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 registration = new UserRegistration
                 {
-                    FirstName = userDelta.FirstName,
-                    LastName = userDelta.LastName,
-                    Cell = userDelta.Cell,
-                    Phone = userDelta.Phone,
-                    WorkEmail = userDelta.WorkEmail,
+                    FirstName = userDelta.Dto.FirstName,
+                    LastName = userDelta.Dto.LastName,
+                    Cell = userDelta.Dto.Cell,
+                    Phone = userDelta.Dto.Phone,
+                    WorkEmail = userDelta.Dto.WorkEmail,
                     //CompanyName = userDelta.Dto.CompanyName,
-                    HearAboutUs = userDelta.HearAboutUs,
-                    Other = userDelta.Other,
-                    IsExistingCustomer = userDelta.IsExistingCustomer,
-                    ItemsForNextProject = userDelta.ItemsForNextProject,
-                    PreferredLocationId = userDelta.PreferredLocationId,
+                    HearAboutUs = userDelta.Dto.HearAboutUs,
+                    Other = userDelta.Dto.Other,
+                    IsExistingCustomer = userDelta.Dto.IsExistingCustomer,
+                    ItemsForNextProject = userDelta.Dto.ItemsForNextProject,
+                    PreferredLocationId = userDelta.Dto.PreferredLocationId,
                     Status = UserRegistrationStatus.Approved,
 
                     CreatedOnUtc = DateTime.UtcNow,
@@ -140,17 +142,17 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             customer = _userRegistrationService.CreateCustomer(
                 registration,
                 password,
-                userDelta.WintrixId
+                userDelta.Dto.WintrixId
                 );
 
             if (customer == null)
                 return Error(HttpStatusCode.NotFound, "customer", "not created successfully");
 
             // create companies and associate to customer
-            foreach (var userCompany in userDelta.UserCompanies)
+            foreach (var userCompany in userDelta.Dto.UserCompanies)
             {
                 var company = _companyService.GetCompanyEntityByErpEntityId(userCompany.CompanyId);
-                if(company == null)
+                if (company == null)
                 {
                     company = new Company
                     {
@@ -160,7 +162,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                         SalesContactEmail = userCompany.SalesContactEmail,
                         SalesContactPhone = userCompany.SalesContactPhone,
                         SalesContactImageUrl = userCompany.SalesContactImageUrl,
-                        CreatedOnUtc = DateTime.UtcNow, 
+                        CreatedOnUtc = DateTime.UtcNow,
                         UpdatedOnUtc = DateTime.UtcNow
                     };
 
@@ -170,7 +172,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 }
 
                 var customerCompany = _customerCompanyService.GetCustomerCompany(customer.Id, company.Id);
-                if(customerCompany == null)
+                if (customerCompany == null)
                 {
                     customerCompany = new CustomerCompany
                     {
@@ -339,7 +341,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
         private void UpdateCustomerGenAttribute(Customer customerToUpdate, string firstname, string lastName, string phone, string cell, int prefferedLocationId)
         {
-            if(!string.IsNullOrEmpty(firstname))
+            if (!string.IsNullOrEmpty(firstname))
                 _genericAttributeService.SaveAttribute(customerToUpdate, NopCustomerDefaults.FirstNameAttribute, firstname);
 
             if (!string.IsNullOrEmpty(lastName))
