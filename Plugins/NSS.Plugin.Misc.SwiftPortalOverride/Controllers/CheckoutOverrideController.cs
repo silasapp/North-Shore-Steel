@@ -817,8 +817,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             foreach (var item in discounUsagetList)
             {
                 var discount = _discountService.GetDiscountById(item.DiscountId);
-                if (discount != null)
-                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, order.OrderSubtotalInclTax), 2), Code = discount.CouponCode ?? discount.Name?.Replace("'", "''") ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
+                if(discount != null)
+                {
+                    decimal amount = decimal.Zero;
+                    switch (discount.DiscountType)
+                    {
+                        case Nop.Core.Domain.Discounts.DiscountType.AssignedToOrderTotal:
+                            amount = order.OrderSubtotalInclTax;
+                            break;
+                        case Nop.Core.Domain.Discounts.DiscountType.AssignedToShipping:
+                            amount = order.OrderShippingExclTax;
+                            break;
+                        case Nop.Core.Domain.Discounts.DiscountType.AssignedToOrderSubTotal:
+                            amount = order.OrderSubtotalExclTax;
+                            break;
+                        default:
+                            amount = order.OrderTotal;
+                            break;
+                    }
+
+                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, amount), 2), Code = discount.CouponCode ?? discount.Name?.Replace("'", "''") ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
+                }
+
             }
 
             // order items
