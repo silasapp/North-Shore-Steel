@@ -358,6 +358,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     if (option == null)
                     {
                         //create option
+                        if (attr.Name == Constants.CountryOfOriginFieldAttribute)
+                            value = value.ToString().ToUpper();
+
                         option = new SpecificationAttributeOption { Name = value.ToString(), SpecificationAttributeId = attr.Id };
                         _specificationAttributeService.InsertSpecificationAttributeOption(option);
                     }
