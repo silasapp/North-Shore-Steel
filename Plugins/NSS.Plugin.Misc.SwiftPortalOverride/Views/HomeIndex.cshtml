@@ -48,29 +48,6 @@
     }
 }
 
-@{
-
-    Func<object, object>
-    Content1 =
-    @<div id="viewMtrModal">
-    <p>dd</p>
-        @*@if (Model.MtrCount > 1)
-        {
-            <div class="d-flex flex-column">
-                <div class="d-flex flex-column mt-4 mb-2">
-                    @foreach (var item in Model.MTRs)
-                    {
-                        <a href="@item.MtrFile" target="_blank" class="text-decoration-none">
-                            <div class="d-flex flex-row mt-4 cursor-pointer">
-                                <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
-                            </div>
-                        </a>
-                    }
-                </div>
-            </div>
-        }*@
-    </div>;
-}
 
 <style>
     .m-b2 {
@@ -85,8 +62,12 @@
         padding-bottom: 1.7rem;
     }
 
-    .p-b10 {
-        padding-bottom: 10rem;
+    .p-b3 {
+        padding-bottom: 2.7rem;
+    }
+
+    .p-b11 {
+        padding-bottom: 11.1rem;
     }
     /*.w-11 {
         width: 11rem;
@@ -96,6 +77,22 @@
 
 
 <div id="app" class="page home-page">
+@{
+
+    Func<object, object>
+    Content1 =
+    @<div id="viewMtrModal">
+        <div class="d-flex flex-column mb-2">
+            <template v-for="p in orderMTRs">
+                <a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
+                    <div class="d-flex flex-row mt-4 cursor-pointer">
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
+                    </div>
+                </a>
+            </template>
+        </div>
+    </div>;
+}
     <div class="page-body">
         <div class="d-none d-md-block">
             <div class="row">
@@ -131,7 +128,7 @@
                                 }
                                 else
                                 {
-                                    <div class="text-center pt-5 p-b10">
+                                    <div class="text-center pt-5 p-b11">
                                         <label>You have not placed an order in the last 30 days.</label>
                                         <div class="action pt-3">
                                             <a href="/catalog">
@@ -148,7 +145,7 @@
 
 
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
-                        <div class="tab-content p-b2" id="pills-tabContent">
+                        <div class="tab-content" id="pills-tabContent">
                             <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
                                 <label class="h4 text-primary font-weight-bold mb-4">CLOSED ORDERS</label>
                                 <table class="table table-striped w3-animate-left nss-table">
@@ -170,7 +167,7 @@
                                                     <td>@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
                                                     <td class="text-center">@order.OrderStatusName???</td>
                                                     <td class="text-center cursor-pointer">
-                                                        <img alt="MTR Icon" onclick="handleMtrModal(@order.OrderId)" src="/Themes/@themeName/Content/assets/invoice.svg" />
+                                                        <img alt="MTR Icon" v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" src="/Themes/@themeName/Content/assets/invoice.svg" />
                                                     </td>
                                                 </tr>
                                             }
@@ -183,7 +180,7 @@
                 }
 
                 <div class="col-md-3 col-sm-6 col-12 m-b2">
-                    <div class="card p-b1">
+                    <div class="card p-b3">
                         <div class="card-body text-center contact-card">
                             <div class="avatar-block">
                                 <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/images/call-avatar.png" alt="profile-default">
@@ -495,6 +492,9 @@
     let openOrders = @Html.Raw(Serialize(Model.OpenOrders));
     let closedOrders = @Html.Raw(Serialize(Model.ClosedOrders));
 
+    var companyId = @Html.Raw(eRPCompanyId);
+   
+
     console.log("openOrders: ", openOrders);
     console.log("closedOrders: ", closedOrders);
 
@@ -505,6 +505,43 @@
             closedOrders,
             showRecentOrders: true,
             isCustomerServiceOpen: false,
+            orderMTRs: []
+        },
+        methods: {
+            showLoading: function () {
+                $('#custom-loading').show();
+            },
+            hideLoading: function () {
+                $('#custom-loading').hide();
+            },
+            handleMtrModal: function (companyId, orderId) {
+
+                const request = {
+                    companyId,
+                    orderId
+                }
+
+                console.log('request', request);
+                this.showLoading();
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("GetOrderMTRs", "HomeOverride")",
+                    type: 'GET',
+                    data: request,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, _, _) {
+                        self.orderMTRs = data.MTRs;
+                        console.log('getNotifications - data', self.orderMTRs)
+                        viewMtrModal.show();
+                        self.hideLoading();
+                    },
+                    error: function (xhr, thrownError) {
+                        self.hideLoading();
+                        console.log(xhr, 'error-data', thrownError);
+                    }
+                });
+            }
         },
     });
 
@@ -512,9 +549,6 @@
         viewMtrModal = this;
     }
 
-    function handleMtrModal() {
-        viewMtrModal.show();
-    }
 
 </script>
 

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using Nop.Services.Common;
 using Nop.Core.Domain.Customers;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -26,11 +27,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ICompanyService _companyService;
         private readonly ICustomerModelFactory _customerModelFactory;
+        private readonly ERPApiProvider _erpApiProvider;
 
         #endregion
 
         #region Constructor
         public HomeOverrideController(
+            ERPApiProvider erpApiProvider,
             ISettingService settingService,
             IStoreContext storeContext,
             ERPApiProvider nSSApiProvider,
@@ -50,10 +53,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _genericAttributeService = genericAttributeService;
             _companyService = companyService;
             _customerModelFactory = customerModelFactory;
+            _erpApiProvider = erpApiProvider;
         }
         #endregion
 
-       
+
         public override IActionResult Index()
         {
             string ERPCId = string.Empty;
@@ -110,6 +114,29 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             int customerId = currentCustomer.Id;
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, customerId);
             saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
+        }
+
+        public OrderDetailsModel GetOrderMTRs(int companyId, int orderId)
+        {
+            var model = new OrderDetailsModel();
+            var token = string.Empty;
+            var orderMTRs = new List<ERPGetOrderMTRResponse>();
+            (token, orderMTRs) = _erpApiProvider.GetOrderMTRs(companyId, orderId);
+
+            foreach (var mtr in orderMTRs)
+            {
+                var orderMTR = new OrderDetailsModel.OrderMTRModel
+                {
+                    MtrId = mtr.MtrId,
+                    LineNo = mtr.LineNo,
+                    HeatNo = mtr.HeatNo,
+                    Description = mtr.Description,
+                    MtrFile = $"{mtr.MtrFile}{token}"
+                };
+
+                model.MTRs.Add(orderMTR);
+            }
+            return model;
         }
 
         private void saveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
