@@ -27,27 +27,25 @@
             </div>
 
             <div v-show="isSearchOpen" class="row">
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0" v-bind:style="{'width': isMobile ? '50%':'100%'}">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
-                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control"
-                               data-date-format="mm/dd/yyyy" id="startDate" placeholder="From (mm/dd/yyyy)" maxlength="10" onpaste="return false;"
-                               v-on:change="!$event.target.value ? (fromDate = null) : null">
+                        @*<input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">*@
+                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="startDate" v-bind:placeholder="isMobile ? 'From':'From (mm/dd/yyyy)'" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0" v-bind:style="{'width': isMobile ? '50%':'100%'}">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
-                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy"
-                               id="endDate" placeholder="To (mm/dd/yyyy)" maxlength="10" onpaste="return false;"
-                               v-on:change="!$event.target.value ? (toDate = null) : null">
+                        @*<input class=nss-form-control type="text" v-model="toDate" id="datepicker2" autocomplete="off" placeholder="To">*@
+                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="endDate" v-bind:placeholder="isMobile ? 'To':'To (mm/dd/yyyy)'" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                <div v-if="!isMobile" class="col-lg-3 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
                     <label>Order #</label>
                     <input class="nss-form-control" type="text" v-model="orderId" placeholder="Enter...">
                 </div>
@@ -55,10 +53,13 @@
                     <label>Purchase Order #</label>
                     <input class=nss-form-control type=text v-model="poNo" placeholder="Enter...">
                 </div>
-                <div class="col-lg-2 col-md-12 col-sm-12 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
-                    <button class="nss-btn-default ml-lg-5 w-100 text-center" v-on:click="searchOrders">Search</button>
+                <div class="col-lg-2 col-md-12 col-sm-12 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0" v-bind:style="{'justify-content': isMobile ? 'center':'flex-end'}">
+                    <button class="nss-btn-default ml-lg-5 text-center" v-on:click="searchOrders">Search</button>
                 </div>
             </div>
+        </div>
+        <div v-if="isMobile" class="mobile-export">
+            <button class=" ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
         </div>
         <div class="d-flex flex-row justify-content-between">
             <div>
@@ -66,14 +67,14 @@
                     <li class=nav-item role="presentation" style=margin-right:.3em>
                         <a class="nav-link active" id=pills-home-tab data-toggle=pill
                            href=#pills-home role=tab aria-controls=pills-home
-                           aria-selected=true v-on:click="isClosed = false; searchOrders(); selectedRowCount = 0;">Open Orders</a>
+                           aria-selected=true v-on:click="isClosed = false; searchOrders();">Open Orders</a>
                     <li class=nav-item role="presentation">
                         <a class=nav-link id=pills-profile-tab
                            data-toggle=pill href=#pills-profile role=tab
-                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchOrders(); selectedRowCount = 0;">Closed Orders</a>
+                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchOrders();">Closed Orders</a>
                 </ul>
             </div>
-            <button v-bind:disabled="selectedRowCount === 0" class="nss-btn-default ml-lg-5 mb-2 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+            <button v-if="!isMobile" class="nss-btn-default ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
         </div>
         <div class="d-flex flex-column p-4 bg-white-shadow">
 
@@ -92,12 +93,28 @@
             fromDate: null,
             toDate: null,
             poNo: null,
-            selectedRowCount: 0,
+            window: {
+                width: 0,
+                height: 0,
+            },
         },
         mounted: function () {
             this.searchOrders();
         },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             showLoading: function () {
                 $('#custom-loading').show();
             },
@@ -113,7 +130,7 @@
                     isClosed: this.isClosed,
                 };
                 this.showLoading();
-                this.selectedRowCount = 0;
+                console.log('request', request);
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("SearchCompanyOrders", "OrderOverride")",
@@ -140,19 +157,18 @@
 <script>
 
     $.fn.datepicker.defaults.format = "mm/dd/yyyy";
-    $('#startDate').datepicker({
-        endDate: '+0d',
-        autoclose: true
-    }).on('changeDate', function (e) {
-        vm.fromDate = $(this).val();
-    });
+    $('#startDate').datepicker();
+    $('#endDate').datepicker();
 
-    $('#endDate').datepicker({
-        endDate: '+0d',
-        autoclose: true
-    }).on('changeDate', function (e) {
-        vm.toDate = $(this).val();
-    });
+    $('#startDate').datepicker()
+        .on('changeDate', function (e) {
+            vm.fromDate = $(this).val();
+        });
+
+    $('#endDate').datepicker()
+        .on('changeDate', function (e) {
+            vm.toDate = $(this).val();
+        });
 
 
 

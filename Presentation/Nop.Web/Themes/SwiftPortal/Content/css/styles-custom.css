@@ -3399,13 +3399,27 @@ and also iPads specifically.
     .place-order-button:hover {
         background-color: #0076B4 !important;
     }
-
+.mobile-export {
+    background-color: #f6f6f6;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+.mobile-export > button {
+    background-color: #ffffff;
+    padding: 10px;
+    border: none;
+}
 @media all and (max-width: 600px) {
     .check-out-card {
         padding: 0 !important;
     }
-
-    .partners-logo, .check-out-info {
+    .orders-search-block > div {
+        justify-content: center;
+        align-items: center;
+        background-color: #f6f6f6 !important;
+    }
+        .partners-logo, .check-out-info {
         display: flex;
         align-items: flex-start;
     }
@@ -3416,20 +3430,25 @@ and also iPads specifically.
         justify-content: center;
         margin-bottom: 40px;
     }
-   
-        .place-order-buttons {
-            display: block;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            box-shadow: 0 0 15px rgba(0,0,0,.2);
-            font-size: 0;
-            z-index: 1000;
-            background: white;
-            text-align: center;
-            padding: 1rem;
-        }
+    .nss-btn-default {
+        background-color: #0076B4 !important;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #ffffff;
+    }
+    .place-order-buttons {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        box-shadow: 0 0 15px rgba(0,0,0,.2);
+        font-size: 0;
+        z-index: 1000;
+        background: white;
+        text-align: center;
+        padding: 1rem;
+    }
     .edit-shop-mob {
         background-color: #fff;
         padding: 10px;
