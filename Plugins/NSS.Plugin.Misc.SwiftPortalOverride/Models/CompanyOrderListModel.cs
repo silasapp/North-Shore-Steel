@@ -35,6 +35,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public DateTimeOffset? ScheduledDate { get; set; }
 
             public string OrderStatusName { get; set; }
+            public string DeliveryStatus { get; set; }
 
             public DateTimeOffset? DeliveryDate { get; set; }
 

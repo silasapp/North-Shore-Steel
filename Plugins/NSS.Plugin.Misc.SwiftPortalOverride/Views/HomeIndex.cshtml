@@ -48,7 +48,22 @@
     }
 }
 
+@{
 
+    Func<object, object>
+    Content1 =
+    @<div id="viewMtrModal">
+        <div class="d-flex flex-column mb-2">
+            <template v-for="p in orderMTRs">
+                <a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
+                    <div class="d-flex flex-row mt-4 cursor-pointer">
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
+                    </div>
+                </a>
+            </template>
+        </div>
+    </div>;
+    }
 <style>
     .m-b2 {
         margin-bottom: 2rem;
@@ -77,22 +92,8 @@
 
 
 <div id="app" class="page home-page">
-@{
 
-    Func<object, object>
-    Content1 =
-    @<div id="viewMtrModal">
-        <div class="d-flex flex-column mb-2">
-            <template v-for="p in orderMTRs">
-                <a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mt-4 cursor-pointer">
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
-                    </div>
-                </a>
-            </template>
-        </div>
-    </div>;
-}
+
     <div class="page-body">
         <div class="d-none d-md-block">
             <div class="row">
@@ -165,7 +166,7 @@
                                                 <tr>
                                                     <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                     <td>@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
-                                                    <td class="text-center">@order.OrderStatusName???</td>
+                                                    <td class="text-center">@(order.DeliveryStatus == "On Time" ? "Yes" : "No")</td>
                                                     <td class="text-center cursor-pointer">
                                                         <img alt="MTR Icon" v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" src="/Themes/@themeName/Content/assets/invoice.svg" />
                                                     </td>

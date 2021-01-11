@@ -200,14 +200,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             {
                 OrderId = order.OrderId,
                 DeliveryDate = order.DeliveryDate,
-                OrderStatusName = order.OrderStatusName,
-                DeliveryTicketCount = order.DeliveryTicketCount,
-                OrderDate = order.OrderDate,
-                OrderTotal = order.OrderTotal,
-                PoNo = order.PoNo,
-                PromiseDate = order.PromiseDate,
-                ScheduledDate = order.ScheduledDate,
-                Weight = order.Weight
+                DeliveryStatus = order.DeliveryStatus
             }).Take(5).ToList();
 
 
