@@ -20,5 +20,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         public static string ERPCompanyCookieKey => "ERPCompanyId{0}";
 
         public static string NewUserEmailForPasswordChange => "CustomerFirstLoginEmail";
+
+        public static string OldPassword => "OldPassword";
+        public static string ERPCompanyId => "ERPCompanyId";
+
+
     }
 }

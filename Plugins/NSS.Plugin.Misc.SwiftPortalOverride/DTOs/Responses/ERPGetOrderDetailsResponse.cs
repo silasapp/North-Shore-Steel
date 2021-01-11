@@ -45,6 +45,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
         [JsonProperty("invoiceFile")]
         public string InvoiceFile { get; set; }
 
+        [JsonProperty("orderFile")]
+        public string OrderFile { get; set; }
+
         [JsonProperty("mtrCount")]
         //[JsonConverter(typeof(ParseStringConverter))]
         public string MtrCount { get; set; }

@@ -104,7 +104,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-        public OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs)
+        public OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs, string token)
         {
             var model = new OrderDetailsModel();
             Nop.Core.Domain.Orders.Order order = null;
@@ -120,10 +120,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 model.DeliveryDate = orderDetailsResponse.DeliveryDate;
                 model.Source = orderDetailsResponse.Source;
                 model.OrderStatusName = orderDetailsResponse.OrderStatusName;
-
                 model.DeliveryMethodName = orderDetailsResponse.DeliveryMethodName;
+
                 model.DeliveryTicketFile = orderDetailsResponse.DeliveryTicketFile;
+                if (!string.IsNullOrEmpty(model.DeliveryTicketFile))
+                    model.DeliveryTicketFile = $"{orderDetailsResponse.DeliveryTicketFile}{token}";
+
                 model.InvoiceFile = orderDetailsResponse.InvoiceFile;
+                if (!string.IsNullOrEmpty(model.InvoiceFile))
+                    model.InvoiceFile = $"{orderDetailsResponse.InvoiceFile}{token}";
+
+                model.OrderFile = orderDetailsResponse.OrderFile;
+                if (!string.IsNullOrEmpty(model.OrderFile))
+                    model.OrderFile = $"{orderDetailsResponse.OrderFile}{token}";
 
                 model.MtrCount = mtrCount;
 
@@ -214,8 +223,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         MtrId = mtr.MtrId,
                         LineNo = mtr.LineNo,
                         HeatNo = mtr.HeatNo,
-                        Description = mtr.Description
-                    };
+                        Description = mtr.Description,
+                        MtrFile = $"{mtr.MtrFile}{token}"
+                };
 
                     model.MTRs.Add(orderMTR);
                 }

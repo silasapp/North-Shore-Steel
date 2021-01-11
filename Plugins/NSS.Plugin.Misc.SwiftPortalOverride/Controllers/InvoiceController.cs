@@ -9,6 +9,8 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
+using System;
+using Nop.Services.Common;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -22,12 +24,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly SwiftCoreSettings _swiftCoreSettings;
         private readonly ERPApiProvider _eRPApiProvider;
+        private readonly IGenericAttributeService _genericAttributeService;
 
         #endregion
 
         #region Ctor
 
-        public InvoiceController(IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory, ICustomerCompanyService customerCompanyService, SwiftCoreSettings swiftCoreSettings, ERPApiProvider eRPApiProvider)
+        public InvoiceController(IGenericAttributeService genericAttributeService, IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory, ICustomerCompanyService customerCompanyService, SwiftCoreSettings swiftCoreSettings, ERPApiProvider eRPApiProvider)
         {
             _workContext = workContext;
             _customerService = customerService;
@@ -35,6 +38,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _customerCompanyService = customerCompanyService;
             _swiftCoreSettings = swiftCoreSettings;
             _eRPApiProvider = eRPApiProvider;
+            _genericAttributeService = genericAttributeService;
         }
 
         #endregion
@@ -45,7 +49,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public IActionResult CompanyInvoices()
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP))
                 return AccessDeniedView();
@@ -84,7 +88,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public PartialViewResult SearchCompanyInvoices([FromBody]CompanyInvoiceListModel.SearchFilter filter)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP))
                 return (PartialViewResult)AccessDeniedView();

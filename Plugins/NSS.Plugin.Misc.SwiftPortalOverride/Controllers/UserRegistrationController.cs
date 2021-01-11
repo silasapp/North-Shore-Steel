@@ -132,16 +132,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 warnings.Add("Please enter Last Name.");
             if (String.IsNullOrEmpty(model.Email))
                 warnings.Add("Please enter Work Email.");
-            if (String.IsNullOrEmpty(model.CellPhone) && String.IsNullOrEmpty(model.Phone))
-                warnings.Add("Work or Cell phone is required.");
+            if (String.IsNullOrEmpty(model.Phone))
+                warnings.Add("Please enter Work Phone.");
             if (String.IsNullOrEmpty(model.Company))
                 warnings.Add("Please enter Company Name.");
-            if (String.IsNullOrEmpty(model.HearAboutUs.ToString()))
-                warnings.Add("Please enter how did you hear about us.");
-            if (String.IsNullOrEmpty(model.ItemsForNextProject))
-                warnings.Add("Please enter how we can help.");
-            if (String.IsNullOrEmpty(model.PreferredPickupLocationId.ToString()))
-                warnings.Add("Please enter preferred pickup location.");
 
 
 
@@ -275,7 +269,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 if (!string.IsNullOrEmpty(error))
                 {
-                    warnings.Add(error);
+                    ModelState.AddModelError("", error);
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
                 }
 
@@ -309,6 +303,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 // send email
                 //_workflowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
             }
+
+
+            // update user state and modified state 
+            _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Approved);
 
             userRegistration = GetRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);

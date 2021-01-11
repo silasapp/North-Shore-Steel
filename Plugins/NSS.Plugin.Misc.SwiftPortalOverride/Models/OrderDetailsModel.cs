@@ -28,6 +28,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string OrderStatusName { get; set; }
         public string DeliveryMethodName { get; set; }
         public string DeliveryTicketFile { get; set; }
+        public string OrderFile { get; set; }
         public string InvoiceFile { get; set; }
         public int MtrCount { get; set; }
 
@@ -75,6 +76,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public string HeatNo { get; set; }
             public int LineNo { get; set; }
             public string Description { get; set; }
+            public string MtrFile { get; set; }
         }
 
         public static class OrderSource

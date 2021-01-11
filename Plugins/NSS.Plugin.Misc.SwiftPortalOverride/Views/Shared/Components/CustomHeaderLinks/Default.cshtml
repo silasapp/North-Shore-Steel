@@ -3,17 +3,19 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride
 @using NSS.Plugin.Misc.SwiftCore.Services
 @using Nop.Web.Models.Common
+@using Nop.Services.Common
 
 @model HeaderLinksModel
 @inject Nop.Core.IWebHelper webHelper
 @inject IWorkContext workContext
 @inject ICustomerCompanyService customerCompanyService
+@inject IGenericAttributeService genericAttributeService
 @inject IThemeContext themeContext
 @using Nop.Web.Framework.Themes
 
 @{
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
     bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
 }
 

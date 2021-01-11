@@ -21,19 +21,6 @@
 
 <style>
 
-    /*.text-left > input {
-        width: 100% !important;
-        font-style: italic !important;
-        font-size: 14px;
-        background: #f6f6f6 0% 0% no-repeat padding-box !important;
-        opacity: 1;*/
-    /*border: none;*/
-    /*font: italic normal normal 14px/24px "Exo 2";
-        letter-spacing: 0px;
-        color: #aaaaaa;
-        opacity: 1;
-    }*/
-
     .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
         width: 67rem !important;
         margin: auto;
@@ -53,6 +40,10 @@
 
     .e-dialog .e-dlg-header {
         width: 97% !important;
+    }
+
+    .p-t4 {
+        padding-top: .4rem !important;
     }
 </style>
 
@@ -269,8 +260,7 @@
                                 <span asp-validation-for="Phone" style="display:flex;"></span>
                             </div>
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <label asp-for="CellPhone">Cell Phone</label>
-                                <nop-required />
+                                <label asp-for="CellPhone">Cell Phone (Optional)</label>
                                 <input asp-for="CellPhone" id="cell-phone" placeholder="Enter cell phone number" maxlength="14" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="CellPhone" style="display:flex;"></span>
                             </div>
@@ -291,19 +281,28 @@
                             </div>
 
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3" id="user_roles" style="display:none">
-                                <label asp-for="Company">Roles</label>
+                                <label asp-for="Company">Select Company Roles</label>
                                 <ul class="option-list d-flex">
                                     <li>
-                                        <input asp-for="BuyerRole" class="mb-2" type="checkbox" checked />
-                                        <label asp-for="BuyerRole" class="mb-2 pr-3" id="buyer_role">Buyer</label>
+                                        <label class="pure-material-checkbox">
+                                            <input asp-for="BuyerRole" class="mb-2 checkmark" type="checkbox" checked />
+                                            <span class="checkmark"></span>
+                                            <label asp-for="BuyerRole" class="pr-3 p-t4" id="buyer_role">Buyer</label>
+                                        </label>
                                     </li>
                                     <li>
-                                        <input asp-for="OperationsRole" class="mb-2" type="checkbox" checked />
-                                        <label asp-for="OperationsRole" class="mb-2 pr-3" id="operations_role">Operations</label>
+                                        <label class="pure-material-checkbox">
+                                            <input asp-for="OperationsRole" class="mb-2 checkmark" type="checkbox" checked />
+                                            <span class="checkmark"></span>
+                                            <label asp-for="OperationsRole" class="pr-3 p-t4" id="operations_role">Operations</label>
+                                        </label>
                                     </li>
                                     <li>
-                                        <input asp-for="APRole" class="mb-2" type="checkbox" checked />
-                                        <label asp-for="APRole" class="mb-2 pr-3" id="ap_role">AP</label>
+                                        <label class="pure-material-checkbox">
+                                            <input asp-for="APRole" class="mb-2 checkmark" type="checkbox" checked />
+                                            <span class="checkmark"></span>
+                                            <label asp-for="APRole" class="pr-3 p-t4" id="ap_role">AP</label>
+                                        </label>
                                     </li>
                                 </ul>
                             </div>
@@ -320,8 +319,7 @@
                     <div class="row">
                         <div class="col-md-6 col-sm-12 col-xs-12">
                             <div style="margin-bottom: 2em">
-                                <label>How did you hear about us?</label>
-                                <nop-required />
+                                <label>How did you hear about us? (Optional)</label>
                                 <select asp-for="HearAboutUs" asp-items="Html.GetEnumSelectList<HearAboutUs>()" class="form-control custom-input about-us" onchange="otherMethodCheck(this);"> </select>
                                 <span asp-validation-for="HearAboutUs"></span>
                             </div>
@@ -336,8 +334,7 @@
                             </div>
 
                             <div>
-                                <label>Preferred pickup location</label>
-                                <nop-required />
+                                <label>Preferred pickup location (Optional)</label>
                                 <select asp-for="PreferredPickupLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
                                 <span asp-validation-for="PreferredPickupLocationId"></span>
 
@@ -348,8 +345,7 @@
 
                         <div class="col-md-6 col-sm-12 col-xs-12">
                             <div>
-                                <label>How can we help?</label>
-                                <nop-required />
+                                <label>How can we help? (Optional)</label>
                                 <textarea asp-for="ItemsForNextProject" placeholder="What items are you considering for your next project?" class="form-control custom-input"></textarea>
                                 <span asp-validation-for="ItemsForNextProject" style="display:flex;"></span>
                             </div>

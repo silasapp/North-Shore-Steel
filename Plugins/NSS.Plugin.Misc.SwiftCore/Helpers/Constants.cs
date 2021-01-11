@@ -12,6 +12,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string ErpKeyAttribute => "ErpId";
         public static string ErpOrderNoAttribute => "ErpOrderNo";
 
+
         #region NSSCustomerAttributes           
         public static string CellAttribute => "Cell";
         public static string IsExistingCustomerAttribute => "Existing Customer";

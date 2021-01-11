@@ -18,6 +18,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
 
         [JsonProperty("description")]
         public string Description { get; set; }
+
+        [JsonProperty("mtrFile")]
+        public string MtrFile { get; set; }
     }
 
     public partial class ERPGetOrderMTRResponse

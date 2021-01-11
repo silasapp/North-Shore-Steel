@@ -24,7 +24,8 @@
 
 @{
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
     bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
 }
 

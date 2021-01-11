@@ -33,6 +33,7 @@
     <Content Remove="obj\**" />
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
+    <Content Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
     <Content Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <Content Remove="Themes\SwiftPortal\Views\Order\**" />
     <Content Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
@@ -46,6 +47,8 @@
 
     <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
 
+    <Compile Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
+
     <Compile Remove="Themes\DefaultClean\Views\NewFolder\**" />
 
     <Compile Remove="Themes\SwiftPortal\Views\Order\**" />
@@ -57,6 +60,7 @@
     <EmbeddedResource Remove="Plugins\**;Themes\**" />
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
+    <EmbeddedResource Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
     <EmbeddedResource Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <EmbeddedResource Remove="Themes\SwiftPortal\Views\Order\**" />
     <EmbeddedResource Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />
@@ -65,6 +69,7 @@
     <None Remove="Plugins\**;Themes\**" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\CartOverride\**" />
     <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Shared\Components\NewFolder\**" />
+    <None Remove="Plugins\Misc.SwiftPortalOverride\Views\Topic\**" />
     <None Remove="Themes\DefaultClean\Views\NewFolder\**" />
     <None Remove="Themes\SwiftPortal\Views\Order\**" />
     <None Remove="Themes\SwiftPortal\Views\Shared\Components\AccountSelector\**" />

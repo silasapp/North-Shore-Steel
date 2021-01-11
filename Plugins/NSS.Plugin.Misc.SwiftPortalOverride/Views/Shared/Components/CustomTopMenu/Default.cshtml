@@ -3,18 +3,22 @@
 @using NSS.Plugin.Misc.SwiftPortalOverride
 @using NSS.Plugin.Misc.SwiftCore.Helpers
 @using NSS.Plugin.Misc.SwiftCore.Services
+@using Nop.Services.Common
 
 @inject ICustomerCompanyService customerCompanyService
+@inject IGenericAttributeService genericAttributeService
 @inject IWorkContext workContext
 
 @model TopMenuModel
 
 @{
-    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
-    bool isAP = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
-    bool isOperations = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
-    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+    var currentCustomer = workContext.CurrentCustomer;
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+    //int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    string eRPCompanyId = genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
+    bool isAP = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.AP);
+    bool isOperations = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Operations);
+    bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
 }
 <style>
     .active-tab {

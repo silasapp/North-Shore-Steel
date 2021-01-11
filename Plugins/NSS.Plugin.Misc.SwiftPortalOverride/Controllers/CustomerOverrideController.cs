@@ -401,6 +401,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                             {
                                 var changePasswordModel = _customerModelFactory.PrepareChangePasswordModel();
                                 Response.Cookies.Append(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange, model.Email);
+                                _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.OldPassword, model.Password);
                                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", changePasswordModel);
                             }
 
@@ -812,8 +813,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (ModelState.IsValid)
             {
+                var oldPassword = _genericAttributeService.GetAttribute<string>(customer, SwiftPortalOverrideDefaults.OldPassword);
                 var changePasswordRequest = new ChangePasswordRequest(customer.Email,
-                    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
+                    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, oldPassword);
                 var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
                 if (changePasswordResult.Success)
                 {
@@ -836,6 +838,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     _customerActivityService.InsertActivity(customer, "PublicStore.Login",
                         _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
 
+                    _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.OldPassword, "");
                     return RedirectToRoute("Homepage");
                 }
 
@@ -895,7 +898,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public IActionResult GetNotifications()
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
@@ -919,7 +922,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 throw new ArgumentNullException(nameof(notificationRequest));
 
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Request.Cookies[compIdCookieKey]);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
