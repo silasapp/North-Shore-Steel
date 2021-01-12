@@ -7,7 +7,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
     {
         void InsertShapes(List<Shape> shapes);
 
-        IList<Shape> GetShapes();
+        IList<Shape> GetShapes(bool parentsOnly = false);
 
         Shape GetShapeById(int id);
 

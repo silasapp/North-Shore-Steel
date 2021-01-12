@@ -37,7 +37,6 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
-using Nop.Services.Common;
 using System.Collections.Generic;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
@@ -125,7 +124,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
             if (int.TryParse(orderDetailsResponse.MtrCount, out int mtrCount) && mtrCount > 0)
             {
-                orderMTRs = _erpApiProvider.GetOrderMTRs(eRPCompanyId, orderId);
+                (token, orderMTRs) = _erpApiProvider.GetOrderMTRs(eRPCompanyId, orderId);
             }
             
 

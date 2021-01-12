@@ -104,22 +104,27 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             //var searchInProductTags = searchInDescriptions;
 
             //products
-            products = _productService.SearchProducts(out var filterableSpecificationAttributeOptionIds,
-                true,
-                categoryIds: shapeIds,
-                storeId: _storeContext.CurrentStore.Id,
-                //visibleIndividuallyOnly: false,
-                featuredProducts: _catalogSettings.IncludeFeaturedProductsInNormalLists ? null : (bool?)false,
-                priceMin: minPriceConverted,
-                priceMax: maxPriceConverted,
-                keywords: searchTerms,
-                filteredSpecs: specIds
-                //orderBy: (ProductSortingEnum)command.OrderBy,
-                //pageIndex: command.PageNumber - 1,
-                //pageSize: command.PageSize
-                );
+            IList<int> filterableSpecificationAttributeOptionIds = new List<int>();
 
-            model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).ToList();
+            if (shapeIds.Count > 0 || specIds.Count > 0)
+            {
+                products = _productService.SearchProducts(out filterableSpecificationAttributeOptionIds,
+                    true,
+                    categoryIds: shapeIds,
+                    storeId: _storeContext.CurrentStore.Id,
+                    //visibleIndividuallyOnly: false,
+                    featuredProducts: _catalogSettings.IncludeFeaturedProductsInNormalLists ? null : (bool?)false,
+                    priceMin: minPriceConverted,
+                    priceMax: maxPriceConverted,
+                    keywords: searchTerms,
+                    filteredSpecs: specIds
+                    //orderBy: (ProductSortingEnum)command.OrderBy,
+                    //pageIndex: command.PageNumber - 1,
+                    //pageSize: command.PageSize
+                    );
+            }
+
+            model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).OrderBy(o => o.Sku).ToList();
 
             model.NoResults = !model.Products.Any();
 
@@ -159,7 +164,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             //specs
             PrepareSpecsFilters(specIds,
                 filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
-                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model);
+                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model, shapeIds);
 
             PrepareShapeFilterModel(ref model);
 
@@ -172,7 +177,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             int[] filterableSpecificationAttributeOptionIds,
             ICacheKeyService cacheKeyService,
             ISpecificationAttributeService specificationAttributeService, ILocalizationService localizationService,
-            IWebHelper webHelper, IWorkContext workContext, IStaticCacheManager staticCacheManager, ref CatalogModel model)
+            IWebHelper webHelper, IWorkContext workContext, IStaticCacheManager staticCacheManager, ref CatalogModel model, IList<int> shapeIds)
         {
             model.PagingFilteringContext.SpecificationFilter.Enabled = false;
             var cacheKey = cacheKeyService.PrepareKeyForDefaultCache(NopModelCacheDefaults.SpecsFilterModelKey, filterableSpecificationAttributeOptionIds, workContext.WorkingLanguage);
@@ -197,96 +202,77 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (!allFilters.Any())
                 return;
 
-            //sort loaded options
-            allFilters = allFilters.OrderBy(saof => saof.SpecificationAttributeDisplayOrder)
-                .ThenBy(saof => saof.SpecificationAttributeName)
-                .ThenBy(saof => saof.SpecificationAttributeOptionDisplayOrder)
-                .ThenBy(saof => saof.SpecificationAttributeOptionName).ToList();
-
             //prepare the model properties
             model.PagingFilteringContext.SpecificationFilter.Enabled = true;
-            //var removeFilterUrl = webHelper.RemoveQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM);
-            //RemoveFilterUrl = ExcludeQueryStringParams(removeFilterUrl, webHelper);
 
-            //get already filtered specification options
-            var alreadyFilteredOptions = allFilters.Where(x => alreadyFilteredSpecOptionIds.Contains(x.SpecificationAttributeOptionId));
-            model.PagingFilteringContext.SpecificationFilter.AlreadyFilteredItems = alreadyFilteredOptions.Select(x =>
-                new SpecificationFilterItem
-                {
-                    SpecificationAttributeName = x.SpecificationAttributeName,
-                    SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
-                    SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb
-                }).ToList();
+            var defaultSpecFilters = new List<string> { SwiftCore.Helpers.Constants.CoatingFieldAttribute, SwiftCore.Helpers.Constants.MetalFieldAttribute };
 
-            //get not filtered specification options
-            model.PagingFilteringContext.SpecificationFilter.NotFilteredItems = allFilters.Except(alreadyFilteredOptions).Select(x =>
+            var specs = model.Products.Select(x => x.SpecificationAttributeModels).SelectMany(specs => specs);
+
+            // not plate individual shape
+            if (!shapeIds.Any(x => x.ToString().StartsWith("13")))
+                specs = specs.Where(x => defaultSpecFilters.Contains(x.SpecificationAttributeName));
+
+            var specGroup = specs.GroupBy(x => x.SpecificationAttributeOptionId);
+
+            var specList = new List<SpecificationFilterItem>();
+
+            foreach (var spec in specGroup)
             {
-                //filter URL
-                var alreadyFiltered = alreadyFilteredSpecOptionIds.Concat(new List<int> { x.SpecificationAttributeOptionId });
-                //var filterUrl = webHelper.ModifyQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM,
-                //    alreadyFiltered.OrderBy(id => id).Select(id => id.ToString()).ToArray());
+                var activeSpec = spec.FirstOrDefault(z => z.SpecificationAttributeOptionId == spec.Key);
 
-                return new SpecificationFilterItem()
+                specList.Add(new SpecificationFilterItem
                 {
-                    SpecificationAttributeOptionId = x.SpecificationAttributeOptionId,
-                    SpecificationAttributeName = x.SpecificationAttributeName,
-                    SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
-                    SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb,
-                    ProductCount = 0
-                    //FilterUrl = ExcludeQueryStringParams(filterUrl, webHelper)
-                };
-            }).ToList();
-
-            var prodSpecs = model.Products.Select(x => x.SpecificationAttributeModels);
-
-            foreach (var specs in prodSpecs)
-            {
-                foreach (var spec in specs)
-                {
-                    if (model.PagingFilteringContext.SpecificationFilter.FilterItems.Any(x => x.SpecificationAttributeOptionId == spec.SpecificationAttributeOptionId))
-                    {
-                        model.PagingFilteringContext.SpecificationFilter.FilterItems.FirstOrDefault(x => x.SpecificationAttributeOptionId == spec.SpecificationAttributeOptionId).ProductCount += 1;
-                    }
-                    else
-                    {
-                        model.PagingFilteringContext.SpecificationFilter.FilterItems.Add(new SpecificationFilterItem { SpecificationAttributeName = spec.SpecificationAttributeName, SpecificationAttributeOptionId = spec.SpecificationAttributeOptionId, SpecificationAttributeOptionColorRgb = spec.ColorSquaresRgb, SpecificationAttributeOptionName = spec.SpecificationAttributeOptionName, ProductCount = 1 });
-                    }
-                }
+                    SpecificationAttributeName = activeSpec?.SpecificationAttributeName,
+                    SpecificationAttributeOptionId = spec.Key,
+                    SpecificationAttributeOptionColorRgb = "",
+                    SpecificationAttributeOptionName = activeSpec?.SpecificationAttributeOptionName,
+                    ProductCount = spec.Count()
+                });
             }
+
+            model.PagingFilteringContext.SpecificationFilter.FilterItems = new List<SpecificationFilterItem>(specList);
+
         }
 
         public void PrepareShapeFilterModel(ref CatalogModel model)
         {
             //var shapes = _shapeService.GetShapes();
             var productGroup = model.Products.GroupBy(x => x.Shape.Id);
-            var shapes = model.Products.Select(x => x.Shape).Distinct();
 
-            foreach (var shapeGroup in productGroup)
+            if(productGroup.Count() > 0)
             {
-                var filterItem = new ShapeFilterItem { Shape = shapeGroup.FirstOrDefault(x => x.Shape.Id == shapeGroup.Key).Shape, ProductCount = shapeGroup.Count() };
-
-                if(filterItem.Shape.Parent != null)
+                foreach (var shapeGroup in productGroup)
                 {
-                    if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.ParentId))
+                    var filterItem = new ShapeFilterItem { Shape = shapeGroup.FirstOrDefault(x => x.Shape.Id == shapeGroup.Key).Shape, ProductCount = shapeGroup.Count() };
+
+                    if (filterItem.Shape.Parent != null)
                     {
-                        model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.ParentId).ProductCount += filterItem.ProductCount;
+                        if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.ParentId))
+                        {
+                            model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.ParentId).ProductCount += filterItem.ProductCount;
+                        }
+                        else
+                        {
+                            // build parent
+                            model.PagingFilteringContext.ShapeFilter.FilterItems.Add(new ShapeFilterItem { Shape = filterItem.Shape.Parent, ProductCount = shapeGroup.Count() });
+                        }
+                    }
+
+                    if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.Id))
+                    {
+                        model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.Id).ProductCount += filterItem.ProductCount;
                     }
                     else
                     {
-                        // build parent
-                        model.PagingFilteringContext.ShapeFilter.FilterItems.Add(new ShapeFilterItem { Shape = filterItem.Shape.Parent, ProductCount = shapeGroup.Count() });
+                        // build shape
+                        model.PagingFilteringContext.ShapeFilter.FilterItems.Add(filterItem);
                     }
                 }
-
-                if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.Id))
-                {
-                    model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.Id).ProductCount += filterItem.ProductCount;
-                }
-                else
-                {
-                    // build shape
-                    model.PagingFilteringContext.ShapeFilter.FilterItems.Add(filterItem);
-                }
+            }
+            else
+            {
+                model.PagingFilteringContext.ShapeFilter.FilterItems = new List<ShapeFilterItem>(_shapeService.GetShapes(parentsOnly: true).Select(shape => new ShapeFilterItem { Shape = shape, ProductCount = 0 }));
             }
         }
     }

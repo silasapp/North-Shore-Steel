@@ -24,6 +24,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
         [JsonProperty("orderDate")]
         public DateTimeOffset OrderDate { get; set; }
 
+        [JsonProperty("deliveryStatus")]
+        public string DeliveryStatus { get; set; }
+
         [JsonProperty("promiseDate")]
         public DateTimeOffset PromiseDate { get; set; }
 

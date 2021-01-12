@@ -11,6 +11,7 @@ using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Services.Stores;
+using NSS.Plugin.Misc.SwiftApi.Attributes;
 using NSS.Plugin.Misc.SwiftApi.Delta;
 using NSS.Plugin.Misc.SwiftApi.DTO.Errors;
 using NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies;
@@ -73,6 +74,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorsRootObject), 422)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
+        [GetRequestsErrorInterceptorActionFilter]
         public IActionResult CreateUser([ModelBinder(typeof(JsonModelBinder<UserDto>))] Delta<UserDto> userDelta)
         {
             if (!ModelState.IsValid)
@@ -90,7 +92,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 if (registration == null)
                     return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
 
-                if (registration.StatusId != (int)UserRegistrationStatus.Rejected)
+                if (registration.StatusId == (int)UserRegistrationStatus.Rejected)
                     return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is rejected");
 
                 if (_customerService.GetCustomerByEmail(registration.WorkEmail) != null)
@@ -150,7 +152,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             foreach (var userCompany in userDelta.Dto.UserCompanies)
             {
                 var company = _companyService.GetCompanyEntityByErpEntityId(userCompany.CompanyId);
-                if(company == null)
+                if (company == null)
                 {
                     company = new Company
                     {
@@ -160,7 +162,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                         SalesContactEmail = userCompany.SalesContactEmail,
                         SalesContactPhone = userCompany.SalesContactPhone,
                         SalesContactImageUrl = userCompany.SalesContactImageUrl,
-                        CreatedOnUtc = DateTime.UtcNow, 
+                        CreatedOnUtc = DateTime.UtcNow,
                         UpdatedOnUtc = DateTime.UtcNow
                     };
 
@@ -170,7 +172,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 }
 
                 var customerCompany = _customerCompanyService.GetCustomerCompany(customer.Id, company.Id);
-                if(customerCompany == null)
+                if (customerCompany == null)
                 {
                     customerCompany = new CustomerCompany
                     {
@@ -339,7 +341,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
         private void UpdateCustomerGenAttribute(Customer customerToUpdate, string firstname, string lastName, string phone, string cell, int prefferedLocationId)
         {
-            if(!string.IsNullOrEmpty(firstname))
+            if (!string.IsNullOrEmpty(firstname))
                 _genericAttributeService.SaveAttribute(customerToUpdate, NopCustomerDefaults.FirstNameAttribute, firstname);
 
             if (!string.IsNullOrEmpty(lastName))

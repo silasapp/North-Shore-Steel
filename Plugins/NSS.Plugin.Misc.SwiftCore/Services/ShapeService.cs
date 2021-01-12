@@ -48,7 +48,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
         }
 
-        public IList<Shape> GetShapes()
+        public IList<Shape> GetShapes(bool parentsOnly = false)
         {
             var shapes = _shapeRepository.Table.Where(s => s.ParentId == null || s.ParentId == 0).ToList();
 
@@ -59,7 +59,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                     shape.SubCategories = _shapeRepository.Table.Where(s => s.ParentId.Value == shape.Id).ToList();
                     shape.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Id).ToList();
                 }
-                else
+                else if (!parentsOnly)
                 {
                     shape.Parent = _shapeRepository.Table.FirstOrDefault(s => s.Id == shape.ParentId);
                     if (shape.Parent != null)
@@ -67,6 +67,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         shape.Parent.Atttributes = _shapeAttributeRepository.Table.Where(sa => sa.ShapeId == shape.Parent.Id).ToList();
                     }
                 }
+
             }
 
             return shapes;

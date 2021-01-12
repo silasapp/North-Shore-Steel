@@ -20,6 +20,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// <returns>Customer navigation model</returns>
         CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, int selectedTabId = 0);
 
+        TransactionModel PrepareCustomerHomeModel(string CompanyId);
         /// <summary>
         /// Prepare the customer register model
         /// </summary>

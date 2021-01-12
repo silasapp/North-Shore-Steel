@@ -11,6 +11,8 @@ using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using System.Collections.Generic;
 using Nop.Services.Common;
 using Nop.Core.Domain.Customers;
+using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -24,18 +26,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ICompanyService _companyService;
+        private readonly ICustomerModelFactory _customerModelFactory;
+        private readonly ERPApiProvider _erpApiProvider;
 
         #endregion
 
         #region Constructor
         public HomeOverrideController(
+            ERPApiProvider erpApiProvider,
             ISettingService settingService,
             IStoreContext storeContext,
             ERPApiProvider nSSApiProvider,
             IWorkContext workContext,
             ICustomerCompanyService customerCompanyService,
             IGenericAttributeService genericAttributeService,
-            ICompanyService companyService
+            ICompanyService companyService,
+            ICustomerModelFactory customerModelFactory
 
             )
         {
@@ -46,10 +52,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _customerCompanyService = customerCompanyService;
             _genericAttributeService = genericAttributeService;
             _companyService = companyService;
+            _customerModelFactory = customerModelFactory;
+            _erpApiProvider = erpApiProvider;
         }
         #endregion
 
-       
+
         public override IActionResult Index()
         {
             string ERPCId = string.Empty;
@@ -66,21 +74,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             ERPCId = _genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
             if (ERPCId != null)
             {
-                //ERPCId = Request.Cookies[compIdCookieKey].ToString();
-                company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(ERPCId));
                 // check if customer still has access to previously selected company
                 IEnumerable<CustomerCompany> cc = customerCompanies.Where(x => x.Company.ErpCompanyId.ToString() == ERPCId);
                 if (cc.Count() > 0)
                 {
-                    model = GetTransactions(ERPCId);
-                    _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company.Name);
+                    model = _customerModelFactory.PrepareCustomerHomeModel(ERPCId);
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
                 }
 
                 // remove cookie
-                //Response.Cookies.Delete(compIdCookieKey);
                 saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, "");
-                //_genericAttributeService.SaveAttribute(currentCustomer, compIdCookieKey, "");
 
 
             }
@@ -88,12 +91,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (customerCompanies.Count() == 1)
             {
                 ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
-                company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(ERPCId));
-                //Response.Cookies.Append(compIdCookieKey, ERPCId);
                 saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCId);
-                //_genericAttributeService.SaveAttribute(currentCustomer, compIdCookieKey, ERPCId);
-                model = GetTransactions(ERPCId);
-                _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company.Name);
+                model = _customerModelFactory.PrepareCustomerHomeModel(ERPCId);
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }
             else if (customerCompanies.Count() > 1)
@@ -117,19 +116,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
         }
 
+        public OrderDetailsModel GetOrderMTRs(int companyId, int orderId)
+        {
+            var model = new OrderDetailsModel();
+            var token = string.Empty;
+            var orderMTRs = new List<ERPGetOrderMTRResponse>();
+            (token, orderMTRs) = _erpApiProvider.GetOrderMTRs(companyId, orderId);
+
+            foreach (var mtr in orderMTRs)
+            {
+                var orderMTR = new OrderDetailsModel.OrderMTRModel
+                {
+                    MtrId = mtr.MtrId,
+                    LineNo = mtr.LineNo,
+                    HeatNo = mtr.HeatNo,
+                    Description = mtr.Description,
+                    MtrFile = $"{mtr.MtrFile}{token}"
+                };
+
+                model.MTRs.Add(orderMTR);
+            }
+            return model;
+        }
+
         private void saveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
         {
             _genericAttributeService.SaveAttribute(currentCustomer, compIdCookieKey, ERPCompanyId);
 
-        }
-
-        private TransactionModel GetTransactions(string ERPCId)
-        {
-            var model = new TransactionModel();
-            model.RecentOrders = _nSSApiProvider.GetRecentOrders(ERPCId);
-            model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(ERPCId);
-            model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(ERPCId);
-            return model;
         }
     }
 }

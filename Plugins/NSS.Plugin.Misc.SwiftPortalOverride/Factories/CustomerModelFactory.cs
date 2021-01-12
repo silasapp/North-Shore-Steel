@@ -1,35 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Nop.Core;
-using Nop.Core.Domain.Catalog;
+﻿using Nop.Core;
 using Nop.Core.Domain.Common;
-using Nop.Core.Domain.Forums;
-using Nop.Core.Domain.Gdpr;
-using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Security;
-using Nop.Core.Domain.Tax;
-using Nop.Core.Domain.Vendors;
-using Nop.Services.Authentication.External;
-using Nop.Services.Catalog;
-using Nop.Services.Common;
-using Nop.Services.Customers;
-using Nop.Services.Directory;
-using Nop.Services.Gdpr;
-using Nop.Services.Helpers;
-using Nop.Services.Localization;
-using Nop.Services.Media;
-using Nop.Services.Messages;
-using Nop.Services.Orders;
-using Nop.Services.Seo;
-using Nop.Services.Stores;
-using Nop.Web.Models.Common;
+using Nop.Core.Domain.Customers;
 using Nop.Web.Framework.Themes;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
-using Nop.Core.Domain.Customers;
-using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftPortalOverride.Services;
+using NSS.Plugin.Misc.SwiftCore.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using Nop.Services.Common;
+using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
@@ -43,12 +24,29 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         private readonly IThemeContext _themeContext;
         private readonly CustomerSettings _customerSettings;
         private readonly CommonSettings _commonSettings;
+        private readonly ERPApiProvider _nSSApiProvider;
+        private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly ERPApiProvider _eRPApiProvider;
+        private readonly IWorkContext _workContext;
+        private readonly IGenericAttributeService _genericAttributeService;
+        private readonly ICompanyService _companyService;
 
-        public CustomerModelFactory(IThemeContext themeContext, CommonSettings commonSettings, CustomerSettings customerSettings)
+        public CustomerModelFactory(
+            IGenericAttributeService genericAttributeService,
+            ICompanyService companyService,
+            ERPApiProvider eRPApiProvider,
+            IWorkContext workContext,
+        IThemeContext themeContext, ICustomerCompanyService customerCompanyService, ERPApiProvider nSSApiProvider, CommonSettings commonSettings, CustomerSettings customerSettings)
         {
             _themeContext = themeContext;
             _customerSettings = customerSettings;
             _commonSettings = commonSettings;
+            _eRPApiProvider = eRPApiProvider;
+            _workContext = workContext;
+            _nSSApiProvider = nSSApiProvider;
+            _genericAttributeService = genericAttributeService;
+            _companyService = companyService;
+            _customerCompanyService = customerCompanyService;
         }
         /// <summary>
         /// Prepare the customer navigation model
@@ -173,6 +171,72 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             } 
         }
 
+
+        public TransactionModel PrepareCustomerHomeModel(string companyId)
+        {
+            var openOrdersResponse = new List<ERPSearchOrdersResponse>();
+            var closedOrdersResponse = new List<ERPSearchOrdersResponse>();
+            var request = new ERPSearchOrdersRequest()
+            {
+                FromDate = DateTimeOffset.UtcNow.AddYears(-1).ToString("yyyy-MM-dd"),
+                ToDate = DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"),
+                OrderId = null,
+                PONo = null,
+            };
+            var model = new TransactionModel();
+            var currentCustomer = _workContext.CurrentCustomer;
+
+            openOrdersResponse = _nSSApiProvider.SearchOpenOrders(Convert.ToInt32(companyId), request, useMock: false);
+            closedOrdersResponse = _nSSApiProvider.SearchClosedOrders(Convert.ToInt32(companyId), request, useMock: false);
+
+            var openOrders = openOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
+            {
+                OrderId = order.OrderId,
+                DeliveryDate = order.DeliveryDate,
+                OrderStatusName = order.OrderStatusName
+            }).Take(5).ToList();
+
+            var closedOrders = closedOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
+            {
+                OrderId = order.OrderId,
+                DeliveryDate = order.DeliveryDate,
+                DeliveryStatus = order.DeliveryStatus
+            }).Take(5).ToList();
+
+
+            model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
+
+
+            model.OpenOrders = openOrders;
+            model.ClosedOrders = closedOrders;
+
+            // get credit summary
+            var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, Convert.ToInt32(companyId));
+            var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
+            {
+                //ApplyForCreditUrl = string.IsNullOrEmpty(_swiftCoreSettings.ApplyForCreditUrl) ? "https://www.nssco.com/assets/files/newaccountform.pdf" : _swiftCoreSettings.ApplyForCreditUrl,
+                CanCredit = customerCompany?.CanCredit ?? false
+            };
+
+            if (creditSummary.CanCredit)
+            {
+                var creditResposne = _eRPApiProvider.GetCompanyCreditBalance(Convert.ToInt32(companyId));
+
+                creditSummary.CreditAmount = creditResposne?.CreditAmount ?? decimal.Zero;
+                creditSummary.CreditLimit = creditResposne?.CreditLimit ?? decimal.Zero;
+                creditSummary.OpenInvoiceAmount = creditResposne?.OpenInvoiceAmount ?? decimal.Zero;
+                creditSummary.PastDueAmount = creditResposne?.PastDueAmount ?? decimal.Zero;
+            }
+
+            model.CreditSummary = creditSummary;
+
+            // save selected company name to generic attributes
+            // display in customer info screen
+            Company company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(companyId));
+            _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company.Name);
+
+            return model;
+        }
 
         /// <summary>
         /// Prepare the customer register model
