@@ -27,39 +27,41 @@
                 <div class="d-flex flex-column mt-4 mb-2">
                     @foreach (var item in Model.MTRs)
                     {
-                        <a href="@item.MtrFile" target="_blank" class="text-decoration-none">
-                            <div class="d-flex flex-row mt-4 cursor-pointer">
-                                <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
-                            </div>
-                        </a>
+                        <div class="d-flex flex-row mt-4 cursor-pointer">
+                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
+                        </div>
                     }
                 </div>
             </div>
         }
     </div>;
 }
-
+<style>
+    .cart-total-left, .cart-total-right {
+        display: table-cell !important;
+    }
+</style>
 <div id="order-detail" class="page order-details-page">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center align-items-md-start bg-white-shadow px-5 py-4">
-        <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('/orders')">
+    <div class="d-flex flex-md-row justify-content-between align-items-center align-items-md-start bg-white-shadow px-5 py-2" style="align-items: center !important;" v-bind:style="{'background': isMobile ? '#f6f6f6' : '#ffffff'}">
+        <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" onclick="setLocation('/orders')" v-bind:style="{'background': isMobile ? '#ffffff' : 'transparent'}">
             <img src="~/Themes/@themeName/Content/assets/enter.svg" alt="" width="20" class="mr-2">
             Back to Orders
         </div>
-        <label class="h3-primary-sans my-3">ORDER NUMBER: @Model.OrderId</label>
+        <label v-if="!isMobile" class="h3-primary-sans my-3">ORDER NUMBER: @Model.OrderId</label>
         @if (Model.SysOrderId != null)
-        {
-            @if (Model.CanBuy)
             {
-                <div class="h4-primary d-flex flex-row my-3 cursor-pointer" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')">
-                    <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
-                    Order Again
-                </div>
-            }
+                @if (Model.CanBuy)
+                {
+        <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')" v-bind:style="{'background': isMobile ? '#ffffff' : 'transparent'}">
+            <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
+            Order Again
+        </div>
         }
+            }
 
     </div>
-    <div class="row mx-0 d-flex flex-row bg-white-shadow px-4 py-4 mt-4">
-        <div class="col-md-4 col-sm-6">
+    <div class="row mx-0 d-flex flex-row bg-white-shadow  mt-4" v-bind:style="{'background': isMobile ? 'transparent' : '#ffffff'}" v-bind:class="{'px-4': !isMobile, 'py-4': !isMobile}">
+        <div class="col-md-4 col-sm-6 text-left" v-bind:style="{'width': isMobile ? '50%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" v-bind:class="{'px-4': isMobile, 'py-4': isMobile, 'mb-4': isMobile}">
             <label class="h4-primary-500-teko text-uppercase mb-0">@T("Order.BillingAddress")</label>
             <ul class="h5-default">
                 <li class="name">
@@ -158,7 +160,7 @@
                     </div>
                 }*@
         </div>
-        <div class="col-md-4 col-sm-6">
+        <div class="col-md-4 col-sm-6 text-left" v-bind:style="{'width': isMobile ? '50%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" v-bind:class="{'px-4': isMobile, 'py-4': isMobile, 'mb-4': isMobile}">
             <div class="shipping-info-wrap">
                 <div class="shipping-info">
                     <label class="h4-primary-500-teko text-uppercase mb-0">@(Model.IsPickup ? T("Order.PickupAddress") : T("Order.ShippingAddress"))</label>
@@ -301,46 +303,34 @@
 
 
         </div>
-        <div class="col-md-4 col-sm-6 d-flex flex-column align-items-center align-items-md-start">
+        <div class="col-md-4 col-sm-6 d-flex flex-column align-items-center align-items-md-start text-left" v-bind:style="{'background': isMobile ? '#f6f6f6' : 'transparent'}" v-bind:class="{'px-4': isMobile, 'py-4': isMobile}">
             @if (Model.InvoiceFile != null)
             {
                 <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
+                    <div class="d-flex flex-row mb-4 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
                         <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice</label>
-                    </div>
-                </a>
-            }
-            @if (Model.OrderFile != null)
-            {
-                <a href="@Model.OrderFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewOrder = true;" v-on:mouseleave="isHoveringViewOrder = false;">
-                        <img alt="Order Icon"
-                             v-bind:src="isHoveringViewOrder ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Order</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice @Model.InvoiceFileNo</label>
                     </div>
                 </a>
             }
             @if (Model.DeliveryTicketFile != null)
             {
                 <a href="@Model.DeliveryTicketFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
+                    <div class="d-flex flex-row cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
                         <img alt="Ticket Icon"
                              v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket @Model.DeliveryTicketFileNo</label>
                     </div>
                 </a>
             }
             @if (Model.MtrCount > 0)
             {
-                <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
+                <div class="d-flex flex-row mt-4 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
                     <img alt="MTR Icon" v-bind:src="isHoveringViewMTR ? '/Themes/@themeName/Content/assets/invoice-dark.svg' : '/Themes/@themeName/Content/assets/invoice.svg'" />
 
                     @if (Model.MtrCount == 1)
                     {
-                        <a href="@Model.MTRs.FirstOrDefault()?.MtrFile" target="_blank" class="text-decoration-none">
-                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
-                        </a>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
                     }
                     else if (Model.MtrCount > 1)
                     {
@@ -351,7 +341,7 @@
 
         </div>
     </div>
-    <div class="mt-4 bg-white-shadow">
+    <div v-if="!isMobile" class="mt-4 bg-white-shadow">
         <table class="table table-striped w3-animate-left nss-table">
             <colgroup>
                 <col width="10%" />
@@ -363,6 +353,7 @@
                 <col width="8%" />
                 <col width="5%" />
                 <col width="8%" />
+                <col width="10%" />
             </colgroup>
             <thead>
                 <tr>
@@ -375,6 +366,7 @@
                     <th>PO #</th>
                     <th class="text-center">Qty.</th>
                     <th class="text-center">UOM</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -390,12 +382,41 @@
                         <td>@Model.PoNo</td>
                         <td class="text-center">@item.Quantity</td>
                         <td class="text-center">@item.UOM</td>
+                        <td></td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-    <div class="col-md-4 offset-md-8 bg-white-shadow p-4 mt-4">
+    @* Cart items - Mobile View *@
+    <div v-if="isMobile" v-bind:class="{'mt-4': isMobile}">
+        @foreach (var item in Model.OrderItems)
+        {
+            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
+                <div class="d-flex flex-row justify-content-between align-items-center">
+                    <label class="fs12-primary-500">Item: @item.LineNo</label>
+                </div>
+                <label class="h2-primary mt-3 mb-2" v-bind:class="{'text-left': isMobile}">@item.Description</label>
+                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                    <label class="h5-default-500">Customer Part #</label>
+                    <label class="h5-primary-600">@item.CustomerPartNo</label>
+                </div>
+                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                    <label class="h5-default-500">Unit Price</label>
+                    <label class="h5-primary-600">$@DoFormat(item.UnitPrice)</label>
+                </div>
+                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                    <label class="h5-default-500">Quantity</label>
+                    <label class="h5-primary-600">@item.Quantity</label>
+                </div>
+                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                    <label class="h5-default-500">Total Price</label>
+                    <label class="h5-primary-600">$@DoFormat(item.TotalPrice)</label>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-4 offset-md-8 bg-white-shadow p-4 mt-4" v-bind:style="{'background': isMobile ? '#f6f6f6' : '#ffffff'}">
         <table class="cart-total">
             <tbody>
                 <tr>
@@ -466,9 +487,25 @@
             isHoveringViewInvoice: false,
             isHoveringViewTicket: false,
             isHoveringViewMTR: false,
-            isHoveringViewOrder: false
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
         },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             onFocused: function () {
                 this.isHoveringViewTicket = true;
                 console.log("onFocused: ");

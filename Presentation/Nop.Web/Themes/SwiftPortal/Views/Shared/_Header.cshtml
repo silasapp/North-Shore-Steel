@@ -17,7 +17,7 @@
         <div class="header-links-wrapper d-flex flex-row order-2 order-md-3 align-items-center px-3 px-lg-5 py-2">
             @await Component.InvokeAsync("CustomHeaderLinks")
         </div>
-        <div id="custom-search-box-container" class="d-flex flex-row flex-grow-1 order-3 order-md-2 align-items-center justify-content-center bg-primary bg-md-transparent py-2">
+        <div v-if="isMobile" id="custom-search-box-container" class="d-flex flex-row flex-grow-1 order-3 order-md-2 align-items-center justify-content-center bg-primary bg-md-transparent py-2">
             <div class="nav-bar-search">
                 @await Component.InvokeAsync("CustomSearchBox")
             </div>
@@ -43,3 +43,35 @@ else
         </div>
     </div>
 </div>
+
+<script>
+    var vm = new Vue({
+        el: '#n-select-account',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+
+        },
+    });
+</script>

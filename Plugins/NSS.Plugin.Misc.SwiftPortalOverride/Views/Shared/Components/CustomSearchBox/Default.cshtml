@@ -3,10 +3,11 @@
 <form action="/catalog" method="get" id="small-search-box-form">
     @if (Model.ShowSearchBox)
     {
-        <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" name="q" placeholder="Search products" aria-label="@T("Search.SearchBox.Text.Label")" />
+        <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" name="q" placeholder="Search products" aria-label="@T("Search.SearchBox.Text.Label")" v-bind:class="{'small-searchterms-mob': isMobile, 'small-searchterms': !isMobile}" />
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBoxBeforeSearchButton })
         <button type="submit" class="button-1 search-box-button">
-            <img style="position: absolute" src="~/Themes/SwiftPortal/Content/assets/search.svg" width="20" height="20" alt="">
+            <img v-if="isMobile" style="position: absolute" src="~/Themes/SwiftPortal/Content/assets/search.svg" width="20" height="20" alt="">
+            <img v-if="!isMobile" style="position: absolute" src="~/Themes/SwiftPortal/Content/assets/search-black.svg" width="20" height="20" alt="">
         </button>
         @if (Model.SearchTermMinimumLength > 0)
         {
@@ -62,3 +63,35 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBox })
     }
 </form>
+
+<script>
+    var vm = new Vue({
+        el: '#small-search-box-form',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+
+        },
+    });
+</script>
