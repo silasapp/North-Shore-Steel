@@ -965,8 +965,6 @@
                             if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD || !self.validate() ||
                                 self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
 
-                            console.log("We're good to go...");
-                            return;
                             self.errorType = self.shared.constants.ERROR_TYPE_NONE;
                             self.showLoading();
 

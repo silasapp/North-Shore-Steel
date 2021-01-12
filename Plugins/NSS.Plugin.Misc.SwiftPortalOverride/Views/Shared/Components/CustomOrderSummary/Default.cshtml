@@ -431,39 +431,6 @@ Content1 =
                                 }
                                 @if (Model.IsEditable)
                                 {
-                                    if (Model.TermsOfServiceOnShoppingCartPage)
-                                    {
-                                        <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display: none;">
-                                            <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
-                                        </div>
-                                        <div class="terms-of-service" style="display: flex;align-items: center;">
-
-                                            <label class="pure-material-checkbox" style=" display: unset;">
-                                                <input id="termsofservice" type="checkbox" name="termsofservice" />
-                                                <span class="checkmark"></span>@T("Checkout.TermsOfService.IAccept")
-
-                                                @if (Model.TermsOfServicePopup)
-                                                {
-                                                    <a class="read" id="read-terms" style="margin-left: 5px !important;">@T("Checkout.TermsOfService.Read")</a>
-                                                    <script asp-location="Footer">
-                                        $(document).ready(function() {
-                                            $('#read-terms').on('click',
-                                                function(e) {
-                                                    e.preventDefault();
-                                                    displayPopupContentFromUrl(
-                                                        '@Url.RouteUrl("TopicPopup", new { SystemName = "conditionsofuse" })',
-                                                        '@T("Checkout.TermsOfService")');
-                                                });
-                                        });
-                                                    </script>
-                                                }
-                                                else
-                                                {
-                                                    <a class="read" id="read-terms" href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("conditionsofuse") })">@T("Checkout.TermsOfService.Read")</a>
-                                                }
-                                            </label>
-                                        </div>
-                                    }
                                     <div class="checkout-buttons">
                                         @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
                                         {
