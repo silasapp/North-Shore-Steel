@@ -23,96 +23,109 @@
         max-height: 532px !important;
     }
 </style>
-<div id="app" class="page catalog-page">
-    <div class="page-body">
-        <div class="row">
-            <div class="col-lg-12 col-xl-3 shapes-treeview">
-
-                <div class="cat-side-drawer" id="drawerPane">
-                    <div class="d-xl-none">
-                        <div class="bg-primary d-flex flex-row justify-content-center py-4 px-3">
-                            <label class="h2-white text-center mb-0 flex-fill">FILTERS</label>
-                            <img src="Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close filter"
-                                 v-on:click="closeFiltersDrawer" width="24">
-                        </div>
-                    </div>
-                    <div id="accordion">
-                        <div class="card">
-                            <a class="card-link" data-toggle="collapse" href="#collapseOne" id="shapes-header"
-                               v-on:click="toggleHeader('shapes-header')">
-                                <div class="card-header">SHAPES</div>
-                            </a>
-                            <div id="collapseOne" class="collapse show">
-                                <div>
-                                    <div id="treeview"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card" style="display: flex" v-for="(specs, index) in defaultSpecs">
-                            <a :id="'default-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#default-spec-collapse-' + index"
-                               v-on:click="toggleHeader('default-spec-header-' + index)">
-                                <div class="card-header">{{ specs[0].name }}</div>
-                            </a>
-                            <div :id="'default-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
-                                <div class="card-body">
-                                    <label class="pure-material-checkbox">
-                                        <input :id="'checkbox-' + spec.specificationAttributeOptionId"
-                                               type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
-                                        <span class="checkmark"></span>{{ spec.displayName }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card" style="display: flex" v-if="showOtherSpecs" v-for="(specs, index) in otherSpecs">
-                            <a :id="'other-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#other-spec-collapse-' + index"
-                               v-on:click="toggleHeader('other-spec-header-' + index)">
-                                <div class="card-header">{{ specs[0].name }}</div>
-                            </a>
-                            <div :id="'other-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
-                                <div class="card-body">
-                                    <label class="pure-material-checkbox">
-                                        <input :id="'checkbox-' + spec.specificationAttributeOptionId"
-                                               type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
-                                        <span class="checkmark"></span>{{ spec.displayName }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+<div id="app" class="page catalog-page" v-cloak>
+    <div v-show="shapeFilterTags.length === 0">
+        <div class="d-flex flex-column align-items-center mx-5">
+            <label class="h2-primary mb-4">SELECT A SHAPE</label>
+            <div class="d-flex flex-row flex-wrap px-5 shape-category">
+                <div class="d-flex flex-column align-items-center mb-3 mx-5" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
+                    <img v-if="shape.icon" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
+                    <div v-if="!shape.icon" class="icon-shape"></div>
+                    <label class="h4-default-500 text-capitalize mt-2">{{ shape.name }}</label>
                 </div>
-            </div>
-            <div class="col-lg-12 col-xl-9">
-                <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
-                    <label class="h5-default-normal mb-2 mr-3">Applied Filters:</label>
-                    <div v-for="(tag, i) in filterTags" class="d-flex flex-row mb-2" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
-                        <span class="filter-tag">
-                            {{ tag.type === 'query' ? `"${tag.text}"` : tag.text }}
-                            <button v-on:click='removeFilter(tag)'>
-                                <img alt="close icon" src="Themes/SwiftPortal/Content/assets/close-filled.svg" width="15" height="15" />
-                            </button>
-                        </span>
-                    </div>
-                    <div v-if="filterTags.length === 0" class="d-flex flex-row mb-2">
-                        <span class="filter-tag">None</span>
-                    </div>
-                    <button v-if="filterTags.length > 0" v-on:click="clearFilters" class="clear-filter mb-2">Clear filters</button>
-                </div>
-                <div id="partialview"></div>
-                <div id="dialog"></div>
             </div>
         </div>
     </div>
-    <div class="overlay-off-canvas" v-bind:style="{'display': isFilterOpen ? 'block' : 'none' }" v-on:click="closeFiltersDrawer"></div>
+    <div v-show="shapeFilterTags.length > 0">
+        <div class="page-body">
+            <div class="row">
+                <div class="col-lg-12 col-xl-3 shapes-treeview">
 
-    <div class="filter-options d-flex flex-row justify-content-around">
-        <div class="d-flex flex-row flex-fill p-3 align-items-center justify-content-center" v-on:click="openFiltersDrawer">
-            <img src="Themes/SwiftPortal/Content/assets/icn-filter.svg" alt="" width="20">
-            <label class="ml-1">Filters</label>
+                    <div class="cat-side-drawer" id="drawerPane">
+                        <div class="d-xl-none">
+                            <div class="bg-primary d-flex flex-row justify-content-center py-4 px-3">
+                                <label class="h2-white text-center mb-0 flex-fill">FILTERS</label>
+                                <img src="Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close filter"
+                                     v-on:click="closeFiltersDrawer" width="24">
+                            </div>
+                        </div>
+                        <div id="accordion">
+                            <div class="card">
+                                <a class="card-link" data-toggle="collapse" href="#collapseOne" id="shapes-header"
+                                   v-on:click="toggleHeader('shapes-header')">
+                                    <div class="card-header">SHAPES</div>
+                                </a>
+                                <div id="collapseOne" class="collapse show">
+                                    <div>
+                                        <div id="treeview"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card" style="display: flex" v-for="(specs, index) in defaultSpecs">
+                                <a :id="'default-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#default-spec-collapse-' + index"
+                                   v-on:click="toggleHeader('default-spec-header-' + index)">
+                                    <div class="card-header">{{ specs[0].name }}</div>
+                                </a>
+                                <div :id="'default-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
+                                    <div class="card-body">
+                                        <label class="pure-material-checkbox">
+                                            <input :id="'checkbox-' + spec.specificationAttributeOptionId"
+                                                   type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
+                                            <span class="checkmark"></span>{{ spec.displayName }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card" style="display: flex" v-if="showOtherSpecs" v-for="(specs, index) in otherSpecs">
+                                <a :id="'other-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#other-spec-collapse-' + index"
+                                   v-on:click="toggleHeader('other-spec-header-' + index)">
+                                    <div class="card-header">{{ specs[0].name }}</div>
+                                </a>
+                                <div :id="'other-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
+                                    <div class="card-body">
+                                        <label class="pure-material-checkbox">
+                                            <input :id="'checkbox-' + spec.specificationAttributeOptionId"
+                                                   type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
+                                            <span class="checkmark"></span>{{ spec.displayName }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-xl-9">
+                    <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
+                        <label class="h5-default-normal mb-2 mr-3">Applied Filters:</label>
+                        <div v-for="(tag, i) in filterTags" class="d-flex flex-row mb-2" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
+                            <span class="filter-tag">
+                                {{ tag.type === 'query' ? `"${tag.text}"` : tag.text }}
+                                <button v-on:click='removeFilter(tag)'>
+                                    <img alt="close icon" src="Themes/SwiftPortal/Content/assets/close-filled.svg" width="15" height="15" />
+                                </button>
+                            </span>
+                        </div>
+                        <div v-if="filterTags.length === 0" class="d-flex flex-row mb-2">
+                            <span class="filter-tag">None</span>
+                        </div>
+                        <button v-if="filterTags.length > 0" v-on:click="clearFilters" class="clear-filter mb-2">Clear filters</button>
+                    </div>
+                    <div id="partialview"></div>
+                    <div id="dialog"></div>
+                </div>
+            </div>
+        </div>
+        <div class="overlay-off-canvas" v-bind:style="{'display': isFilterOpen ? 'block' : 'none' }" v-on:click="closeFiltersDrawer"></div>
+
+        <div class="filter-options d-flex flex-row justify-content-around">
+            <div class="d-flex flex-row flex-fill p-3 align-items-center justify-content-center" v-on:click="openFiltersDrawer">
+                <img src="Themes/SwiftPortal/Content/assets/icn-filter.svg" alt="" width="20">
+                <label class="ml-1">Filters</label>
+            </div>
         </div>
     </div>
-
 </div>
 
 @functions{
@@ -183,6 +196,25 @@
             groupedSpecs: [],
             groupedShapes: [],
 
+            shapeIcon: {
+                angle: '',
+                beam: 'img-ibeam.png',
+                channel: '',
+                flatbar: '',
+                pipe: '',
+                roundbar: 'img-roundbar.png',
+                squarebar: 'img-squarebar.png',
+                hexbar: 'img-hexbar.png',
+                rebar: 'img-rebar.png',
+                tubing: '',
+                expandedmetal: '',
+                grating: '',
+                plate: 'img-plate.png',
+                sheet: 'img-sheet.png',
+                cylinder: '',
+                plateindividual: '',
+            },
+
             constants: {
                 SPEC_TYPE_DEFAULT: 1,
                 SPEC_TYPE_OTHERS: 2,
@@ -194,6 +226,7 @@
         el: '#app',
         data: {
             shared: store.state,
+            showShapeCategories: true,
             specNames: [],
             shapeNames: [],
             specIDs: [],
@@ -234,6 +267,14 @@
             this.treeview.appendTo("#treeview");
         },
         computed: {
+            topShapes: function () {
+                const shapes = this.shared.groupedShapes.filter(x => !x.parentId);
+                shapes.forEach(shape => shape.icon = this.getShapeIcon(shape));
+                return shapes;
+            },
+            shapeFilterTags: function () {
+                return this.filterTags.filter(x => x.type === 'shape');
+            },
             defaultSpecs: function () {
                 return this.groupedSpecs.filter(x => x[0].type === this.shared.constants.SPEC_TYPE_DEFAULT);
             },
@@ -293,6 +334,17 @@
                 this.groupedSpecs = this.shared.groupedSpecs;
             },
 
+            getShapeIcon: function (shape) {
+                const name = shape.name.replaceAll(' ', '').replaceAll('-', '').toLowerCase();
+                console.log("name: ", name);
+                return this.shared.shapeIcon[name];
+            },
+
+            handleCategoryClicked: function (shape) {
+                shape.isChecked = 'true';
+                this.toggleShape(shape);
+            },
+
             buildDialog: function () {
                 this.dialog = new ej.popups.Dialog({
                     header: dialogHeader,
@@ -313,6 +365,8 @@
                 const shape = this.shared.groupedShapes.find(x => x.id == node.id);
                 let resultShapes = [];
                 let resultNodes = [];
+                console.log("toggleShape: ", node, shape);
+
                 if (node.isChecked === 'true') {
                     if (!shape.parentId) { // topmost node
                         resultShapes = this.shared.groupedShapes.filter(x => x.parentId === shape.id || x.id === shape.id);

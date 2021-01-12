@@ -66,6 +66,16 @@
         color: #03175b;
     }
 
+.shape-category {
+    cursor: pointer;
+}
+
+.icon-shape {
+    width: 112px;
+    height: 112px;
+    background: #FFF;
+}
+
 /* #region BOOTSTRAP MEDIA QUERIES */
 /*// Small devices (landscape phones, 576px and up)*/
 @media (min-width: 576px) {
