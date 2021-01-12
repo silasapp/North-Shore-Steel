@@ -91,7 +91,9 @@
                     <div class="col-md-4 col-sm-6 col-12 m-b2">
                         <div class="tab-content p-b11" id="pills-tabContent">
                             <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <label class="h4 text-primary font-weight-bold mb-4">OPEN ORDERS</label>
+                                <div class="card-title mb-2 border-bottom-0 mt-2">
+                                    <h1>OPEN ORDERS</h1>
+                                </div>
                                 @if (Model.OpenOrders != null && Model.OpenOrders.Count > 0)
                                 {
                                     <table class="table table-striped w3-animate-left nss-table">
@@ -114,17 +116,17 @@
 
                                         </tbody>
                                     </table>
-                                    <label>* All orders display the five most recent result from the past 30 day.</label>
+                                    <label class="nss-light-grey">* All orders display the five most recent result from the past 30 day.</label>
                                 }
                                 else
                                 {
                                     <div class="text-center pt-5">
-                                        <label>You have not placed an order in the last 30 days.</label>
+                                        <label class="h5-default">You have not placed an order in the last 30 days.</label>
                                         <div class="action pt-3">
                                             @*<a href="/catalog">*@
-                                                <button class="swift-color-btn">
-                                                    <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
-                                                </button>
+                                            <button class="swift-color-btn">
+                                                <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
+                                            </button>
                                             @*</a>*@
                                         </div>
                                     </div>
@@ -137,7 +139,9 @@
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
                             <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <label class="h4 text-primary font-weight-bold mb-4">CLOSED ORDERS</label>
+                                <div class="card-title mb-2 border-bottom-0 mt-2">
+                                    <h1>CLOSED ORDERS</h1>
+                                </div>
                                 <table class="table table-striped w3-animate-left nss-table">
                                     <thead class="thead-default">
                                         <tr>
@@ -175,8 +179,8 @@
                             <div class="avatar-block">
                                 <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/images/call-avatar.png" alt="profile-default">
                             </div>
-                            <h6 class="h4-primary-600-teko mb-2 mt-2 mx-3">Outstanding</h6>
-                            <h6 class="h4-primary-600-teko mb-3 mx-3">Customer Service</h6>
+                            <h6 class="h4-primary-600-teko mb-2 mt-2 mx-3 nss-dark-blue">Outstanding</h6>
+                            <h6 class="h4-primary-600-teko mb-3 mx-3 nss-dark-blue">Customer Service</h6>
                             <h6 class="h5-default">I'm here to provide you with</h6>
                             <h6 class="h5-default mb-3">exceptional customer service.</h6>
                             <div class="d-flex flex-row align-items-center justify-content-center pb-2" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
@@ -236,23 +240,25 @@
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
                         <div class="tab-content p-b1" id="pills-tabContent">
                             <div class="text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <label class="h4 text-primary font-weight-bold mb-4">CREDIT SUMMARY</label>
+                                <div class="card-title border-bottom-0">
+                                    <h1>CREDIT SUMMARY</h1>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12 d-block">
-                                        <label class="float-left">Credit Limit</label>
-                                        <h5 class="float-right">$@DoFormat(Model.CreditSummary?.CreditLimit)</h5>
+                                        <label class="float-left h5-default">Credit Limit</label>
+                                        <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditLimit)</h5>
                                     </div>
                                     <div class="col-md-12 d-block">
-                                        <label class="float-left">Total Open Invoices</label>
-                                        <h5 class="float-right">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
+                                        <label class="float-left h5-default">Total Open Invoices</label>
+                                        <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
                                     </div>
                                     <div class="col-md-12 d-block">
-                                        <label class="float-left">Total Past Due</label>
+                                        <label class="float-left h5-default">Total Past Due</label>
                                         <h5 style="color: red;" class="float-right">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
                                     </div>
                                     <div class="col-md-12 d-block">
-                                        <label class="float-left">Open Credit</label>
-                                        <h5 class="float-right">$@DoFormat(Model.CreditSummary?.CreditAmount)</h5>
+                                        <label class="float-left h5-default">Open Credit</label>
+                                        <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditAmount)</h5>
                                     </div>
 
                                 </div>
@@ -267,20 +273,22 @@
                     <div class="col-md-7 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
                             <div class=" text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <label class="h4 text-primary font-weight-bold mb-4">STATISTICS</label>
+                                <div class="card-title border-bottom-0">
+                                    <h1>STATISTICS</h1>
+                                </div>
                                 <div class="row" v-for="stats in companyStats">
                                     <div class="col-md-12 d-block">
-                                        <label class="float-left">{{stats.statName}}</label>
-                                        <h5 class="float-right">{{stats.statValue}}</h5>
+                                        <label class="float-left h5-default">{{stats.statName}}</label>
+                                        <h5 class="float-right nss-dark-blue">{{stats.statValue}}</h5>
                                     </div>
                                 </div>
-                                <label>Combines online and offline orders.</label>
+                                <label class="nss-light-grey">Combines online and offline orders.</label>
                             </div>
                         </div>
                     </div>
                 }
 
-                 @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render();
+                 @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render()
             </div>
             <div class="discount-block" alt="">
                 <img src="~/Themes/@(themeName)/Content/assets/discount.PNG" alt="">
