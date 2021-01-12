@@ -164,7 +164,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             //specs
             PrepareSpecsFilters(specIds,
                 filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
-                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model);
+                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model, shapeIds);
 
             PrepareShapeFilterModel(ref model);
 
@@ -177,7 +177,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             int[] filterableSpecificationAttributeOptionIds,
             ICacheKeyService cacheKeyService,
             ISpecificationAttributeService specificationAttributeService, ILocalizationService localizationService,
-            IWebHelper webHelper, IWorkContext workContext, IStaticCacheManager staticCacheManager, ref CatalogModel model)
+            IWebHelper webHelper, IWorkContext workContext, IStaticCacheManager staticCacheManager, ref CatalogModel model, IList<int> shapeIds)
         {
             model.PagingFilteringContext.SpecificationFilter.Enabled = false;
             var cacheKey = cacheKeyService.PrepareKeyForDefaultCache(NopModelCacheDefaults.SpecsFilterModelKey, filterableSpecificationAttributeOptionIds, workContext.WorkingLanguage);
@@ -202,56 +202,34 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (!allFilters.Any())
                 return;
 
-            //sort loaded options
-            allFilters = allFilters.OrderBy(saof => saof.SpecificationAttributeDisplayOrder)
-                .ThenBy(saof => saof.SpecificationAttributeName)
-                .ThenBy(saof => saof.SpecificationAttributeOptionDisplayOrder)
-                .ThenBy(saof => saof.SpecificationAttributeOptionName).ToList();
-
             //prepare the model properties
             model.PagingFilteringContext.SpecificationFilter.Enabled = true;
-            //var removeFilterUrl = webHelper.RemoveQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM);
-            //RemoveFilterUrl = ExcludeQueryStringParams(removeFilterUrl, webHelper);
 
-            //get already filtered specification options
-            var alreadyFilteredOptions = allFilters.Where(x => alreadyFilteredSpecOptionIds.Contains(x.SpecificationAttributeOptionId));
-            model.PagingFilteringContext.SpecificationFilter.AlreadyFilteredItems = alreadyFilteredOptions.Select(x =>
-                new SpecificationFilterItem
-                {
-                    SpecificationAttributeName = x.SpecificationAttributeName,
-                    SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
-                    SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb
-                }).ToList();
+            var defaultSpecFilters = new List<string> { SwiftCore.Helpers.Constants.CoatingFieldAttribute, SwiftCore.Helpers.Constants.MetalFieldAttribute };
 
-            //get not filtered specification options
-            model.PagingFilteringContext.SpecificationFilter.NotFilteredItems = allFilters.Except(alreadyFilteredOptions).Select(x =>
+            var specs = model.Products.Select(x => x.SpecificationAttributeModels).SelectMany(specs => specs);
+
+            // not plate individual shape
+            if (!shapeIds.Any(x => x.ToString().StartsWith("13")))
+                specs = specs.Where(x => defaultSpecFilters.Contains(x.SpecificationAttributeName));
+
+            var specGroup = specs.GroupBy(x => x.SpecificationAttributeOptionId);
+
+            var specList = new List<SpecificationFilterItem>();
+
+            foreach (var spec in specGroup)
             {
-                //filter URL
-                var alreadyFiltered = alreadyFilteredSpecOptionIds.Concat(new List<int> { x.SpecificationAttributeOptionId });
-                //var filterUrl = webHelper.ModifyQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM,
-                //    alreadyFiltered.OrderBy(id => id).Select(id => id.ToString()).ToArray());
+                var activeSpec = spec.FirstOrDefault(z => z.SpecificationAttributeOptionId == spec.Key);
 
-                return new SpecificationFilterItem()
+                specList.Add(new SpecificationFilterItem
                 {
-                    SpecificationAttributeOptionId = x.SpecificationAttributeOptionId,
-                    SpecificationAttributeName = x.SpecificationAttributeName,
-                    SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
-                    SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb,
-                    ProductCount = 0
-                    //FilterUrl = ExcludeQueryStringParams(filterUrl, webHelper)
-                };
-            }).ToList();
-
-            var prodSpecs = model.Products.Select(x => x.SpecificationAttributeModels);
-
-            var specList = prodSpecs.SelectMany(specs => specs).GroupBy(x => x.SpecificationAttributeOptionId).Select(y => new SpecificationFilterItem
-            {
-                SpecificationAttributeName = y.FirstOrDefault(z => z.SpecificationAttributeOptionId == y.Key)?.SpecificationAttributeName,
-                SpecificationAttributeOptionId = y.Key,
-                SpecificationAttributeOptionColorRgb = "",
-                SpecificationAttributeOptionName = y.FirstOrDefault(z => z.SpecificationAttributeOptionId == y.Key)?.SpecificationAttributeOptionName,
-                ProductCount = y.Count()
-            });
+                    SpecificationAttributeName = activeSpec?.SpecificationAttributeName,
+                    SpecificationAttributeOptionId = spec.Key,
+                    SpecificationAttributeOptionColorRgb = "",
+                    SpecificationAttributeOptionName = activeSpec?.SpecificationAttributeOptionName,
+                    ProductCount = spec.Count()
+                });
+            }
 
             model.PagingFilteringContext.SpecificationFilter.FilterItems = new List<SpecificationFilterItem>(specList);
 
