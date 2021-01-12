@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride.Domains.PayPal
+namespace NSS.Plugin.Misc.SwiftCore.Domain.PayPal
 {
     /// <summary>
     /// Represents an exception details

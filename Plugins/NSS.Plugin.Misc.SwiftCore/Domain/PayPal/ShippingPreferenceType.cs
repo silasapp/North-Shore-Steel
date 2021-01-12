@@ -1,4 +1,4 @@
-﻿namespace NSS.Plugin.Misc.SwiftPortalOverride.Domains.PayPal
+﻿namespace NSS.Plugin.Misc.SwiftCore.Domain.PayPal
 {
     /// <summary>
     /// Represents the type of shipping preference for customer checkout flow
