@@ -11,9 +11,15 @@
     .colorRed {
         color: red !important;
     }
+
+    .home-table-sm-header {
+        width: 110px !important;
+        background-color: #0076b4 !important;
+        /* border-bottom: 0.1px solid white; */
+    }
 </style>
-<div>
-    <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true"
+<div id="ordersGrid">
+    <ejs-grid v-if="!isMobile" id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true"
               allowPaging="true" allowFiltering="true" rowSelected="onRowSelected" rowDeselected="onRowDeselected">
         <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
         <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
@@ -37,8 +43,140 @@
             <e-grid-column type="checkbox" width="30"></e-grid-column>
         </e-grid-columns>
     </ejs-grid>
-</div>
+    <div v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
+        @foreach (var order in Model.Orders)
+        {
+            <div v-if="isMobile" class="d-flex" style="background-color: #ffffff;">
+                <label v-if="isExportMode" class="nss-checkbox mr-3">
+                    <input type="checkbox"
+                           v-on:change="onCheck(@order.OrderId)">
+                    <span class="checkmark"></span>
+                </label>
+                <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
 
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Order #</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <a class="fs12-link" href="/orders/@order.OrderId">@order.OrderId</a>
+                        </div>
+                    </div><div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Purchase Order #</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <a class="fs12-link">@order.PoNo</a>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Tot. Weight (lbs)</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">@order.Weight</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Order Amount</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">@order.OrderTotal</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Order Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">@order.OrderDate</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Promise Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">@order.PromiseDate</label>
+                        </div>
+                    </div>
+                    @if (Model.IsClosed)
+                    {
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Scheduled Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">@order.ScheduledDate</label>
+                            </div>
+                        </div>
+                        @*<div class="d-flex flex-row">
+                                <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                    <label class="fs12-white mb-0">Promise Date</label>
+                                </div>
+                                <div class="d-flex p-2">
+                                    <label class="fs12-default mb-0">@order.DeliveryDate</label>
+                                </div>
+                            </div>*@
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Promise Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">@order.PromiseDate</label>
+                            </div>
+                        </div><div class="d-flex flex-row">
+                            <div class="d-flex bg-primary p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Status</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">@order.OrderStatusName</label>
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#ordersGrid',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+
+        },
+    });
+</script>
 <script>
     function toolbarClick() {
         var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
