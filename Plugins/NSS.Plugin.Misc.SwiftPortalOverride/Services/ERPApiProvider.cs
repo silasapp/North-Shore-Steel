@@ -1088,6 +1088,60 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return (result, error);
         }
 
+        public List<ERPGetCompanyStats> GetCompanyStats(string companyId)
+        {
+            //initialize
+            var retVal = new List<ERPGetCompanyStats>();
+            var respContent = string.Empty;
+
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - GetCompanyStats", new Exception("NSS API attributes not configured correctly."));
+                return retVal;
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    var token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetCompanyStats -> {companyId}", new Exception("NSS token returned empty"));
+                        return retVal;
+                    }
+
+                    var resource = $"companies/{companyId}/stats";
+
+                    var response = httpClient.GetAsync(resource).Result;
+
+                    // throw error if not successful
+                    response.EnsureSuccessStatusCode();
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+                    retVal = JsonConvert.DeserializeObject<List<ERPGetCompanyStats>>(respContent);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.GetCompanyStats -> {companyId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetCompanyStats details => companyid: {companyId}", $"resp content ==> {respContent ?? "empty"}");
+
+            return retVal;
+        }
+
         #endregion
 
         #region Shipping API

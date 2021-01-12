@@ -27,9 +27,11 @@
                 <div class="d-flex flex-column mt-4 mb-2">
                     @foreach (var item in Model.MTRs)
                     {
-                        <div class="d-flex flex-row mt-4 cursor-pointer">
-                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
-                        </div>
+                        <a href="@item.MtrFile" target="_blank" class="text-decoration-none">
+                            <div class="d-flex flex-row mt-4 cursor-pointer">
+                                <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
+                            </div>
+                        </a>
                     }
                 </div>
             </div>
@@ -49,15 +51,15 @@
         </div>
         <label v-if="!isMobile" class="h3-primary-sans my-3">ORDER NUMBER: @Model.OrderId</label>
         @if (Model.SysOrderId != null)
+        {
+            @if (Model.CanBuy)
             {
-                @if (Model.CanBuy)
-                {
-        <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')" v-bind:style="{'background': isMobile ? '#ffffff' : 'transparent'}">
-            <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
-            Order Again
-        </div>
-        }
+                <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')" v-bind:style="{'background': isMobile ? '#ffffff' : 'transparent'}">
+                    <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
+                    Order Again
+                </div>
             }
+        }
 
     </div>
     <div class="row mx-0 d-flex flex-row bg-white-shadow  mt-4" v-bind:style="{'background': isMobile ? 'transparent' : '#ffffff'}" v-bind:class="{'px-4': !isMobile, 'py-4': !isMobile}">
@@ -307,30 +309,42 @@
             @if (Model.InvoiceFile != null)
             {
                 <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mb-4 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
+                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
                         <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice @Model.InvoiceFileNo</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice</label>
+                    </div>
+                </a>
+            }
+            @if (Model.OrderFile != null)
+            {
+                <a href="@Model.OrderFile" target="_blank" class="text-decoration-none">
+                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewOrder = true;" v-on:mouseleave="isHoveringViewOrder = false;">
+                        <img alt="Order Icon"
+                             v-bind:src="isHoveringViewOrder ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Order</label>
                     </div>
                 </a>
             }
             @if (Model.DeliveryTicketFile != null)
             {
                 <a href="@Model.DeliveryTicketFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
+                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
                         <img alt="Ticket Icon"
                              v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket @Model.DeliveryTicketFileNo</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket</label>
                     </div>
                 </a>
             }
             @if (Model.MtrCount > 0)
             {
-                <div class="d-flex flex-row mt-4 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
+                <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
                     <img alt="MTR Icon" v-bind:src="isHoveringViewMTR ? '/Themes/@themeName/Content/assets/invoice-dark.svg' : '/Themes/@themeName/Content/assets/invoice.svg'" />
 
                     @if (Model.MtrCount == 1)
                     {
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
+                        <a href="@Model.MTRs.FirstOrDefault()?.MtrFile" target="_blank" class="text-decoration-none">
+                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
+                        </a>
                     }
                     else if (Model.MtrCount > 1)
                     {
@@ -353,7 +367,6 @@
                 <col width="8%" />
                 <col width="5%" />
                 <col width="8%" />
-                <col width="10%" />
             </colgroup>
             <thead>
                 <tr>
@@ -366,7 +379,6 @@
                     <th>PO #</th>
                     <th class="text-center">Qty.</th>
                     <th class="text-center">UOM</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -382,7 +394,6 @@
                         <td>@Model.PoNo</td>
                         <td class="text-center">@item.Quantity</td>
                         <td class="text-center">@item.UOM</td>
-                        <td></td>
                     </tr>
                 }
             </tbody>
@@ -487,6 +498,7 @@
             isHoveringViewInvoice: false,
             isHoveringViewTicket: false,
             isHoveringViewMTR: false,
+            isHoveringViewOrder: false,
             window: {
                 width: 0,
                 height: 0,
