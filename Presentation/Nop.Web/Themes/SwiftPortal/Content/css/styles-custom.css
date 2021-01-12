@@ -3421,12 +3421,14 @@ and also iPads specifically.
     padding: 20px;
     text-align: center;
     margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
 }
-.mobile-export > button {
-    background-color: #ffffff;
-    padding: 10px;
-    border: none;
-}
+    .mobile-export > button, .mobile-export > div {
+        background-color: #ffffff;
+        padding: 10px;
+        border: none;
+    }
 @media all and (max-width: 600px) {
     .check-out-card {
         padding: 0 !important;

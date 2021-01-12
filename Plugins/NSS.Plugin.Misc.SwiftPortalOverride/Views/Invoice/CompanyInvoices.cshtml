@@ -94,8 +94,17 @@
                 </div>
             </div>
         </div>
-        <div v-if="isMobile" class="mobile-export">
-            <button class=" ml-lg-5 text-center" onclick="swithToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+        <div v-if="isMobile && !isExportMode" class="mobile-export">
+            <button class=" ml-lg-5 text-center" v-on:click="switchToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+        </div>
+        <div v-if="isMobile && isExportMode" class="mobile-export">
+            <button class=" ml-lg-5 text-center mr-2" v-on:click="cancelExportMode()"><img src="~/Themes/@(themeName)/Content/assets/close.svg" alt="" width="25">Cancel</button>
+            <div class="ml-2">
+                <label v-if="isExportMode" class="nss-checkbox" style="position: relative;">
+                    <input type="checkbox" class=" mr-2">
+                    <span class="checkmark"></span>Select All
+                </label>
+            </div>
         </div>
         <div class="d-flex flex-row justify-content-between">
             <div v-bind:style="{'padding-left': isMobile ? '20px':'0'}">
@@ -110,11 +119,11 @@
                            aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchInvoices(); selectedRowCount = 0;">Closed Invoices</a>
                 </ul>
             </div>
-            <div class="order-export-btn-container">
+            <div class="order-export-btn-container" v-if="!isMobile || isExportMode">
                 <button v-bind:disabled="selectedRowCount === 0" class="nss-btn-default ml-lg-5 mb-2 text-center order-export-btn" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
             </div>
         </div>
-        <div class="d-flex flex-column p-4 bg-white-shadow">
+        <div class="d-flex flex-column p-4 " v-bind:class="{'bg-white-shadow': !isMobile}">
 
             <div id="invoice-grid"></div>
         </div>
@@ -146,6 +155,7 @@
                 width: 0,
                 height: 0,
             },
+            isExportMode: false,
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
@@ -160,6 +170,14 @@
             },
         },
         methods: {
+            switchToExport: function () {
+                this.isExportMode = true;
+                invoicegridvm.switchToExport();
+            },
+            cancelExportMode: function () {
+                this.isExportMode = false;
+                invoicegridvm.cancelExportMode();
+            },
             handleResize: function () {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
