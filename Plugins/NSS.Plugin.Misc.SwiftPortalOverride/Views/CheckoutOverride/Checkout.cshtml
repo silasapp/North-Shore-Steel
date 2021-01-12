@@ -25,8 +25,6 @@
 @{
     Layout = "_ColumnsOne";
     var themeName = themeContext.WorkingThemeName;
-    //title
-    Html.AddTitleParts("Checkout");
 
     //page class
     Html.AppendPageCssClassParts("html-home-page");
@@ -105,6 +103,12 @@
     }
 </style>
 <div id="checkout" class="page home-page" v-cloak>
+    <div v-if="isMobile" class="edit-shop-container">
+        <button class="h6 text-primary edit-shop-mob" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
+            <img src="Themes/@themeName/Content/assets/return.svg" alt="" width="20" class="mr-2">
+            Edit Shopping Cart
+        </button>
+    </div>
     <div class=page-title>
         <h1>CHECKOUT</h1>
     </div>
@@ -139,14 +143,14 @@
                     <label class="h5 text-primary font-weight-bold mb-4">ORDER INFORMATION</label>
                     <div class="checkout-card-1">
                         <div class="d-flex flex-column">
-                            <label for="purchaseOrder" class="fs-13 text-black">Purchase Order #</label>
+                            <label for="purchaseOrder" class="fs-13 text-black">{{isMobile ? "PO#":"Purchase Order #"}}</label>
                             <label id="purchaseOrder" class="p-2 text-black" style="min-height: 30px">{{ purchaseOrder }}</label>
                         </div>
                         <div class="d-flex flex-column">
                             <label for="deliveryDate" class="fs-13 text-black">Promise Date</label>
                             <label id="deliveryDate" class="p-2 text-black">{{ deliveryDate ?? 'N/A' }}</label>
                         </div>
-                        <button class="h6 text-primary" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
+                        <button v-if="!isMobile" class="h6 text-primary" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
                             <img src="Themes/@themeName/Content/assets/return.svg" alt="" width="20" class="mr-2">
                             Edit Shopping Cart
                         </button>
@@ -316,10 +320,10 @@
 
                             <h1 class="h5 text-primary font-weight-bold mt-3">Billing Address</h1>
                             <div class="d-flex flex-column mt-2" v-if="!shipToSameAddress || !isDelivery">
-                                <div class="d-flex flex-row">
-                                    <select type="text" class="bg-accent text-black px-2 py-2"
+                                <div class=" flex-row" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
+                                    <select type="text" class="bg-accent text-black px-2 py-2 nss-form-control"
                                             id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddressId"
-                                            v-bind:class="{'w-100': showNewBillingAddress, 'w-75' : !showNewBillingAddress}">
+                                            v-bind:class="{'w-100': showNewBillingAddress || isMobile, 'w-75' : !showNewBillingAddress || !isMobile}">
                                         <option v-bind:value="null">-Select Address-</option>
                                         <option v-bind:value="address.id" v-for="address in shared.billingAddresses">
                                             {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
@@ -327,7 +331,7 @@
                                             {{ address.stateProvinceName }} {{ address.zipPostalCode }}
                                         </option>
                                     </select>
-                                    <button class="fs-14 w-25 text-primary justify-content-end text-decoration-underline"
+                                    <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
                                             v-if="!showNewBillingAddress" v-on:click="showNewBillingAddress = true; billingAddressId = null">
                                         Enter new billing address
                                     </button>
@@ -409,74 +413,117 @@
                     <div class=page-title>
                         <h1>ORDER SUMMARY</h1>
                     </div>
-
-                    <table class="table table-striped nss-table checkout-table" id="catalogTable" onload="sortTable(0)">
-                        <thead>
-                            <tr>
-                                <th scope="col">Item #</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Customer Part #</th>
-                                <th scope="col">Unit Price</th>
-                                <th scope="col">Total Price</th>
-                                <th scope="col">Weight (lb)</th>
-                                <th scope="col" class="text-center">Qty.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.ShoppingCartModel.Items)
-                            {
-                                var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
-
-                                var product = productService.GetProductById(item.ProductId);
-                                var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-
-                                var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
-                                var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
-                                var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
-                                var uom = "EA";
-                                if (mapping != null)
-                                    uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
-
-                                var customerPathNo = "";
-                                if (customerCompany != null)
+                    @* Cart items - Web View *@
+                    <div v-if="!isMobile" class="table-wrapper">
+                        <table class="table table-striped nss-table checkout-table" id="catalogTable" onload="sortTable(0)">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Item #</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Customer Part #</th>
+                                    <th scope="col">Unit Price</th>
+                                    <th scope="col">Total Price</th>
+                                    <th scope="col">Weight (lb)</th>
+                                    <th scope="col" class="text-center">Qty.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.ShoppingCartModel.Items)
                                 {
-                                    var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
-                                    customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
+                                    var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
+
+                                    var product = productService.GetProductById(item.ProductId);
+                                    var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                                    var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                                    var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
+                                    var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
+                                    var uom = "EA";
+                                    if (mapping != null)
+                                        uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
+
+                                    var customerPathNo = "";
+                                    if (customerCompany != null)
+                                    {
+                                        var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                        customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
+                                    }
+
+                                    var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                    var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                    string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                    var iNo = serialized == "True" ? itemTagNo : itemNo;
+
+                                    var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
+
+                                    <tr>
+                                        <td>@iNo</td>
+                                        <td>
+                                            @item.ProductName
+                                            @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                                {
+                                                    <div class="attributes">
+                                                        @Html.Raw(item.AttributeInfo)
+                                                    </div>
+                                                }*@
+                                        </td>
+                                        <td>@customerPathNo</td>
+                                        <td>@item.UnitPrice / @uom</td>
+                                        <td>@item.SubTotal</td>
+                                        <td>@DoFormat(totalWeight)</td>
+                                        <td class="text-center">@item.Quantity</td>
+                                    </tr>
                                 }
 
-                                var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
-                                var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
-                                string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                                var iNo = serialized == "True" ? itemTagNo : itemNo;
+                            </tbody>
+                        </table>
+                    </div>
+                    @* Cart items - Mobile View *@
+                    <div v-if="isMobile">
+                        @foreach (var item in Model.ShoppingCartModel.Items)
+                        {
+                            var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
 
-                                var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
+                            var product = productService.GetProductById(item.ProductId);
+                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
 
-                                <tr>
-                                    <td>@iNo</td>
-                                    <td>
-                                        @item.ProductName
-                                        @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
-                                            {
-                                                <div class="attributes">
-                                                    @Html.Raw(item.AttributeInfo)
-                                                </div>
-                                            }*@
-                                    </td>
-                                    <td>@customerPathNo</td>
-                                    <td>@item.UnitPrice / @uom</td>
-                                    <td>@item.SubTotal</td>
-                                    <td>@DoFormat(totalWeight)</td>
-                                    <td class="text-center">@item.Quantity</td>
-                                </tr>
+                            var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                            var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
+                            var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
+                            var uom = "EA";
+                            if (mapping != null)
+                                uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
+
+                            var customerPathNo = "";
+                            if (customerCompany != null)
+                            {
+                                var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
                             }
 
-                        </tbody>
-                    </table>
+                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                            string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                            var iNo = serialized == "True" ? itemTagNo : itemNo;
 
+                            var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
+                            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <label class="fs12-primary-500">Item: @iNo</label>
+                                </div>
+                                <label class="h2-primary mt-3 mb-2 text-left">@item.ProductName</label>
+                                <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
+                                <label class="h5-default-500 text-left">Unit Price: @item.UnitPrice / @uom </label>
+                                <label class="h5-default-500 text-left">Total Price: @item.SubTotal </label>
+                                <label class="h5-default-500 text-left">Weight: @DoFormat(totalWeight) </label>
+                                <label class="h5-default-500 text-left">Quantity: @item.Quantity </label>
+
+                            </div>}
+                    </div>
 
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
                 <div class="card card-mod">
                     <label class="fs-14 text-primary font-weight-bold text-center">ORDER SUMMARY</label>
                     <div class="order-summary mt-2">
@@ -504,7 +551,7 @@
                         </div>
                     </div>
                 </div>
-                <div style="display:flex;justify-content: center;">
+                <div style="display:flex;justify-content: center;" class="place-order-buttons">
                     <button id="place-order" v-show="paymentMethodIndex !== shared.constants.PAYMENT_METHOD_PAYPAL"
                             v-on:click="placeOrder" v-bind:disabled="disableSubmit || errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE">
                         PLACE ORDER
@@ -630,6 +677,17 @@
             taxAmount: orderTotals.tax.replace("$", ""),
             orderTotal: orderTotals.orderTotal.replace("$", ""),
             disableSubmit: false,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
         },
         mounted: function () {
             this.setupCreditCardMethod();
@@ -637,11 +695,18 @@
             this.getShippingRate(true);
         },
         computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
             lineOfCreditDisabled: function () {
                 return this.shared.accountCredit.creditAmount < Number(this.orderTotal);
             },
         },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             showLoading: function () {
                 $('#custom-loading').show();
             },
