@@ -2981,6 +2981,10 @@ table input {
     background: #03175b !important;
 }
 
+.bg-primary2 {
+    background: #1899E1 !important;
+}
+
 .bg-white-shadow {
     background: #ffffff 0% 0% no-repeat padding-box;
     box-shadow: 0px 1px 16px #0000001a;
