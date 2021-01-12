@@ -4,10 +4,14 @@
 @using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @using NSS.Plugin.Misc.SwiftCore.Services
 @using NSS.Plugin.Misc.SwiftCore.Helpers
+@using Nop.Services.Common
+
 @inject IWorkContext workContext
 @inject ICustomerCompanyService customerCompanyService
+@inject IGenericAttributeService genericAttributeService
 @{
-    int customerId = workContext.CurrentCustomer.Id;
+    var currentCustomer = workContext.CurrentCustomer;
+    int customerId = currentCustomer.Id;
     // get all companies assigned to customer
     IEnumerable<CustomerCompany> customerCompanies = customerCompanyService.GetCustomerCompanies(customerId);
 
@@ -20,7 +24,7 @@
 @{
     // get cust company
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
 }
 
 
@@ -50,13 +54,36 @@
 </div>
 
 <script type='text/javascript'>
-        function SelectCompany(option) {
+        @*function SelectCompany(option) {
             let ErpId = option.options[option.selectedIndex].id;
             let cookieKey = `ERPCompanyId${@{@selectAccountModel.loggedInCustomerId}}=`
             document.cookie = cookieKey + ErpId;
             document.location.href = "/";
-        }
+        }*@
 
+    function SelectCompany(option) {
+        let ErpId = option.options[option.selectedIndex].id;
+        request = { ERPCompanyId: ErpId.toString() }
+        $('#custom-loading').show();
+        //const self = this;
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("SelectCompany", "HomeOverride")",
+            data: request,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data, _, _) {
+                console.log('success-data', data)
+                document.location.href = "/";
+                $('#custom-loading').hide();
+            },
+            error: function (xhr, thrownError) {
+                console.log('error-data', xhr)
+                document.location.href = "/";
+            }
+        });
+    }
 
         var erpCompId = @Html.Raw(eRPCompanyId);
         $(document).ready(function () {

@@ -9,13 +9,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
     public class TransactionModel : BaseNopModel
     {
+        public TransactionModel()
+        {
+            CompanyStats = new List<CompanyStats>();
+            OpenOrders = new List<CompanyOrderListModel.OrderDetailsModel>();
+            ClosedOrders = new List<CompanyOrderListModel.OrderDetailsModel>();
+            CreditSummary = new CreditSummaryModel();
+            CompanyInfo = new CompanyInfo();
+        }
         public List<CompanyOrderListModel.OrderDetailsModel> OpenOrders { get; set; }
+
+        public IList<CompanyStats> CompanyStats { get; set; }
         public List<CompanyOrderListModel.OrderDetailsModel> ClosedOrders { get; set; }
-        public List<Invoice> RecentInvoices { get; set; }
+        //public List<Invoice> RecentInvoices { get; set; }
         public CreditSummaryModel CreditSummary { get; set; }
         public CompanyInfo CompanyInfo { get; set; }
     }
 
+    public class CompanyStats
+    {
+        public string StatName { get; set; }
+        public string StatValue { get; set; }
+    }
     public class CompanyInfo
     {
         public int CompanyId { get; set; }

@@ -195,7 +195,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 DeliveryDate = order.DeliveryDate,
                 OrderStatusName = order.OrderStatusName
             }).Take(5).ToList();
-
+            
             var closedOrders = closedOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
                 OrderId = order.OrderId,
@@ -205,10 +205,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
 
             model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
-
-
             model.OpenOrders = openOrders;
             model.ClosedOrders = closedOrders;
+            var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
+
+            foreach (var stats in companyStats)
+            {
+                var cStats = new CompanyStats
+                {
+                    StatName = stats.StatName,
+                    StatValue = stats.StatValue
+                };
+
+                model.CompanyStats.Add(cStats);
+            }
 
             // get credit summary
             var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, Convert.ToInt32(companyId));
@@ -220,12 +230,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             if (creditSummary.CanCredit)
             {
-                var creditResposne = _eRPApiProvider.GetCompanyCreditBalance(Convert.ToInt32(companyId));
+                var creditResponse = _eRPApiProvider.GetCompanyCreditBalance(Convert.ToInt32(companyId));
 
-                creditSummary.CreditAmount = creditResposne?.CreditAmount ?? decimal.Zero;
-                creditSummary.CreditLimit = creditResposne?.CreditLimit ?? decimal.Zero;
-                creditSummary.OpenInvoiceAmount = creditResposne?.OpenInvoiceAmount ?? decimal.Zero;
-                creditSummary.PastDueAmount = creditResposne?.PastDueAmount ?? decimal.Zero;
+                creditSummary.CreditAmount = creditResponse?.CreditAmount ?? decimal.Zero;
+                creditSummary.CreditLimit = creditResponse?.CreditLimit ?? decimal.Zero;
+                creditSummary.OpenInvoiceAmount = creditResponse?.OpenInvoiceAmount ?? decimal.Zero;
+                creditSummary.PastDueAmount = creditResponse?.PastDueAmount ?? decimal.Zero;
             }
 
             model.CreditSummary = creditSummary;
