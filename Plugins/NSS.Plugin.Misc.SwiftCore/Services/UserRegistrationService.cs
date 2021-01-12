@@ -12,6 +12,7 @@ using Nop.Services.Events;
 using Nop.Services.Common;
 using Nop.Services.Messages;
 using System.Collections.Generic;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {

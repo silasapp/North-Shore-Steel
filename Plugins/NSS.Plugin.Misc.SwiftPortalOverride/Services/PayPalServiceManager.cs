@@ -2,7 +2,6 @@
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
-using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Services.Catalog;
@@ -13,10 +12,7 @@ using Nop.Services.Orders;
 using Nop.Services.Tax;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
 using NSS.Plugin.Misc.SwiftCore.Services;
-using NSS.Plugin.Misc.SwiftPortalOverride.Domains;
-using NSS.Plugin.Misc.SwiftPortalOverride.Domains.PayPal;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
+using NSS.Plugin.Misc.SwiftCore.Domain.PayPal;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
@@ -25,9 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using Item = PayPalCheckoutSdk.Orders.Item;
 using Order = PayPalCheckoutSdk.Orders.Order;
+using NSS.Plugin.Misc.SwiftCore;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 {
