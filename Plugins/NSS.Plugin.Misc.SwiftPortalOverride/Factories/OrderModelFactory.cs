@@ -225,7 +225,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         HeatNo = mtr.HeatNo,
                         Description = mtr.Description,
                         MtrFile = $"{mtr.MtrFile}{token}"
-                };
+                    };
 
                     model.MTRs.Add(orderMTR);
                 }
