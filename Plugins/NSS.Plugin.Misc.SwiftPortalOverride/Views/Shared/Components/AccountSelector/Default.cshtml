@@ -4,14 +4,10 @@
 @using NSS.Plugin.Misc.SwiftCore.Domain.Customers
 @using NSS.Plugin.Misc.SwiftCore.Services
 @using NSS.Plugin.Misc.SwiftCore.Helpers
-@using Nop.Services.Common
-
 @inject IWorkContext workContext
 @inject ICustomerCompanyService customerCompanyService
-@inject IGenericAttributeService genericAttributeService
 @{
-    var currentCustomer = workContext.CurrentCustomer;
-    int customerId = currentCustomer.Id;
+    int customerId = workContext.CurrentCustomer.Id;
     // get all companies assigned to customer
     IEnumerable<CustomerCompany> customerCompanies = customerCompanyService.GetCustomerCompanies(customerId);
 
@@ -24,8 +20,7 @@
 @{
     // get cust company
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
-    //int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
 }
 
 
@@ -46,83 +41,58 @@
             </select>
         }
         @await Component.InvokeAsync("CustomTopMenu")
+        <div v-if="!isMobile" id="custom-search-box-container" class="d-flex flex-row  align-items-center justify-content-center bg-primary bg-md-transparent">
+            <div class="nav-bar-search">
+                @await Component.InvokeAsync("CustomSearchBox")
+            </div>
+        </div>
     </div>
 </div>
 
-
-<script>
-        @*function SelectCompany(option) {
+<script type='text/javascript'>
+        function SelectCompany(option) {
             let ErpId = option.options[option.selectedIndex].id;
             let cookieKey = `ERPCompanyId${@{@selectAccountModel.loggedInCustomerId}}=`
             document.cookie = cookieKey + ErpId;
             document.location.href = "/";
-        }*@
+        }
 
-    function SelectCompany(option) {
-        let ErpId = option.options[option.selectedIndex].id;
-        request = { ERPCompanyId: ErpId.toString() }
-        $('#custom-loading').show();
-        //const self = this;
-
-        $.ajax({
-            type: "GET",
-            url: "@Url.Action("SelectCompany", "HomeOverride")",
-            data: request,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (data, _, _) {
-                console.log('success-data', data)
-                document.location.href = "/";
-                $('#custom-loading').hide();
-            },
-            error: function (xhr, thrownError) {
-                console.log('error-data', xhr)
-                document.location.href = "/";
-            }
-        });
-    }
 
         var erpCompId = @Html.Raw(eRPCompanyId);
         $(document).ready(function () {
             $('select[name="options"]').find('option[value='+erpCompId+']').attr("selected", true);
         });
 
-    new Vue({
+    var vm = new Vue({
         el: '#top-menu-drawer',
         data: {
-
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
         },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             closeMenuDrawer: function () {
                 headerLinksVm.closeDrawer();
             },
 
-            @*SelectCompany: function (option) {
-                console.log('option',option)
-                let ErpId = option.options[option.selectedIndex].id;
-                request = { ERPCompanyId: ErpId.toString() }
-
-                this.showLoading();
-                const self = this;
-                $.ajax({
-                    type: "GET",
-                    url: "@Url.Action("SelectCompany", "HomeOverride")",
-                    data: request,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (data, _, _) {
-                        console.log('success-data', data)
-                        location.href = "@Url.Action("Index")"
-                        self.hideLoading();
-                    },
-                    error: function (xhr, thrownError) {
-                        console.log('error-data', xhr)
-                        location.href = "@Url.Action("Index")"
-                        self.hideLoading();
-                    }
-                });
-            },*@
-        }
-    })
+        },
+    });
 </script>
 
