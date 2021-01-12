@@ -3,8 +3,10 @@
 @using NSS.Plugin.Misc.SwiftCore.Helpers
 @using NSS.Plugin.Misc.SwiftPortalOverride
 @using NSS.Plugin.Misc.SwiftCore.Services
+@using Nop.Services.Common
 @inject IWorkContext workContext
 @inject ICustomerCompanyService customerCompanyService
+@inject IGenericAttributeService genericAttributeService
 @model CustomerAddressEditModel
 @{
     Layout = "_ColumnsTwo";
@@ -20,7 +22,7 @@
 
 @{
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Common.GetSavedERPCompanyIdFromCookies(Context.Request.Cookies[compIdCookieKey]);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
     bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
 }
 
