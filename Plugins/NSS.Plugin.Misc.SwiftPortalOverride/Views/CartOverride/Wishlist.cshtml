@@ -125,7 +125,7 @@
                         </div>
                     }
                     <form asp-route="Wishlist" method="post">
-                        <div class="responsive-table-container tab-content mb-5 d-none d-md-block" id=pills-tabContent>
+                        <div v-if="!isMobile" class="responsive-table-container tab-content mb-5" id=pills-tabContent>
                             <div class="tab-pane fade show active" id=pills-home role=tabpanel aria-labelledby=pills-home-tab>
                                 <table class="table table-striped w3-animate-left nss-table">
                                     <thead class=thead-default>
@@ -313,7 +313,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="d-md-none">
+                        <div v-if="isMobile">
                             @foreach (var item in Model.Items)
                             {
                                 var product = productService.GetProductById(item.ProductId);
@@ -450,6 +450,19 @@
 @Content1).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
 </div>
 
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
 <script>
     function removeFromFavorites() {
         $('#custom-loading').show();
@@ -460,10 +473,15 @@
     var sawOptionModal, toleranceLength;
 
     var title = 'TESTING...';
-
+     var items = @Html.Raw(Serialize(Model.Items));
+    var pageModel = @Html.Raw(Serialize(Model));
+    @*var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));*@
     var modalVm = new Vue({
         el: '#wishlist',
         data: {
+            items,
+            pageModel,
+            isEditable: pageModel.isEditable,
             sawOptionControlId: null,
             sawOptions: [],
             sawOption: null,
@@ -474,11 +492,30 @@
             quantity: 0,
             quantityId: 0,
             productId: null,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
         },
         mounted: function () {
-
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
         },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             addToCart: function () {
                 let request = {
                     [this.sawOptionControlId]: this.sawOption,
