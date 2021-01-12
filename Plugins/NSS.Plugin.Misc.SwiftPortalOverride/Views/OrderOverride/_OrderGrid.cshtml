@@ -43,10 +43,13 @@
             <e-grid-column type="checkbox" width="30"></e-grid-column>
         </e-grid-columns>
     </ejs-grid>
-    <div v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
+    <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
+        <div v-if="@Model.Orders.Count == 0" style="background:#ffffff; padding: 10px;">
+            <label class=".fs12-default"> No records to display</label>
+        </div>
         @foreach (var order in Model.Orders)
         {
-            <div v-if="isMobile" class="d-flex">
+            <div class="d-flex">
                 <label v-if="isExportMode" class="nss-checkbox mr-3 d-flex align-items-center" style="position: relative;">
                     <input type="checkbox"
                            v-on:change="onCheck(@order.OrderId)">
