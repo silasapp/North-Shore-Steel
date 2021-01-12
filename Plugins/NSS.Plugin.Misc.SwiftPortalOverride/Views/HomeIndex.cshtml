@@ -69,6 +69,7 @@
         margin-bottom: 2rem;
     }
 
+    /*
     .p-b2 {
         padding-bottom: 2.2rem;
     }
@@ -83,11 +84,7 @@
 
     .p-b11 {
         padding-bottom: 11.1rem;
-    }
-    /*.w-11 {
-        width: 11rem;
     }*/
-
 </style>
 
 
@@ -246,32 +243,32 @@
 
                     <div class="col-md-7 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
-                            <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <label class="h4 text-primary font-weight-bold mb-4">ORDER STATISTICS</label>
+                            <div class=" text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                                <label class="h4 text-primary font-weight-bold mb-4">STATISTICS</label>
                                 <div class="row">
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label class="w-11">YTD $ Sales</label>
-                                        <h5>$10,000.00</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">YTD $ Sales</label>
+                                        <h5 class="float-right">$10,000.00</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label class="w-11">YTD Lbs. Shipped</label>
-                                        <h5>200,000</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">YTD Lbs. Shipped</label>
+                                        <h5 class="float-right">200,000</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label class="w-11">YTD % On-Time Sales Orders Delivered</label>
-                                        <h5>200,000</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">YTD % On-Time Sales Orders Delivered</label>
+                                        <h5 class="float-right">200,000</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label class="w-11">YTD Total Discounts Earned</label>
-                                        <h5>$10,000.00</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">YTD Total Discounts Earned</label>
+                                        <h5 class="float-right">$10,000.00</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label class="w-11">YTD Number of Sales Orders Shipped</label>
-                                        <h5>200,000</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">YTD Number of Sales Orders Shipped</label>
+                                        <h5 class="float-right">200,000</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label class="w-11">Number of Sales Orders Currently Booked</label>
-                                        <h5>2</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">Number of Sales Orders Currently Booked</label>
+                                        <h5 class="float-right">2</h5>
                                     </div>
                                 </div>
                             </div>
@@ -284,24 +281,24 @@
                 {
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
                         <div class="tab-content p-b1" id="pills-tabContent">
-                            <div class=" tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                            <div class="text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
                                 <label class="h4 text-primary font-weight-bold mb-4">CREDIT SUMMARY</label>
                                 <div class="row">
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label>Credit Limit</label>
-                                        <h5>$@DoFormat(Model.CreditSummary.CreditLimit)</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">Credit Limit</label>
+                                        <h5 class="float-right">$@DoFormat(Model.CreditSummary.CreditLimit)</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label>Total Open Invoices</label>
-                                        <h5>$@DoFormat(Model.CreditSummary.OpenInvoiceAmount)</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">Total Open Invoices</label>
+                                        <h5 class="float-right">$@DoFormat(Model.CreditSummary.OpenInvoiceAmount)</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label>Total Past Due</label>
-                                        <h5 style="color: red;">$@DoFormat(Model.CreditSummary.PastDueAmount)</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">Total Past Due</label>
+                                        <h5 style="color: red;" class="float-right">$@DoFormat(Model.CreditSummary.PastDueAmount)</h5>
                                     </div>
-                                    <div class="col-md-4 text-center mb-3">
-                                        <label>Open Credit</label>
-                                        <h5>$@DoFormat(Model.CreditSummary.CreditAmount)</h5>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left">Open Credit</label>
+                                        <h5 class="float-right">$@DoFormat(Model.CreditSummary.CreditAmount)</h5>
                                     </div>
 
                                 </div>
