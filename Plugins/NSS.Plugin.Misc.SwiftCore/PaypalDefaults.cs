@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride
+namespace NSS.Plugin.Misc.SwiftCore
 {
     /// <summary>
     /// Represents paypal plugin constants
