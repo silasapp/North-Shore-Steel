@@ -207,7 +207,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             }).Take(5).ToList();
 
             model.RecentOrders = _nSSApiProvider.GetRecentOrders(companyId);
-            model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(companyId);
+            var (token, recentInvoices) = _nSSApiProvider.GetRecentInvoices(companyId);
+
+            foreach (var invoice in recentInvoices)
+            {
+                var recentInvoice = new Invoice
+                {
+                    InvoiceId = invoice.InvoiceId,
+                    OrderNo = invoice.OrderNo,
+                    InvoiceAmount = invoice.InvoiceAmount,
+                    InvoiceDate = invoice.InvoiceDate,
+                    InvoiceDueDate = invoice.InvoiceDueDate,
+                    InvoiceStatusName = invoice.InvoiceStatusName,
+                    InvoiceFile = $"{invoice.InvoiceFile}{token}"
+                };
+
+                model.RecentInvoices.Add(recentInvoice);
+            }
+
             model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
             model.OpenOrders = openOrders;
             model.ClosedOrders = closedOrders;
