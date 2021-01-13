@@ -192,18 +192,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var openOrders = openOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
                 OrderId = order.OrderId,
-                DeliveryDate = order.DeliveryDate,
+                PoNo = order.PoNo,
+                PromiseDate = order.PromiseDate,
+                ScheduledDate = order.ScheduledDate,
                 OrderStatusName = order.OrderStatusName
             }).Take(5).ToList();
             
             var closedOrders = closedOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
                 OrderId = order.OrderId,
+                PoNo = order.PoNo,
                 DeliveryDate = order.DeliveryDate,
                 DeliveryStatus = order.DeliveryStatus
             }).Take(5).ToList();
 
-
+            model.RecentOrders = _nSSApiProvider.GetRecentOrders(companyId);
+            model.RecentInvoices = _nSSApiProvider.GetRecentInvoices(companyId);
             model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
             model.OpenOrders = openOrders;
             model.ClosedOrders = closedOrders;

@@ -430,7 +430,7 @@ a:not([href]):not([class]) {
 
     .nss-table > thead,
     .cart-summary-content thead {
-        background-color: #03175b;
+        background-color: #1898E1;
         color: #ffffff;
     }
 
@@ -1217,7 +1217,7 @@ input:focus {
     }
 
 table a {
-    color: #0076b4;
+    color: #1899E1;
     text-decoration: underline;
 }
 
