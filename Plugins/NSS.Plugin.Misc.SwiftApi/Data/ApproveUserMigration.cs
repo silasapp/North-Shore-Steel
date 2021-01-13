@@ -46,16 +46,17 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
                 Create.ForeignKey("FK_CustomerCompany_Company").FromTable("CustomerCompany").ForeignColumn("CompanyId").ToTable("Company").PrimaryColumn("Id");
             }
 
-            if (!Schema.Table("CustomerCompany").Column("CanCredit").Exists())
-            {
+            /** Commented out as per Chika's advice */
+            //if (!Schema.Table("CustomerCompany").Column("CanCredit").Exists())
+            //{
 
-                Alter
-                    .Table("CustomerCompany")
-                    .AddColumn("CanCredit")
-                    .AsBoolean()
-                    .WithDefaultValue("");
+            //    Alter
+            //        .Table("CustomerCompany")
+            //        .AddColumn("CanCredit")
+            //        .AsBoolean()
+            //        .WithDefaultValue("");
 
-            }
+            //}
         }
         #endregion
     }
