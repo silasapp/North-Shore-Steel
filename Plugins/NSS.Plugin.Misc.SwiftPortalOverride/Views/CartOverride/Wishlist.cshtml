@@ -25,6 +25,7 @@
     Html.AddTitleParts(T("PageTitle.Wishlist").Text);
     //page class
     Html.AppendPageCssClassParts("html-wishlist-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
 }
 
 @{
@@ -124,7 +125,7 @@
                         </div>
                     }
                     <form asp-route="Wishlist" method="post">
-                        <div class="responsive-table-container tab-content mb-5" id=pills-tabContent>
+                        <div v-if="!isMobile" class="responsive-table-container tab-content mb-5" id=pills-tabContent>
                             <div class="tab-pane fade show active" id=pills-home role=tabpanel aria-labelledby=pills-home-tab>
                                 <table class="table table-striped w3-animate-left nss-table">
                                     <thead class=thead-default>
@@ -312,6 +313,101 @@
                                 </table>
                             </div>
                         </div>
+                        <div v-if="isMobile">
+                            @foreach (var item in Model.Items)
+                            {
+                                var product = productService.GetProductById(item.ProductId);
+                                var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                                var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
+                                var hasSawOption = false;
+                                if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
+                                {
+                                    var shape = shapeService.GetShapeById(shapeId);
+                                    hasSawOption = shape != null ? shape.SawOption : false;
+                                }
+                                var itemId = item.Id;
+                                var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
+                                var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
+
+                                var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
+
+                                var mappingIds = mappings.Select(x => x.Id).ToArray();
+
+                                var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
+                                var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
+                                var _productAttributes = GetJson(attrs);
+                                var prodAttrs = new List<SawOptionsAttribute>();
+
+
+                                foreach (var it in attrs)
+                                {
+                                    var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
+                                    var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
+                                    var obj = new SawOptionsAttribute
+                                    {
+                                        Name = it.Name,
+                                        Values = xValues,
+                                        Id = xMapping.Id,
+                                    };
+
+                                    prodAttrs.Add(obj);
+                                }
+                                <div class="product-sm d-flex flex-column align-items-start mb-2">
+                                    <label class="fs12-primary mb-1">Item: @iNo</label>
+                                    <label class="h2-primary my-2">@item.ProductName</label>
+                                    <div class="d-flex flex-row">
+                                        <label class="fs12-default mr-3 mb-0">Dimension: @dimensions</label>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between w-100 my-3">
+                                        <div class="d-flex flex-row align-items-center">
+                                            @*@if (eRPCompanyIdExist)
+                                                {
+                                                    <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="product-action-sm"
+                                                         v-on:click="handleAddToWishList(data)" title="add to wishlist" width="24" height="24" alt="">
+                                                }*@
+                                            <div class="table-action-button">
+                                                <label class="mb-0">
+                                                    <span style="cursor:pointer">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" aria-hidden="true" focusable="false" width="24" height="24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+                                                            <title>Remove favorite</title>
+                                                            <path d="M2.808 1.393l18.384 18.385l-1.414 1.414l-3.747-3.747L12 21.485l-8.48-8.492a6 6 0 0 1 .034-8.023L1.393 2.808l1.415-1.415zm17.435 3.364a6 6 0 0 1 .236 8.236l-1.635 1.636L7.26 3.046a5.986 5.986 0 0 1 4.741 1.483a5.998 5.998 0 0 1 8.242.228z" />
+                                                        </svg>
+                                                    </span>
+                                                    <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
+                                                </label>
+                                            </div>
+                                            @if (hasSawOption)
+                                            {
+                                                <img src="Themes/SwiftPortal/Content/assets/saw-blade.svg" class="product-action-sm" width="24" height="24" alt=""
+                                                     v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
+                                            }
+                                            @if (!string.IsNullOrEmpty(mtr))
+                                            {
+                                                <a class="table-action-button" style="text-decoration: none" href="@mtr" target="_blank">
+                                                    <img class="product-action-sm" src="Themes/SwiftPortal/Content/assets/invoice.svg" title="mtr report" width="24" height="24" alt="">
+                                                </a>}
+                                        </div>
+                                        <div class="d-flex flex-row">
+                                            <button type="button" class="btn-sm-step" v-on:click="handleDecrementQuantity(@(item.ProductId))">-</button>
+                                            <input name="itemquantity@(item.Id)" type="number" width="20" id="itemquantity@(item.ProductId)" value="@(item.Quantity)" min="1" class="form-control-sm" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
+                                            @*<input class="form-control-sm" type="number" min="1" name="itemquantity@(item.Id)" v-bind:id="'qty' + data._itemId" value="@(item.Quantity)"
+                                                oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">*@
+                                            <button type="button" class="btn-sm-step" v-on:click="handleIncrementQuantity(@(item.ProductId))">+</button>
+                                        </div>
+                                    </div>
+                                    @if (eRPCompanyIdExist)
+                                    {
+                                        <button type="button" class="btn-sm-add-to-cart" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);">
+                                            <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" class="product-action-sm" width="24" height="24" alt="">
+                                            Add to cart
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
                         <div class="buttons">
                             @if (Model.IsEditable)
                             {
@@ -338,7 +434,8 @@
                     </div>
                 }*@
             <div class="discount-block" alt="">
-                <img src="~/Themes/@themeName/Content/assets/discount.PNG" alt="">
+                <img v-if="!isMobile" src="~/Themes/@themeName/Content/assets/discount.PNG" alt="">
+                <img v-if="isMobile" src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="">
                 <div class="action">
                     <button class="white-btn">
                         <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
@@ -354,6 +451,19 @@
 @Content1).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
 </div>
 
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
 <script>
     function removeFromFavorites() {
         $('#custom-loading').show();
@@ -364,10 +474,15 @@
     var sawOptionModal, toleranceLength;
 
     var title = 'TESTING...';
-
+     var items = @Html.Raw(Serialize(Model.Items));
+    var pageModel = @Html.Raw(Serialize(Model));
+    @*var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));*@
     var modalVm = new Vue({
         el: '#wishlist',
         data: {
+            items,
+            pageModel,
+            isEditable: pageModel.isEditable,
             sawOptionControlId: null,
             sawOptions: [],
             sawOption: null,
@@ -378,11 +493,30 @@
             quantity: 0,
             quantityId: 0,
             productId: null,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
         },
         mounted: function () {
-
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
         },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             addToCart: function () {
                 let request = {
                     [this.sawOptionControlId]: this.sawOption,
@@ -439,6 +573,19 @@
             },
             decrementQuantity: function () {
                 this.quantity = this.quantity > 1 ? Number(this.quantity) - 1 : 1;
+            },
+            handleDecrementQuantity: function (itemId) {
+                const quantityEl = $('#itemquantity' + itemId);
+                const quantity = Number(quantityEl.val());
+                quantityEl.val(quantity && quantity - 1 > 1 ? quantity - 1 : 1);
+                console.log("handleDecrementQuantity: ", quantity && quantity - 1 > 1 ? quantity - 1 : 1);
+            },
+
+            handleIncrementQuantity: function (itemId) {
+                const quantityEl = $('#itemquantity' + itemId);
+                const quantity = Number(quantityEl.val());
+                quantityEl.val(quantity ? quantity + 1 : 1);
+                console.log("handleIncrementQuantity: ", quantity ? quantity + 1 : 1);
             },
         },
     });
