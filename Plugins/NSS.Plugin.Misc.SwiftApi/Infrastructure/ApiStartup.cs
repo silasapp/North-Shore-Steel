@@ -15,6 +15,7 @@ using NSS.Plugin.Misc.SwiftApi.Authorization.Policies;
 using NSS.Plugin.Misc.SwiftApi.Authorization.Requirements;
 using NSS.Plugin.Misc.SwiftApi.Configuration;
 using Nop.Web.Framework.Infrastructure.Extensions;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
 {
@@ -31,31 +32,39 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
                 if (!string.IsNullOrEmpty(apiConfig.SecurityKey))
                 {
                     services.AddAuthentication(options =>
-                            {
-                                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                            })
-                            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, jwtBearerOptions =>
-                            {
-                                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
-                                {
-                                    ValidateIssuerSigningKey = true,
-                                    IssuerSigningKey =
-                                                                                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(apiConfig.SecurityKey)),
-                                    ValidateIssuer = false, // ValidIssuer = "The name of the issuer",
-                                    ValidateAudience = false, // ValidAudience = "The name of the audience",
-                                    ValidateLifetime =
-                                                                                     true, // validate the expiration and not before values in the token
-                                    ClockSkew = TimeSpan.FromMinutes(apiConfig.AllowedClockSkewInMinutes)
-                                };
-                            });
+                    {
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    })
+                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, jwtBearerOptions =>
+                    {
+                        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey =
+                                                                                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(apiConfig.SecurityKey)),
+                            ValidateIssuer = false, // ValidIssuer = "The name of the issuer",
+                            ValidateAudience = false, // ValidAudience = "The name of the audience",
+                            ValidateLifetime =
+                                                                                true, // validate the expiration and not before values in the token
+                            ClockSkew = TimeSpan.FromMinutes(apiConfig.AllowedClockSkewInMinutes)
+                        };
+                    });
 
                     JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
                     AddAuthorizationPipeline(services);
                     //services.AddHostedService<ApplicationPartsLogger>();
                 }
             }
-           
+
+            services.Configure<FormOptions>(options =>
+            {
+                options.KeyLengthLimit = int.MaxValue;
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = int.MaxValue;
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+
         }
 
         public void Configure(IApplicationBuilder app)
@@ -65,10 +74,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
 
             app.UseRewriter(rewriteOptions);
 
-            app.UseCors(x => x
-                             .AllowAnyOrigin()
-                             .AllowAnyMethod()
-                             .AllowAnyHeader());
+            app.UseCors(x => x.AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader());
 
             // Need to enable rewind so we can read the request body multiple times
             // This should eventually be refactored, but both JsonModelBinder and all of the DTO validators need to read this stream.
@@ -89,7 +97,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
                 ),
                 a =>
                 {
-                    
+
                     a.Use(async (context, next) =>
                                 {
                                     Console.WriteLine("API Call");
@@ -107,8 +115,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
                         endpoints
                             .MapControllers();
                     });
-                    
-                    
+
+
                 }
             );
         }
