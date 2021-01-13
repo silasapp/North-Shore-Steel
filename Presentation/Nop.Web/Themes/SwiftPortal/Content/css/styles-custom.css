@@ -67,7 +67,7 @@ a:not([href]):not([class]) {
     .nav-pills .nav-link:hover,
     .nav-pills .nav-link.active,
     .nav-pills .show > .nav-link {
-        background-color: #0076b4 !important;
+        background-color: #1898E1 !important;
         color: #ffffff;
     }
 
@@ -430,7 +430,7 @@ a:not([href]):not([class]) {
 
     .nss-table > thead,
     .cart-summary-content thead {
-        background-color: #03175b;
+        background-color: #1898E1;
         color: #ffffff;
     }
 
@@ -641,6 +641,7 @@ a:not([href]):not([class]) {
     background-color: #033551 !important;
     color: #fff !important;
 }
+
 
 .forgot-password * {
     color: #033551 !important
@@ -897,13 +898,14 @@ input:-webkit-autofill {
     padding: 0 !important;
 }
 
-.card-title > h1 {
-    text-align: center;
-    font: normal normal 500 34px/24px "Teko";
-    letter-spacing: 0.27px;
-    color: #033551;
-    opacity: 1;
-}
+    .card-title > h1 {
+        text-align: center;
+        font: normal normal 500 34px/24px "Teko";
+        letter-spacing: 0.27px;
+        color: #033551;
+        opacity: 1;
+    }
+
 .page-title {
     border-bottom: 2px solid #03175b;
     margin: 0 0 30px !important;
@@ -1217,7 +1219,7 @@ input:focus {
     }
 
 table a {
-    color: #0076b4;
+    color: #1899E1;
     text-decoration: underline;
 }
 
@@ -1342,7 +1344,7 @@ table input {
 }
 
 .e-headercell {
-    background-color: #03175b !important;
+    background-color: #1898E1 !important;
     color: #ffffff !important;
 }
 
@@ -3009,6 +3011,10 @@ table input {
     background: #03175b !important;
 }
 
+.bg-primary2 {
+    background: #1899E1 !important;
+}
+
 .bg-white-shadow {
     background: #ffffff 0% 0% no-repeat padding-box;
     box-shadow: 0px 1px 16px #0000001a;
@@ -3449,38 +3455,16 @@ and also iPads specifically.
     padding: 20px;
     text-align: center;
     margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
 }
-.mobile-export > button {
+    .mobile-export > button, .mobile-export > div {
     background-color: #ffffff;
     padding: 10px;
     border: none;
 }
 @media all and (max-width: 600px) {
-    .check-out-card {
-        padding: 0 !important;
-    }
-    .orders-search-block > div {
-        justify-content: center;
-        align-items: center;
-        background-color: #f6f6f6 !important;
-    }
-        .partners-logo, .check-out-info {
-        display: flex;
-        align-items: flex-start;
-    }
-    .edit-shop-container {
-        background-color: #F6F6F6;
-        padding: 10px;
-        display: flex;
-        justify-content: center;
-        margin-bottom: 40px;
-    }
-    .nss-btn-default {
-        background-color: #0076B4 !important;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        color: #ffffff;
-    }
+    
     .place-order-buttons, .order-export-btn-container {
         display: block;
         position: fixed;
@@ -3762,6 +3746,35 @@ and also iPads specifically.
 
 /*// Small devices (landscape phones, less than 768px)*/
 @media (max-width: 767.98px) {
+    .check-out-card {
+        padding: 0 !important;
+}
+
+    .orders-search-block > div {
+        justify-content: center;
+        align-items: center;
+        background-color: #f6f6f6 !important;
+    }
+
+    .partners-logo, .check-out-info {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .edit-shop-container {
+        background-color: #F6F6F6;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .nss-btn-default {
+        background-color: #1899E1 !important;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #ffffff;
+    }
 }
 
 /*// Medium devices (tablets, less than 992px)*/
