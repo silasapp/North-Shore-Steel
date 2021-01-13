@@ -12,8 +12,19 @@
     string LastName = genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
 }
 
+
 <input asp-for="Id" type="hidden" />
-<div class="edit-address">
+<style>
+    .grey-bg {
+        background-color: #f6f6f6 !important;
+        padding: 20px;
+    }
+
+    .color-white {
+        color: #ffffff !important;
+    }
+</style>
+<div class="edit-address" id="edit-address-form"  v-bind:style="{'background-color':isMobile?'#f6f6f6 !important':'#ffffff'}">
     <div class="" hidden>
         <label asp-for="FirstName" asp-postfix=":"></label>
         <nop-required />
@@ -135,3 +146,33 @@
         @await Html.PartialAsync("_AddressAttributes", Model.CustomAddressAttributes)
     }
 </div>
+
+<script>
+    var vm = new Vue({
+        el: '#edit-address-form',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+        },
+    });
+</script>

@@ -47,7 +47,7 @@
         </e-grid-columns>
     </ejs-grid>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
-        <div v-if="@Model.Orders.Count == 0" style="background:#ffffff; padding: 10px;">
+        <div v-if="@Model.Invoices.Count == 0" style="background:#ffffff; padding: 10px;">
             <label class=".fs12-default"> No records to display</label>
         </div>
         @foreach (var invoice in Model.Invoices)

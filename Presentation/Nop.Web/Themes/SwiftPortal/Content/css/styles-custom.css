@@ -430,7 +430,7 @@ a:not([href]):not([class]) {
 
     .nss-table > thead,
     .cart-summary-content thead {
-        background-color: #1898E1;
+        background-color: #03175b;
         color: #ffffff;
     }
 
@@ -1219,7 +1219,7 @@ input:focus {
     }
 
 table a {
-    color: #1899E1;
+    color: #0076b4;
     text-decoration: underline;
 }
 
@@ -1344,7 +1344,7 @@ table input {
 }
 
 .e-headercell {
-    background-color: #1898E1 !important;
+    background-color: #03175b !important;
     color: #ffffff !important;
 }
 
@@ -3459,10 +3459,10 @@ and also iPads specifically.
     justify-content: center;
 }
     .mobile-export > button, .mobile-export > div {
-    background-color: #ffffff;
-    padding: 10px;
-    border: none;
-}
+        background-color: #ffffff;
+        padding: 10px;
+        border: none;
+    }
 @media all and (max-width: 600px) {
     
     .place-order-buttons, .order-export-btn-container {
@@ -3748,7 +3748,7 @@ and also iPads specifically.
 @media (max-width: 767.98px) {
     .check-out-card {
         padding: 0 !important;
-}
+    }
 
     .orders-search-block > div {
         justify-content: center;
