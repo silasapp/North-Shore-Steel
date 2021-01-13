@@ -16,9 +16,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             ClosedOrders = new List<CompanyOrderListModel.OrderDetailsModel>();
             CreditSummary = new CreditSummaryModel();
             CompanyInfo = new CompanyInfo();
+            RecentOrders = new List<Order>();
+            RecentInvoices = new List<Invoice>();
         }
         public List<CompanyOrderListModel.OrderDetailsModel> OpenOrders { get; set; }
 
+        public List<Order> RecentOrders { get; set; }
+        public List<Invoice> RecentInvoices { get; set; }
         public IList<CompanyStats> CompanyStats { get; set; }
         public List<CompanyOrderListModel.OrderDetailsModel> ClosedOrders { get; set; }
         //public List<Invoice> RecentInvoices { get; set; }
