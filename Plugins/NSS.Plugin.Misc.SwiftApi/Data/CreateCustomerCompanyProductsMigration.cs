@@ -6,7 +6,7 @@ using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftApi.Data
 {
-    [NopMigration("2020/11/04 12:30:00", "Swift.Api Create Customer Company Products schema")]
+    [NopMigration("2020/11/04 19:30:00", "Swift.Api Create Customer Company Products schema")]
     public class CreateCustomerCompanyProductsMigration : AutoReversingMigration
     {
 
