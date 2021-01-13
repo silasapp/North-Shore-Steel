@@ -67,5 +67,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public DateTime InvoiceDate { get; set; }
         public DateTime InvoiceDueDate { get; set; }
         public string InvoiceStatusName { get; set; }
+        public string InvoiceFile { get; set; }
     }
 }
