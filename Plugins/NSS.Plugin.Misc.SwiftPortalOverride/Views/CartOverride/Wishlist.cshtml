@@ -434,7 +434,8 @@
                     </div>
                 }*@
             <div class="discount-block" alt="">
-                <img src="~/Themes/@themeName/Content/assets/discount.PNG" alt="">
+                <img v-if="!isMobile" src="~/Themes/@themeName/Content/assets/discount.PNG" alt="">
+                <img v-if="isMobile" src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="">
                 <div class="action">
                     <button class="white-btn">
                         <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
