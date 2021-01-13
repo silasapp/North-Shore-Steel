@@ -353,10 +353,8 @@
 
 
     function openMTR(mtrFile) {
-        console.log('mtr', mtrFile);
         var pdfViewer = document.getElementById('pdfviewer').ej2_instances[0];
         pdfViewer.serviceUrl = window.location.origin + '/api/PdfViewer';
-        console.log('serviceUrl', pdfViewer.serviceUrl);
         pdfViewer.load(mtrFile, null);
         openMTRModal.show();
     }
@@ -367,8 +365,6 @@
     gridColumns = @Html.Raw(Serialize(headerColumns));
     shopVm.buildSortOptions(gridColumns);
 
-    console.log("gridData: ", gridData);
-    console.log("gridColumns: ", gridColumns);
 
     var gridVm = new Vue({
         el: '#gridView',
@@ -427,25 +423,17 @@
                 this.grid.appendTo('#Grid');
             },
             handleTooltipping: function (args) {
-                //if (args.column.template === '#optionsTemplate') {
-                //    console.log('handleTooltipping...', args);
-                //    new ej.popups.Tooltip({
-                //        content: 'Add to Wishlist' // add Essential JS2 tooltip for every cell.
-                //    }, args.cell);
-                //}
             },
             handleDecrementQuantity: function (itemId) {
                 const quantityEl = $('#qty' + itemId);
                 const quantity = Number(quantityEl.val());
                 quantityEl.val(quantity && quantity - 1 > 1 ? quantity - 1 : 1);
-                console.log("handleDecrementQuantity: ", quantity && quantity - 1 > 1 ? quantity - 1 : 1);
             },
 
             handleIncrementQuantity: function (itemId) {
                 const quantityEl = $('#qty' + itemId);
                 const quantity = Number(quantityEl.val());
                 $('#qty' + itemId).val(quantity ? quantity + 1 : 1);
-                console.log("handleIncrementQuantity: ", quantity ? quantity + 1 : 1);
             },
 
             handleAddToWishList: function(data) {

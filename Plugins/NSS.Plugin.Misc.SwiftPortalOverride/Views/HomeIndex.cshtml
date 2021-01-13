@@ -638,11 +638,6 @@
 
     var companyId = @Html.Raw(eRPCompanyId)
 
-
-    console.log("openOrders: ", openOrders);
-    console.log("closedOrders: ", closedOrders);
-    console.log("companyStats", companyStats);
-
     new Vue({
         el: '#app',
         data: {
@@ -668,7 +663,6 @@
                     orderId
                 }
 
-                console.log('request', request);
                 this.showLoading();
                 const self = this;
                 $.ajax({
@@ -679,13 +673,11 @@
                     dataType: "json",
                     success: function (data, _, _) {
                         self.orderMTRs = data.MTRs;
-                        console.log('getNotifications - data', self.orderMTRs)
                         viewMtrModal.show();
                         self.hideLoading();
                     },
                     error: function (xhr, thrownError) {
                         self.hideLoading();
-                        console.log(xhr, 'error-data', thrownError);
                     }
                 });
             }
