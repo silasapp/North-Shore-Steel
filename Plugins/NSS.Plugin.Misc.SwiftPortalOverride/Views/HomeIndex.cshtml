@@ -72,7 +72,9 @@
         margin-bottom: 2rem;
     }
 
-
+    .p-t6 {
+        padding: 6.7rem 0;
+    }
     .p-b11 {
         padding-bottom: 11.8rem;
     }
@@ -80,12 +82,19 @@
     .p-b1 {
         padding-bottom: 1.2rem;
     }
+
+    .nss-no-orders {
+        text-align: center;
+        font: normal normal 500 34px/24px "Teko";
+        letter-spacing: 0.27px;
+        color: #03175B;
+        opacity: 1;
+    }
 </style>
 
 
 <div id="app" class="page home-page">
-
-
+ 
     <div class="page-body">
         <div class="d-none d-md-block">
             <div class="row">
@@ -94,11 +103,11 @@
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
                             <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <div class="card-title mb-2 border-bottom-0 mt-2">
-                                    <h1>OPEN ORDERS</h1>
-                                </div>
-                                @if (Model.OpenOrders != null && Model.OpenOrders.Count > 0)
+                                @if (Model.OpenOrders == null)
                                 {
+                                    <div class="card-title mb-2 border-bottom-0 mt-2">
+                                        <h1>OPEN ORDERS</h1>
+                                    </div>
                                     <table class="table table-striped w3-animate-left nss-table">
                                         <thead class="thead-default">
                                             <tr>
@@ -115,7 +124,7 @@
                                                 <tr>
                                                     <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                     <td>@order.PoNo</td>
-                                                    <td>@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
+                                                    <td>@order.PromiseDate.ToString("MM/dd/yyyy")</td>
                                                     <td>@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
                                                     <td class="text-center cursor-pointer">@order.OrderStatusName</td>
                                                 </tr>
@@ -126,8 +135,9 @@
                                 }
                                 else
                                 {
-                                    <div class="text-center pt-5">
-                                        <label class="h5-default">You have not placed an order in the last 30 days.</label>
+                                    <div class="text-center p-t6">
+                                        <h2 class="nss-no-orders">You have not placed an</h2>
+                                        <h2 class="nss-no-orders">order in the last 30 days.</h2>
                                         <div class="action pt-3">
                                             <a href="/catalog">
                                                 <button class="swift-color-btn">
@@ -300,7 +310,7 @@
                     </div>
                 }
 
-               <div class="row">
+                <div class="row">
                     <div class="col-md-12">
 
                         <ul class="nav nav-pills mb-1 " id="pills-tab" role="tablist">
@@ -313,27 +323,27 @@
                         </ul>
                         <div class="tab-content" id="pills-tabContent">
                             <div class="responsive-table-container tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                                <ejs-grid id="OrderGrid" dataSource="@Model.RecentOrders" allowPaging="true" allowFiltering="false">
+                                <ejs-grid id="OrderGrid" dataSource="@Model.RecentOrders" allowPaging="true" allowFiltering="false" rowHeight="38">
                                     <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
                                     <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
                                     <e-grid-columns>
                                         <e-grid-column template="#orderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column field="Weight" headerText="Tot. Weight (lbs)" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column template="#orderTotal" headerText="Order Amount" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column field="PONo" headerText="PO#" minWidth="180" width="140"></e-grid-column>
+                                        <e-grid-column field="PONo" headerText="PO #" minWidth="180" width="140"></e-grid-column>
+                                        <e-grid-column field="Weight" headerText="Weight (lb)" format="N0" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column field="OrderTotal" headerText="Order Amt." format="C2" minWidth="120" width="70"></e-grid-column>
                                         <e-grid-column field="EstDeliveryDate" headerText="Est. Delivery" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
                                         <e-grid-column field="OrderStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
                                     </e-grid-columns>
                                 </ejs-grid>
                             </div>
                             <div class="responsive-table-container tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                                <ejs-grid id="InvoiceGrid" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false">
+                                <ejs-grid id="InvoiceGrid" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false" rowHeight="38">
                                     <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                    <e-grid-pagesettings pageSize="50" pageSizes="true"></e-grid-pagesettings>
+                                    <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
                                     <e-grid-columns>
                                         <e-grid-column field="InvoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
                                         <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column template="#invoiceAmount" headerText="Invoice Amount" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column field="InvoiceAmount" headerText="Invoice Amt." format="C2"  minWidth="120" width="70"></e-grid-column>
                                         <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
                                         <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
                                         <e-grid-column template="#invoiceStatus" headerText="Status" minWidth="110" width="70"></e-grid-column>
@@ -344,9 +354,11 @@
                     </div>
                 </div>
 
- 
 
+
+               
                 @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render()
+
 
             </div>
             <div class="discount-block" alt="">
@@ -601,9 +613,7 @@
 <script id="invoiceOrderNo" type="text/x-template">
     <a href="/orders/${OrderNo}">${OrderNo}</a>
 </script>
-<script id="orderTotal" type="text/x-template">
-    $${OrderTotal}
-</script>
+
 
 @functions{
     string DoFormat(decimal? myNumber)

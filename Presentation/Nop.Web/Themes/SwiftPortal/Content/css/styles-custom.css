@@ -67,7 +67,7 @@ a:not([href]):not([class]) {
     .nav-pills .nav-link:hover,
     .nav-pills .nav-link.active,
     .nav-pills .show > .nav-link {
-        background-color: #0076b4 !important;
+        background-color: #1898E1 !important;
         color: #ffffff;
     }
 
@@ -1342,7 +1342,7 @@ table input {
 }
 
 .e-headercell {
-    background-color: #03175b !important;
+    background-color: #1898E1 !important;
     color: #ffffff !important;
 }
 
