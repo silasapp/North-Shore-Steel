@@ -31,11 +31,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
         /// </summary>
         public override void Up()
         {
-            _migrationManager.BuildTable<CustomerCompanyProduct>(Create);
+            if (!Schema.Table("CustomerCompanyProduct").Exists())
+            {
+                _migrationManager.BuildTable<CustomerCompanyProduct>(Create);
 
 
-            Create.ForeignKey("FK_CustomerCompanyProduct_Product").FromTable("CustomerCompanyProduct").ForeignColumn("ProductId").ToTable("Product").PrimaryColumn("Id");
-            Create.ForeignKey("FK_CustomerCompanyProduct_CustomerCompany").FromTable("CustomerCompanyProduct").ForeignColumn("CustomerCompanyId").ToTable("CustomerCompany").PrimaryColumn("Id");
+                Create.ForeignKey("FK_CustomerCompanyProduct_Product").FromTable("CustomerCompanyProduct").ForeignColumn("ProductId").ToTable("Product").PrimaryColumn("Id");
+                Create.ForeignKey("FK_CustomerCompanyProduct_CustomerCompany").FromTable("CustomerCompanyProduct").ForeignColumn("CustomerCompanyId").ToTable("CustomerCompany").PrimaryColumn("Id");
+            }
         }
         #endregion
     }
