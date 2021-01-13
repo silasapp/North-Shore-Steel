@@ -654,13 +654,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
         #region Invoices API
 
-        public List<Invoice> GetRecentInvoices(string ERPCompanyId)
+        public (string, List<Invoice>) GetRecentInvoices(string ERPCompanyId)
         {
             var retVal = new List<Invoice>();
+            var token = string.Empty;
+
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
                 _logger.Warning("Swift Api provider - Get Recent Invoices", new Exception("NSS API attributes not configured correctly."));
-                return retVal;
+                return ("", retVal);
             }
 
             try
@@ -669,12 +671,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 {
                     client.BaseAddress = new Uri(_baseUrl);
                     //get token
-                    var token = GetNSSToken(client);
+                    token = GetNSSToken(client);
 
                     if (string.IsNullOrEmpty(token))
                     {
                         _logger.Warning($"NSS.GetRecentInvoices -> ", new Exception("NSS token returned empty"));
-                        return retVal;
+                        return ("", retVal);
                     }
 
                     var resource = $"/companies/{ERPCompanyId}/invoices/recent";
@@ -696,7 +698,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 _logger.Error($"NSS.GetRecentInvoices ->", ex);
             }
 
-            return retVal;
+            return (token, retVal);
         }
 
         public (string, List<ERPSearchInvoicesResponse>) SearchOpenInvoices(int companyId, ERPSearchInvoicesRequest request, bool useMock = false)

@@ -67,7 +67,7 @@ a:not([href]):not([class]) {
     .nav-pills .nav-link:hover,
     .nav-pills .nav-link.active,
     .nav-pills .show > .nav-link {
-        background-color: #1899E1 !important;
+        background-color: #1898E1 !important;
         color: #ffffff;
     }
 
@@ -635,9 +635,24 @@ a:not([href]):not([class]) {
     }
 
 .register-button,
+.register-next-step-button,
+.password-recovery-button,
 .login-button {
-    background-color: #03175b !important;
+    background-color: #033551 !important;
     color: #fff !important;
+}
+
+
+.forgot-password * {
+    color: #033551 !important
+}
+
+.nss-dark-blue {
+    color: #033551 !important;
+}
+
+.nss-light-grey {
+    color: #AAAAAA !important;
 }
 
 .buttons > .register-button,
@@ -678,7 +693,7 @@ a:not([href]):not([class]) {
 .coupon-box > .title > strong {
     font: normal normal 500 26px/24px "Teko";
     letter-spacing: 0.21px;
-    color: #03175b;
+    color: #033551;
     opacity: 1;
 }
 
@@ -876,6 +891,21 @@ input:-webkit-autofill {
         color: #000000;
     }
 
+.card-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 !important;
+}
+
+    .card-title > h1 {
+        text-align: center;
+        font: normal normal 500 34px/24px "Teko";
+        letter-spacing: 0.27px;
+        color: #033551;
+        opacity: 1;
+    }
+
 .page-title {
     border-bottom: 2px solid #03175b;
     margin: 0 0 30px !important;
@@ -890,7 +920,7 @@ input:-webkit-autofill {
         text-align: center;
         font: normal normal 500 34px/24px "Teko";
         letter-spacing: 0.27px;
-        color: #03175b;
+        color: #033551;
         opacity: 1;
     }
 

@@ -91,6 +91,11 @@
         color: #03175B;
         opacity: 1;
     }
+
+
+    .colorRed {
+        color: red !important;
+    }
 </style>
 
 
@@ -104,7 +109,7 @@
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
                             <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                @if (Model.OpenOrders == null)
+                                @if (Model.OpenOrders.Count > 0)
                                 {
                                     <div class="card-title mb-2 border-bottom-0 mt-2">
                                         <h1>OPEN ORDERS</h1>
@@ -238,26 +243,26 @@
 
                 @if (isOperations || isBuyer)
                 {
-                    <div class="col-md-5 col-sm-6 col-12 m-b2">
-                        <div class="tab-content" id="pills-tabContent">
-                            <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <div class="card-title mb-2 border-bottom-0 mt-2">
-                                    <h1>CLOSED ORDERS</h1>
-                                </div>
-                                <table class="table table-striped w3-animate-left nss-table">
-                                    <thead class="thead-default">
-                                        <tr>
-                                            <td scope="col">Order #</td>
-                                            <td scope="col">PO #</td>
-                                            <td scope="col">Delivery Date</td>
-                                            <td scope="col">Delivered</td>
-                                            <td scope="col" class="text-center">MTR/POD</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if (Model.ClosedOrders != null && Model.ClosedOrders.Count > 0)
-                                        {
-                                            foreach (var order in Model.ClosedOrders)
+                    @if (Model.ClosedOrders.Count > 0)
+                    {
+                        <div class="col-md-5 col-sm-6 col-12 m-b2">
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                                    <div class="card-title mb-2 border-bottom-0 mt-2">
+                                        <h1>CLOSED ORDERS</h1>
+                                    </div>
+                                    <table class="table table-striped w3-animate-left nss-table">
+                                        <thead class="thead-default">
+                                            <tr>
+                                                <td scope="col">Order #</td>
+                                                <td scope="col">PO #</td>
+                                                <td scope="col">Delivery Date</td>
+                                                <td scope="col">Delivered</td>
+                                                <td scope="col" class="text-center">MTR/POD</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var order in Model.ClosedOrders)
                                             {
                                                 <tr>
                                                     <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
@@ -269,13 +274,13 @@
                                                     </td>
                                                 </tr>
                                             }
-                                        }
-                                    </tbody>
-                                </table>
-                                <div class="nss-light-grey text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
+                                        </tbody>
+                                    </table>
+                                    <div class="nss-light-grey text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 }
 
 
@@ -338,16 +343,16 @@
                                 </ejs-grid>
                             </div>
                             <div class="responsive-table-container tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                                <ejs-grid id="InvoiceGrid" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false" rowHeight="38">
+                                <ejs-grid id="InvoiceGrid" queryCellInfo="customiseCell" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false" rowHeight="38">
                                     <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
                                     <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
                                     <e-grid-columns>
-                                        <e-grid-column field="InvoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
+                                        <e-grid-column template="#invoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
                                         <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
                                         <e-grid-column field="InvoiceAmount" headerText="Invoice Amt." format="C2" minWidth="120" width="70"></e-grid-column>
                                         <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
                                         <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                        <e-grid-column template="#invoiceStatus" headerText="Status" minWidth="110" width="70"></e-grid-column>
+                                        <e-grid-column field="InvoiceStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
                                     </e-grid-columns>
                                 </ejs-grid>
                             </div>
@@ -371,170 +376,190 @@
             </div>
         </div>
 
+    </div>
+    <div class="d-md-none">
+        <p class="fs-14" style="font-weight: 500; padding: 0 20px; color: #242424;">*All orders display the five most recent results from the past 30-days</p>
+        <ul class="nav nav-pills mb-1 mt-2 mx-4 justify-content-center" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation" style="margin-right: 0.3em" v-on:click="showRecentOrders = true;">
+                <a class="nav-link" v-bind:class="{'active': showRecentOrders}">Open Orders</a>
+            </li>
+            <li class="nav-item" role="presentation" v-on:click="showRecentOrders = false;">
+                <a class="nav-link" v-bind:class="{'active': !showRecentOrders}">Closed Orders</a>
+            </li>
+        </ul>
 
-        <div class="d-md-none">
-            <p class="fs-14" style="font-weight: 500; padding: 0 20px; color: #242424;">*All orders display the five most recent results from the past 30-days</p>
-            <ul class="nav nav-pills mb-1 mt-2 mx-4 justify-content-center" id="pills-tab" role="tablist">
-                <li class="nav-item" role="presentation" style="margin-right: 0.3em" v-on:click="showRecentOrders = true;">
-                    <a class="nav-link" v-bind:class="{'active': showRecentOrders}">Open Orders</a>
-                </li>
-                <li class="nav-item" role="presentation" v-on:click="showRecentOrders = false;">
-                    <a class="nav-link" v-bind:class="{'active': !showRecentOrders}">Closed Orders</a>
-                </li>
-            </ul>
-
-            <div class="mt-2 mx-4">
-                <div v-if="showRecentOrders">
-                    <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                        <label class=".fs12-default">You have not placed an order in the last 30 days.</label>
-                    </div>
-                    <div v-for="order in openOrders" class="d-flex flex-column bg-white-shadow mb-3">
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Order #</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">PO #</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.poNo }}</a>
-                            </div>
-                        </div>
-
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0"> Promise Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0"> Scheduled Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.scheduledDate | date }}</label>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Status</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.orderStatusName }}</label>
-                            </div>
+        <div class="mt-2 mx-4">
+            <div v-if="showRecentOrders">
+                <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
+                    <div class="text-center p-t6">
+                        <h2 class="nss-no-orders">You have not placed an</h2>
+                        <h2 class="nss-no-orders">order in the last 30 days.</h2>
+                        <div class="action pt-3">
+                            <a href="/catalog">
+                                <button class="swift-color-btn">
+                                    <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
+                                </button>
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div v-if="!showRecentOrders">
-                    <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                        <label class=".fs12-default">You have not closed an order in the last 30 days.</label>
+                <div v-for="order in openOrders" class="d-flex flex-column bg-white-shadow mb-3">
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Order #</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                        </div>
                     </div>
-                    <div v-for="order in closedOrders" class="d-flex flex-column bg-white-shadow mb-3">
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Order #</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
-                            </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">PO #</label>
                         </div>
+                        <div class="d-flex p-2">
+                            <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.poNo }}</a>
+                        </div>
+                    </div>
 
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0"> Order Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.orderDate | date }}</label>
-                            </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0"> Promise Date</label>
                         </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0"> Promise Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
-                            </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
                         </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0"> Delivery Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.deliveryDate | date }}</label>
-                            </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0"> Scheduled Date</label>
                         </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Status</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.deliveryStatus }}</label>
-                            </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{ order.scheduledDate | date }}</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Status</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{ order.orderStatusName }}</label>
                         </div>
                     </div>
                 </div>
-
-                @if (isAP || isBuyer)
-                {
-                    <div class="col-md-5 col-sm-6 col-12 m-b2 p-0 mt-2">
-                        <div class="tab-content p-b1" id="pills-tabContent">
-                            <div class="text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <div class="card-title border-bottom-0">
-                                    <h1 style="font: normal normal 500 34px/24px 'Teko';">CREDIT SUMMARY</h1>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 d-block">
-                                        <label class="float-left h5-default">Credit Limit</label>
-                                        <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditLimit)</h5>
-                                    </div>
-                                    <div class="col-md-12 d-block">
-                                        <label class="float-left h5-default">Total Open Invoices</label>
-                                        <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
-                                    </div>
-                                    <div class="col-md-12 d-block">
-                                        <label class="float-left h5-default">Total Past Due</label>
-                                        <h5 style="color: red;" class="float-right">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
-                                    </div>
-                                    <div class="col-md-12 d-block">
-                                        <label class="float-left h5-default">Open Credit</label>
-                                        <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditAmount)</h5>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-
-                @if (isOperations)
-                {
-
-                    <div class="col-md-7 col-sm-6 col-12 m-b2 p-0">
-                        <div class="tab-content" id="pills-tabContent">
-                            <div class=" text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                <div class="card-title border-bottom-0">
-                                    <h1 style="font: normal normal 500 34px/24px 'Teko';">STATISTICS</h1>
-                                </div>
-                                <div class="row" v-for="stats in companyStats">
-                                    <div class="col-md-12 d-block">
-                                        <label class="float-left h5-default">{{stats.statName}}</label>
-                                        <h5 class="float-right nss-dark-blue">{{stats.statValue}}</h5>
-                                    </div>
-                                </div>
-                                <label class="nss-light-grey">Combines online and offline orders.</label>
-                            </div>
-                        </div>
-                    </div>
-                }
             </div>
+            <div v-if="!showRecentOrders">
+                <div v-if="closedOrders.length == 0" style="background:#ffffff; padding: 10px;">
+                    <div class="text-center p-t6">
+                        <h2 class="nss-no-orders">You have not placed an</h2>
+                        <h2 class="nss-no-orders">order in the last 30 days.</h2>
+                        <div class="action pt-3">
+                            <a href="/catalog">
+                                <button class="swift-color-btn">
+                                    <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div v-for="order in closedOrders" class="d-flex flex-column bg-white-shadow mb-3">
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Order #</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0"> Order Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{ order.orderDate | date }}</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0"> Promise Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0"> Delivery Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{ order.deliveryDate | date }}</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Status</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{ order.deliveryStatus }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (isAP || isBuyer)
+            {
+                <div class="col-md-5 col-sm-6 col-12 m-b2 p-0 mt-2">
+                    <div class="tab-content p-b1" id="pills-tabContent">
+                        <div class="text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                            <div class="card-title border-bottom-0">
+                                <h1>CREDIT SUMMARY</h1>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 d-block">
+                                    <label class="float-left h5-default">Credit Limit</label>
+                                    <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditLimit)</h5>
+                                </div>
+                                <div class="col-md-12 d-block">
+                                    <label class="float-left h5-default">Total Open Invoices</label>
+                                    <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
+                                </div>
+                                <div class="col-md-12 d-block">
+                                    <label class="float-left h5-default">Total Past Due</label>
+                                    <h5 style="color: red;" class="float-right">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
+                                </div>
+                                <div class="col-md-12 d-block">
+                                    <label class="float-left h5-default">Open Credit</label>
+                                    <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditAmount)</h5>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (isOperations)
+            {
+
+                <div class="col-md-7 col-sm-6 col-12 m-b2 p-0">
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class=" text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                            <div class="card-title border-bottom-0">
+                                <h1>STATISTICS</h1>
+                            </div>
+                            <div class="row" v-for="stats in companyStats">
+                                <div class="col-md-12 d-block">
+                                    <label class="float-left h5-default">{{stats.statName}}</label>
+                                    <h5 class="float-right nss-dark-blue">{{stats.statValue}}</h5>
+                                </div>
+                            </div>
+                            <label class="nss-light-grey">Combines online and offline orders.</label>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
+
 
         <div class="customer-service-section-sm d-flex flex-column justify-content-center align-items-center">
             <div class="avatar-block">
@@ -671,6 +696,13 @@
         viewMtrModal = this;
     }
 
+    function customiseCell(args) {
+        if (args.column.field === 'InvoiceStatusName') {
+            if (args.data['InvoiceStatusName'].indexOf("Past due") > -1) {
+                args.cell.classList.add('colorRed');
+            }
+        }
+    }
 
 </script>
 
@@ -680,7 +712,9 @@
 <script id="invoiceOrderNo" type="text/x-template">
     <a href="/orders/${OrderNo}">${OrderNo}</a>
 </script>
-
+<script id="invoiceId" type="text/x-template">
+    <a href="${InvoiceFile}" target="_blank">${InvoiceId}</a>
+</script>
 
 @functions{
     string DoFormat(decimal? myNumber)
