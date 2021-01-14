@@ -441,7 +441,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     //    break;
                     //case CustomerLoginResults.WrongPassword:
                     default:
-                        //ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials"));
+                        ModelState.AddModelError("", "");
                         break;
                 }
             }
