@@ -22,6 +22,11 @@
         height: 0 !important;
         visibility: hidden;
     }
+
+    .active-page {
+        background-color: #1899E1 !important;
+        color: #ffffff;
+    }
 </style>
 <div id="invoicesGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
@@ -57,107 +62,119 @@
         <div v-if="@Model.Invoices.Count == 0" style="background:#ffffff; padding: 10px;">
             <label class=".fs12-default"> No records to display</label>
         </div>
-        @foreach (var invoice in Model.Invoices)
-        {
-            <div class="d-flex">
-                <label v-if="isExportMode" class="pure-material-checkbox mr-3  d-flex align-items-center" style="position: relative;">
-                    <input type="checkbox" name="invoice-checkox"
-                           v-on:change="onCheck(@invoice.InvoiceId)">
-                    <span class="checkmark"></span>
-                </label>
-                <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
 
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Invoice #</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <a href="@invoice.InvoiceFile" class="fs12-link" target="_blank">@invoice.InvoiceId</a>
-                        </div>
+        <div v-for="invoice in paginatedData" class="d-flex">
+            <label v-if="isExportMode" class="pure-material-checkbox mr-3  d-flex align-items-center" style="position: relative;">
+                <input type="checkbox" name="invoice-checkox"
+                       v-on:click="onCheck(invoice.invoiceId)">
+                <span class="checkmark"></span>
+            </label>
+            <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
+
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Invoice #</label>
                     </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Order #</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <a class="fs12-link" href="/orders/@invoice.OrderNo">@invoice.OrderNo</a>
-                        </div>
+                    <div class="d-flex p-2">
+                        <a v-bind:href="invoice.invoiceFile" class="fs12-link" target="_blank">{{invoice.invoiceId}}</a>
                     </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Purchase Order #</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <a class="fs12-default">@invoice.PoNo</a>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Invoice Amount</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">@invoice.InvoiceAmount</label>
-                        </div>
-                    </div>
-
-
-                    @if (!Model.IsClosed)
-                    {
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Balance Amount</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@invoice.BalanceAmount</label>
-                            </div>
-                        </div>
-
-                    }
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Invoice Date</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">@invoice.InvoiceDate.ToString("MM/dd/yyyy")</label>
-                        </div>
-                    </div>
-
-                    @if (Model.IsClosed)
-                    {
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Paid Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@invoice.InvoicePaidDate?.ToString("MM/dd/yyyy")</label>
-                            </div>
-                        </div>
-
-                    }
-                    else
-                    {
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Due Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</label>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Status</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@invoice.InvoiceStatusName</label>
-                            </div>
-                        </div>
-                    }
-
-
                 </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Order #</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <a class="fs12-link" v-bind:href="'/orders/'+invoice.orderNo">{{invoice.orderNo}}</a>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Purchase Order #</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <a class="fs12-default">{{invoice.poNo}}</a>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Invoice Amount</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">{{invoice.invoiceAmount}}</label>
+                    </div>
+                </div>
+
+
+                @if (!Model.IsClosed)
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Balance Amount</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.balanceAmount}}</label>
+                        </div>
+                    </div>
+
+                }
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Invoice Date</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">{{invoice.invoiceDate|date}}</label>
+                    </div>
+                </div>
+
+                @if (Model.IsClosed)
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Paid Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.invoicePaidDate|date}}</label>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Due Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.invoiceDueDate|date}}</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Status</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.invoiceStatusName}}</label>
+                        </div>
+                    </div>
+                }
+
+
             </div>
-        }
+        </div>
+
+        <div class="pagination-mobile  d-flex bg-white-shadow py-3 px-2 justify-content-between align-items-center" v-if="isMobile">
+            <select id="paginationPageCount" v-on:change="setPageSize(); paginate(currentPage, pageSize);" style="border: none;">
+                <option value="10">10 per page</option>
+                <option value="20">20 per page</option>
+                <option value="50">50 per page</option>
+            </select>
+            <div>
+                <span class="mx-1" style="padding: 2px 10px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-if="currentPage>1" v-on:click="currentPage -= 1; paginate(currentPage, pageSize);"><img style="transform: rotate(270deg);" src="~/Themes/SwiftPortal/Content/assets/icn-arrow-up.svg" alt=""></span>
+                <span v-for="page in pageCount" class="mx-1" v-bind:class="{'active-page': currentPage == page}" style="padding: 2px 10px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-on:click="currentPage = page; paginate(page, pageSize);">{{page}}</span>
+                <span class="mx-1" style="padding: 2px 10px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-if="currentPage<pageCount" v-on:click="currentPage += 1; paginate(currentPage, pageSize);"><img style="transform: rotate(90deg);" src="~/Themes/SwiftPortal/Content/assets/icn-arrow-up.svg" alt=""></span>
+
+            </div>
+        </div>
     </div>
 </div>
 @functions{
@@ -174,6 +191,7 @@
     }
 }
 <script>
+    var invPageModel = @Html.Raw(Serialize(Model));
     var invoicegridvm = new Vue({
         el: '#invoicesGrid',
         data: {
@@ -182,10 +200,15 @@
                 height: 0,
             },
             isExportMode: false,
+            paginatedData: [],
+            currentPage: 1,
+            pageSize: 10,
+            pageCount: 0,
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
             this.handleResize();
+            this.paginate(this.currentPage, this.pageSize);
         },
         destroyed: function () {
             window.removeEventListener("resize", this.handleResize);
@@ -206,38 +229,54 @@
             cancelExportMode: function () {
                 this.isExportMode = false;
                 mobileExcelInvoiceData = [];
+            },
+            paginate: function (page_number, page_size) {
+                page_number = page_number > 0 ? page_number : 1;
+                this.currentPage = page_number;
+                this.paginatedData = invPageModel.invoices.slice((page_number - 1) * page_size, page_number * page_size);
+                var pageCountDiv = invPageModel.invoices.length / page_size;
+                var pageCountRound = Math.round(pageCountDiv);
+                this.pageCount = pageCountRound > pageCountDiv ? pageCountRound : pageCountRound + 1;
+
+
+            },
+            setPageSize() {
+                this.pageSize = Number(document.getElementById('paginationPageCountInv').value);
+                if (this.isExportMode) {
+                    selectAll(false);
+                }
             }
 
         },
     });
 </script>
 <script>
+    var invPageModel = @Html.Raw(Serialize(Model));
+    var mobileExcelInvoiceData = [];
     function formatDate(date) {
         date = new Date(date);
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
-
-    var invPageModel = @Html.Raw(Serialize(Model));
-    var mobileExcelInvoiceData = [];
     function onCheck(invoiceId) {
         var found = mobileExcelInvoiceData.find(x => x.InvoiceId == invoiceId);
         var exportBtn = document.getElementById('export-mob-btn');
         if (!found) {
             var data = invPageModel.invoices.find(x => x.invoiceId == invoiceId);
-            Object.keys(data).map(function (key, index) {
-                data["invoiceDate"] = formatDate(data["invoiceDate"]);
-                data["invoicePaidDate"] = formatDate(data["invoicePaidDate"]);
-                data["invoiceDueDate"] = formatDate(data["invoiceDueDate"]);
+            var newData = { ...data };
+            Object.keys(newData).map(function (key, index) {
+                newData["invoiceDate"] = formatDate(newData["invoiceDate"]);
+                newData["invoicePaidDate"] = formatDate(newData["invoicePaidDate"]);
+                newData["invoiceDueDate"] = formatDate(newData["invoiceDueDate"]);
             });
-            for (var key in data) {
+            for (var key in newData) {
                 var temp;
-                if (data.hasOwnProperty(key)) {
-                    temp = data[key];
-                    delete data[key];
-                    data[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
+                if (newData.hasOwnProperty(key)) {
+                    temp = newData[key];
+                    delete newData[key];
+                    newData[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
                 }
             }
-            mobileExcelInvoiceData.push(data);
+            mobileExcelInvoiceData.push(newData);
             exportBtn.innerHTML = "EXPORT" + " " + mobileExcelInvoiceData.length + " " + "INVOICES";
         } else {
             mobileExcelInvoiceData = mobileExcelInvoiceData.filter(x => x.InvoiceId != invoiceId);
@@ -277,12 +316,13 @@
             checkboxes[i].checked = value.checked;
         }
         if (value.checked) {
-            for (var i = 0; i < invPageModel.invoices.length; i++) {
-                onCheck(invPageModel.invoices[i].invoiceId);
+            for (var i = 0; i < invoicegridvm.paginatedData.length; i++) {
+                onCheck(invoicegridvm.paginatedData[i].invoiceId);
             }
         } else {
             var exportBtn = document.getElementById('export-mob-btn');
             exportBtn.innerHTML = "EXPORT 0 INVOICE";
+            document.getElementById('select-all-invoices').checked = false;
         }
     }
 
