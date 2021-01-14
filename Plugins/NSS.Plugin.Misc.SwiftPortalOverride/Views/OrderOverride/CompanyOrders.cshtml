@@ -76,15 +76,18 @@
                     <li class=nav-item role="presentation" style=margin-right:.3em>
                         <a class="nav-link active" id=pills-home-tab data-toggle=pill
                            href=#pills-home role=tab aria-controls=pills-home
-                           aria-selected=true v-on:click="isClosed = false; searchOrders();">Open Orders</a>
+                           aria-selected=true v-on:click="isClosed = false; searchOrders();isExportMode=false;">Open Orders</a>
                     <li class=nav-item role="presentation">
                         <a class=nav-link id=pills-profile-tab
                            data-toggle=pill href=#pills-profile role=tab
-                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchOrders();">Closed Orders</a>
+                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchOrders();isExportMode=false;">Closed Orders</a>
                 </ul>
             </div>
-            <div class="order-export-btn-container" v-if="!isMobile || isExportMode">
+            <div class="order-export-btn-container" v-if="!isMobile">
                 <button class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+            </div>
+            <div class="order-export-btn-container" v-if="isExportMode && isMobile">
+                <button id="export-mob-btn" class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="exportExcelMobile()"><img src="~/Themes/@(themeName)/Content/assets/icn-download-white.svg" alt=""><span class="mr-1">0</span>Export</button>
             </div>
         </div>
         <div class="d-flex flex-column p-4 bg-white-shadow" v-bind:style="{'background': isMobile ? 'transparent 0% 0% no-repeat padding-box':'#ffffff 0% 0% no-repeat padding-box'}">
