@@ -306,15 +306,6 @@
 
         </div>
         <div class="col-md-4 col-sm-6 d-flex flex-column align-items-center align-items-md-start text-left" v-bind:style="{'background': isMobile ? '#f6f6f6' : 'transparent'}" v-bind:class="{'px-4': isMobile, 'py-4': isMobile}">
-            @if (Model.InvoiceFile != null)
-            {
-                <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
-                        <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice</label>
-                    </div>
-                </a>
-            }
             @if (Model.OrderFile != null)
             {
                 <a href="@Model.OrderFile" target="_blank" class="text-decoration-none">
@@ -325,6 +316,16 @@
                     </div>
                 </a>
             }
+            @if (Model.InvoiceFile != null)
+            {
+                <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
+                    <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">
+                        <img alt="Invoice Icon" v-bind:src="isHoveringViewInvoice ? '/Themes/@themeName/Content/assets/icn-invoice-dark.svg' : '/Themes/@themeName/Content/assets/icn-invoice.svg'" />
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Invoice</label>
+                    </div>
+                </a>
+            }
+
             @if (Model.DeliveryTicketFile != null)
             {
                 <a href="@Model.DeliveryTicketFile" target="_blank" class="text-decoration-none">
@@ -491,7 +492,6 @@
         viewMtrModal = this;
     }
 
-    console.log("model: ", @Html.Raw(shippingAddresses));
     new Vue({
         el: '#order-detail',
         data: {
@@ -520,11 +520,9 @@
             },
             onFocused: function () {
                 this.isHoveringViewTicket = true;
-                console.log("onFocused: ");
             },
             onBlur: function () {
                 this.isHoveringViewTicket = false;
-                console.log("onBlur: ");
             }
         },
     });

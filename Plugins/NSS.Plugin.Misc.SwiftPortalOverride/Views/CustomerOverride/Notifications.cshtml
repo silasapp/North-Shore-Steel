@@ -40,12 +40,21 @@
     .iconContainer {
         background-color: #0076B4 !important;
     }
+
+    .grey-bg {
+        background-color: #f6f6f6 !important;
+        padding: 20px;
+    }
+
+    .color-white {
+        color: #ffffff !important;
+    }
 </style>
 
 <div id="notifications" class="page account-page customer-info-page" v-cloak>
     <div class="page-body">
-        <div class=account-page-card>
-            <div class="title">
+        <div class="account-page-card" v-bind:class="{'grey-bg':isMobile}">
+            <div class="title" v-bind:class="{'flex-column': isMobile,'align-items-center': isMobile}">
                 <strong>NOTIFICATIONS</strong>
                 <a v-on:click="enableAllNotifications" class="notification-all">Enable all notifications</a>
             </div>
@@ -107,8 +116,8 @@
                     </div>
                 </div>
             </div>
-            <div class="buttons save-customer-info-button notification-btn">
-                <input type=submit v-on:click="updatePreferences"
+            <div class="buttons save-customer-info-button notification-btn" v-bind:class="{'justify-content-center': isMobile}">
+                <input type=submit v-on:click="updatePreferences" v-bind:class="{'bg-primary': isMobile,'color-white': isMobile}"
                        id=save-info-button value='Update Preferences' name=save-info-button
                        class="button-2 ">
             </div>
@@ -123,11 +132,31 @@
             preferences: [],
             preferenceArr: [],
             transformedPreference: [],
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
         },
         mounted: function () {
             this.getPreferences();
         },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             transformDataForClient: function (data) {
                 this.preferenceArr = [];
                     data.map(item => {
@@ -165,13 +194,11 @@
                     type: 'GET',
                     contentType: 'application/json;',
                     success: function (data, _, _) {
-                        console.log('getNotifications - data', self.preferences)
                         self.transformDataForClient(data.model.Notifications);
                         self.hideLoading();
                     },
                     error: function (xhr, thrownError) {
                         self.hideLoading();
-                        console.log(xhr, 'error-data', thrownError);
                     }
                 });
             },
@@ -184,7 +211,6 @@
 
                 this.showLoading();
                 const self = this;
-                console.log('JSONrequest', request);
                 $.ajax({
                     url: "@Url.Action("UpdateNotifications", "CustomerOverride")",
                     type: 'POST',
@@ -192,12 +218,10 @@
                     contentType: 'application/json;',
                     data: JSON.stringify(request),
                     success: function (data,_,_) {
-                        console.log('success-data', data);
                         self.hideLoading();
                     },
                     error: function (xhr, thrownError) {
                         self.hideLoading();
-                        console.log(xhr, 'error-data', thrownError);
                     }
                 });
             },

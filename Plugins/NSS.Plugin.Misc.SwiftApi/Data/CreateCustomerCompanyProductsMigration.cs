@@ -6,7 +6,7 @@ using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftApi.Data
 {
-    [NopMigration("2020/11/04 12:30:00", "Swift.Api Create Customer Company Products schema")]
+    [NopMigration("2020/11/04 19:30:00", "Swift.Api Create Customer Company Products schema")]
     public class CreateCustomerCompanyProductsMigration : AutoReversingMigration
     {
 
@@ -31,11 +31,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
         /// </summary>
         public override void Up()
         {
-            _migrationManager.BuildTable<CustomerCompanyProduct>(Create);
+            if (!Schema.Table("CustomerCompanyProduct").Exists())
+            {
+                _migrationManager.BuildTable<CustomerCompanyProduct>(Create);
 
 
-            Create.ForeignKey("FK_CustomerCompanyProduct_Product").FromTable("CustomerCompanyProduct").ForeignColumn("ProductId").ToTable("Product").PrimaryColumn("Id");
-            Create.ForeignKey("FK_CustomerCompanyProduct_CustomerCompany").FromTable("CustomerCompanyProduct").ForeignColumn("CustomerCompanyId").ToTable("CustomerCompany").PrimaryColumn("Id");
+                Create.ForeignKey("FK_CustomerCompanyProduct_Product").FromTable("CustomerCompanyProduct").ForeignColumn("ProductId").ToTable("Product").PrimaryColumn("Id");
+                Create.ForeignKey("FK_CustomerCompanyProduct_CustomerCompany").FromTable("CustomerCompanyProduct").ForeignColumn("CustomerCompanyId").ToTable("CustomerCompany").PrimaryColumn("Id");
+            }
         }
         #endregion
     }

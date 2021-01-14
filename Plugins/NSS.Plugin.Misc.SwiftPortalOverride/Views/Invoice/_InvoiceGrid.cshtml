@@ -14,7 +14,7 @@
 
     .home-table-sm-header {
         width: 110px !important;
-        background-color: #0076b4 !important;
+        background-color: #1899E1 !important;
         /* border-bottom: 0.1px solid white; */
     }
 </style>
@@ -46,11 +46,14 @@
             <e-grid-column type="checkbox" width="30"></e-grid-column>
         </e-grid-columns>
     </ejs-grid>
-    <div v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
+    <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
+        <div v-if="@Model.Invoices.Count == 0" style="background:#ffffff; padding: 10px;">
+            <label class=".fs12-default"> No records to display</label>
+        </div>
         @foreach (var invoice in Model.Invoices)
         {
-            <div v-if="isMobile" class="d-flex">
-                <label v-if="isExportMode" class="nss-checkbox mr-3">
+            <div class="d-flex">
+                <label v-if="isExportMode" class="nss-checkbox mr-3  d-flex align-items-center" style="position: relative;">
                     <input type="checkbox"
                            v-on:change="onCheck(@invoice.InvoiceId)">
                     <span class="checkmark"></span>
@@ -62,7 +65,7 @@
                             <label class="fs12-white mb-0">Invoice #</label>
                         </div>
                         <div class="d-flex p-2">
-                            <a class="fs12-link">@invoice.InvoiceId</a>
+                            <a href="@invoice.InvoiceFile" class="fs12-link" target="_blank">@invoice.InvoiceId</a>
                         </div>
                     </div>
                     <div class="d-flex flex-row">
@@ -152,7 +155,7 @@
 </div>
 
 <script>
-    var vm = new Vue({
+    var invoicegridvm = new Vue({
         el: '#invoicesGrid',
         data: {
             window: {
@@ -178,6 +181,12 @@
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
             },
+            switchToExport: function () {
+                this.isExportMode = true;
+            },
+            cancelExportMode: function () {
+                this.isExportMode = false;
+            }
 
         },
     });
@@ -205,14 +214,12 @@
     function onRowSelected(args) {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
-        console.log("onRowSelected: ", exceldata.length);
         vm.selectedRowCount = exceldata.length;
     }
 
     function onRowDeselected(args) {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
-        console.log("onRowDeselected: ", exceldata.length);
         vm.selectedRowCount = exceldata.length;
     }
 

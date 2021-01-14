@@ -40,12 +40,22 @@
     string CellPhone = genericAttributeService.GetAttribute<string>(customer, Constants.CellAttribute);
     int preferredLocationId = genericAttributeService.GetAttribute<int>(customer, Constants.PreferredLocationIdAttribute);
 }
+<style>
+    .grey-bg {
+        background-color: #f6f6f6 !important;
+        padding: 20px;
+    }
 
-<div class="page account-page customer-info-page">
+    .color-white {
+        color: #ffffff !important;
+        ;
+    }
+</style>
+<div id="customer-info-page" class="page account-page customer-info-page">
     <div class="page-body">
         <form asp-route="CustomerInfo" method="post">
-            <div class="account-page-card">
-                <div class="title"><strong>PERSONAL INFORMATION</strong></div>
+            <div class="account-page-card" v-bind:class="{'text-left': isMobile,'grey-bg':isMobile}">
+                <div class="title" v-bind:class="{'justify-content-center': isMobile}"><strong>PERSONAL INFORMATION</strong></div>
                 <div asp-validation-summary="ModelOnly" class="message-error"></div>
                 <div class="form-fields">
                     <div class="input-block">
@@ -98,19 +108,48 @@
                         </div>
                     }
 
-                    @*<div class="">
-                            <label>Preferred Pickup Location</label>
-                            <select name="preferred-location-id" asp-for="@preferredLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
-                        </div>*@
+                    <div class="" hidden>
+                        <label>Preferred Pickup Location</label>
+                        <select name="preferred-location-id" asp-for="@preferredLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
+                    </div>
 
                 </div>
-                <div class="buttons save-customer-info-button">
-                    <input type=submit id=save-info-button value='Save Changes' onClick="return validatePhoneNumbers();" name="save-info-button" class="button-2 ">
+                <div class="buttons save-customer-info-button" v-bind:class="{'justify-content-center': isMobile}">
+                    <input type=submit id=save-info-button value='Save Changes' onClick="return validatePhoneNumbers();" name="save-info-button" class="button-2 " v-bind:class="{'bg-primary': isMobile,'color-white': isMobile}">
                 </div>
             </div>
         </form>
     </div>
 </div>
+<script>
+    var vm = new Vue({
+        el: '#customer-info-page',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+        },
+    });
+</script>
 <script asp-location="Footer">
     function removeexternalassociation(itemId) {
         if (confirm('@T("Common.AreYouSure")')) {

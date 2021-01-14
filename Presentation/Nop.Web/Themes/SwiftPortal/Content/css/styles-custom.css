@@ -67,7 +67,7 @@ a:not([href]):not([class]) {
     .nav-pills .nav-link:hover,
     .nav-pills .nav-link.active,
     .nav-pills .show > .nav-link {
-        background-color: #0076b4 !important;
+        background-color: #1898E1 !important;
         color: #ffffff;
     }
 
@@ -635,9 +635,24 @@ a:not([href]):not([class]) {
     }
 
 .register-button,
+.register-next-step-button,
+.password-recovery-button,
 .login-button {
-    background-color: #03175b !important;
+    background-color: #033551 !important;
     color: #fff !important;
+}
+
+
+.forgot-password * {
+    color: #033551 !important
+}
+
+.nss-dark-blue {
+    color: #033551 !important;
+}
+
+.nss-light-grey {
+    color: #AAAAAA !important;
 }
 
 .buttons > .register-button,
@@ -678,7 +693,7 @@ a:not([href]):not([class]) {
 .coupon-box > .title > strong {
     font: normal normal 500 26px/24px "Teko";
     letter-spacing: 0.21px;
-    color: #03175b;
+    color: #033551;
     opacity: 1;
 }
 
@@ -876,6 +891,21 @@ input:-webkit-autofill {
         color: #000000;
     }
 
+.card-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 !important;
+}
+
+    .card-title > h1 {
+        text-align: center;
+        font: normal normal 500 34px/24px "Teko";
+        letter-spacing: 0.27px;
+        color: #033551;
+        opacity: 1;
+    }
+
 .page-title {
     border-bottom: 2px solid #03175b;
     margin: 0 0 30px !important;
@@ -890,7 +920,7 @@ input:-webkit-autofill {
         text-align: center;
         font: normal normal 500 34px/24px "Teko";
         letter-spacing: 0.27px;
-        color: #03175b;
+        color: #033551;
         opacity: 1;
     }
 
@@ -2981,6 +3011,10 @@ table input {
     background: #03175b !important;
 }
 
+.bg-primary2 {
+    background: #1899E1 !important;
+}
+
 .bg-white-shadow {
     background: #ffffff 0% 0% no-repeat padding-box;
     box-shadow: 0px 1px 16px #0000001a;
@@ -3421,38 +3455,16 @@ and also iPads specifically.
     padding: 20px;
     text-align: center;
     margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
 }
-.mobile-export > button {
-    background-color: #ffffff;
-    padding: 10px;
-    border: none;
-}
-@media all and (max-width: 600px) {
-    .check-out-card {
-        padding: 0 !important;
-    }
-    .orders-search-block > div {
-        justify-content: center;
-        align-items: center;
-        background-color: #f6f6f6 !important;
-    }
-        .partners-logo, .check-out-info {
-        display: flex;
-        align-items: flex-start;
-    }
-    .edit-shop-container {
-        background-color: #F6F6F6;
+    .mobile-export > button, .mobile-export > div {
+        background-color: #ffffff;
         padding: 10px;
-        display: flex;
-        justify-content: center;
-        margin-bottom: 40px;
+        border: none;
     }
-    .nss-btn-default {
-        background-color: #0076B4 !important;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        color: #ffffff;
-    }
+@media all and (max-width: 600px) {
+    
     .place-order-buttons, .order-export-btn-container {
         display: block;
         position: fixed;
@@ -3734,6 +3746,35 @@ and also iPads specifically.
 
 /*// Small devices (landscape phones, less than 768px)*/
 @media (max-width: 767.98px) {
+    .check-out-card {
+        padding: 0 !important;
+    }
+
+    .orders-search-block > div {
+        justify-content: center;
+        align-items: center;
+        background-color: #f6f6f6 !important;
+    }
+
+    .partners-logo, .check-out-info {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .edit-shop-container {
+        background-color: #F6F6F6;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .nss-btn-default {
+        background-color: #1899E1 !important;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #ffffff;
+    }
 }
 
 /*// Medium devices (tablets, less than 992px)*/

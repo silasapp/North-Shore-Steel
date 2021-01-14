@@ -41,14 +41,19 @@
     .action-btn {
         background-color: #f6f6f6 !important;
     }
+
+    .grey-bg {
+        background-color: #f6f6f6 !important;
+        padding: 20px;
+    }
 </style>
-<div class="page account-page address-list-page">
+<div class="page account-page address-list-page" id="address-list-page">
     <div class="page-body">
         <nop-antiforgery-token />
         @if (Model.Addresses.Count > 0)
         {
-            <div class=account-page-card>
-                <div class="title"><strong>ADDRESSES</strong></div>
+            <div class="account-page-card" v-bind:class="{'grey-bg':isMobile}">
+                <div class="title" v-bind:class="{'justify-content-center': isMobile}"><strong>ADDRESSES</strong></div>
                 <div class="address-block">
                     @for (var i = 0; i < Model.Addresses.Count; i++)
                     {
@@ -137,3 +142,32 @@
         }
     </div>
 </div>
+<script>
+    var vm = new Vue({
+        el: '#address-list-page',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+        },
+    });
+</script>
