@@ -32,7 +32,9 @@
     var themeName = themeContext.WorkingThemeName;
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    var eRPCompanyIdExist = Context.Request.Cookies.Any(x => x.Key == compIdCookieKey);
+    var eRPCompanyId = genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey);
+    var eRPCompanyIdExist = false;
+    eRPCompanyIdExist = string.IsNullOrEmpty(eRPCompanyId) && true;
 }
 
 <style>
@@ -42,7 +44,7 @@
 </style>
 @{
     Func<object, object>
-    Content1 =
+Content1 =
     @<form id="sawOptionModal">
         <div class="d-flex flex-column">
             <div class="d-flex flex-column mt-4 mb-2">

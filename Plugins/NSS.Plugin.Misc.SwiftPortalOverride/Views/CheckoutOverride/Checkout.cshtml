@@ -577,7 +577,7 @@
     {
         var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
 
-        int.TryParse(Context.Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+        int.TryParse(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey), out int eRPCompanyId);
 
         CustomerCompany customerCompany = null;
 
