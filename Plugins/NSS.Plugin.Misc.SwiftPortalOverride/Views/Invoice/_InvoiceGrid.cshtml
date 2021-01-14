@@ -17,35 +17,42 @@
         background-color: #1899E1 !important;
         /* border-bottom: 0.1px solid white; */
     }
+
+    .invisible-grid {
+        height: 0 !important;
+        visibility: hidden;
+    }
 </style>
 <div id="invoicesGrid">
-    <ejs-grid v-if="!isMobile" id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo"
-              queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true"
-              rowSelected="onRowSelected" rowDeselected="onRowDeselected">
-        <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-        <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
-        <e-grid-columns>
-            <e-grid-column template="#invoiceNo" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
-            <e-grid-column template="#orderNo" headerText="Order #" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
-            @if (!Model.IsClosed)
-            {
-                <e-grid-column field="BalanceAmount" headerText="Balance Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
-            }
-            <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
-            @if (Model.IsClosed)
-            {
-                <e-grid-column field="InvoicePaidDate" headerText="Paid Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
-            }
-            else
-            {
-                <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="80" width="100" maxWidth="120"></e-grid-column>
-            }
-            <e-grid-column type="checkbox" width="30"></e-grid-column>
-        </e-grid-columns>
-    </ejs-grid>
+    <div v-bind:class="{'invisible-grid': isMobile}">
+        <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo"
+                  queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true"
+                  rowSelected="onRowSelected" rowDeselected="onRowDeselected">
+            <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+            <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
+            <e-grid-columns>
+                <e-grid-column template="#invoiceNo" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#orderNo" headerText="Order #" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                @if (!Model.IsClosed)
+                {
+                    <e-grid-column field="BalanceAmount" headerText="Balance Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                }
+                <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                @if (Model.IsClosed)
+                {
+                    <e-grid-column field="InvoicePaidDate" headerText="Paid Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                }
+                else
+                {
+                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="80" width="100" maxWidth="120"></e-grid-column>
+                }
+                <e-grid-column type="checkbox" width="30"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+    </div>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
         <div v-if="@Model.Invoices.Count == 0" style="background:#ffffff; padding: 10px;">
             <label class=".fs12-default"> No records to display</label>
@@ -53,8 +60,8 @@
         @foreach (var invoice in Model.Invoices)
         {
             <div class="d-flex">
-                <label v-if="isExportMode" class="nss-checkbox mr-3  d-flex align-items-center" style="position: relative;">
-                    <input type="checkbox"
+                <label v-if="isExportMode" class="pure-material-checkbox mr-3  d-flex align-items-center" style="position: relative;">
+                    <input type="checkbox" name="invoice-checkox"
                            v-on:change="onCheck(@invoice.InvoiceId)">
                     <span class="checkmark"></span>
                 </label>
@@ -111,7 +118,7 @@
                             <label class="fs12-white mb-0">Invoice Date</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">@invoice.InvoiceDate</label>
+                            <label class="fs12-default mb-0">@invoice.InvoiceDate.ToString("MM/dd/yyyy")</label>
                         </div>
                     </div>
 
@@ -122,7 +129,7 @@
                                 <label class="fs12-white mb-0">Paid Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@invoice.InvoicePaidDate</label>
+                                <label class="fs12-default mb-0">@invoice.InvoicePaidDate?.ToString("MM/dd/yyyy")</label>
                             </div>
                         </div>
 
@@ -134,7 +141,7 @@
                                 <label class="fs12-white mb-0">Due Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@invoice.InvoiceDueDate</label>
+                                <label class="fs12-default mb-0">@invoice.InvoiceDueDate.ToString("MM/dd/yyyy")</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -153,7 +160,19 @@
         }
     </div>
 </div>
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
 
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
 <script>
     var invoicegridvm = new Vue({
         el: '#invoicesGrid',
@@ -186,12 +205,47 @@
             },
             cancelExportMode: function () {
                 this.isExportMode = false;
+                mobileExcelInvoiceData = [];
             }
 
         },
     });
 </script>
 <script>
+    function formatDate(date) {
+        date = new Date(date);
+        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    }
+
+    var invPageModel = @Html.Raw(Serialize(Model));
+    var mobileExcelInvoiceData = [];
+    function onCheck(invoiceId) {
+        var found = mobileExcelInvoiceData.find(x => x.InvoiceId == invoiceId);
+        var exportBtn = document.getElementById('export-mob-btn');
+        if (!found) {
+            var data = invPageModel.invoices.find(x => x.invoiceId == invoiceId);
+            Object.keys(data).map(function (key, index) {
+                data["invoiceDate"] = formatDate(data["invoiceDate"]);
+                data["invoicePaidDate"] = formatDate(data["invoicePaidDate"]);
+                data["invoiceDueDate"] = formatDate(data["invoiceDueDate"]);
+            });
+            for (var key in data) {
+                var temp;
+                if (data.hasOwnProperty(key)) {
+                    temp = data[key];
+                    delete data[key];
+                    data[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
+                }
+            }
+            mobileExcelInvoiceData.push(data);
+            exportBtn.innerHTML = "EXPORT" + " " + mobileExcelInvoiceData.length + " " + "INVOICES";
+        } else {
+            mobileExcelInvoiceData = mobileExcelInvoiceData.filter(x => x.InvoiceId != invoiceId);
+            exportBtn.innerHTML = "EXPORT" + " " + mobileExcelInvoiceData.length + " " + "INVOICES";
+            document.getElementById('select-all-invoices').checked = false;
+        }
+        console.log('mobileExcelData', mobileExcelInvoiceData);
+    }
     function toolbarClick() {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
@@ -201,6 +255,34 @@
                 fileName: "InvoiceExport.xlsx"
             };
             gridObj.excelExport(exportProperties);
+        }
+    }
+    function exportExcelMobile() {
+        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+        //var exceldata = gridObj.getSelectedRecords();
+        console.log(mobileExcelInvoiceData);
+        if (mobileExcelInvoiceData.length > 0) {
+            var exportProperties = {
+                dataSource: mobileExcelInvoiceData,
+                fileName: "InvoiceExport.xlsx"
+            };
+            gridObj.excelExport(exportProperties);
+        }
+    }
+
+    function selectAll(value) {
+        mobileExcelInvoiceData = [];
+        var checkboxes = document.getElementsByName('invoice-checkox');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = value.checked;
+        }
+        if (value.checked) {
+            for (var i = 0; i < invPageModel.invoices.length; i++) {
+                onCheck(invPageModel.invoices[i].invoiceId);
+            }
+        } else {
+            var exportBtn = document.getElementById('export-mob-btn');
+            exportBtn.innerHTML = "EXPORT 0 INVOICE";
         }
     }
 

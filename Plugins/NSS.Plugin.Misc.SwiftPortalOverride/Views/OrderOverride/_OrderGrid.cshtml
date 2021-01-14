@@ -2,6 +2,8 @@
 
 @model CompanyOrderListModel
 @using Syncfusion.EJ2
+@using Nop.Core
+@using Nop.Services.Common
 
 <style>
     .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
@@ -17,32 +19,39 @@
         background-color: #1899E1 !important;
         /* border-bottom: 0.1px solid white; */
     }
+
+    .invisible-grid {
+        height: 0 !important;
+        visibility: hidden;
+    }
 </style>
 <div id="ordersGrid">
-    <ejs-grid v-if="!isMobile" id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true"
-              allowPaging="true" allowFiltering="true" rowSelected="onRowSelected" rowDeselected="onRowDeselected">
-        <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-        <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
-        <e-grid-columns>
-            <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="PoNo" headerText="PO #" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="Weight" headerText="Weight (lb)" minWidth="120" format="N0" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="OrderTotal" headerText="Order Amount" minWidth="110" width="120" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="OrderDate" headerText="Order Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
-            <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
-            @if (Model.IsClosed)
-            {
-                <e-grid-column field="DeliveryDate" headerText="Delivery Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
-                <e-grid-column template="#viewTicket" headerText="Delivery Ticket" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
-            }
-            else
-            {
-                <e-grid-column field="ScheduledDate" headerText="Scheduled Date" minWidth="120" width="130" maxWidth="140" format="M/d/yy" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="110" width="120" maxWidth="130"></e-grid-column>
-            }
-            <e-grid-column type="checkbox" width="30"></e-grid-column>
-        </e-grid-columns>
-    </ejs-grid>
+    <div v-bind:class="{'invisible-grid': isMobile}">
+        <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true"
+                  allowPaging="true" allowFiltering="true" rowSelected="onRowSelected" rowDeselected="onRowDeselected">
+            <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+            <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
+            <e-grid-columns>
+                <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PoNo" headerText="PO #" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="Weight" headerText="Weight (lb)" minWidth="120" format="N0" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="OrderTotal" headerText="Order Amount" minWidth="110" width="120" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="OrderDate" headerText="Order Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                @if (Model.IsClosed)
+                {
+                    <e-grid-column field="DeliveryDate" headerText="Delivery Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column template="#viewTicket" headerText="Delivery Ticket" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
+                }
+                else
+                {
+                    <e-grid-column field="ScheduledDate" headerText="Scheduled Date" minWidth="120" width="130" maxWidth="140" format="M/d/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="110" width="120" maxWidth="130"></e-grid-column>
+                }
+                <e-grid-column type="checkbox" width="30"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+    </div>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
         <div v-if="@Model.Orders.Count == 0" style="background:#ffffff; padding: 10px;">
             <label class=".fs12-default"> No records to display</label>
@@ -50,9 +59,9 @@
         @foreach (var order in Model.Orders)
         {
             <div class="d-flex">
-                <label v-if="isExportMode" class="nss-checkbox mr-3 d-flex align-items-center" style="position: relative;">
-                    <input type="checkbox"
-                           v-on:change="onCheck(@order.OrderId)">
+                <label v-if="isExportMode" class="pure-material-checkbox mr-3 d-flex align-items-center" style="position: relative;">
+                    <input type="checkbox" name="order-checkox"
+                           onclick="onCheck(@order.OrderId)">
                     <span class="checkmark"></span>
                 </label>
                 <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
@@ -94,7 +103,7 @@
                             <label class="fs12-white mb-0">Order Date</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">@order.OrderDate</label>
+                            <label class="fs12-default mb-0">@order.OrderDate.ToString("MM/dd/yyyy")</label>
                         </div>
                     </div>
                     <div class="d-flex flex-row">
@@ -102,17 +111,17 @@
                             <label class="fs12-white mb-0">Promise Date</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">@order.PromiseDate</label>
+                            <label class="fs12-default mb-0">@order.PromiseDate.ToString("MM/dd/yyyy")</label>
                         </div>
                     </div>
-                    @if (Model.IsClosed)
+                    @if (!Model.IsClosed)
                     {
                         <div class="d-flex flex-row">
                             <div class="d-flex bg-primary p-2 home-table-sm-header">
                                 <label class="fs12-white mb-0">Scheduled Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@order.ScheduledDate</label>
+                                <label class="fs12-default mb-0">@order.ScheduledDate?.ToString("MM/dd/yyyy")</label>
                             </div>
                         </div>
                         @*<div class="d-flex flex-row">
@@ -131,7 +140,7 @@
                                 <label class="fs12-white mb-0">Promise Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">@order.PromiseDate</label>
+                                <label class="fs12-default mb-0">@order.PromiseDate.ToString("MM/dd/yyyy")</label>
                             </div>
                         </div><div class="d-flex flex-row">
                             <div class="d-flex bg-primary p-2 home-table-sm-header">
@@ -149,6 +158,19 @@
         }
     </div>
 </div>
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
 <script>
     var ordergridvm = new Vue({
         el: '#ordersGrid',
@@ -158,6 +180,7 @@
                 height: 0,
             },
             isExportMode: false,
+            mobileExcelData: [],
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
@@ -181,48 +204,112 @@
             },
             cancelExportMode: function () {
                 this.isExportMode = false;
+                mobileExcelData = [];
             }
 
         },
     });
 </script>
 <script>
-    function toolbarClick() {
-        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
-        var exceldata = gridObj.getSelectedRecords();
-        if (exceldata.length > 0) {
-            var exportProperties = {
-                dataSource: exceldata,
-                fileName: "OrdersExport.xlsx"
-            };
-            gridObj.excelExport(exportProperties);
+    function formatDate(date) {
+        date = new Date(date);
+        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    }
+        var pageModel = @Html.Raw(Serialize(Model));
+    var mobileExcelData = [];
+        function onCheck(orderId) {
+            var found = mobileExcelData.find(x => x.OrderId == orderId);
+            var exportBtn = document.getElementById('export-mob-btn');
+            if (!found) {
+                var data = pageModel.orders.find(x => x.orderId == orderId);
+                var newData = { ...data };
+                Object.keys(newData).map(function (key, index) {
+                    newData["orderDate"] = formatDate(newData["orderDate"] );
+                    newData["deliveryDate"] = formatDate(newData["deliveryDate"] );
+                    newData["promiseDate"] = formatDate(newData["promiseDate"] );
+                    newData["scheduledDate"] = formatDate(newData["scheduledDate"]);
+                });
+                for (var key in newData) {
+                    var temp;
+                    if (newData.hasOwnProperty(key)) {
+                        temp = newData[key];
+                        delete newData[key];
+                        newData[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
+                    }
+                }
+                mobileExcelData.push(newData);
+
+                exportBtn.innerHTML = "EXPORT" + " " + mobileExcelData.length + " " + "ORDERS";
+            } else {
+                mobileExcelData = mobileExcelData.filter(x => x.OrderId != orderId);
+                exportBtn.innerHTML = "EXPORT" + " " + mobileExcelData.length + " " + "ORDERS";
+                document.getElementById('select-all-orders').checked = false;
+            }
+            console.log('mobileExcelData', mobileExcelData);
         }
-    }
-
-    function excelQueryCellInfo(args) {
-        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
-        if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
-    }
-
-    function onRowSelected(args) {
-        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
-        var exceldata = gridObj.getSelectedRecords();
-        vm.selectedRowCount = exceldata.length;
-    }
-
-    function onRowDeselected(args) {
-        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
-        var exceldata = gridObj.getSelectedRecords();
-        vm.selectedRowCount = exceldata.length;
-    }
-
-    function customiseCell(args) {
-        if (args.column.field === 'OrderStatusName') {
-            if (args.data['OrderStatusName'].indexOf("past due") > -1) {
-                args.cell.classList.add('colorRed');
+        function toolbarClick() {
+            var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+            var exceldata = gridObj.getSelectedRecords();
+            console.log(exceldata);
+            if (exceldata.length > 0) {
+                var exportProperties = {
+                    dataSource: exceldata,
+                    fileName: "OrdersExport.xlsx"
+                };
+                gridObj.excelExport(exportProperties);
             }
         }
-    }
+        function exportExcelMobile() {
+            var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+            //var exceldata = gridObj.getSelectedRecords();
+            console.log(mobileExcelData);
+            if (mobileExcelData.length > 0) {
+                var exportProperties = {
+                    dataSource: mobileExcelData,
+                    fileName: "OrdersExport.xlsx"
+                };
+                gridObj.excelExport(exportProperties);
+            }
+        }
+        function selectAll(value) {
+            mobileExcelData = [];
+            var checkboxes = document.getElementsByName('order-checkox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = value.checked;
+            }
+            if (value.checked) {
+                for (var i = 0; i < pageModel.orders.length; i++) {
+                    onCheck(pageModel.orders[i].orderId);
+                }
+            } else {
+                var exportBtn = document.getElementById('export-mob-btn');
+                exportBtn.innerHTML = "EXPORT 0 ORDER";
+            }
+        }
+        function excelQueryCellInfo(args) {
+            if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
+            if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
+        }
+
+        function onRowSelected(args) {
+            var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+            var exceldata = gridObj.getSelectedRecords();
+            vm.selectedRowCount = exceldata.length;
+        }
+
+        function onRowDeselected(args) {
+            var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+            var exceldata = gridObj.getSelectedRecords();
+            vm.selectedRowCount = exceldata.length;
+        }
+
+        function customiseCell(args) {
+            if (args.column.field === 'OrderStatusName') {
+                if (args.data['OrderStatusName'].indexOf("past due") > -1) {
+                    args.cell.classList.add('colorRed');
+                }
+            }
+        }
 
 </script>
 
