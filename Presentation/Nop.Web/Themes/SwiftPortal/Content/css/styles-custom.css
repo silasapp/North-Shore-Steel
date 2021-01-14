@@ -55,14 +55,14 @@ a:not([href]):not([class]) {
     padding: 0;
 }
 
-.nav-pills .nav-link {
-    background-color: #ffffff !important;
-    color: #242424;
-    border-radius: 0;
-    font-size: 16px;
-    font: normal normal 500 16px/24px "Exo 2";
-    padding: 8px 16px;
-}
+    .nav-pills .nav-link {
+        background-color: #ffffff !important;
+        color: #242424;
+        border-radius: 0;
+        font-size: 16px;
+        font: normal normal 500 16px/24px "Exo 2";
+        padding: 8px 16px;
+    }
 
     .nav-pills .nav-link:hover,
     .nav-pills .nav-link.active,
@@ -338,6 +338,7 @@ a:not([href]):not([class]) {
     #custom-search-box-container {
         width: 100%;
     }
+
 }
 
 /*// Medium devices (tablets, less than 992px)*/
@@ -3775,6 +3776,14 @@ and also iPads specifically.
         padding-bottom: 10px;
         color: #ffffff;
     }
+    .shape-category {
+        padding: 0 !important;
+        justify-content: space-between;
+    }
+
+        .shape-category > div {
+            margin: 5px !important;
+        }
 }
 
 /*// Medium devices (tablets, less than 992px)*/
