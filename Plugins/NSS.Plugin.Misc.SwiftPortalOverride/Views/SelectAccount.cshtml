@@ -85,31 +85,6 @@
 </div>
 
 <script type='text/javascript'>
-    @*function SelectCompany(ErpId) {
-        let cookieKey = `ERPCompanyId${@{@Model.loggedInCustomerId}}=`
-        document.cookie = cookieKey + ErpId;
-        location.href = "@Url.Action("Index")"
-    }*@
-
-    @*function SelectCompany(ErpId) {
-        const request = {
-            ERPCompanyId: ErpId
-        }
-
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("SelectCompany", "HomeOverride")",
-            data: request,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (data, _, _) {
-                console.log('success-data', data);
-            },
-            error: function (xhr, thrownError) {
-                console.log(xhr, 'error-data', thrownError);
-            }
-        });
-    }*@
 
     function SelectCompany(ErpId) {
         const request = {
@@ -123,11 +98,9 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data, _, _) {
-                console.log('success-data', data)
                 location.href = "@Url.Action("Index")"
             },
             error: function (xhr, thrownError) {
-                console.log('error-data', xhr)
                 location.href = "@Url.Action("Index")"
             }
         });

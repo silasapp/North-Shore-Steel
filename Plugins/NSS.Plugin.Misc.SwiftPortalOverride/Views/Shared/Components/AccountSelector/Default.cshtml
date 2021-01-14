@@ -74,12 +74,10 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data, _, _) {
-                console.log('success-data', data)
                 document.location.href = "/";
                 $('#custom-loading').hide();
             },
             error: function (xhr, thrownError) {
-                console.log('error-data', xhr)
                 document.location.href = "/";
             }
         });

@@ -194,13 +194,11 @@
                     type: 'GET',
                     contentType: 'application/json;',
                     success: function (data, _, _) {
-                        console.log('getNotifications - data', self.preferences)
                         self.transformDataForClient(data.model.Notifications);
                         self.hideLoading();
                     },
                     error: function (xhr, thrownError) {
                         self.hideLoading();
-                        console.log(xhr, 'error-data', thrownError);
                     }
                 });
             },
@@ -213,7 +211,6 @@
 
                 this.showLoading();
                 const self = this;
-                console.log('JSONrequest', request);
                 $.ajax({
                     url: "@Url.Action("UpdateNotifications", "CustomerOverride")",
                     type: 'POST',
@@ -221,12 +218,10 @@
                     contentType: 'application/json;',
                     data: JSON.stringify(request),
                     success: function (data,_,_) {
-                        console.log('success-data', data);
                         self.hideLoading();
                     },
                     error: function (xhr, thrownError) {
                         self.hideLoading();
-                        console.log(xhr, 'error-data', thrownError);
                     }
                 });
             },

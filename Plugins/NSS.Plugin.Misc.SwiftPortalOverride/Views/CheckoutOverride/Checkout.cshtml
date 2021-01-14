@@ -598,9 +598,6 @@
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
 
-    console.log("purchaseOrder: ", purchaseOrder);
-    console.log("orderTotals: ", orderTotals);
-    //console.log("ShoppingCartModel: ", @Html.Raw(Model.ShoppingCartModel));
 
     const store = {
         state: {
@@ -765,7 +762,6 @@
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data, _, _) {
-                        console.log("GetShippingRate success: ", data);
                         self.disableSubmit = false;
                         self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
                         self.orderTotal = data.orderTotal;
@@ -782,7 +778,6 @@
                         self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
                         if (!disableSpinner)
                             self.hideLoading();
-                        console.log(thrownError, 'GetShippingRate datadata-error', xhr);
                     }
                 });
             },
@@ -828,15 +823,12 @@
                     },
                     hasError: false,
                 };
-                console.log('creating order...', request);
                 await $.ajax({
                     url: "@Url.Action("CreatePayPalOrder", "CheckoutOverride")",
                     type: 'POST',
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data, textStatus, XMLHttpRequest) {
-                        console.log('success - created order...', data);
-                        //if (data?.error === 1) return;
                         if (data.error === self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR) {
                             self.errorType = self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR;
                             self.errorMessage = data.message;
@@ -847,7 +839,6 @@
                     error: function (xhr, ajaxOptions, thrownError) {
                         self.errorType = self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR;
                         self.errorMessage = 'An error occured.';
-                        console.log("createOrder error: ", thrownError, xhr);
                     }
                 });
                 return orderId;
@@ -882,7 +873,6 @@
                     },
                     hasError: false,
                 };
-                console.log("request: ", request);
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("PlaceOrder", "CheckoutOverride")",
@@ -890,7 +880,6 @@
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data, textStatus, XMLHttpRequest) {
-                        console.log("PlaceOrder response: ", data);
                         if (data?.error === 1) {
                             alert(data.message);
                             return;
@@ -903,7 +892,6 @@
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         self.hideLoading();
-                        console.log("PlaceOrder error: ", thrownError, xhr);
                     }
                 });
             },
@@ -976,7 +964,6 @@
                                     self.finalizeOrder();
                                 })
                                 .catch(function (err) {
-                                    console.log('error: ', JSON.stringify(err));
                                     self.hideLoading();
                                     self.errorMessage = err.message;
                                     self.errorMessages = err.details.map(x => x.description);

@@ -682,8 +682,6 @@ Content1 =
                 item.warnings = JSON.parse(item.warnings);
                 item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr)
             });
-            console.log("purchaseUnitAttr items: ", items.map(x => x.purchaseUnitAttr));
-            console.log("selectedPurchaseUnit items: ", items.map(x => x.selectedPurchaseUnit));
         },
         computed: {
             isMobile: function () {
@@ -721,7 +719,6 @@ Content1 =
                     default:
                         break;
                 }
-                console.log("toggleUnitPrice: ", itemUnit, ":", unitPrice);
                 this.items.forEach(item => {
                     if (item.id === id) {
                         item.unitPrice = `${unitPrice}`;
@@ -752,7 +749,6 @@ Content1 =
                         totalPrice = quantity * unitPrice;
                         break;
                 }
-                console.log("calculateItemTotalPrice: ", itemUnit, " => length: ", length, ", weight: ", weight, ", quantity: ", quantity, ', unitPrice: ', unitPrice);
                 this.items.forEach(item => {
                     if (item.id === id) {
                         item.subTotal = `$${totalPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;

@@ -30,7 +30,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly IOrderService _orderService;
         private readonly IOrderProcessingService _orderProcessingService;
 
-        public OrderFundsCaptureController(OrderProcessingService orderProcessingService, OrderService orderService, SwiftCoreSettings swiftCoreSettings, PayPalProcessor payPalProcessor, CustomGenericAttributeService genericAttributeService, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
+        public OrderFundsCaptureController(IOrderProcessingService orderProcessingService, IOrderService orderService, SwiftCoreSettings swiftCoreSettings, PayPalProcessor payPalProcessor, CustomGenericAttributeService genericAttributeService, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
         {
             _genericAttributeService = genericAttributeService;
             _payPalProcessor = payPalProcessor;
@@ -68,6 +68,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             // validate thats its paypal and has authid
             if (string.IsNullOrEmpty(order.AuthorizationTransactionId))
                 return Error(HttpStatusCode.BadRequest, "order", "not valid for capture.");
+
+            if (!string.IsNullOrEmpty(order.CaptureTransactionId) && order.CaptureTransactionResult?.ToUpperInvariant() == "COMPLETED")
+                return Error(HttpStatusCode.BadRequest, "order", "order has already been captured.");
 
             // capture request from paypal
             var (capture, error) = _payPalProcessor.CaptureAuthorization(_swiftCoreSettings, order.AuthorizationTransactionId);

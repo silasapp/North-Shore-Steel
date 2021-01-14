@@ -492,7 +492,6 @@
         viewMtrModal = this;
     }
 
-    console.log("model: ", @Html.Raw(shippingAddresses));
     new Vue({
         el: '#order-detail',
         data: {
@@ -521,11 +520,9 @@
             },
             onFocused: function () {
                 this.isHoveringViewTicket = true;
-                console.log("onFocused: ");
             },
             onBlur: function () {
                 this.isHoveringViewTicket = false;
-                console.log("onBlur: ");
             }
         },
     });

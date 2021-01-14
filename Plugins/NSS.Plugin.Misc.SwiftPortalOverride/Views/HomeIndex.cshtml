@@ -360,7 +360,7 @@
                     </div>
                 </div>
 
-                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'></span>
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render();
 
 
 
@@ -636,12 +636,7 @@
     let openOrders = @Html.Raw(Serialize(Model.OpenOrders));
     let closedOrders = @Html.Raw(Serialize(Model.ClosedOrders));
 
-    var companyId = @Html.Raw(eRPCompanyId);
-
-
-    console.log("openOrders: ", openOrders);
-    console.log("closedOrders: ", closedOrders);
-    console.log("companyStats", companyStats);
+    var companyId = @Html.Raw(eRPCompanyId)
 
     new Vue({
         el: '#app',
@@ -668,7 +663,6 @@
                     orderId
                 }
 
-                console.log('request', request);
                 this.showLoading();
                 const self = this;
                 $.ajax({
@@ -679,13 +673,11 @@
                     dataType: "json",
                     success: function (data, _, _) {
                         self.orderMTRs = data.MTRs;
-                        console.log('getNotifications - data', self.orderMTRs)
                         viewMtrModal.show();
                         self.hideLoading();
                     },
                     error: function (xhr, thrownError) {
                         self.hideLoading();
-                        console.log(xhr, 'error-data', thrownError);
                     }
                 });
             }

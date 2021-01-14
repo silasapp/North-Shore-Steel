@@ -277,14 +277,12 @@
     function onRowSelected(args) {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
-        console.log("onRowSelected: ", exceldata.length);
         vm.selectedRowCount = exceldata.length;
     }
 
     function onRowDeselected(args) {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
-        console.log("onRowDeselected: ", exceldata.length);
         vm.selectedRowCount = exceldata.length;
     }
 

@@ -539,7 +539,6 @@
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         AjaxCart.setLoadWaiting(false);
-                        console.log(thrownError, 'addToCart datadata-error', xhr);
                     }
                 });
             },
@@ -548,7 +547,6 @@
                 const _attributes = attributes;
                 const cutOptions = _attributes.find(x => x.name === "Cut Options");
                 const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
-                console.log("handleSawOption: ", _attributes);
                 this.quantity = 1;
                 this.productId = productId;
                 this.sawOptionControlId = prefix + cutOptions.id;
@@ -578,14 +576,12 @@
                 const quantityEl = $('#itemquantity' + itemId);
                 const quantity = Number(quantityEl.val());
                 quantityEl.val(quantity && quantity - 1 > 1 ? quantity - 1 : 1);
-                console.log("handleDecrementQuantity: ", quantity && quantity - 1 > 1 ? quantity - 1 : 1);
             },
 
             handleIncrementQuantity: function (itemId) {
                 const quantityEl = $('#itemquantity' + itemId);
                 const quantity = Number(quantityEl.val());
                 quantityEl.val(quantity ? quantity + 1 : 1);
-                console.log("handleIncrementQuantity: ", quantity ? quantity + 1 : 1);
             },
         },
     });
@@ -596,7 +592,6 @@
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
         $('#qty' + itemId).val("");
-        console.log('itemId, cartId, qty', itemId, cartId, qty, link);
         AjaxCart.addproducttocart_catalog(link);
     }
 
