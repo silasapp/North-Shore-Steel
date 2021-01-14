@@ -294,6 +294,47 @@
             },
             prepareGroupedSpecs: function () {
                 this.shared.groupedSpecs.forEach((specs, index) => {
+
+                    // Handle Thickness fractions sorting
+                    const isThicknessGroup = specs.some(x => x.specificationAttributeName === 'displayThickness');
+                    if (isThicknessGroup) {
+                        specs.forEach(spec => {
+                            let value = spec.specificationAttributeOptionName;
+                            if (value.includes(' ')) {
+                                const array = value.split(' ');
+                                const wholeNumber = Number(array[0]);
+                                const fraction = eval(array[1]);
+                                spec.sort = wholeNumber + fraction;
+                            } else if (value.includes('/')) {
+                                spec.sort = eval(value);
+                            } else {
+                                spec.sort = Number(value);
+                            }
+                        });
+                        console.log("before: ", specs.map(x => x.sort));
+                        specs.sort((a, b) => a.sort - b.sort);
+                        console.log("after: ", specs.map(x => x.sort));
+                    }
+                    // Handle Minimum Width fractions sorting
+                    const isWidthGroup = specs.some(x => x.specificationAttributeName === 'displayWidth');
+                    if (isWidthGroup) {
+                        specs.forEach(spec => {
+                            let value = spec.specificationAttributeOptionName;
+                            if (value.includes(' ')) {
+                                const array = value.split(' ');
+                                const wholeNumber = Number(array[0]);
+                                const fraction = eval(array[1]);
+                                spec.sort = wholeNumber + fraction;
+                            } else if (value.includes('/')) {
+                                spec.sort = eval(value);
+                            } else {
+                                spec.sort = Number(value);
+                            }
+                        });
+                        console.log("before: ", specs.map(x => x.sort));
+                        specs.sort((a, b) => a.sort - b.sort);
+                        console.log("after: ", specs.map(x => x.sort));
+                    }
                     specs.forEach(spec => {
                         let name = '';
                         let type = this.shared.constants.SPEC_TYPE_OTHERS;
