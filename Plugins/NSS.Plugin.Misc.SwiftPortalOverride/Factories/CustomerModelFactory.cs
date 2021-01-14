@@ -209,7 +209,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.RecentOrders = _nSSApiProvider.GetRecentOrders(companyId);
             var (token, recentInvoices) = _nSSApiProvider.GetRecentInvoices(companyId);
 
-            if (recentInvoices != null)
+            if (recentInvoices != null && recentInvoices.Count > 0)
             {
                 foreach (var invoice in recentInvoices)
                 {
@@ -233,7 +233,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.ClosedOrders = closedOrders;
             var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
 
-            if (companyStats != null)
+            if (companyStats != null && companyStats.Count > 0)
             {
 
                 foreach (var stats in companyStats)
