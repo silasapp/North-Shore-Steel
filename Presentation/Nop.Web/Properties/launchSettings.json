@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://test1.store.com"
+      "applicationUrl": "http://localhost:8001"
     },
     "iisExpress": {
       "applicationUrl": "http://localhost:15536/",
@@ -29,7 +29,7 @@
     "Local IIS": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "http://test1.store.com",
+      "launchUrl": "http://localhost:8001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
