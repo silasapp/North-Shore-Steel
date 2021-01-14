@@ -60,7 +60,7 @@
         {
             <div class="d-flex">
                 <label v-if="isExportMode" class="pure-material-checkbox mr-3 d-flex align-items-center" style="position: relative;">
-                    <input type="checkbox"
+                    <input type="checkbox" name="order-checkox"
                            onclick="onCheck(@order.OrderId)">
                     <span class="checkmark"></span>
                 </label>
@@ -204,6 +204,7 @@
             },
             cancelExportMode: function () {
                 this.isExportMode = false;
+                mobileExcelData = [];
             }
 
         },
@@ -215,31 +216,34 @@
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
         var pageModel = @Html.Raw(Serialize(Model));
-        var mobileExcelData = [];
+    var mobileExcelData = [];
         function onCheck(orderId) {
-            var found = mobileExcelData.find(x => x.orderId == orderId);
+            var found = mobileExcelData.find(x => x.OrderId == orderId);
+            var exportBtn = document.getElementById('export-mob-btn');
             if (!found) {
                 var data = pageModel.orders.find(x => x.orderId == orderId);
-
-                Object.keys(data).map(function (key, index) {
-                    data["orderDate"] = formatDate(data["orderDate"] );
-                    data["deliveryDate"] = formatDate(data["deliveryDate"] );
-                    data["promiseDate"] = formatDate(data["promiseDate"] );
-                    data["scheduledDate"] = formatDate(data["scheduledDate"]);
+                var newData = { ...data };
+                Object.keys(newData).map(function (key, index) {
+                    newData["orderDate"] = formatDate(newData["orderDate"] );
+                    newData["deliveryDate"] = formatDate(newData["deliveryDate"] );
+                    newData["promiseDate"] = formatDate(newData["promiseDate"] );
+                    newData["scheduledDate"] = formatDate(newData["scheduledDate"]);
                 });
-                for (var key in data) {
+                for (var key in newData) {
                     var temp;
-                    if (data.hasOwnProperty(key)) {
-                        temp = data[key];
-                        delete data[key];
-                        data[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
+                    if (newData.hasOwnProperty(key)) {
+                        temp = newData[key];
+                        delete newData[key];
+                        newData[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
                     }
                 }
-                mobileExcelData.push(data);
-                var exportBtn = document.getElementById('export-mob-btn');
-                exportBtn.innerHTML = "<img src='Themes/SwiftPortal/Content/assets/icn-download.svg' alt=''><span class='mr-1'>" + mobileExcelData.length +  "</span>Export";
+                mobileExcelData.push(newData);
+
+                exportBtn.innerHTML = "EXPORT" + " " + mobileExcelData.length + " " + "ORDERS";
             } else {
-                mobileExcelData = mobileExcelData.filter(x => x.orderId != orderId);
+                mobileExcelData = mobileExcelData.filter(x => x.OrderId != orderId);
+                exportBtn.innerHTML = "EXPORT" + " " + mobileExcelData.length + " " + "ORDERS";
+                document.getElementById('select-all-orders').checked = false;
             }
             console.log('mobileExcelData', mobileExcelData);
         }
@@ -267,7 +271,21 @@
                 gridObj.excelExport(exportProperties);
             }
         }
-
+        function selectAll(value) {
+            mobileExcelData = [];
+            var checkboxes = document.getElementsByName('order-checkox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = value.checked;
+            }
+            if (value.checked) {
+                for (var i = 0; i < pageModel.orders.length; i++) {
+                    onCheck(pageModel.orders[i].orderId);
+                }
+            } else {
+                var exportBtn = document.getElementById('export-mob-btn');
+                exportBtn.innerHTML = "EXPORT 0 ORDER";
+            }
+        }
         function excelQueryCellInfo(args) {
             if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
             if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
