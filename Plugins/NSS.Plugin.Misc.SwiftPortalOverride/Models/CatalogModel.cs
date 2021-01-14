@@ -1,4 +1,5 @@
-﻿using Nop.Web.Factories;
+﻿using Nop.Core.Domain.Catalog;
+using Nop.Web.Factories;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Catalog;
 using NSS.Plugin.Misc.SwiftCore.Domain.Shapes;
@@ -16,13 +17,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         {
             PagingFilteringContext = new CatalogPagingFilteringModel();
             Products = new List<ProductOverviewModel>();
+            Shapes = new List<ShapeData>();
         }
         public string Warning { get; set; }
         public bool NoResults { get; set; }
         public IList<ProductOverviewModel> Products { get; set; }
         public CatalogPagingFilteringModel PagingFilteringContext { get; set; }
         public CatalogOverrideController.FilterParams FilterParams { get; internal set; }
-        public List<ShapeData> Shapes { get; set; }
+        public IList<ShapeData> Shapes { get; set; }
+        public IList<SpecificationAttributeOptionFilter> AllFilters { get; set; }
 
         #region Nested Class
 
