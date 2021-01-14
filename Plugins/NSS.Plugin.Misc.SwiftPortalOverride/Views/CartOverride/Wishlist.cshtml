@@ -34,7 +34,7 @@
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
     var eRPCompanyId = genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey);
     var eRPCompanyIdExist = false;
-    eRPCompanyIdExist = string.IsNullOrEmpty(eRPCompanyId) && true;
+    eRPCompanyIdExist = !string.IsNullOrEmpty(eRPCompanyId) && true;
 }
 
 <style>

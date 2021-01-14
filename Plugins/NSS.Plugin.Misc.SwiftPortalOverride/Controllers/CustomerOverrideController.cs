@@ -424,24 +424,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                             return Redirect(returnUrl);
                         }
-                    case CustomerLoginResults.CustomerNotExist:
-                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.CustomerNotExist"));
-                        break;
-                    case CustomerLoginResults.Deleted:
-                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.Deleted"));
-                        break;
-                    case CustomerLoginResults.NotActive:
-                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotActive"));
-                        break;
-                    case CustomerLoginResults.NotRegistered:
-                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotRegistered"));
-                        break;
-                    case CustomerLoginResults.LockedOut:
-                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.LockedOut"));
-                        break;
-                    case CustomerLoginResults.WrongPassword:
+                    //case CustomerLoginResults.CustomerNotExist:
+                    //    ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.CustomerNotExist"));
+                    //    break;
+                    //case CustomerLoginResults.Deleted:
+                    //    ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.Deleted"));
+                    //    break;
+                    //case CustomerLoginResults.NotActive:
+                    //    ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotActive"));
+                    //    break;
+                    //case CustomerLoginResults.NotRegistered:
+                    //    ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotRegistered"));
+                    //    break;
+                    //case CustomerLoginResults.LockedOut:
+                    //    ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.LockedOut"));
+                    //    break;
+                    //case CustomerLoginResults.WrongPassword:
                     default:
-                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials"));
+                        //ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials"));
                         break;
                 }
             }
