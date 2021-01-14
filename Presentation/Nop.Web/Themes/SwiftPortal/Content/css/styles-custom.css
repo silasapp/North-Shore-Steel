@@ -431,7 +431,7 @@ a:not([href]):not([class]) {
 
     .nss-table > thead,
     .cart-summary-content thead {
-        background-color: #03175b;
+        background-color: #1898E1;
         color: #ffffff;
     }
 
@@ -1345,7 +1345,7 @@ table input {
 }
 
 .e-headercell {
-    background-color: #03175b !important;
+    background-color: #1898E1 !important;
     color: #ffffff !important;
 }
 

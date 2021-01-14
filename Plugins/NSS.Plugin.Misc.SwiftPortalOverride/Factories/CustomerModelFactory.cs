@@ -148,10 +148,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                             AddPreference(keyValue, "When any order has shipped", ref model);
                             break;
                         default:
-                            break;  
+                            break;
                     }
                 }
- 
+
             }
 
             return model;
@@ -168,7 +168,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
 
                 model.Notifications.Add(itemModel);
-            } 
+            }
         }
 
 
@@ -197,7 +197,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 ScheduledDate = order.ScheduledDate,
                 OrderStatusName = order.OrderStatusName
             }).Take(5).ToList();
-            
+
             var closedOrders = closedOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
                 OrderId = order.OrderId,
@@ -209,20 +209,23 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.RecentOrders = _nSSApiProvider.GetRecentOrders(companyId);
             var (token, recentInvoices) = _nSSApiProvider.GetRecentInvoices(companyId);
 
-            foreach (var invoice in recentInvoices)
+            if (recentInvoices != null)
             {
-                var recentInvoice = new Invoice
+                foreach (var invoice in recentInvoices)
                 {
-                    InvoiceId = invoice.InvoiceId,
-                    OrderNo = invoice.OrderNo,
-                    InvoiceAmount = invoice.InvoiceAmount,
-                    InvoiceDate = invoice.InvoiceDate,
-                    InvoiceDueDate = invoice.InvoiceDueDate,
-                    InvoiceStatusName = invoice.InvoiceStatusName,
-                    InvoiceFile = $"{invoice.InvoiceFile}{token}"
-                };
+                    var recentInvoice = new Invoice
+                    {
+                        InvoiceId = invoice.InvoiceId,
+                        OrderNo = invoice.OrderNo,
+                        InvoiceAmount = invoice.InvoiceAmount,
+                        InvoiceDate = invoice.InvoiceDate,
+                        InvoiceDueDate = invoice.InvoiceDueDate,
+                        InvoiceStatusName = invoice.InvoiceStatusName,
+                        InvoiceFile = $"{invoice.InvoiceFile}{token}"
+                    };
 
-                model.RecentInvoices.Add(recentInvoice);
+                    model.RecentInvoices.Add(recentInvoice);
+                }
             }
 
             model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
@@ -230,15 +233,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.ClosedOrders = closedOrders;
             var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
 
-            foreach (var stats in companyStats)
+            if (companyStats != null)
             {
-                var cStats = new CompanyStats
-                {
-                    StatName = stats.StatName,
-                    StatValue = stats.StatValue
-                };
 
-                model.CompanyStats.Add(cStats);
+                foreach (var stats in companyStats)
+                {
+                    var cStats = new CompanyStats
+                    {
+                        StatName = stats.StatName,
+                        StatValue = stats.StatValue
+                    };
+
+                    model.CompanyStats.Add(cStats);
+                }
             }
 
             // get credit summary
