@@ -129,7 +129,7 @@
                                                 <tr>
                                                     <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                     <td>@order.PoNo</td>
-                                                    <td>@order.PromiseDate.ToString("MM/dd/yyyy")</td>
+                                                    <td>@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
                                                     <td>@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
                                                     <td class="text-center cursor-pointer">@order.OrderStatusName</td>
                                                 </tr>

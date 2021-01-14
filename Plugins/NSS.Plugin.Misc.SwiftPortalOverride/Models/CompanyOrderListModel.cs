@@ -28,9 +28,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
             public string PoNo { get; set; }
 
-            public DateTimeOffset OrderDate { get; set; }
+            public DateTimeOffset? OrderDate { get; set; }
 
-            public DateTimeOffset PromiseDate { get; set; }
+            public DateTimeOffset? PromiseDate { get; set; }
 
             public DateTimeOffset? ScheduledDate { get; set; }
 
