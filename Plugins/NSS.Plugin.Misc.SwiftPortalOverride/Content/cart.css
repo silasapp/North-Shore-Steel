@@ -370,7 +370,7 @@ input:active {
         padding: 0.5rem !important;
         text-align: center;
         height: 32px !important;
-        width: 65px;
+        width: 75px;
     }
 
     .cart-price-select {
@@ -383,7 +383,7 @@ input:active {
         text-align: center;
         padding: 0.25rem 0.5rem !important;
         height: 32px;
-        width: 65px;
+        width: 75px;
         margin-left: 0px !important;
     }
 
