@@ -28,10 +28,10 @@
 </style>
 <div id="app" class="page catalog-page" v-cloak>
     <div v-show="filterTags.length === 0">
-        <div class="d-flex flex-column align-items-center mx-5">
+        <div class="d-flex flex-column align-items-center text-center shapes-container">
             <label class="h2-primary mb-4">SELECT A SHAPE</label>
             <div class="d-flex flex-row flex-wrap px-5 shape-category">
-                <div class="d-flex flex-column align-items-center mb-3 mx-5" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
+                <div class="d-flex flex-column align-items-center mb-3 mx-5" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
                     <img v-if="shape.icon" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
                     <div v-if="!shape.icon" class="icon-shape"></div>
                     <label class="h4-default-500 text-capitalize mt-2">{{ shape.name }}</label>

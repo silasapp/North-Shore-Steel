@@ -55,14 +55,14 @@ a:not([href]):not([class]) {
     padding: 0;
 }
 
-    .nav-pills .nav-link {
-        background-color: #ffffff !important;
-        color: #242424;
-        border-radius: 0;
-        font-size: 16px;
-        font: normal normal 500 16px/24px "Exo 2";
-        padding: 8px 16px;
-    }
+.nav-pills .nav-link {
+    background-color: #ffffff !important;
+    color: #242424;
+    border-radius: 0;
+    font-size: 16px;
+    font: normal normal 500 16px/24px "Exo 2";
+    padding: 8px 16px;
+}
 
     .nav-pills .nav-link:hover,
     .nav-pills .nav-link.active,
@@ -338,7 +338,6 @@ a:not([href]):not([class]) {
     #custom-search-box-container {
         width: 100%;
     }
-
 }
 
 /*// Medium devices (tablets, less than 992px)*/
@@ -474,14 +473,17 @@ a:not([href]):not([class]) {
 
 .small-searchterms::placeholder {
     color: #242424 !important;
-
 }
+
 .small-searchterms:focus {
     color: #242424 !important;
 }
+
 .small-searchterms-mob:focus {
     color: #ffffff;
-}.small-searchterms-mob::placeholder {
+}
+
+.small-searchterms-mob::placeholder {
     color: #ffffff;
 }
 
@@ -724,7 +726,7 @@ a:not([href]):not([class]) {
     .top-menu > li > a.active-tab,
     .nav-sub-menu > a.active-tab {
         text-decoration: none;
-        color: #0076b4 !important;
+        color: #1899E1 !important;
     }
 
     .top-menu > li > a,
@@ -1309,7 +1311,7 @@ table input {
 .e-css.e-checkbox-wrapper .e-frame.e-check,
 .e-checkbox-wrapper .e-frame.e-check:hover,
 .e-css.e-checkbox-wrapper .e-frame.e-check:hover {
-    background-color: #0076b4;
+    background-color: #1899E1;
 }
 
 .e-treeview .e-list-item.e-active > .e-text-content {
@@ -1701,9 +1703,11 @@ table input {
 
 .checkout-button,
 .checkout-button:hover {
-    background-color: #03175b !important;
+    background-color: #1899E1 !important;
 }
-
+    .checkout-button-mob, .checkout-button:hover {
+        background-color: #033551 !important;
+    }
 .terms-modal-body {
     text-align: left;
     font: normal normal 600 18px/32px "Exo 2";
@@ -3186,7 +3190,7 @@ hr {
 
 .e-pager .e-currentitem,
 .e-pager .e-currentitem:hover {
-    background: #03175b;
+    background: #1899E1;
     color: #fff;
     opacity: 1;
 }
@@ -3439,6 +3443,7 @@ and also iPads specifically.
 .p-o-text-mob {
     display: none;
 }
+
 .place-order-button {
     padding: .5rem 1rem;
     font: normal normal 500 16px/24px 'Exo 2';
@@ -3451,6 +3456,7 @@ and also iPads specifically.
     .place-order-button:hover {
         background-color: #0076B4 !important;
     }
+
 .mobile-export {
     background-color: #f6f6f6;
     padding: 20px;
@@ -3459,13 +3465,15 @@ and also iPads specifically.
     display: flex;
     justify-content: center;
 }
+
     .mobile-export > button, .mobile-export > div {
         background-color: #ffffff;
         padding: 10px;
         border: none;
     }
+
 @media all and (max-width: 600px) {
-    
+
     .place-order-buttons, .order-export-btn-container {
         display: block;
         position: fixed;
@@ -3479,10 +3487,12 @@ and also iPads specifically.
         text-align: center;
         padding: 1rem;
     }
+
     .edit-shop-mob {
         background-color: #fff;
         padding: 10px;
     }
+
     .part-logo, .edit-shop, .p-o-text {
         display: none;
     }
@@ -3500,9 +3510,11 @@ and also iPads specifically.
         width: auto !important;
         box-shadow: 0px 1px 16px #0000001a;
     }
+
     .checkout-card-1 {
         align-items: baseline;
     }
+
     .checkout-shipping-label {
         text-align: left;
     }
@@ -3511,13 +3523,15 @@ and also iPads specifically.
         background: #fff !important;
         background-color: #fff !important;
     }
+
         .shipping-tab.active {
             background-color: #0076B4 !important;
             color: #FFF;
         }
-        .footer {
-            display: none;
-        }
+
+    .footer {
+        display: none;
+    }
 
         .footer li, .login-footer li {
             justify-content: center;
@@ -3732,19 +3746,60 @@ and also iPads specifically.
     .cart-total > tbody > tr {
         padding: 0px 20px !important;
     }*/
-
+.shapes-container {
+    margin: 0 50px;
+}
 /*// Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
 }
 
 /*// Large devices (desktops, 992px and up)*/
 @media (min-width: 992px) {
+
+
+    /*// Extra large devices (large desktops, 1200px and up)*/
+    @media (min-width: 1200px) {
+    }
+
+    @media (max-width: 1200px) {
+        .shapes-container {
+            margin: 0 30px;
+        }
+        .shape-category {
+            padding: 0 !important;
+        }
+
+            .shape-category > div {
+                margin: 20px !important;
+            }
+            .shape-category > div {
+                width: 110px !important;
+            }
+
+                .shape-category > div > img, .icon-shape {
+                    width: 110px !important;
+                    height: 110px !important;
+                }
+    }
 }
 
-/*// Extra large devices (large desktops, 1200px and up)*/
-@media (min-width: 1200px) {
-}
+@media (max-width: 992px) {
+    .shape-category {
+        padding: 0 !important;
+    }
 
+        .shape-category > div {
+            margin: 10px !important;
+        }
+        .shape-category > div {
+            width: 100px !important;
+        }
+
+            .shape-category > div > img, .icon-shape {
+                width: 100px !important;
+                height: 100px !important;
+            }
+}
 /*// Small devices (landscape phones, less than 768px)*/
 @media (max-width: 767.98px) {
     .check-out-card {
@@ -3776,14 +3831,27 @@ and also iPads specifically.
         padding-bottom: 10px;
         color: #ffffff;
     }
+    .shapes-container {
+        margin: 0 10px;
+    }
+
     .shape-category {
         padding: 0 !important;
-        justify-content: space-between;
+        justify-content: center;
     }
 
         .shape-category > div {
             margin: 5px !important;
         }
+
+        .shape-category > div {
+            width: 75px !important;
+        }
+
+            .shape-category > div > img, .icon-shape {
+                width: 75px !important;
+                height: 75px !important;
+            }
 }
 
 /*// Medium devices (tablets, less than 992px)*/
