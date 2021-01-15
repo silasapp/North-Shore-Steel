@@ -258,10 +258,6 @@ a:not([href]):not([class]) {
         margin: 0 5px;
     }
 
-    .header-logo > a > img {
-        width: 7rem !important;
-    }
-
     #topcartlink {
         padding: 0 10px;
     }
