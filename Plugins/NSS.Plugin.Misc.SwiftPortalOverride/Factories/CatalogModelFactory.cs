@@ -173,7 +173,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             //specs
             Stopwatch specFilterTimer = Stopwatch.StartNew();
-            if(!isPageLoad)
+            if(!isPageLoad && (shapeIds.Count > 0 || specIds.Count > 0 || !string.IsNullOrEmpty(searchTerms)))
                 PrepareSpecsFilters(specIds,
                     filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
                     _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model, shapeIds);
