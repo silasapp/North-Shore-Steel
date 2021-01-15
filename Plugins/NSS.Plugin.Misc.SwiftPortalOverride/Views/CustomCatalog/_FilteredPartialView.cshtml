@@ -194,7 +194,7 @@
 
     if (shapeIds.Count > 0)
     {
-        headerColumns = Model.Products.FirstOrDefault().Shape?.Atttributes.ToList();
+        headerColumns = Model.ActiveShapeAttributes.ToList();
     }
     else
     {

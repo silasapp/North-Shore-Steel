@@ -73,15 +73,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
                 //specs
 
-                model.SpecificationAttributeModels = PrepareProductSpecificationModel(product);
+                //model.SpecificationAttributeModels = PrepareProductSpecificationModel(product);
 
                 //reviews
                 //model.ReviewOverviewModel = PrepareProductReviewOverviewModel(product);
 
                 // erp
                 var attr = _genericAttributeService.GetAttributesForEntity(model.Id, nameof(Product));
-                if(int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
-                    model.Shape = _shapeService.GetShapeById(shapeId);
+                //if(int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
+                //    model.Shape = _shapeService.GetShapeById(shapeId);
 
                 model.ProductCustomAttributes = attr;
 

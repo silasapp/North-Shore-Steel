@@ -13,6 +13,9 @@
     //page class
     Html.AppendPageCssClassParts("html-home-page");
     Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
+
+    var groupedSpecs = Model.AllFilters.GroupBy(sf => sf.SpecificationAttributeName).Select(x => x.OrderBy(y => y.SpecificationAttributeOptionName));
+    var shapesCountData = Model.PagingFilteringContext.ShapeFilter.FilterItems;
 }
 <style>
     .clear-filter {
@@ -24,7 +27,7 @@
     }
 </style>
 <div id="app" class="page catalog-page" v-cloak>
-    <div v-show="shapeFilterTags.length === 0">
+    <div v-show="filterTags.length === 0">
         <div class="d-flex flex-column align-items-center text-center shapes-container">
             <label class="h2-primary mb-4">SELECT A SHAPE</label>
             <div class="d-flex flex-row flex-wrap px-5 shape-category">
@@ -36,7 +39,7 @@
             </div>
         </div>
     </div>
-    <div v-show="shapeFilterTags.length > 0">
+    <div v-show="filterTags.length > 0">
         <div class="page-body">
             <div class="row">
                 <div class="col-lg-12 col-xl-3 shapes-treeview">
@@ -72,7 +75,7 @@
                                         <label class="pure-material-checkbox">
                                             <input :id="'checkbox-' + spec.specificationAttributeOptionId"
                                                    type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
-                                            <span class="checkmark"></span>{{ spec.displayName }}
+                                            <span class="checkmark"></span>{{ spec.displayName }} ({{ spec.count }})
                                         </label>
                                     </div>
                                 </div>
@@ -87,7 +90,7 @@
                                         <label class="pure-material-checkbox">
                                             <input :id="'checkbox-' + spec.specificationAttributeOptionId"
                                                    type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
-                                            <span class="checkmark"></span>{{ spec.displayName }}
+                                            <span class="checkmark"></span>{{ spec.displayName }} ({{ spec.count }})
                                         </label>
                                     </div>
                                 </div>
@@ -189,12 +192,21 @@
 </script>
 
 <script>
+    const shapes = @Html.Raw(Serialize(Model.Shapes));
+    const specs = @Html.Raw(Serialize(groupedSpecs));
+    const shapesCountData = @Html.Raw(Serialize(shapesCountData));
+
+    console.log("shapes: ", shapes);
+    console.log("specs: ", specs);
+    console.log("shapesCountData: ", shapesCountData);
+
     let gridData = [];
     let gridColumns = [];
     const store = {
         state: {
-            groupedSpecs: [],
-            groupedShapes: [],
+            groupedSpecs: specs,
+            groupedShapes: shapes,
+            defaultShapesCount: shapesCountData,
 
             shapeIcon: {
                 angle: '',
@@ -240,10 +252,17 @@
             isFilterOpen: false,
             sortOption: null,
             sortOptions: [],
+
+            activeSpecGroup: null,
+
+            shouldRebuildShapes: false,
+            shouldRebuildSpecs: false,
         },
         mounted: function () {
-            this.getFilteredProduuts();
             this.buildDialog();
+            this.updateShapesCount(this.shared.defaultShapesCount);
+            this.buildTreeview();
+            this.prepareGroupedSpecs();
 
             let query = getUrlParameter('q');
             if (query) {
@@ -253,18 +272,12 @@
                     type: 'query',
                 };
                 this.filterTags = [tag];
+
+                this.shouldRebuildShapes = true;
+                this.shouldRebuildSpecs = true;
+
+                this.getFilteredProduuts();
             }
-
-            ej.base.enableRipple(false);
-
-            //Initialize TreeView component
-            this.treeview = new ej.navigations.TreeView({
-                fields: { dataSource: this.shared.groupedShapes, id: 'id', parentID: 'parentId', text: 'displayName', hasChildren: 'hasChild' },
-                showCheckBox: true, autoCheck: false, cssClass: 'custom', nodeChecked: this.nodeChecked,
-            });
-
-            //Render initialized TreeView
-            this.treeview.appendTo("#treeview");
         },
         computed: {
             topShapes: function () {
@@ -272,14 +285,11 @@
                 shapes.forEach(shape => shape.icon = this.getShapeIcon(shape));
                 return shapes;
             },
-            shapeFilterTags: function () {
-                return this.filterTags.filter(x => x.type === 'shape');
-            },
             defaultSpecs: function () {
-                return this.groupedSpecs.filter(x => x[0].type === this.shared.constants.SPEC_TYPE_DEFAULT);
+                return this.groupedSpecs.filter(x => x && x[0] && x[0].type === this.shared.constants.SPEC_TYPE_DEFAULT);
             },
             otherSpecs: function () {
-                return this.groupedSpecs.filter(x => x[0].type === this.shared.constants.SPEC_TYPE_OTHERS);
+                return this.groupedSpecs.filter(x => x && x[0] && x[0].type === this.shared.constants.SPEC_TYPE_OTHERS);
             },
             showOtherSpecs: function () {
                 return this.filterTags.some(x => x.type === 'shape' && (x.id === 13 || x.parentId === 13));
@@ -311,9 +321,7 @@
                                 spec.sort = Number(value);
                             }
                         });
-                        console.log("before: ", specs.map(x => x.sort));
                         specs.sort((a, b) => a.sort - b.sort);
-                        console.log("after: ", specs.map(x => x.sort));
                     }
                     // Handle Minimum Width fractions sorting
                     const isWidthGroup = specs.some(x => x.specificationAttributeName === 'displayWidth');
@@ -331,9 +339,7 @@
                                 spec.sort = Number(value);
                             }
                         });
-                        console.log("before: ", specs.map(x => x.sort));
                         specs.sort((a, b) => a.sort - b.sort);
-                        console.log("after: ", specs.map(x => x.sort));
                     }
                     specs.forEach(spec => {
                         let name = '';
@@ -368,11 +374,27 @@
                         }
                         spec.name = name;
                         spec.type = type;
-                        spec.displayName = `${spec.specificationAttributeOptionName} (${spec.productCount})`;
+                        spec.displayName = `${spec.specificationAttributeOptionName}`;
                         spec.checked = this.filterTags.some(x => x.type === 'spec' && x.id === spec.specificationAttributeOptionId);
+                        spec.count = 0;
                     });
                 });
                 this.groupedSpecs = this.shared.groupedSpecs;
+            },
+            updateSpecsCount: function (specsCount) {
+                console.log("updateSpecsCount: ", specsCount, this.activeSpecGroup);
+                this.shared.groupedSpecs.forEach(specs => {
+                    if (specs[0].specificationAttributeName !== this.activeSpecGroup) {
+                        specs.forEach(spec => {
+                            const data = specsCount.find(x => x.specificationAttributeOptionId === spec.specificationAttributeOptionId);
+                            spec.count = data && data.productCount ? data.productCount : 0;
+                        });
+                    }
+                });
+                this.groupedSpecs = this.shared.groupedSpecs.map(specs => {
+                    specs = specs.filter(x => x.count > 0);
+                    return specs.map(spec => spec)
+                });
             },
 
             getShapeIcon: function (shape) {
@@ -397,6 +419,19 @@
                 });
                 this.dialog.appendTo('#dialog');
             },
+            buildTreeview: function () {
+                ej.base.enableRipple(false);
+
+                //Initialize TreeView component
+                this.treeview = new ej.navigations.TreeView({
+                    fields: { dataSource: this.shared.groupedShapes, id: 'id', parentID: 'parentId', text: 'displayName', hasChildren: 'hasChild' },
+                    showCheckBox: true, autoCheck: false, cssClass: 'custom', nodeChecked: this.nodeChecked,
+                });
+
+                //Render initialized TreeView
+                this.treeview.appendTo("#treeview");
+            },
+
             nodeChecked: function (args) {
                 if (!args.isInteracted) return;
                 this.toggleShape(args.data[0]);
@@ -434,9 +469,15 @@
                 });
                 this.filterTags = this.filterTags.filter(x => x.type !== 'shape');
                 this.filterTags = [...this.filterTags, ...shapeFilters];
+
+                this.activeSpecGroup = null;
+                this.shouldRebuildShapes = this.filterTags.some(x => x.type !== 'shape');
+                this.shouldRebuildSpecs = true;
+
                 this.getFilteredProduuts();
             },
             toggleSpec: function (spec) {
+                console.log("spec: ", spec);
                 spec.checked = !spec.checked;
                 if (spec.checked) {
                     const tag = {
@@ -449,11 +490,21 @@
                 } else {
                     this.filterTags = this.filterTags.filter(x => x.id !== spec.specificationAttributeOptionId || x.type !== 'spec');
                 }
+
+                this.activeSpecGroup = spec.specificationAttributeName;
+                this.shouldRebuildShapes = true;
+                this.shouldRebuildSpecs = true;
+
                 this.getFilteredProduuts();
             },
 
             removeFilter: function (tag) {
                 const { id, type, data } = tag;
+                console.log("removeFilter: ", this.filterTags);
+                if (this.filterTags.length === 1) {
+                    this.clearFilters();
+                    return;
+                }
                 if (type === 'shape') {
                     const parentID = this.shared.groupedShapes.find(x => x.id === id).parentId;
                     const shapeData = {
@@ -467,6 +518,11 @@
                 } else if (type === 'query') {
                     this.filterTags = this.filterTags.filter(x => x.type !== 'query');
                     window.history.pushState({}, document.title, window.location.pathname);
+
+                    this.activeSpecGroup = null;
+                    this.shouldRebuildShapes = true;
+                    this.shouldRebuildSpecs = true;
+
                     this.getFilteredProduuts();
                 }
             },
@@ -477,7 +533,11 @@
 
                 window.history.pushState("object or string", "Title", "/" + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]);
 
-                this.getFilteredProduuts();
+                this.shouldRebuildShapes = false;
+                this.shouldRebuildSpecs = false;
+
+                this.updateShapesCount(this.shared.defaultShapesCount);
+                this.resetTreeview();
             },
 
             getFilteredProduuts: function () {
@@ -485,8 +545,13 @@
 
                 let searchKeyword = getUrlParameter('q');
                 const shapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
+                let activeShapeAttributes = [];
+                if (shapeIds.length > 0) {
+                    const shape = this.shared.groupedShapes.find(x => x.id === shapeIds[0]);
+                    activeShapeAttributes = shape.shapeAttributes;
+                }
                 const specIds = this.filterTags.filter(x => x.type === 'spec').map(x => x.id);
-                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword };
+                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes };
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
@@ -496,10 +561,14 @@
                     success: function (data) {
                         if (data != null) {
                             $('#partialview').html(data.partialView);
-                            self.shared.groupedShapes = JSON.parse(data.shapes);
-                            self.shared.groupedSpecs = JSON.parse(data.specs);
+
+                            if (self.shouldRebuildShapes) {
+                                self.updateShapesCount(JSON.parse(data.shapes));
+                            }
                             self.resetTreeview();
-                            self.prepareGroupedSpecs();
+                            if (self.shouldRebuildSpecs) {
+                                self.updateSpecsCount(JSON.parse(data.specs));
+                            }
                         }
                         self.hideLoading();
                     },
@@ -511,13 +580,31 @@
                 this.closeFiltersDrawer();
             },
 
+            updateShapesCount: function (shapes) {
+                this.shared.groupedShapes = this.shared.groupedShapes.map(groupedShape => {
+                    const { id, name, parentId, hasChild } = groupedShape;
+                    let shapeCount = 0;
+                    if (!parentId && hasChild) {
+                        const children = this.shared.groupedShapes.filter(x => x.parentId === id).map(x => x.id);
+                        const childrenCount = shapes.filter(x => children.includes(x.shapeId)).map(x => x.productCount);
+                        shapeCount = childrenCount.reduce((a, b) => a + b, 0);
+                    } else {
+                        const shape = shapes.find(x => x.shapeId === id);
+                        shapeCount = shape && shape.productCount ? shape.productCount : 0;
+                    }
+                    groupedShape.displayName = `${name} (${shapeCount})`;
+                    return groupedShape;
+                });
+            },
+
             resetTreeview: function () {
                 const filterShapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
-                this.shared.groupedShapes.forEach(shape => {
+                this.shared.groupedShapes = this.shared.groupedShapes.map(shape => {
                     const childrenIds = this.shared.groupedShapes.filter(x => x.parentId === shape.id).map(x => x.id);
                     const exists = childrenIds.some(x => filterShapeIds.includes(x));
                     shape.expanded = exists;
                     shape.isChecked = filterShapeIds.includes(shape.id);
+                    return shape;
                 });
                 this.treeview.fields = {
                     dataSource: this.shared.groupedShapes, id: 'id', parentID: 'parentId',

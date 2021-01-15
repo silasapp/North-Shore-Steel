@@ -15,8 +15,10 @@ using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogModel;
 using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogPagingFilteringModel;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
@@ -82,7 +84,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// <param name="model">Search model</param>
         /// <param name="command">Catalog paging filtering command</param>
         /// <returns>Search model</returns>
-        public CatalogModel PrepareSwiftCatalogModel(IList<int> shapeIds, IList<int> specIds, string searchKeyword = null)
+        public CatalogModel PrepareSwiftCatalogModel(IList<int> shapeIds, IList<int> specIds, string searchKeyword = null, bool isPageLoad = false)
         {
             var model = new CatalogModel();
             var searchTerms = searchKeyword; //string.Empty;
@@ -106,25 +108,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             //products
             IList<int> filterableSpecificationAttributeOptionIds = new List<int>();
 
-            if (shapeIds.Count > 0 || specIds.Count > 0)
-            {
-                products = _productService.SearchProducts(out filterableSpecificationAttributeOptionIds,
-                    true,
-                    categoryIds: shapeIds,
-                    storeId: _storeContext.CurrentStore.Id,
-                    //visibleIndividuallyOnly: false,
-                    featuredProducts: _catalogSettings.IncludeFeaturedProductsInNormalLists ? null : (bool?)false,
-                    priceMin: minPriceConverted,
-                    priceMax: maxPriceConverted,
-                    keywords: searchTerms,
-                    filteredSpecs: specIds
-                    //orderBy: (ProductSortingEnum)command.OrderBy,
-                    //pageIndex: command.PageNumber - 1,
-                    //pageSize: command.PageSize
-                    );
-            }
+            Stopwatch searchTimer = Stopwatch.StartNew();
 
+            products = _productService.SearchProducts(out filterableSpecificationAttributeOptionIds,
+                true,
+                categoryIds: shapeIds,
+                storeId: _storeContext.CurrentStore.Id,
+                //visibleIndividuallyOnly: false,
+                featuredProducts: _catalogSettings.IncludeFeaturedProductsInNormalLists ? null : (bool?)false,
+                priceMin: minPriceConverted,
+                priceMax: maxPriceConverted,
+                keywords: searchTerms,
+                filteredSpecs: specIds
+                //orderBy: (ProductSortingEnum)command.OrderBy,
+                //pageIndex: command.PageNumber - 1,
+                //pageSize: command.PageSize
+                );
+
+            searchTimer.Stop();
+            TimeSpan timespan = searchTimer.Elapsed;
+            Console.WriteLine("search timer (ms)", timespan.Milliseconds.ToString());
+
+
+            Stopwatch productModelTimer = Stopwatch.StartNew();
+            
             model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).OrderBy(o => o.Sku).ToList();
+            productModelTimer.Stop();
+            Console.WriteLine("prod model timer (ms)", productModelTimer.Elapsed.Milliseconds.ToString());
 
             model.NoResults = !model.Products.Any();
 
@@ -162,11 +172,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             }
 
             //specs
-            PrepareSpecsFilters(specIds,
-                filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
-                _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model, shapeIds);
+            Stopwatch specFilterTimer = Stopwatch.StartNew();
+            if(!isPageLoad && (shapeIds.Count > 0 || specIds.Count > 0 || !string.IsNullOrEmpty(searchTerms)))
+                PrepareSpecsFilters(specIds,
+                    filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
+                    _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model, shapeIds);
+            else
+                PrepareSpecsFilters(specIds,
+                    filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
+                    _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model);
+            specFilterTimer.Stop();
+            Console.WriteLine("spec timer (ms)", specFilterTimer.Elapsed.Milliseconds.ToString());
 
+            Stopwatch shapeFilterTimer = Stopwatch.StartNew();
+            
             PrepareShapeFilterModel(ref model);
+            if (isPageLoad)
+                PrepareShapeData(ref model);
+            shapeFilterTimer.Stop();
+            Console.WriteLine("shape timer (ms)", shapeFilterTimer.Elapsed.Milliseconds.ToString());
 
             model.PagingFilteringContext.LoadPagedList(products);
 
@@ -205,74 +229,110 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             //prepare the model properties
             model.PagingFilteringContext.SpecificationFilter.Enabled = true;
 
-            var defaultSpecFilters = new List<string> { SwiftCore.Helpers.Constants.CoatingFieldAttribute, SwiftCore.Helpers.Constants.MetalFieldAttribute };
+            //var defaultSpecFilters = new List<string> { SwiftCore.Helpers.Constants.CoatingFieldAttribute, SwiftCore.Helpers.Constants.MetalFieldAttribute };
+            var filteredProductIds = model.Products.Select(p => p.Id);
 
-            var specs = model.Products.Select(x => x.SpecificationAttributeModels).SelectMany(specs => specs);
-
-            // not plate individual shape
-            if (!shapeIds.Any(x => x.ToString().StartsWith("13")))
-                specs = specs.Where(x => defaultSpecFilters.Contains(x.SpecificationAttributeName));
-
-            var specGroup = specs.GroupBy(x => x.SpecificationAttributeOptionId);
-
-            var specList = new List<SpecificationFilterItem>();
-
-            foreach (var spec in specGroup)
+            var specFilters = allFilters.Select(af =>
             {
-                var activeSpec = spec.FirstOrDefault(z => z.SpecificationAttributeOptionId == spec.Key);
+                var prodSpecs = _specificationAttributeService.GetProductSpecificationAttributes(specificationAttributeOptionId: af.SpecificationAttributeOptionId);
 
-                specList.Add(new SpecificationFilterItem
+                // filter result
+                var prodSpecGroup = prodSpecs.GroupBy(ps => ps.ProductId).Where(p => filteredProductIds.Contains(p.Key));
+
+                return new SpecificationFilterItem
                 {
-                    SpecificationAttributeName = activeSpec?.SpecificationAttributeName,
-                    SpecificationAttributeOptionId = spec.Key,
-                    SpecificationAttributeOptionColorRgb = "",
-                    SpecificationAttributeOptionName = activeSpec?.SpecificationAttributeOptionName,
-                    ProductCount = spec.Count()
-                });
+                    SpecificationAttributeName = af.SpecificationAttributeName,
+                    SpecificationAttributeOptionId = af.SpecificationAttributeOptionId,
+                    SpecificationAttributeOptionName = af.SpecificationAttributeOptionName,
+                    ProductCount = prodSpecGroup.Count()
+                };
+
+            });
+
+            model.PagingFilteringContext.SpecificationFilter.FilterItems = new List<SpecificationFilterItem>(specFilters);
+
+        }
+
+        public void PrepareSpecsFilters(IList<int> alreadyFilteredSpecOptionIds,
+            int[] filterableSpecificationAttributeOptionIds,
+            ICacheKeyService cacheKeyService,
+            ISpecificationAttributeService specificationAttributeService, ILocalizationService localizationService,
+            IWebHelper webHelper, IWorkContext workContext, IStaticCacheManager staticCacheManager, ref CatalogModel model)
+        {
+            model.PagingFilteringContext.SpecificationFilter.Enabled = false;
+            var cacheKey = cacheKeyService.PrepareKeyForDefaultCache(NopModelCacheDefaults.SpecsFilterModelKey, filterableSpecificationAttributeOptionIds, workContext.WorkingLanguage);
+
+            var allOptions = specificationAttributeService.GetSpecificationAttributeOptionsByIds(filterableSpecificationAttributeOptionIds);
+            var allFilters = staticCacheManager.Get(cacheKey, () => allOptions.Select(sao =>
+            {
+                var specAttribute = specificationAttributeService.GetSpecificationAttributeById(sao.SpecificationAttributeId);
+
+                return new SpecificationAttributeOptionFilter
+                {
+                    SpecificationAttributeId = specAttribute.Id,
+                    SpecificationAttributeName = localizationService.GetLocalized(specAttribute, x => x.Name, workContext.WorkingLanguage.Id),
+                    SpecificationAttributeDisplayOrder = specAttribute.DisplayOrder,
+                    SpecificationAttributeOptionId = sao.Id,
+                    SpecificationAttributeOptionName = localizationService.GetLocalized(sao, x => x.Name, workContext.WorkingLanguage.Id),
+                    SpecificationAttributeOptionColorRgb = sao.ColorSquaresRgb,
+                    SpecificationAttributeOptionDisplayOrder = sao.DisplayOrder
+                };
+            }).ToList());
+
+            model.AllFilters = new List<SpecificationAttributeOptionFilter>(allFilters);
+        }
+
+        public void PrepareShapeData(ref CatalogModel model)
+        {
+            var shapes = _shapeService.GetShapes().OrderBy(s => s.Order);
+
+            foreach (var shape in shapes)
+            {
+                var childShapes = shape?.SubCategories?.ToList() ?? new List<SwiftCore.Domain.Shapes.Shape>();
+                foreach (var item in childShapes)
+                {
+                    var childData = new ShapeData
+                    {
+                        Id = item.Id,
+                        ParentId = item.ParentId,
+                        Name = $"{item.Name}",
+                        DisplayName = $"{item.Name}",
+                        Count = 0,
+                        HasChild = false,
+                        ShapeAttributes = shape.Atttributes.ToList(),
+                    };
+                    model.Shapes.Add(childData);
+                }
+
+                var data = new ShapeData
+                {
+                    Id = shape.Id,
+                    ParentId = shape.ParentId,
+                    Name = $"{shape.Name}",
+                    DisplayName = $"{shape.Name}",
+                    Count = 0,
+                    HasChild = childShapes.Count > 0,
+                    ShapeAttributes = shape.Atttributes.ToList(),
+                };
+                model.Shapes.Add(data);
             }
-
-            model.PagingFilteringContext.SpecificationFilter.FilterItems = new List<SpecificationFilterItem>(specList);
-
         }
 
         public void PrepareShapeFilterModel(ref CatalogModel model)
         {
             //var shapes = _shapeService.GetShapes();
-            var productGroup = model.Products.GroupBy(x => x.Shape.Id);
+            var props = model.Products.Select(x => x.ProductCustomAttributes.FirstOrDefault(x => x.Key == "shapeId"));
+            var shapeGroupList = props.GroupBy(x => Convert.ToInt32(x.Value));
 
-            if(productGroup.Count() > 0)
+            if (shapeGroupList.Count() > 0)
             {
-                foreach (var shapeGroup in productGroup)
+                foreach (var shapeGroup in shapeGroupList)
                 {
-                    var filterItem = new ShapeFilterItem { Shape = shapeGroup.FirstOrDefault(x => x.Shape.Id == shapeGroup.Key).Shape, ProductCount = shapeGroup.Count() };
+                    var filterItem = new ShapeFilterItem { ShapeId = shapeGroup.Key, ProductCount = shapeGroup.Count() };
 
-                    if (filterItem.Shape.Parent != null)
-                    {
-                        if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.ParentId))
-                        {
-                            model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.ParentId).ProductCount += filterItem.ProductCount;
-                        }
-                        else
-                        {
-                            // build parent
-                            model.PagingFilteringContext.ShapeFilter.FilterItems.Add(new ShapeFilterItem { Shape = filterItem.Shape.Parent, ProductCount = shapeGroup.Count() });
-                        }
-                    }
-
-                    if (model.PagingFilteringContext.ShapeFilter.FilterItems.Any(x => x.Shape.Id == filterItem.Shape.Id))
-                    {
-                        model.PagingFilteringContext.ShapeFilter.FilterItems.FirstOrDefault(x => x.Shape.Id == filterItem.Shape.Id).ProductCount += filterItem.ProductCount;
-                    }
-                    else
-                    {
-                        // build shape
-                        model.PagingFilteringContext.ShapeFilter.FilterItems.Add(filterItem);
-                    }
+                    // build shape
+                    model.PagingFilteringContext.ShapeFilter.FilterItems.Add(filterItem);
                 }
-            }
-            else
-            {
-                model.PagingFilteringContext.ShapeFilter.FilterItems = new List<ShapeFilterItem>(_shapeService.GetShapes(parentsOnly: true).Select(shape => new ShapeFilterItem { Shape = shape, ProductCount = 0 }));
             }
         }
     }

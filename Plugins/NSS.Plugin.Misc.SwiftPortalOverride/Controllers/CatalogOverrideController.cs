@@ -28,6 +28,7 @@ using System.IO;
 using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogModel;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftCore.Services;
+using System.Diagnostics;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -39,9 +40,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWebHelper _webHelper;
         private readonly IStoreContext _storeContext;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly IShapeService _shapeService;
 
         #region Constructor
-        public CatalogOverrideController(ICustomerCompanyService customerCompanyService, ICatalogModelFactory catalogModelFactory, IGenericAttributeService genericAttributeService, IWorkContext workContext, IWebHelper webHelper, IStoreContext storeContext)
+        public CatalogOverrideController(IShapeService shapeService, ICustomerCompanyService customerCompanyService, ICatalogModelFactory catalogModelFactory, IGenericAttributeService genericAttributeService, IWorkContext workContext, IWebHelper webHelper, IStoreContext storeContext)
         {
             _catalogModelFactory = catalogModelFactory;
             _genericAttributeService = genericAttributeService;
@@ -49,6 +51,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _webHelper = webHelper;
             _storeContext = storeContext;
             _customerCompanyService = customerCompanyService;
+            _shapeService = shapeService;
         }
         #endregion
 
@@ -67,6 +70,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _webHelper.GetThisPageUrl(false),
                 _storeContext.CurrentStore.Id);
 
+            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(new List<int>(), new List<int>(), isPageLoad: true);
+
             //ViewBag.dataSource = JavaScriptConvert.ToString(shapeData);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
         }
@@ -75,6 +80,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [IgnoreAntiforgeryToken]
         public JsonResult FilteredProductsResult([FromBody] FilterParams filterParams)
         {
+            Stopwatch filterTimer = new Stopwatch();
+            filterTimer.Start();
+
             var shapeIds = filterParams?.ShapeIds;
             var specIds = filterParams?.SpecIds;
             var searchKeyword = filterParams?.SearchKeyword;
@@ -83,31 +91,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (specIds == null)
                 specIds = new List<int>();
 
+            var catalogTimer = new Stopwatch();
+            catalogTimer.Start();
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds, searchKeyword);
             CatalogModel.FilterParams = filterParams;
+            catalogTimer.Stop();
+            Debug.Print("catalogTimer", catalogTimer.Elapsed.TotalMilliseconds);
 
-            var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.OrderBy(s => s.Shape.Order).ToList();
+            filterTimer.Stop();
+            Debug.Print("filterTimer", filterTimer.Elapsed.TotalMilliseconds);
+            CatalogModel.ActiveShapeAttributes = filterParams?.ActiveShapeAttributes?.ToList();
 
-            List<ShapeData> shapeData = new List<ShapeData>();
-            for (var i = 0; i < shapes.Count; i++)
-            {
-                var childShapes = shapes[i].Shape?.SubCategories?.ToList();
-                var shape = new ShapeData
-                {
-                    Id = shapes[i].Shape.Id,
-                    ParentId = shapes[i].Shape.ParentId,
-                    Name = $"{shapes[i].Shape.Name}",
-                    DisplayName = $"{shapes[i].Shape.Name} ({shapes[i].ProductCount})",
-                    Count = shapes[i].ProductCount,
-                    HasChild = shapes.Any(x => x.Shape.ParentId == shapes[i].Shape.Id),
-                };
-                shapeData.Add(shape);
-            }
             return Json(
                 new {
                     partialView = RenderPartialViewToString("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel),
-                    shapes = JavaScriptConvert.ToString(shapeData),
-                    specs = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.SpecificationFilter.FilterItems.GroupBy(sf => sf.SpecificationAttributeName).Select(x => x.OrderBy(y => y.SpecificationAttributeOptionName))),
+                    shapes = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems),
+                    specs = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.SpecificationFilter.FilterItems),
                 }
             );
         }
@@ -123,6 +122,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             public List<int> SpecIds { get; set; }
             public List<int> ShapeIds { get; set; }
             public string SearchKeyword { get; set; }
+            public IList<ShapeAttribute> ActiveShapeAttributes { get; set; }
         }
 
         public CatalogModel CatalogModel { get; set; }

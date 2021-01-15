@@ -8,6 +8,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public partial interface ICatalogModelFactory
     {
-        public CatalogModel PrepareSwiftCatalogModel(IList<int> categoryIds, IList<int> specIds, string searchKeyword = null);
+        public CatalogModel PrepareSwiftCatalogModel(IList<int> categoryIds, IList<int> specIds, string searchKeyword = null, bool isPageLoad = false);
     }
 }
