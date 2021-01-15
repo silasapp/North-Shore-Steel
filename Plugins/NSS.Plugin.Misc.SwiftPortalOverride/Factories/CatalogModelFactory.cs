@@ -230,17 +230,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.PagingFilteringContext.SpecificationFilter.Enabled = true;
 
             //var defaultSpecFilters = new List<string> { SwiftCore.Helpers.Constants.CoatingFieldAttribute, SwiftCore.Helpers.Constants.MetalFieldAttribute };
+            var filteredProductIds = model.Products.Select(p => p.Id);
 
             var specFilters = allFilters.Select(af =>
             {
                 var prodSpecs = _specificationAttributeService.GetProductSpecificationAttributes(specificationAttributeOptionId: af.SpecificationAttributeOptionId);
+
+                // filter result
+                var prodSpecGroup = prodSpecs.GroupBy(ps => ps.ProductId).Where(p => filteredProductIds.Contains(p.Key));
 
                 return new SpecificationFilterItem
                 {
                     SpecificationAttributeName = af.SpecificationAttributeName,
                     SpecificationAttributeOptionId = af.SpecificationAttributeOptionId,
                     SpecificationAttributeOptionName = af.SpecificationAttributeOptionName,
-                    ProductCount = prodSpecs.GroupBy(ps => ps.SpecificationAttributeOptionId).Count()
+                    ProductCount = prodSpecGroup.Count()
                 };
 
             });
