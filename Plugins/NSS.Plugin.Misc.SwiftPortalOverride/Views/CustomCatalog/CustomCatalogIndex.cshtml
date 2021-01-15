@@ -25,14 +25,18 @@
     .e-control.e-dialog.e-lib.e-dlg-modal.e-popup.e-popup-open {
         max-height: 532px !important;
     }
+
+    .shape-icon-img:hover {
+        transform: scale(1.05);
+    }
 </style>
 <div id="app" class="page catalog-page" v-cloak>
     <div v-show="filterTags.length === 0">
-        <div class="d-flex flex-column align-items-center mx-5">
+        <div class="d-flex flex-column align-items-center text-center shapes-container">
             <label class="h2-primary mb-4">SELECT A SHAPE</label>
             <div class="d-flex flex-row flex-wrap px-5 shape-category">
-                <div class="d-flex flex-column align-items-center mb-3 mx-5" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
-                    <img v-if="shape.icon" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
+                <div class="d-flex flex-column align-items-center mb-3 mx-5" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
+                    <img v-if="shape.icon" class="shape-icon-img" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
                     <div v-if="!shape.icon" class="icon-shape"></div>
                     <label class="h4-default-500 text-capitalize mt-2">{{ shape.name }}</label>
                 </div>
@@ -209,22 +213,22 @@
             defaultShapesCount: shapesCountData,
 
             shapeIcon: {
-                angle: '',
+                angle: 'img-angle.svg',
                 beam: 'img-ibeam.png',
-                channel: '',
-                flatbar: '',
-                pipe: '',
+                channel: 'img-channel.svg',
+                flatbar: 'img-angle.svg',
+                pipe: 'img-pipe.svg',
                 roundbar: 'img-roundbar.png',
                 squarebar: 'img-squarebar.png',
                 hexbar: 'img-hexbar.png',
                 rebar: 'img-rebar.png',
-                tubing: '',
-                expandedmetal: '',
-                grating: '',
+                tubing: 'img-tubing.svg',
+                expandedmetal: 'img-expanded-metal.svg',
+                grating: 'img-grating.svg',
                 plate: 'img-plate.png',
                 sheet: 'img-sheet.png',
-                cylinder: '',
-                plateindividual: '',
+                cylinder: 'img-roundbar.png',
+                plateindividual: 'img-plate.png',
             },
 
             constants: {
@@ -283,6 +287,7 @@
             topShapes: function () {
                 const shapes = this.shared.groupedShapes.filter(x => !x.parentId);
                 shapes.forEach(shape => shape.icon = this.getShapeIcon(shape));
+                console.log(shapes);
                 return shapes;
             },
             defaultSpecs: function () {
@@ -546,14 +551,12 @@
                 let searchKeyword = getUrlParameter('q');
                 const shapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
                 let activeShapeAttributes = [];
-                let sawOption = false;
                 if (shapeIds.length > 0) {
                     const shape = this.shared.groupedShapes.find(x => x.id === shapeIds[0]);
                     activeShapeAttributes = shape.shapeAttributes;
-                    sawOption = shape.sawOption;
                 }
                 const specIds = this.filterTags.filter(x => x.type === 'spec').map(x => x.id);
-                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes, sawOption };
+                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes };
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
