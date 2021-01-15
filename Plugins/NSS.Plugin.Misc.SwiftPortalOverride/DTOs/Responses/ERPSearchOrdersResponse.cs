@@ -22,13 +22,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
         public string PoNo { get; set; }
 
         [JsonProperty("orderDate")]
-        public DateTimeOffset OrderDate { get; set; }
+        public DateTimeOffset? OrderDate { get; set; }
 
         [JsonProperty("deliveryStatus")]
         public string DeliveryStatus { get; set; }
 
         [JsonProperty("promiseDate")]
-        public DateTimeOffset PromiseDate { get; set; }
+        public DateTimeOffset? PromiseDate { get; set; }
 
         [JsonProperty("scheduledDate", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? ScheduledDate { get; set; }
