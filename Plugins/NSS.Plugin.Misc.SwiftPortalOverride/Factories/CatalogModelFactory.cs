@@ -131,8 +131,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
 
             Stopwatch productModelTimer = Stopwatch.StartNew();
-            if(!isPageLoad)
-                model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).OrderBy(o => o.Sku).ToList();
+            
+            model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).OrderBy(o => o.Sku).ToList();
             productModelTimer.Stop();
             Console.WriteLine("prod model timer (ms)", productModelTimer.Elapsed.Milliseconds.ToString());
 
@@ -185,9 +185,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             Console.WriteLine("spec timer (ms)", specFilterTimer.Elapsed.Milliseconds.ToString());
 
             Stopwatch shapeFilterTimer = Stopwatch.StartNew();
-            if (!isPageLoad)
-                PrepareShapeFilterModel(ref model);
-            else
+            
+            PrepareShapeFilterModel(ref model);
+            if (isPageLoad)
                 PrepareShapeData(ref model);
             shapeFilterTimer.Stop();
             Console.WriteLine("shape timer (ms)", shapeFilterTimer.Elapsed.Milliseconds.ToString());
@@ -284,7 +284,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             foreach (var shape in shapes)
             {
-                var childShapes = shape?.SubCategories?.ToList();
+                var childShapes = shape?.SubCategories?.ToList() ?? new List<SwiftCore.Domain.Shapes.Shape>();
+                foreach (var item in childShapes)
+                {
+                    var childData = new ShapeData
+                    {
+                        Id = item.Id,
+                        ParentId = item.ParentId,
+                        Name = $"{item.Name}",
+                        DisplayName = $"{item.Name}",
+                        Count = 0,
+                        HasChild = false,
+                        ShapeAttributes = shape.Atttributes.ToList(),
+                    };
+                    model.Shapes.Add(childData);
+                }
+
                 var data = new ShapeData
                 {
                     Id = shape.Id,
@@ -292,7 +307,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     Name = $"{shape.Name}",
                     DisplayName = $"{shape.Name}",
                     Count = 0,
-                    HasChild = shapes.Any(x => x.ParentId == shape.Id),
+                    HasChild = childShapes.Count > 0,
+                    ShapeAttributes = shape.Atttributes.ToList(),
                 };
                 model.Shapes.Add(data);
             }

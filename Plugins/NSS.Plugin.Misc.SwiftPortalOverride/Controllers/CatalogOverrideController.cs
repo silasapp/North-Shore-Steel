@@ -98,39 +98,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             catalogTimer.Stop();
             Debug.Print("catalogTimer", catalogTimer.Elapsed.TotalMilliseconds);
 
-            var shapeTimer = new Stopwatch();
-            shapeTimer.Start();
-            //var shapes = CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems.OrderBy(s => s.Shape.Order).ToList();
-
-            List<ShapeData> shapeData = new List<ShapeData>();
-            var shapes = _shapeService.GetShapes().OrderBy(s => s.Order);
-
-            foreach (var shape in shapes)
-            {
-                var childShapes = shape?.SubCategories?.ToList();
-                var data = new ShapeData
-                {
-                    Id = shape.Id,
-                    ParentId = shape.ParentId,
-                    Name = $"{shape.Name}",
-                    DisplayName = $"{shape.Name}",
-                    Count = 0,
-                    HasChild = shapes.Any(x => x.ParentId == shape.Id),
-                };
-                shapeData.Add(data);
-            }
-
-            shapeTimer.Stop();
-            Debug.Print("catalogTimer", shapeTimer.Elapsed.TotalMilliseconds);
-
             filterTimer.Stop();
             Debug.Print("filterTimer", filterTimer.Elapsed.TotalMilliseconds);
+            CatalogModel.ActiveShapeAttributes = filterParams?.ActiveShapeAttributes?.ToList();
 
             return Json(
                 new {
                     partialView = RenderPartialViewToString("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel),
-                    shapes = JavaScriptConvert.ToString(shapeData),
-                    specs = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.SpecificationFilter.FilterItems.GroupBy(sf => sf.SpecificationAttributeName).Select(x => x.OrderBy(y => y.SpecificationAttributeOptionName))),
+                    shapes = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems),
+                    specs = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.SpecificationFilter.FilterItems),
                 }
             );
         }
@@ -146,6 +122,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             public List<int> SpecIds { get; set; }
             public List<int> ShapeIds { get; set; }
             public string SearchKeyword { get; set; }
+            public IList<ShapeAttribute> ActiveShapeAttributes { get; set; }
         }
 
         public CatalogModel CatalogModel { get; set; }
