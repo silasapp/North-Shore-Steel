@@ -124,8 +124,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             customer.RegisteredInStoreId = _storeContext.CurrentStore.Id;
 
             var warnings = new List<string>();
-            if (model.Email.ToLower() != model.ConfirmEmail.ToLower())
-                warnings.Add("Emails does not match.");
+            if(!string.IsNullOrEmpty(model.Email) && !string.IsNullOrEmpty(model.ConfirmEmail))
+            {
+                if (model.Email.ToLower() != model.ConfirmEmail.ToLower())
+                    warnings.Add("Emails does not match.");
+            }
             if (String.IsNullOrEmpty(model.FirstName))
                 warnings.Add("Please enter First Name.");
             if (String.IsNullOrEmpty(model.LastName))
