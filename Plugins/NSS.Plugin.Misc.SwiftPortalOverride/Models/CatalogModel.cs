@@ -45,6 +45,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public string DisplayName { get; set; }
             public bool? HasChild { get; set; }
             public int Count { get; set; }
+            public bool SawOption { get; set; }
             public IList<ShapeAttribute> ShapeAttributes { get; set; }
         }
 

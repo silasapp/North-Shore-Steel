@@ -28,10 +28,10 @@
 </style>
 <div id="app" class="page catalog-page" v-cloak>
     <div v-show="filterTags.length === 0">
-        <div class="d-flex flex-column align-items-center text-center shapes-container">
+        <div class="d-flex flex-column align-items-center mx-5">
             <label class="h2-primary mb-4">SELECT A SHAPE</label>
             <div class="d-flex flex-row flex-wrap px-5 shape-category">
-                <div class="d-flex flex-column align-items-center mb-3 mx-5" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
+                <div class="d-flex flex-column align-items-center mb-3 mx-5" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
                     <img v-if="shape.icon" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
                     <div v-if="!shape.icon" class="icon-shape"></div>
                     <label class="h4-default-500 text-capitalize mt-2">{{ shape.name }}</label>
@@ -546,12 +546,14 @@
                 let searchKeyword = getUrlParameter('q');
                 const shapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
                 let activeShapeAttributes = [];
+                let sawOption = false;
                 if (shapeIds.length > 0) {
                     const shape = this.shared.groupedShapes.find(x => x.id === shapeIds[0]);
                     activeShapeAttributes = shape.shapeAttributes;
+                    sawOption = shape.sawOption;
                 }
                 const specIds = this.filterTags.filter(x => x.type === 'spec').map(x => x.id);
-                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes };
+                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes, sawOption };
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
