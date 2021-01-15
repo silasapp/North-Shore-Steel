@@ -255,7 +255,7 @@ a:not([href]):not([class]) {
 
 @media (max-width: 750px) {
     .header-links li {
-        margin: 0 5px;
+        margin: 0 10px;
     }
 
     #topcartlink {
