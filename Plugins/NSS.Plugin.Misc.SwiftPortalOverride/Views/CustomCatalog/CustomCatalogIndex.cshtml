@@ -272,6 +272,11 @@
                     type: 'query',
                 };
                 this.filterTags = [tag];
+
+                this.shouldRebuildShapes = true;
+                this.shouldRebuildSpecs = true;
+
+                this.getFilteredProduuts();
             }
         },
         computed: {
@@ -466,7 +471,7 @@
                 this.filterTags = [...this.filterTags, ...shapeFilters];
 
                 this.activeSpecGroup = null;
-                this.shouldRebuildShapes = false;
+                this.shouldRebuildShapes = this.filterTags.some(x => x.type !== 'shape');
                 this.shouldRebuildSpecs = true;
 
                 this.getFilteredProduuts();
@@ -495,6 +500,11 @@
 
             removeFilter: function (tag) {
                 const { id, type, data } = tag;
+                console.log("removeFilter: ", this.filterTags);
+                if (this.filterTags.length === 1) {
+                    this.clearFilters();
+                    return;
+                }
                 if (type === 'shape') {
                     const parentID = this.shared.groupedShapes.find(x => x.id === id).parentId;
                     const shapeData = {
@@ -508,6 +518,11 @@
                 } else if (type === 'query') {
                     this.filterTags = this.filterTags.filter(x => x.type !== 'query');
                     window.history.pushState({}, document.title, window.location.pathname);
+
+                    this.activeSpecGroup = null;
+                    this.shouldRebuildShapes = true;
+                    this.shouldRebuildSpecs = true;
+
                     this.getFilteredProduuts();
                 }
             },
@@ -518,10 +533,11 @@
 
                 window.history.pushState("object or string", "Title", "/" + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]);
 
-                this.shouldRebuildShapes = true;
-                this.shouldRebuildSpecs = true;
+                this.shouldRebuildShapes = false;
+                this.shouldRebuildSpecs = false;
 
-                this.getFilteredProduuts();
+                this.updateShapesCount(this.shared.defaultShapesCount);
+                this.resetTreeview();
             },
 
             getFilteredProduuts: function () {
