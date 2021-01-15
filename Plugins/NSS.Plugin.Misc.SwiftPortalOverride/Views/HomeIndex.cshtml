@@ -92,7 +92,6 @@
         opacity: 1;
     }
 
-
     .colorRed {
         color: red !important;
     }
@@ -130,7 +129,7 @@
                                                 <tr>
                                                     <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                     <td>@order.PoNo</td>
-                                                    <td>@order.PromiseDate.ToString("MM/dd/yyyy")</td>
+                                                    <td>@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
                                                     <td>@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
                                                     <td class="text-center cursor-pointer">@order.OrderStatusName</td>
                                                 </tr>
@@ -163,7 +162,7 @@
 
                     <div class="col-md-4 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
-                            <div class=" text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                            <div class=" text-center tab-pane fade show active" id="" role="tabpanel" style="height:19.6rem" aria-labelledby="">
                                 <div class="card-title border-bottom-0">
                                     <h1 style="font: normal normal 500 34px/24px 'Teko';">STATISTICS</h1>
                                 </div>
@@ -173,8 +172,8 @@
                                         <h5 class="float-right nss-dark-blue">{{stats.statValue}}</h5>
                                     </div>
                                 </div>
-                                <label class="nss-light-grey">Combines online and offline orders.</label>
                             </div>
+                                <div class="nss-light-grey text-center">Combines online and offline orders.</div>
                         </div>
                     </div>
                 }
