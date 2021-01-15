@@ -32,7 +32,7 @@
 </style>
 <div id="ordersGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
-        <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" allowExcelExport="true"
+        <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" rowHeight="38" allowExcelExport="true"
                   allowPaging="true" allowFiltering="true" rowSelected="onRowSelected" rowDeselected="onRowDeselected">
             <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
             <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
@@ -359,5 +359,8 @@
 </script>
 <script id="viewTicket" type="text/x-template">
     <a href="">View Ticket</a>
+    @*${if(DeliveryTicketCount > 0)}
+    <a href="${DeliveryTicketFile}" target="_blank">View Ticket</a>
+    ${/if}*@
 </script>
 <ejs-scripts></ejs-scripts>
