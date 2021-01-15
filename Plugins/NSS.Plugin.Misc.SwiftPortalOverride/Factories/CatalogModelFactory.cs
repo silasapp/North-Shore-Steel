@@ -300,6 +300,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         Count = 0,
                         HasChild = false,
                         ShapeAttributes = shape.Atttributes.ToList(),
+                        SawOption = shape.SawOption
                     };
                     model.Shapes.Add(childData);
                 }
@@ -313,6 +314,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     Count = 0,
                     HasChild = childShapes.Count > 0,
                     ShapeAttributes = shape.Atttributes.ToList(),
+                    SawOption = shape.SawOption,
                 };
                 model.Shapes.Add(data);
             }

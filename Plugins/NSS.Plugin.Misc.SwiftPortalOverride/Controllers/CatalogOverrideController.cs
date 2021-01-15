@@ -123,6 +123,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             public List<int> ShapeIds { get; set; }
             public string SearchKeyword { get; set; }
             public IList<ShapeAttribute> ActiveShapeAttributes { get; set; }
+            public bool SawOption { get; set; }
         }
 
         public CatalogModel CatalogModel { get; set; }
