@@ -551,12 +551,14 @@
                 let searchKeyword = getUrlParameter('q');
                 const shapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
                 let activeShapeAttributes = [];
+                let sawOption = false;
                 if (shapeIds.length > 0) {
                     const shape = this.shared.groupedShapes.find(x => x.id === shapeIds[0]);
                     activeShapeAttributes = shape.shapeAttributes;
+                    sawOption = shape.sawOption;
                 }
                 const specIds = this.filterTags.filter(x => x.type === 'spec').map(x => x.id);
-                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes };
+                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes, sawOption };
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
