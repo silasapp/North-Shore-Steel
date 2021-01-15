@@ -281,10 +281,10 @@
                 return shapes;
             },
             defaultSpecs: function () {
-                return this.groupedSpecs.filter(x => x[0].type === this.shared.constants.SPEC_TYPE_DEFAULT);
+                return this.groupedSpecs.filter(x => x && x[0] && x[0].type === this.shared.constants.SPEC_TYPE_DEFAULT);
             },
             otherSpecs: function () {
-                return this.groupedSpecs.filter(x => x[0].type === this.shared.constants.SPEC_TYPE_OTHERS);
+                return this.groupedSpecs.filter(x => x && x[0] && x[0].type === this.shared.constants.SPEC_TYPE_OTHERS);
             },
             showOtherSpecs: function () {
                 return this.filterTags.some(x => x.type === 'shape' && (x.id === 13 || x.parentId === 13));
