@@ -33,5 +33,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false);
 
         NotificationsModel PrepareNotificationsModel(string error, IDictionary<string, bool> notifications);
+
+        Nop.Web.Models.Customer.CustomerAddressListModel PrepareCustomerAddressListModel();
     }
 }

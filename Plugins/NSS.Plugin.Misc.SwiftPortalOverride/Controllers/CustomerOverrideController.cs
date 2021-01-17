@@ -44,6 +44,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using RegisterModel = Nop.Web.Models.Customer.RegisterModel;
+using Nop.Web.Extensions;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -85,12 +86,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IShoppingCartService _shoppingCartService;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerCompanyService _customerCompanyService;
+        private readonly ICompanyService _companyService;
+        private readonly IAddressAttributeParser _addressAttributeParser;
 
         #endregion
 
         #region Constructor
 
-        public CustomerOverrideController(Factories.ICustomerModelFactory overrideCustomerModelFactory, ICustomerCompanyService customerCompanyService, AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, ERPApiProvider nSSApiProvider, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
+        public CustomerOverrideController(ICompanyService companyService, Factories.ICustomerModelFactory overrideCustomerModelFactory, ICustomerCompanyService customerCompanyService, AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, ERPApiProvider nSSApiProvider, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
         {
             _customerSettings = customerSettings;
             _customerModelFactory = customerModelFactory;
@@ -126,6 +129,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _shoppingCartService = shoppingCartService;
             _customerActivityService = customerActivityService;
             _customerCompanyService = customerCompanyService;
+            _companyService = companyService;
+            _addressAttributeParser = addressAttributeParser;
         }
 
         #endregion
@@ -455,6 +460,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #endregion
 
 
+        #region My account / Register
         [HttpsRequirement]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
@@ -773,6 +779,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View(model);
         }
 
+        #endregion
+
+
         #region My account / Change password
 
         public override IActionResult ChangePassword(ChangePasswordModel model)
@@ -851,7 +860,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", model);
         }
 
+        #endregion
 
+        #region My account / Info
         [HttpsRequirement]
         public override IActionResult Info()
         {
@@ -863,107 +874,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             return View(model);
         }
-
-        [HttpsRequirement]
-        public override IActionResult AddressEdit(int addressId)
-        {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
-                return Challenge();
-
-            var customer = _workContext.CurrentCustomer;
-            //find address (ensure that it belongs to the current customer)
-            var address = _customerService.GetCustomerAddress(customer.Id, addressId);
-            if (address == null)
-                //address is not found
-                return RedirectToRoute("CustomerAddresses");
-
-            var model = new CustomerAddressEditModel();
-            _addressModelFactory.PrepareAddressModel(model.Address,
-                address: address,
-                excludeProperties: false,
-                addressSettings: _addressSettings,
-                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
-
-            return View(model);
-        }
-
-        [HttpsRequirement]
-        public IActionResult Notifications()
-        {
-            return View();
-
-        }
-
-        [HttpsRequirement]
-        public IActionResult GetNotifications()
-        {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
-                return AccessDeniedView();
-
-            // call api
-            var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
-            var (result, error) = _nSSApiProvider.GetCompanyNotificationPreferences(custNo, eRPCompanyId);
-
-            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(error, result);
-
-            return Json(new { model });
-        }
-
-
-
-        [HttpsRequirement]
-        [IgnoreAntiforgeryToken]
-        public IActionResult UpdateNotifications([FromBody] NotificationsModel.NotificationUpdateModel notificationRequest)
-        {
-            if (notificationRequest == null)
-                throw new ArgumentNullException(nameof(notificationRequest));
-
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
-                return AccessDeniedView();
-
-            // call api
-            var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
-            var preferences = new Dictionary<string, bool>();
-
-            if (notificationRequest.Preferences != null)
-            {
-                foreach (var item in notificationRequest.Preferences)
-                {
-                    preferences.Add(item.Key, item.Value);
-                }
-            }
-
-            var (result, error) = _nSSApiProvider.UpdateCompanyNotificationPreferences(custNo, eRPCompanyId, preferences);
-
-            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(error, result);
-
-            //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Notifications.cshtml", model);
-
-            return Json(new { model });
-        }
-
-        [HttpsRequirement]
-        public override IActionResult AddressAdd()
-        {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
-                return Challenge();
-
-            var model = new CustomerAddressEditModel();
-            _addressModelFactory.PrepareAddressModel(model.Address,
-                address: null,
-                excludeProperties: false,
-                addressSettings: _addressSettings,
-                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
-
-            return View(model);
-        }
-
 
         [HttpPost]
         public override IActionResult Info(CustomerInfoModel model, IFormCollection form)
@@ -1199,7 +1109,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     }
 
                     #endregion
-                    
+
                     _nSSApiProvider.UpdateNSSUser(ErpId, request);
 
 
@@ -1215,10 +1125,177 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model = _customerModelFactory.PrepareCustomerInfoModel(model, customer, true, customerAttributesXml);
             return View(model);
         }
-        
-        #endregion
 
         #endregion
 
+        #region My account / Address
+
+        [HttpsRequirement]
+        public override IActionResult Addresses()
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var model = _overrideCustomerModelFactory.PrepareCustomerAddressListModel();
+            return View(model);
+        }
+
+        [HttpsRequirement]
+        public override IActionResult AddressEdit(int addressId)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var customer = _workContext.CurrentCustomer;
+            //find address (ensure that it belongs to the current customer)
+            var address = _customerService.GetCustomerAddress(customer.Id, addressId);
+            if (address == null)
+                //address is not found
+                return RedirectToRoute("CustomerAddresses");
+
+            var model = new CustomerAddressEditModel();
+            _addressModelFactory.PrepareAddressModel(model.Address,
+                address: address,
+                excludeProperties: false,
+                addressSettings: _addressSettings,
+                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+
+            return View(model);
+        }
+
+        [HttpsRequirement]
+        public override IActionResult AddressAdd()
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var model = new CustomerAddressEditModel();
+            _addressModelFactory.PrepareAddressModel(model.Address,
+                address: null,
+                excludeProperties: false,
+                addressSettings: _addressSettings,
+                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public override IActionResult AddressAdd(CustomerAddressEditModel model, IFormCollection form)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+
+            //custom address attributes
+            var customAttributes = _addressAttributeParser.ParseCustomAddressAttributes(form);
+            var customAttributeWarnings = _addressAttributeParser.GetAttributeWarnings(customAttributes);
+            foreach (var error in customAttributeWarnings)
+            {
+                ModelState.AddModelError("", error);
+            }
+
+            if (ModelState.IsValid)
+            {
+                var address = model.Address.ToEntity();
+                address.CustomAttributes = customAttributes;
+                address.CreatedOnUtc = DateTime.UtcNow;
+                //some validation
+                if (address.CountryId == 0)
+                    address.CountryId = null;
+                if (address.StateProvinceId == 0)
+                    address.StateProvinceId = null;
+
+
+                _addressService.InsertAddress(address);
+                _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+
+
+                var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
+                _genericAttributeService.SaveAttribute<int>(company, "CompanyAddress", address.Id);
+
+                return RedirectToRoute("CustomerAddresses");
+            }
+
+            //If we got this far, something failed, redisplay form
+            _addressModelFactory.PrepareAddressModel(model.Address,
+                address: null,
+                excludeProperties: true,
+                addressSettings: _addressSettings,
+                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id),
+                overrideAttributesXml: customAttributes);
+
+            return View(model);
+        }
+        #endregion
+
+        #region My account / Notification
+
+        [HttpsRequirement]
+        public IActionResult Notifications()
+        {
+            return View();
+
+        }
+
+        [HttpsRequirement]
+        public IActionResult GetNotifications()
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
+            // call api
+            var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
+            var (result, error) = _nSSApiProvider.GetCompanyNotificationPreferences(custNo, eRPCompanyId);
+
+            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(error, result);
+
+            return Json(new { model });
+        }
+
+
+
+        [HttpsRequirement]
+        [IgnoreAntiforgeryToken]
+        public IActionResult UpdateNotifications([FromBody] NotificationsModel.NotificationUpdateModel notificationRequest)
+        {
+            if (notificationRequest == null)
+                throw new ArgumentNullException(nameof(notificationRequest));
+
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+                return AccessDeniedView();
+
+            // call api
+            var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
+            var preferences = new Dictionary<string, bool>();
+
+            if (notificationRequest.Preferences != null)
+            {
+                foreach (var item in notificationRequest.Preferences)
+                {
+                    preferences.Add(item.Key, item.Value);
+                }
+            }
+
+            var (result, error) = _nSSApiProvider.UpdateCompanyNotificationPreferences(custNo, eRPCompanyId, preferences);
+
+            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(error, result);
+
+            //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Notifications.cshtml", model);
+
+            return Json(new { model });
+        }
+
+        #endregion
+
+
+        #endregion
     }
 }

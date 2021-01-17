@@ -12,6 +12,11 @@ using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using Nop.Services.Common;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
+using Nop.Web.Models.Common;
+using Nop.Web.Factories;
+using Nop.Services.Customers;
+using Nop.Services.Stores;
+using Nop.Services.Directory;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -30,8 +35,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         private readonly IWorkContext _workContext;
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ICompanyService _companyService;
-
+        private readonly IAddressModelFactory _addressModelFactory;
+        private readonly AddressSettings _addressSettings;
+        private readonly ICountryService _countryService;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly ICustomerService _customerService;
+        private readonly IAddressService _addressService;
         public CustomerModelFactory(
+            IAddressService addressService,
+            ICustomerService customerService,
+            IStoreMappingService storeMappingService,
+            ICountryService countryService,
+            AddressSettings addressSettings,
+            IAddressModelFactory addressModelFactory,
             IGenericAttributeService genericAttributeService,
             ICompanyService companyService,
             ERPApiProvider eRPApiProvider,
@@ -47,6 +63,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             _genericAttributeService = genericAttributeService;
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
+            _addressModelFactory = addressModelFactory;
+            _customerService = customerService;
+            _storeMappingService = storeMappingService;
+            _countryService = countryService;
+            _addressSettings = addressSettings;
+            _addressService = addressService;
         }
         /// <summary>
         /// Prepare the customer navigation model
@@ -276,6 +298,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
+
         /// <summary>
         /// Prepare the customer register model
         /// </summary>
@@ -304,6 +327,47 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.CheckUsernameAvailabilityEnabled = _customerSettings.CheckUsernameAvailabilityEnabled;
             model.EnteringEmailTwice = _customerSettings.EnteringEmailTwice;
 
+            return model;
+        }
+
+        public virtual Nop.Web.Models.Customer.CustomerAddressListModel PrepareCustomerAddressListModel()
+        {
+            int addressId;
+            var currentCustomer = _workContext.CurrentCustomer;
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+            int ERPCId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+            var company = _companyService.GetCompanyEntityByErpEntityId(ERPCId);
+            //get address by entity id
+            var attributes = _genericAttributeService.GetAttributesForEntity(company.Id, "Company");
+            List<Address> addresses = new List<Address>();
+
+
+            foreach (var attr in attributes)
+            {
+                int.TryParse(attr.Value, out addressId);
+                var addy = _addressService.GetAddressById(addressId);
+                addresses.Add(addy);
+            }
+
+
+
+            //var addresses = _customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id)
+            //    //enabled for the current store
+            //    .Where(a => a.CountryId == null || _storeMappingService.Authorize(_countryService.GetCountryByAddress(a)))
+            //    .ToList();
+
+
+            var model = new Nop.Web.Models.Customer.CustomerAddressListModel();
+            foreach (var address in addresses)
+            {
+                var addressModel = new AddressModel();
+                _addressModelFactory.PrepareAddressModel(addressModel,
+                    address: address,
+                    excludeProperties: false,
+                    addressSettings: _addressSettings,
+                    loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+                model.Addresses.Add(addressModel);
+            }
             return model;
         }
     }
