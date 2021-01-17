@@ -18,6 +18,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         public static string NewCustomerRejectionMessageTemplateName => "NewCustomer.Rejection";
 
         public static string ERPCompanyCookieKey => "ERPCompanyId{0}";
+        public static string CompanyAddressKey => " CompanyAddressId{0}";
 
         public static string NewUserEmailForPasswordChange => "CustomerFirstLoginEmail";
 

@@ -423,7 +423,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                             _customerActivityService.InsertActivity(customer, "PublicStore.Login",
                                 _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
 
-                           
+
                             if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
                                 return RedirectToRoute("Homepage");
 
@@ -855,7 +855,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 foreach (var error in changePasswordResult.Errors)
                     ModelState.AddModelError("", error);
             }
-            
+
             //If we got this far, something failed, redisplay form
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", model);
         }
@@ -1213,7 +1213,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
                 var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
-                _genericAttributeService.SaveAttribute<int>(company, "CompanyAddress", address.Id);
+                var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+                _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
 
                 return RedirectToRoute("CustomerAddresses");
             }
