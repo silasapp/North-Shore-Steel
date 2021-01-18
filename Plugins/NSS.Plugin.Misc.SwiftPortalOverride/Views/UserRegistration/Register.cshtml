@@ -370,7 +370,9 @@
                                         } else {
                                             $("#found-us-text-error").css("display", "none")
                                         }
-                                        validatePhoneNumbers();
+                                        if (!validatePhoneNumbers()) {
+                                            return false;
+                                        }
                                         if ($('#accept-consent').is(':checked')) {
                                             //do some stuff
                                             return true;
@@ -484,6 +486,7 @@
                 }
             }
         }
+        return true;
     }
 
 </script>
