@@ -358,9 +358,8 @@
     <a href="/orders/${OrderId}">${OrderId}</a>
 </script>
 <script id="viewTicket" type="text/x-template">
-    <a href="">View Ticket</a>
-    @*${if(DeliveryTicketCount > 0)}
+    ${if(DeliveryTicketCount > 0)}
     <a href="${DeliveryTicketFile}" target="_blank">View Ticket</a>
-    ${/if}*@
+    ${/if}
 </script>
 <ejs-scripts></ejs-scripts>

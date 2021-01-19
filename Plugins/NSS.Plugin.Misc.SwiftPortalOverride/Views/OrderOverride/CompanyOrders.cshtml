@@ -30,8 +30,9 @@
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0" v-bind:style="{'width': isMobile ? '50%':'100%'}">
                     <label for=orderFromDate>Order Dates</label>
                     <div class="input-with-icon">
-                        @*<input class=nss-form-control type="text" v-model="fromDate" id="datepicker" autocomplete="off" placeholder="From">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="fromDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="startDate" v-bind:placeholder="isMobile ? 'From':'From (mm/dd/yyyy)'" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" id="startDate" v-model="fromDate" class="datepicker nss-form-control"
+                               data-date-format="mm/dd/yyyy" placeholder="From (mm/dd/yyyy)"
+                               v-on:change="!$event.target.value ? (fromDate = null) : null" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -39,8 +40,9 @@
                 <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0" v-bind:style="{'width': isMobile ? '50%':'100%'}">
                     <label for=orderToDate> &nbsp;</label>
                     <div class="input-with-icon">
-                        @*<input class=nss-form-control type="text" v-model="toDate" id="datepicker2" autocomplete="off" placeholder="To">*@
-                        <input style="height: 36px; border-radius: 0;" v-model="toDate" class="datepicker nss-form-control" data-date-format="mm/dd/yyyy" id="endDate" v-bind:placeholder="isMobile ? 'To':'To (mm/dd/yyyy)'" maxlength="10" onpaste="return false;">
+                        <input style="height: 36px; border-radius: 0;" id="endDate" v-model="toDate" class="datepicker nss-form-control"
+                               data-date-format="mm/dd/yyyy" placeholder="To (mm/dd/yyyy)"
+                               v-on:change="!$event.target.value ? (toDate = null) : null" maxlength="10" onpaste="return false;">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
                     </div>
 
@@ -178,18 +180,20 @@
 <script>
 
     $.fn.datepicker.defaults.format = "mm/dd/yyyy";
-    $('#startDate').datepicker();
-    $('#endDate').datepicker();
 
-    $('#startDate').datepicker()
-        .on('changeDate', function (e) {
-            vm.fromDate = $(this).val();
-        });
+    $('#startDate').datepicker({
+        endDate: '+0d',
+        autoclose: true
+    }).on('changeDate', function (e) {
+        vm.fromDate = $(this).val();
+    });
 
-    $('#endDate').datepicker()
-        .on('changeDate', function (e) {
-            vm.toDate = $(this).val();
-        });
+    $('#endDate').datepicker({
+        endDate: '+0d',
+        autoclose: true
+    }).on('changeDate', function (e) {
+        vm.toDate = $(this).val();
+    });
 
 
 

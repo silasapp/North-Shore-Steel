@@ -650,8 +650,8 @@ a:not([href]):not([class]) {
     color: #033551 !important;
 }
 
-.nss-light-grey {
-    color: #AAAAAA !important;
+.nss-dark {
+    color: #000000 !important;
 }
 
 .buttons > .register-button,
@@ -3904,4 +3904,8 @@ and also iPads specifically.
 
 [v-cloak] {
     display: none;
+}
+
+.ui-dialog-titlebar-close {
+    background: url('../images/close.svg') center no-repeat !important;
 }

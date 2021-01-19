@@ -49,6 +49,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         {
             // search nss api
             var response = new List<ERPSearchOrdersResponse>();
+            var token = string.Empty;
 
             if ((filter.OrderId == null && filter.PONo == null) && (filter.FromDate == null || filter.ToDate == null))
             {
@@ -77,7 +78,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             };
 
             if (filter.IsClosed)
-                response = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: false);
+                (token, response) = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: false);
             else
                 response = _nSSApiProvider.SearchOpenOrders(companyId, request, useMock: false);
 
@@ -92,7 +93,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 PoNo = order.PoNo,
                 PromiseDate = order.PromiseDate,
                 ScheduledDate = order.ScheduledDate,
-                Weight = order.Weight
+                Weight = order.Weight,
+                DeliveryTicketFile = $"{order.DeliveryTicketFile}{token}"
             }).ToList();
 
             var model = new CompanyOrderListModel 
