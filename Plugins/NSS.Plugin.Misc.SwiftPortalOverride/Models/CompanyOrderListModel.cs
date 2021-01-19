@@ -39,6 +39,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
             public DateTimeOffset? DeliveryDate { get; set; }
 
+            public string DeliveryTicketFile { get; set; }
+
             public int? DeliveryTicketCount { get; set; }
         }
 

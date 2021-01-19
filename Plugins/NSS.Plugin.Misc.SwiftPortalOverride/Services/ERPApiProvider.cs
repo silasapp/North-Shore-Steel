@@ -441,7 +441,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             return retVal;
         }
 
-        public List<ERPSearchOrdersResponse> SearchClosedOrders(int companyId, ERPSearchOrdersRequest request, bool useMock = false)
+        public (string, List<ERPSearchOrdersResponse>) SearchClosedOrders(int companyId, ERPSearchOrdersRequest request, bool useMock = false)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -449,12 +449,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             //initialize
             var retVal = new List<ERPSearchOrdersResponse>();
             var respContent = string.Empty;
+            var token = string.Empty;
 
             if (!useMock)
                 if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
                 {
                     _logger.Warning("Swift Api provider - SearchClosedOrders", new Exception("NSS API attributes not configured correctly."));
-                    return retVal;
+                    return ("", retVal);
                 }
 
             //create swift user
@@ -472,12 +473,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (!useMock)
                     {
                         //get token
-                        var token = GetNSSToken(httpClient);
+                        token = GetNSSToken(httpClient);
 
                         if (string.IsNullOrEmpty(token))
                         {
                             _logger.Warning($"NSS.SearchClosedOrders -> {companyId}", new Exception("NSS token returned empty"));
-                            return retVal;
+                            return ("", retVal);
                         }
 
                         //httpClient.DefaultRequestHeaders.Authorization =
@@ -508,7 +509,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             // log request & resp
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.SearchClosedOrders details => companyId: {companyId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
-            return retVal;
+            return (token, retVal);
         }
 
         public (string, ERPGetOrderDetailsResponse) GetOrderDetails(int companyId, int erpOrderId)
