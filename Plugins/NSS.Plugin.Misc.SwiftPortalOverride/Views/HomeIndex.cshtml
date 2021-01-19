@@ -106,7 +106,7 @@
                 @if (isOperations || isBuyer)
                 {
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
-                        <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-content" id="pills-tabContent" style="height: 22.7rem">
                             <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
                                 @if (Model.OpenOrders.Count > 0)
                                 {
@@ -315,7 +315,6 @@
                     </div>
                 }
 
-                <div class="row">
                     <div class="col-md-12">
 
                         <ul class="nav nav-pills mb-1 " id="pills-tab" role="tablist">
@@ -357,9 +356,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render();
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render()
 
 
 
