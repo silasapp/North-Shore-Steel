@@ -196,6 +196,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
         public TransactionModel PrepareCustomerHomeModel(string companyId)
         {
+            var token = string.Empty;
+            List<Invoice> recentInvoices = new List<Invoice>();
             var openOrdersResponse = new List<ERPSearchOrdersResponse>();
             var closedOrdersResponse = new List<ERPSearchOrdersResponse>();
             var request = new ERPSearchOrdersRequest()
@@ -209,7 +211,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var currentCustomer = _workContext.CurrentCustomer;
 
             openOrdersResponse = _nSSApiProvider.SearchOpenOrders(Convert.ToInt32(companyId), request, useMock: false);
-            closedOrdersResponse = _nSSApiProvider.SearchClosedOrders(Convert.ToInt32(companyId), request, useMock: false);
+            (token, closedOrdersResponse) = _nSSApiProvider.SearchClosedOrders(Convert.ToInt32(companyId), request, useMock: false);
 
             var openOrders = openOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
@@ -229,7 +231,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             }).Take(5).ToList();
 
             model.RecentOrders = _nSSApiProvider.GetRecentOrders(companyId);
-            var (token, recentInvoices) = _nSSApiProvider.GetRecentInvoices(companyId);
+            (token, recentInvoices) = _nSSApiProvider.GetRecentInvoices(companyId);
 
             if (recentInvoices != null && recentInvoices.Count > 0)
             {

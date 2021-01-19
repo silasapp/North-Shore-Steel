@@ -73,7 +73,7 @@
     }
 
     .p-t6 {
-        padding: 6.7rem 0;
+        padding: 5.7rem 0;
     }
 
     .p-b11 {
@@ -106,8 +106,9 @@
                 @if (isOperations || isBuyer)
                 {
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
-                        <div class="tab-content" id="pills-tabContent">
-                            <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                        <div class="tab-content" id="pills-tabContent" style="height: 22.7rem">
+                            <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="        height: 19.4rem
+">
                                 @if (Model.OpenOrders.Count > 0)
                                 {
                                     <div class="card-title mb-2 border-bottom-0 mt-2">
@@ -136,7 +137,6 @@
                                             }
                                         </tbody>
                                     </table>
-                                    <div class="nss-light-grey text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
                                 }
                                 else
                                 {
@@ -153,6 +153,8 @@
                                     </div>
                                 }
                             </div>
+
+                            <div class="nss-dark text-center mb-1 @(Model.OpenOrders.Count > 0 ? "": "d-none")">* All orders display the five most recent result from the past 30 days.</div>
                         </div>
                     </div>
                 }
@@ -173,7 +175,7 @@
                                     </div>
                                 </div>
                             </div>
-                                <div class="nss-light-grey text-center">Combines online and offline orders.</div>
+                                <div class="nss-dark text-center">Combines online and offline orders.</div>
                         </div>
                     </div>
                 }
@@ -275,7 +277,7 @@
                                             }
                                         </tbody>
                                     </table>
-                                    <div class="nss-light-grey text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
+                                    <div class="nss-dark text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
                                 </div>
                             </div>
                         </div>
@@ -315,7 +317,6 @@
                     </div>
                 }
 
-                <div class="row">
                     <div class="col-md-12">
 
                         <ul class="nav nav-pills mb-1 " id="pills-tab" role="tablist">
@@ -357,9 +358,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render();
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render()
 
 
 
@@ -552,7 +552,7 @@
                                     <h5 class="float-right nss-dark-blue">{{stats.statValue}}</h5>
                                 </div>
                             </div>
-                            <label class="nss-light-grey">Combines online and offline orders.</label>
+                            <label class="nss-dark">Combines online and offline orders.</label>
                         </div>
                     </div>
                 </div>
