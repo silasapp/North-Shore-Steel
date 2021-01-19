@@ -837,7 +837,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                             break;
                     }
 
-                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, amount), 2), Code = discount.CouponCode ?? discount.Name?.Replace("'", "''") ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
+                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, amount), 2), Code = discount.CouponCode ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
                 }
 
             }
