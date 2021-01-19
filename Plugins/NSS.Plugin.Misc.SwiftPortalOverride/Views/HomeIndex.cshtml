@@ -285,7 +285,7 @@
                 }
 
 
-                @if (isAP || isBuyer)
+                @if (Model.CreditSummary.CanCredit && (isAP || isBuyer))
                 {
                     <div class="col-md-4 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
@@ -505,7 +505,7 @@
                 </div>
             </div>
 
-            @if (isAP || isBuyer)
+            @if (Model.CreditSummary.CanCredit && (isAP || isBuyer))
             {
                 <div class="col-md-5 col-sm-6 col-12 m-b2 p-0 mt-2">
                     <div class="tab-content p-b1" id="pills-tabContent">
