@@ -53,19 +53,41 @@
     Func<object, object>
     Content1 =
     @<div id="viewMtrModal">
-        <div class="d-flex flex-column mb-2 mt-4">
-            <template v-for="p in orderMTRs">
-                <a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mt-4 cursor-pointer">
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
-                    </div>
-                </a>
-            </template>
-            <template v-if="orderMTRs.length == 0">
-                No available MTR report.
-            </template>
-        </div>
-    </div>;
+         <div class="d-flex flex-column">
+             <div class="d-flex flex-column mt-4 mb-2">
+                 <table class="table table-striped w3-animate-left nss-table">
+                     <thead class="thead-default">
+                         <tr>
+                             <td scope="col">Id</td>
+                             <td scope="col" class="text-center">Line #</td>
+                             <td scope="col">Heat #</td>
+                             <td scope="col">Description</td>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <template v-for="p in orderMTRs">
+                             <tr>
+                                 <td><a v-bind:href="p.MtrFile" target="_blank" scope="row">{{p.MtrId}}</a></td>
+                                 <td class="text-center">{{p.LineNo}}</td>
+                                 <td>{{p.HeatNo}}</td>
+                                 <td>{{p.Description}}</td>
+                             </tr>
+
+                             @*<a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
+                                 <div class="d-flex flex-row mt-4 cursor-pointer">
+                                     <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
+                                 </div>
+                             </a>*@
+                         </template>
+                         <template v-if="orderMTRs.length == 0">
+                             No available MTR report.
+                         </template>
+                     </tbody>
+                 </table>
+             </div>
+                
+             </div>
+         </div>;
 }
 <style>
     .m-b2 {
@@ -359,7 +381,7 @@
                         </div>
                     </div>
 
-            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render()
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
 
 
 
