@@ -16312,7 +16312,7 @@
     <Value>Shipping:</Value>
   </LocaleResource>
   <LocaleResource Name="Messages.Order.SubTotal">
-    <Value>SubTotal:</Value>
+    <Value>Sub-Total:</Value>
   </LocaleResource>
   <LocaleResource Name="Messages.Order.SubTotalDiscount">
     <Value>Discount:</Value>
@@ -16609,7 +16609,7 @@
     <Value>Shipping Address</Value>
   </LocaleResource>
   <LocaleResource Name="Order.SubTotal">
-    <Value>SubTotal</Value>
+    <Value>Sub-Total</Value>
   </LocaleResource>
   <LocaleResource Name="Order.SubTotalDiscount">
     <Value>Discount</Value>
@@ -16918,7 +16918,7 @@
     <Value>SKU</Value>
   </LocaleResource>
   <LocaleResource Name="PDFInvoice.Sub-Total">
-    <Value>SubTotal:</Value>
+    <Value>Sub-Total:</Value>
   </LocaleResource>
   <LocaleResource Name="PDFInvoice.Tax">
     <Value>Tax:</Value>
@@ -18205,7 +18205,7 @@
     <Value>Not required</Value>
   </LocaleResource>
   <LocaleResource Name="ShoppingCart.Totals.SubTotal">
-    <Value>SubTotal</Value>
+    <Value>Sub-Total</Value>
   </LocaleResource>
   <LocaleResource Name="ShoppingCart.Totals.SubTotalDiscount">
     <Value>Discount</Value>
