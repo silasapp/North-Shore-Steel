@@ -213,7 +213,7 @@ Content1 =
                 <div>
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-column flex-md-row justify-content-md-between">
-                            <div v-if="isEditable" class="d-flex flex-row bg-accent bg-md-white justify-content-around mb-3 p-3 p-md-0 order-0 order-md-1">
+                            <div v-if="isEditable" class="d-flex flex-row bg-accent bg-md-white justify-content-between mb-3 p-3 p-md-0 order-0 order-md-1 w-100">
                                 <button type="submit" class="nss-btn-white mr-md-4" name="continueshopping">
                                     <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="">
                                     {{ isMobile ? 'Keep Shopping' : 'Continue Shopping' }}
@@ -224,17 +224,6 @@ Content1 =
                                 </button>
                             </div>
 
-                            <div class="d-flex flex-row bg-accent bg-md-white p-3 p-md-0 mb-3 order-1 order-md-0">
-                                <div class="d-flex flex-column mr-2 w-50 w-md-100">
-                                    <label class="fs12-default-500 mb-2">Purchase Order #</label>
-                                    <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
-                                           v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
-                                </div>
-                                @*<div class="d-flex flex-column ml-2 w-50 w-md-100">
-                                        <label class="fs12-default-500 mb-2">Promise Date</label>
-                                        <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
-                                    </div>*@
-                            </div>
                         </div>
 
                         @* Cart items - Web View *@
@@ -249,6 +238,7 @@ Content1 =
                                         <th scope="col" width="9%">Total Price</th>
                                         <th scope="col" width="9%">Weight (lb)</th>
                                         <th scope="col" width="8%" class="text-center">Qty.</th>
+                                        <th scope="col" width="8%" class="text-center">Saw Options</th>
                                         <th scope="col" width="5%" class="text-center">Notes</th>
                                         <th scope="col" width="5%" class="text-center">Remove</th>
                                     </tr>
@@ -289,6 +279,9 @@ Content1 =
                                                    v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'"
                                                    aria-label="@T("ShoppingCart.Quantity")"
                                                    min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="">View Options</a>
                                         </td>
                                         <td class="text-center">
                                             <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
@@ -340,6 +333,7 @@ Content1 =
                                            v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'" aria-label="@T("ShoppingCart.Quantity")"
                                            min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
                                 </div>
+                                <a class="fs12-link-500 mb-3">View Options</a>
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Unit Price</label>
                                     <div class="d-flex flex-row align-items-center">
@@ -371,10 +365,23 @@ Content1 =
                             </div>
                         }
                         <div class="cart-footer row mt-0 mt-md-2">
+
+
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
                             @if (Model.IsEditable)
                             {
                                 <div class="cart-collaterals col-sm-12 col-md-5 col-lg-4 mx-0">
+                                    <div class="d-flex flex-row bg-accent bg-md-white p-3 p-md-0 mb-3 order-1 order-md-0">
+                                        <div class="d-flex flex-column mr-2 w-50 w-md-100">
+                                            <label class="fs12-default-500 mb-2">Purchase Order #</label>
+                                            <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
+                                                   v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
+                                        </div>
+                                        @*<div class="d-flex flex-column ml-2 w-50 w-md-100">
+                                                <label class="fs12-default-500 mb-2">Promise Date</label>
+                                                <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
+                                            </div>*@
+                                    </div>
                                     <div class="deals" style="width: 100%;max-width: 100%;">
                                         @*@await Html.PartialAsync("_DiscountBox", Model.DiscountBox)*@
                                         @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
