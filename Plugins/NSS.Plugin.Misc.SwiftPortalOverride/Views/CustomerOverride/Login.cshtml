@@ -27,7 +27,7 @@
 </style>
 <div class="page login-page">
     <div class="page-title">
-        <h1 class="welcome-msg">WELCOME TO "THE LINDA EXPERIENCE"!</h1>
+        <h1 class="welcome-msg">WELCOME TO "THE LINDA EXPERIENCE".</h1>
     </div>
     @await Html.PartialAsync("_ExternalAuthentication.Errors")
     <div class="page-body">
@@ -40,12 +40,12 @@
                     </div>
                     <div class="form-fields">
                         <div class="inputs">
-                            <label asp-for="Email" class="text-left">Email Address:</label>
+                            <label asp-for="Email" class="text-left nss-login-label">Email Address</label>
                             <input asp-for="Email" class="email user-input-field" placeholder="Enter email address" autofocus="autofocus" />
                             <span asp-validation-for="Email"></span>
                         </div>
                         <div class="inputs">
-                            <label asp-for="Password" asp-postfix=":" class="text-left"></label>
+                            <label asp-for="Password" class="text-left nss-login-label"></label>
                             <input asp-for="Password" placeholder="Enter password" class="password user-input-field" />
                             <span asp-validation-for="Password"></span>
                         </div>
@@ -98,9 +98,9 @@
             }
             else
             {
-                <div class="new-wrapper fieldset register-block">
+                <div class="new-wrapper fieldset register-block" style="padding-top:5rem">
                     <div class="title"><strong style="font-weight: 500;">NEW CUSTOMER</strong></div>
-                    <div style=" margin-bottom: 20%; ">
+                    <div style="position: relative; bottom: 1rem;">
                         <div class="text">
                             Don’t have an online account?
                         </div>
@@ -108,7 +108,7 @@
                             Register now by clicking the button below.
                         </div>
                     </div>
-                    <div class="buttons">
+                    <div class="buttons" style="margin-bottom:4rem">
                         <input type="button" class="button-1 register-button" onclick="location.href='@registerUrl'" value="@T("Account.Register")" />
                     </div>
                 </div>

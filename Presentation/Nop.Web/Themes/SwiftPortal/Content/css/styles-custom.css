@@ -740,6 +740,11 @@ a:not([href]):not([class]) {
     margin-bottom: 30px;
 }
 
+.nss-login-label {
+    font-size: small !important;
+    font-weight: 500 !important;
+}
+
 .password-fieldset {
     padding: 30px 35%;
     margin-bottom: 100px;
@@ -761,7 +766,7 @@ a:not([href]):not([class]) {
         letter-spacing: 0px;
         color: #242424;
         opacity: 1;
-        margin-left: 5px !important;
+        /*margin-left: 5px !important;*/
     }
 
 .form-fields,
