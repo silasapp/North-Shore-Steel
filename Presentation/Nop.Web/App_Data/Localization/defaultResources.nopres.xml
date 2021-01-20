@@ -16918,7 +16918,7 @@
     <Value>SKU</Value>
   </LocaleResource>
   <LocaleResource Name="PDFInvoice.Sub-Total">
-    <Value>Sub-Total:</Value>
+    <Value>Sub-total:</Value>
   </LocaleResource>
   <LocaleResource Name="PDFInvoice.Tax">
     <Value>Tax:</Value>
