@@ -207,6 +207,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             new { },
             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
             );
+
+            //topics
+            endpointRouteBuilder.MapControllerRoute("TopicPopup", "t-popup/{SystemName}",
+              new { controller = "TopicOverride", action = "TopicDetailsPopup" },
+             new { },
+             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+             );
+
         }
     }
 }
