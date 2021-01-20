@@ -25,7 +25,7 @@
         width: 67rem !important;
         margin: auto;
         position: relative !important;
-        top: -100rem !important;
+        top: -110rem !important;
     }
 
     .text-format {
@@ -42,8 +42,19 @@
         width: 97% !important;
     }
 
+    .ui-dialog .ui-dialog-title {
+        text-align: center !important;
+        margin: .6em 0;
+        font-size: 25px !important;
+        width: -webkit-fill-available !important;
+    }
+
     .p-t4 {
         padding-top: .4rem !important;
+    }
+
+    #ph-title {
+        display: none;
     }
 </style>
 
@@ -207,9 +218,9 @@
                             @if (Model.FirstNameEnabled)
                             {
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                    <label asp-for="FirstName">First Name</label>
+                                    <label asp-for="FirstName" class="nss-input-label">First Name</label>
                                     <nop-required />
-                                    <input asp-for="FirstName" placeholder="Enter first name" class="form-control custom-input" />
+                                    <input asp-for="FirstName" placeholder="Enter..." class="form-control custom-input" />
                                     <span asp-validation-for="FirstName" style="display:flex;"></span>
                                 </div>
                             }
@@ -218,9 +229,9 @@
                             @if (Model.LastNameEnabled)
                             {
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                    <label asp-for="LastName">Last Name</label>
+                                    <label asp-for="LastName" class="nss-input-label">Last Name</label>
                                     <nop-required />
-                                    <input asp-for="LastName" placeholder="Enter last name" class="form-control custom-input" />
+                                    <input asp-for="LastName" placeholder="Enter..." class="form-control custom-input" />
                                     <span asp-validation-for="LastName" style="display: flex;"></span>
                                 </div>
                             }
@@ -233,18 +244,18 @@
                         <div class="form-group row">
 
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <label asp-for="Email">Work Email</label>
+                                <label asp-for="Email" class="nss-input-label">Work Email</label>
                                 <nop-required />
-                                <input asp-for="Email" placeholder="Enter email" class="form-control custom-input" />
+                                <input asp-for="Email" placeholder="Ex: john.smith@acme.com" class="form-control custom-input" />
                                 <span asp-validation-for="Email" style="display:flex;"></span>
                             </div>
 
                             @if (Model.EnteringEmailTwice)
                             {
                                 <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                    <label asp-for="ConfirmEmail">Confirm Email</label>
+                                    <label asp-for="ConfirmEmail" class="nss-input-label">Confirm Email</label>
                                     <nop-required />
-                                    <input asp-for="ConfirmEmail" placeholder="Confirm email" class="form-control custom-input" />
+                                    <input asp-for="ConfirmEmail" placeholder="Enter..." class="form-control custom-input" />
                                     <span asp-validation-for="ConfirmEmail" style="display:flex;"></span>
                                 </div>
                             }
@@ -254,22 +265,22 @@
                         <div class="form-group row">
 
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left">
-                                <label asp-for="Phone">Work Phone</label>
+                                <label asp-for="Phone" class="nss-input-label">Work Phone</label>
                                 <nop-required />
-                                <input asp-for="Phone" id="work-phone" placeholder="Enter work phone number" maxlength="14" class="form-control custom-input phone-number" />
+                                <input asp-for="Phone" id="work-phone" placeholder="Enter..." maxlength="14" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="Phone" style="display:flex;"></span>
                             </div>
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <label asp-for="CellPhone">Cell Phone (Optional)</label>
-                                <input asp-for="CellPhone" id="cell-phone" placeholder="Enter cell phone number" maxlength="14" class="form-control custom-input phone-number" />
+                                <label asp-for="CellPhone" class="nss-input-label">Cell Phone (Optional, used to send notifications via text messages)</label>
+                                <input asp-for="CellPhone" id="cell-phone" placeholder="Enter..." maxlength="14" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="CellPhone" style="display:flex;"></span>
                             </div>
                         </div>
                         <div class="form-group row">
                             <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <label asp-for="Company">Company Name</label>
+                                <label asp-for="Company" class="nss-input-label">Company Name</label>
                                 <nop-required />
-                                <input asp-for="Company" placeholder="Enter company name" class="form-control custom-input" />
+                                <input asp-for="Company" placeholder="Enter..." class="form-control custom-input" />
                                 <span asp-validation-for="Company" style="display:flex;"></span>
                                 <div class="pt-3">
                                     <label class="pure-material-checkbox" id="current-customer">
@@ -319,14 +330,14 @@
                     <div class="row">
                         <div class="col-md-6 col-sm-12 col-xs-12">
                             <div style="margin-bottom: 2em">
-                                <label>How did you hear about us? (Optional)</label>
+                                <label class="nss-input-label">How did you hear about us? (Optional)</label>
                                 <select asp-for="HearAboutUs" asp-items="Html.GetEnumSelectList<HearAboutUs>()" class="form-control custom-input about-us" onchange="otherMethodCheck(this);"> </select>
                                 <span asp-validation-for="HearAboutUs"></span>
                             </div>
 
                             <div style="margin-bottom: 2em">
                                 <div id="other-method" style="display:none">
-                                    <label> Let us know how you found us</label>
+                                    <label class="nss-input-label"> Let us know how you found us</label>
                                     <input asp-for="Other" placeholder="Enter how you found us" class="textbox form-control custom-input found-us" />
                                     <label id="found-us-text-error" style="display:none" class="text-danger mt-1 mb-0">How you found us is required</label>
                                     @*<span asp-validation-for="Other" style="display:flex;"></span>*@
@@ -334,7 +345,7 @@
                             </div>
 
                             <div>
-                                <label>Preferred pickup location (Optional)</label>
+                                <label class="nss-input-label">Preferred pickup location (Optional)</label>
                                 <select asp-for="PreferredPickupLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
                                 <span asp-validation-for="PreferredPickupLocationId"></span>
 
@@ -345,7 +356,7 @@
 
                         <div class="col-md-6 col-sm-12 col-xs-12">
                             <div>
-                                <label>How can we help? (Optional)</label>
+                                <label class="nss-input-label">How can we help? (Optional)</label>
                                 <textarea asp-for="ItemsForNextProject" placeholder="What items are you considering for your next project?" class="form-control custom-input"></textarea>
                                 <span asp-validation-for="ItemsForNextProject" style="display:flex;"></span>
                             </div>
@@ -391,12 +402,15 @@
                             <span class="checkmark"></span>
                             @if (Model.AcceptPrivacyPolicyPopup)
                             {
-                                <a class="read" id="read-privacyinfo">Accept Terms and Privacy Policy</a>
+                                <a class="read nss-input-label" id="read-privacyinfo">I have read and agree to the Terms and Conditions and Privacy Policy.</a>
                                 <script asp-location="Footer">
                                     $(document).ready(function () {
                                         $('#read-privacyinfo').on('click',
                                             function (e) {
-                                                handleTOSModal()
+                                                handleTOSModal();
+                                                @*displayPopupContentFromUrl(
+                                                    '@Url.RouteUrl("TopicPopup", new {SystemName = "ConditionsOfUse" })',
+                                                    'TERMS OF SERVICE');*@
                                             });
                                     });
                                 </script>
