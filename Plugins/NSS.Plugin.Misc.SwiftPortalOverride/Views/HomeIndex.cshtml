@@ -58,9 +58,9 @@
                  <table class="table table-striped w3-animate-left nss-table">
                      <thead class="thead-default">
                          <tr>
-                             <td scope="col">Id</td>
-                             <td scope="col" class="text-center">Line #</td>
+                             <td scope="col">MTR #</td>
                              <td scope="col">Heat #</td>
+                             <td scope="col" class="text-center">Line #</td>
                              <td scope="col">Description</td>
                          </tr>
                      </thead>
@@ -68,8 +68,8 @@
                          <template v-for="p in orderMTRs">
                              <tr>
                                  <td><a v-bind:href="p.MtrFile" target="_blank" scope="row">{{p.MtrId}}</a></td>
-                                 <td class="text-center">{{p.LineNo}}</td>
                                  <td>{{p.HeatNo}}</td>
+                                 <td class="text-center">{{p.LineNo}}</td>
                                  <td>{{p.Description}}</td>
                              </tr>
 
@@ -129,7 +129,7 @@
                 {
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent" style="height: 22.7rem">
-                            <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="        height: 19.4rem
+                            <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="        height: 19.4rem
 ">
                                 @if (Model.OpenOrders.Count > 0)
                                 {
@@ -176,7 +176,7 @@
                                 }
                             </div>
 
-                            <div class="nss-dark text-center mb-1 @(Model.OpenOrders.Count > 0 ? "": "d-none")">* All orders display the five most recent result from the past 30 days.</div>
+                            <div class="text-nowrap nss-dark text-center mb-1 @(Model.OpenOrders.Count > 0 ? "": "d-none")">* All orders display the five most recent result from the past 30 days.</div>
                         </div>
                     </div>
                 }
@@ -270,7 +270,7 @@
                     {
                         <div class="col-md-5 col-sm-6 col-12 m-b2">
                             <div class="tab-content" id="pills-tabContent">
-                                <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                                <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
                                     <div class="card-title mb-2 border-bottom-0 mt-2">
                                         <h1>CLOSED ORDERS</h1>
                                     </div>
@@ -299,7 +299,7 @@
                                             }
                                         </tbody>
                                     </table>
-                                    <div class="nss-dark text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
+                                    <div class="text-nowrap nss-dark text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
                                 </div>
                             </div>
                         </div>
@@ -527,7 +527,7 @@
                 </div>
             </div>
 
-            @if (Model.CreditSummary.CanCredit && (isAP || isBuyer))
+            @if (isAP || isBuyer)
             {
                 <div class="col-md-5 col-sm-6 col-12 m-b2 p-0 mt-2">
                     <div class="tab-content p-b1" id="pills-tabContent">
