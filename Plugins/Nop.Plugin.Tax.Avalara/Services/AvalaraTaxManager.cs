@@ -957,7 +957,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
             return HandleFunction(() =>
             {
                 //create tax transaction for a simplified item and without saving 
-                var model = PrepareTransactionModel(address, _workContext.CurrentCustomer.Id.ToString(), DocumentType.SalesOrder);
+                var model = PrepareTransactionModel(address, _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, string.Format("ERPCompanyId{0}", _workContext.CurrentCustomer.Id)) ?? _workContext.CurrentCustomer.Id.ToString(), DocumentType.SalesOrder);
                 model.lines = new List<LineItemModel> { new LineItemModel { amount = 100, quantity = 1 } };
                 return CreateTransaction(model);
             });
@@ -994,7 +994,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
                 return HandleFunction(() =>
                 {
                     //create tax transaction for a single item and without saving
-                    var model = PrepareTransactionModel(address, customer.Id.ToString(), DocumentType.SalesOrder);
+                    var model = PrepareTransactionModel(address, _genericAttributeService.GetAttribute<string>(customer, string.Format("ERPCompanyId{0}", customer.Id)) ?? customer.Id.ToString(), DocumentType.SalesOrder);
                     model.lines = new List<LineItemModel>
                     {
                         new LineItemModel
@@ -1089,7 +1089,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
 
                 //prepare transaction model
                 var address = GetTaxAddress(order);
-                var model = PrepareTransactionModel(address, customer.Id.ToString(), DocumentType.SalesOrder);
+                var model = PrepareTransactionModel(address, _genericAttributeService.GetAttribute<string>(customer, string.Format("ERPCompanyId{0}", customer.Id)) ?? customer.Id.ToString(), DocumentType.SalesOrder);
                 model.email = CommonHelper.EnsureMaximumLength(customer.Email, 50);
                 model.discount = order.OrderSubTotalDiscountExclTax;
 
@@ -1115,7 +1115,7 @@ namespace Nop.Plugin.Tax.Avalara.Services
                 //prepare transaction model
                 var address = GetTaxAddress(order);
                 var customer = _customerService.GetCustomerById(order.CustomerId);
-                var model = PrepareTransactionModel(address, customer.Id.ToString(), DocumentType.SalesInvoice);
+                var model = PrepareTransactionModel(address, _genericAttributeService.GetAttribute<string>(customer, string.Format("ERPCompanyId{0}", customer.Id)) ?? customer.Id.ToString(), DocumentType.SalesInvoice);
                 model.email = CommonHelper.EnsureMaximumLength(customer.Email, 50);
                 model.code = CommonHelper.EnsureMaximumLength(order.CustomOrderNumber, 50);
                 model.commit = _avalaraTaxSettings.CommitTransactions;
