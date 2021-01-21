@@ -33,7 +33,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         
         #region CheckoutAttributes
         public static string CheckoutPONoAttribute => "Purchase Order #";
-        public static string CheckoutDeliveryOptionAttribute => "Delivery Option";
+        //public static string CheckoutDeliveryOptionAttribute => "Delivery Option";
         #endregion
 
         #region ProductFields

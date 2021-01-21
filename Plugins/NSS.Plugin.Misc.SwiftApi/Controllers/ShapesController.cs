@@ -122,12 +122,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 var checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.TextBox, Name = Constants.CheckoutPONoAttribute };
                 _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
-
-                checkoutAttribute = new CheckoutAttribute { AttributeControlType = AttributeControlType.RadioList, IsRequired = true, Name = Constants.CheckoutDeliveryOptionAttribute };
-                _checkoutAttributeService.InsertCheckoutAttribute(checkoutAttribute);
-
-                _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Ship to Me", DisplayOrder = 1, IsPreSelected = true });
-                _checkoutAttributeService.InsertCheckoutAttributeValue(new CheckoutAttributeValue { CheckoutAttributeId = checkoutAttribute.Id, Name = "Pickup from North Shore Steel", DisplayOrder = 2 });
             }
 
             IList<Shape> createdShapes = _shapeService.GetShapes();
