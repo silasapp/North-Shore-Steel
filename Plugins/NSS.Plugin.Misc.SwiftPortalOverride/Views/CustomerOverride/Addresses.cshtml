@@ -46,6 +46,35 @@
         background-color: #f6f6f6 !important;
         padding: 20px;
     }
+
+
+
+    .profile:hover {
+        cursor: pointer;
+    }
+
+
+    .menu {
+        display: none;
+        clear: both;
+    }
+
+        .menu li {
+            font-size: 12px;
+            margin: 0;
+        }
+
+            .menu li a {
+                color: #03175b;
+            }
+
+            .menu li:hover > a {
+                color: #03175b;
+            }
+
+    .profile:hover .menu {
+        display: block;
+    }
 </style>
 <div class="page account-page address-list-page" id="address-list-page">
     <div class="page-body">
@@ -61,7 +90,6 @@
                         var address = Model.Addresses[i];
                         <div class="address-info">
                             <ul>
-                                @*<button><img src="~/Themes/@themeName/Content/assets/icn-more-vert.svg" alt=""></button>*@
                                 <li class="title">ADDRESS @count</li>
                                 <li class="name">@address.FirstName @address.LastName</li>
                                 @if (address.CompanyEnabled && !string.IsNullOrEmpty(address.Company))
@@ -79,17 +107,21 @@
                                 {
                                     <li class="city-state-zip">@address.City, @address.StateProvinceName, @address.ZipPostalCode</li>
                                 }
-                                @*@if (address.CityEnabled && !string.IsNullOrEmpty(address.City) ||
-                                    address.CountyEnabled && !string.IsNullOrEmpty(address.County) ||
-                                    address.StateProvinceEnabled && !string.IsNullOrEmpty(address.StateProvinceName) ||
-                                    address.ZipPostalCodeEnabled && !string.IsNullOrEmpty(address.ZipPostalCode))
-                                            {
-                                                <li class="city-state-zip">@address.City, @address.StateProvinceName, @address.ZipPostalCode</li>
-                                            }*@
                             </ul>
+
                             <div class="buttons">
-                                <input type="button" class="button-2 edit-address-button action-btn" style="background-color:#f6f6f6 !important; padding: 1px 9px !important" onclick="location.href = '@(Url.RouteUrl("CustomerAddressEdit", new {addressId = address.Id}))'" value="" />
-                                <input type="button" class="button-2 delete-address-button action-btn" style="background-color:#f6f6f6 !important; padding: 1px 9px !important" onclick="deletecustomeraddress(@(address.Id))" value="" />
+                                <ul class="">
+                                    <li>
+                                        <div class="profile" style="width:3rem;">
+                                            <img class="collapse-icon" src="~/Themes/@(themeName)/Content/assets/icn-more-vert.svg" alt="" />
+                                            <ul class="menu">
+                                                <li onclick="location.href = '@(Url.RouteUrl("CustomerAddressEdit", new {addressId = address.Id}))'" value="">Edit</li>
+                                                <li onclick="deletecustomeraddress(@(address.Id))">Delete</li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+
                             </div>
                         </div>
                     }
