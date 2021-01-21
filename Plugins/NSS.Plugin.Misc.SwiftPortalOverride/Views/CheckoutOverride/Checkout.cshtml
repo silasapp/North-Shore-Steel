@@ -1189,7 +1189,7 @@ Content2 =
         billingAddressModal.show();
     }
     $('#use-shipping').on('click', function () {
-        checkoutvm.getShippingRate(true);
+        checkoutvm.getShippingRate();
         checkoutvm.newShippingAddress = {
             address1: null,
             address2: null,
@@ -1202,7 +1202,7 @@ Content2 =
         shippingAddressModal.hide();
     });
     $('#use-billing').on('click', function () {
-        checkoutvm.getShippingRate(true);
+        checkoutvm.getShippingRate();
         checkoutvm.newBillingAddress = {
             address1: null,
             address2: null,
