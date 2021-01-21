@@ -5,12 +5,13 @@
     // check if user is guest
     var customer = EngineContext.Current.Resolve<IWorkContext>().CurrentCustomer;
     var isGuestCustomer = EngineContext.Current.Resolve<ICustomerService>().IsGuest(customer);
-    
+
 }
 
 @if (!isGuestCustomer)
 {
-    <div class="d-flex flex-row flex-wrap flex-md-nowrap justify-content-between navbar-bg px-0 px-xl-5" id="n-select-account" v-bind:class="{'mb-4': isMobile}">
+<div id="n-select-account">
+    <div v-if="!isCheckout" class="d-flex flex-row flex-wrap flex-md-nowrap justify-content-between navbar-bg px-0 px-xl-5" v-bind:class="{'mb-4': isMobile}">
         <div class="header-logo order-0 px-3 px-xl-5 py-3 py-lg-4">
             @await Component.InvokeAsync("Logo")
         </div>
@@ -23,6 +24,14 @@
             </div>
         </div>
     </div>
+    <div v-if="isCheckout" class="header-upper nss-nav-bar navbar-bg" style="background-color: transparent!important; border-bottom: none!important;padding-top:4rem;" v-bind:class="{'navbar-bg':isCheckout}">
+        <div class="master-wrapper-content align-items-center">
+            <div class="header-logo">
+                @await Component.InvokeAsync("Logo")
+            </div>
+        </div>
+    </div>
+</div>
 }
 else
 {
@@ -65,6 +74,9 @@ else
             isMobile: function () {
                 return this.window.width <= 767.98;
             },
+            isCheckout: function () {
+                return (window.location.href.indexOf("onepagecheckout") > -1 || window.location.href.indexOf("Completed") > -1 || window.location.href.indexOf("Rejected") > -1);
+            }
         },
         methods: {
             handleResize: function () {

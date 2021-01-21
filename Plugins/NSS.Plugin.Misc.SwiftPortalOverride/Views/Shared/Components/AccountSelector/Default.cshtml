@@ -28,7 +28,7 @@
 }
 
 
-<div id="top-menu-drawer">
+<div v-if="!isCheckout" id="top-menu-drawer">
     <div class="d-flex flex-column flex-lg-row align-items-lg-center mb-0">
         <div class="d-lg-none d-flex flex-row align-items-center justify-content-center bg-primary px-3 py-4 flex-fill">
             <label class="h2-white-500 text-center ml-3 mb-0 pt-1 flex-fill">MENU</label>
@@ -107,6 +107,9 @@
             isMobile: function () {
                 return this.window.width <= 767.98;
             },
+            isCheckout: function () {
+                return (window.location.href.indexOf("onepagecheckout") > -1 || window.location.href.indexOf("Completed") > -1 || window.location.href.indexOf("Rejected") > -1);
+            }
         },
         methods: {
             handleResize: function () {
