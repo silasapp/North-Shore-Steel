@@ -114,9 +114,6 @@
         opacity: 1;
     }
 
-    .colorRed {
-        color: red !important;
-    }
 </style>
 
 
@@ -338,48 +335,6 @@
                         </div>
                     </div>
                 }
-
-                    <div class="col-md-12">
-
-                        <ul class="nav nav-pills mb-1 " id="pills-tab" role="tablist">
-                            <li class="nav-item" role="presentation" style="margin-right: 0.3em">
-                                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Recent Orders</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Recent Invoices</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="pills-tabContent">
-                            <div class="responsive-table-container tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                                <ejs-grid id="OrderGrid" dataSource="@Model.RecentOrders" allowPaging="true" allowFiltering="false" rowHeight="38">
-                                    <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                    <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
-                                    <e-grid-columns>
-                                        <e-grid-column template="#orderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column field="PONo" headerText="PO #" minWidth="180" width="140"></e-grid-column>
-                                        <e-grid-column field="Weight" headerText="Weight (lb)" format="N0" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column field="OrderTotal" headerText="Order Amt." format="C2" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column field="EstDeliveryDate" headerText="Est. Delivery" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                        <e-grid-column field="OrderStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
-                                    </e-grid-columns>
-                                </ejs-grid>
-                            </div>
-                            <div class="responsive-table-container tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                                <ejs-grid id="InvoiceGrid" queryCellInfo="customiseCell" dataSource="@Model.RecentInvoices" allowPaging="true" allowFiltering="false" rowHeight="38">
-                                    <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
-                                    <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
-                                    <e-grid-columns>
-                                        <e-grid-column template="#invoiceId" headerText="Invoice #" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column template="#invoiceOrderNo" headerText="Order #" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column field="InvoiceAmount" headerText="Invoice Amt." format="C2" minWidth="120" width="70"></e-grid-column>
-                                        <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                        <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="120" width="70" format="MM/dd/yyyy"></e-grid-column>
-                                        <e-grid-column field="InvoiceStatusName" headerText="Status" minWidth="110" width="70"></e-grid-column>
-                                    </e-grid-columns>
-                                </ejs-grid>
-                            </div>
-                        </div>
-                    </div>
 
             @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
 
@@ -709,24 +664,6 @@
         viewMtrModal = this;
     }
 
-    function customiseCell(args) {
-        if (args.column.field === 'InvoiceStatusName') {
-            if (args.data['InvoiceStatusName'].indexOf("Past due") > -1) {
-                args.cell.classList.add('colorRed');
-            }
-        }
-    }
-
-</script>
-
-<script id="orderNo" type="text/x-template">
-    <a href="/orders/${OrderId}">${OrderId}</a>
-</script>
-<script id="invoiceOrderNo" type="text/x-template">
-    <a href="/orders/${OrderNo}">${OrderNo}</a>
-</script>
-<script id="invoiceId" type="text/x-template">
-    <a href="${InvoiceFile}" target="_blank">${InvoiceId}</a>
 </script>
 
 @functions{
