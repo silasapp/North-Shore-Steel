@@ -53,19 +53,41 @@
     Func<object, object>
     Content1 =
     @<div id="viewMtrModal">
-        <div class="d-flex flex-column mb-2 mt-4">
-            <template v-for="p in orderMTRs">
-                <a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
-                    <div class="d-flex flex-row mt-4 cursor-pointer">
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
-                    </div>
-                </a>
-            </template>
-            <template v-if="orderMTRs.length == 0">
-                No available MTR report.
-            </template>
-        </div>
-    </div>;
+         <div class="d-flex flex-column">
+             <div class="d-flex flex-column mt-4 mb-2">
+                 <table class="table table-striped w3-animate-left nss-table">
+                     <thead class="thead-default">
+                         <tr>
+                             <td scope="col">MTR #</td>
+                             <td scope="col">Heat #</td>
+                             <td scope="col" class="text-center">Line #</td>
+                             <td scope="col">Description</td>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <template v-for="p in orderMTRs">
+                             <tr>
+                                 <td><a v-bind:href="p.MtrFile" target="_blank" scope="row">{{p.MtrId}}</a></td>
+                                 <td>{{p.HeatNo}}</td>
+                                 <td class="text-center">{{p.LineNo}}</td>
+                                 <td>{{p.Description}}</td>
+                             </tr>
+
+                             @*<a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
+                                 <div class="d-flex flex-row mt-4 cursor-pointer">
+                                     <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
+                                 </div>
+                             </a>*@
+                         </template>
+                         <template v-if="orderMTRs.length == 0">
+                             No available MTR report.
+                         </template>
+                     </tbody>
+                 </table>
+             </div>
+                
+             </div>
+         </div>;
 }
 <style>
     .m-b2 {
@@ -107,7 +129,7 @@
                 {
                     <div class="col-md-5 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent" style="height: 22.7rem">
-                            <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="        height: 19.4rem
+                            <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="        height: 19.4rem
 ">
                                 @if (Model.OpenOrders.Count > 0)
                                 {
@@ -154,7 +176,7 @@
                                 }
                             </div>
 
-                            <div class="nss-dark text-center mb-1 @(Model.OpenOrders.Count > 0 ? "": "d-none")">* All orders display the five most recent result from the past 30 days.</div>
+                            <div class="text-nowrap nss-dark text-center mb-1 @(Model.OpenOrders.Count > 0 ? "": "d-none")">* All orders display the five most recent result from the past 30 days.</div>
                         </div>
                     </div>
                 }
@@ -248,7 +270,7 @@
                     {
                         <div class="col-md-5 col-sm-6 col-12 m-b2">
                             <div class="tab-content" id="pills-tabContent">
-                                <div class="responsive-table-container tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
+                                <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
                                     <div class="card-title mb-2 border-bottom-0 mt-2">
                                         <h1>CLOSED ORDERS</h1>
                                     </div>
@@ -277,7 +299,7 @@
                                             }
                                         </tbody>
                                     </table>
-                                    <div class="nss-dark text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
+                                    <div class="text-nowrap nss-dark text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
                                 </div>
                             </div>
                         </div>
@@ -285,7 +307,7 @@
                 }
 
 
-                @if (isAP || isBuyer)
+                @if (Model.CreditSummary.CanCredit && (isAP || isBuyer))
                 {
                     <div class="col-md-4 col-sm-6 col-12 m-b2">
                         <div class="tab-content" id="pills-tabContent">
@@ -359,7 +381,7 @@
                         </div>
                     </div>
 
-            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render()
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
 
 
 

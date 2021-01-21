@@ -633,7 +633,7 @@ label, label + * {
 	margin: 0 !important;
 	border: none !important;
 	border-radius: 0;
-	background: url('../images/close.png') center no-repeat !important;
+	/*background: url('../images/close.png') center no-repeat !important;*/
 	padding: 0 !important;
 }
 .ui-dialog-titlebar button span {

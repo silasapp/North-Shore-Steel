@@ -25,14 +25,28 @@
         {
             <div class="d-flex flex-column">
                 <div class="d-flex flex-column mt-4 mb-2">
-                    @foreach (var item in Model.MTRs)
-                    {
-                        <a href="@item.MtrFile" target="_blank" class="text-decoration-none">
-                            <div class="d-flex flex-row mt-4 cursor-pointer">
-                                <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @item.MtrId</label>
-                            </div>
-                        </a>
-                    }
+                    <table class="table table-striped w3-animate-left nss-table">
+                        <thead class="thead-default">
+                            <tr>
+                                <td scope="col">MTR #</td>
+                                <td scope="col">Heat #</td>
+                                <td scope="col" class="text-center">Line #</td>
+                                <td scope="col">Description</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.MTRs)
+                            {
+                                <tr>
+                                    <td><a href="@item.MtrFile" target="_blank" scope="row">@item.MtrId</a></td>
+                                    <td>@item.HeatNo</td>
+                                    <td class="text-center">@item.LineNo</td>
+                                    <td>@item.Description</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
         }
@@ -174,17 +188,17 @@
                             }
 
                             @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                                   !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                                   !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                   !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                               !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                               !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                               !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                             {
                                 <li class="city-state-zip">
                                     @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                     {
                                         @Model.ShippingAddress.City
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                                           !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                           !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                       !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                                       !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                         {
                                             <text>, </text>
                                         }
@@ -194,7 +208,7 @@
                                     {
                                         @Model.ShippingAddress.County
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                               !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                           !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                         {
                                             <text>, </text>
                                         }
@@ -249,8 +263,8 @@
                                     {
                                         @Model.PickupAddress.City
                                         @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                                           !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                           !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                       !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                                       !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                         {
                                             <text>, </text>
                                         }
@@ -259,7 +273,7 @@
                                     {
                                         @Model.PickupAddress.County
                                         @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                           !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                       !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                         {
                                             <text>, </text>
                                         }
@@ -332,7 +346,7 @@
                     @if (Model.MtrCount == 1)
                     {
                         <a href="@Model.MTRs.FirstOrDefault()?.MtrFile" target="_blank" class="text-decoration-none">
-                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR @Model.MTRs.FirstOrDefault()?.MtrId</label>
+                            <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR</label>
                         </a>
                     }
                     else if (Model.MtrCount > 1)
@@ -453,7 +467,7 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderDetailsPageBottom, additionalData = Model })
     </div>
 
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("450px").Target("body").Render();
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render();
 
 </div>
 

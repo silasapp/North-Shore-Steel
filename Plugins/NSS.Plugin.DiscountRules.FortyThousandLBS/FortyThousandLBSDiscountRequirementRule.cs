@@ -99,7 +99,7 @@ namespace NSS.Plugin.DiscountRules.FortyThousandLBS
         {
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
-            return urlHelper.Action("Configure", "DiscountRulesTenThousandLBS",
+            return urlHelper.Action("Configure", "DiscountRulesFortyThousandLBS",
                 new { discountId = discountId, discountRequirementId = discountRequirementId }, _webHelper.CurrentRequestProtocol);
         }
 

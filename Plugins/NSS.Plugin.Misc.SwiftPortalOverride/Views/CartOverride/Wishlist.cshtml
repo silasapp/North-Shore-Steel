@@ -395,8 +395,6 @@ Content1 =
                                         <div class="d-flex flex-row">
                                             <button type="button" class="btn-sm-step" v-on:click="handleDecrementQuantity(@(item.ProductId))">-</button>
                                             <input name="itemquantity@(item.Id)" type="number" width="20" id="itemquantity@(item.ProductId)" value="@(item.Quantity)" min="1" class="form-control-sm" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
-                                            @*<input class="form-control-sm" type="number" min="1" name="itemquantity@(item.Id)" v-bind:id="'qty' + data._itemId" value="@(item.Quantity)"
-                                                oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">*@
                                             <button type="button" class="btn-sm-step" v-on:click="handleIncrementQuantity(@(item.ProductId))">+</button>
                                         </div>
                                     </div>
@@ -427,14 +425,7 @@ Content1 =
                     </div>
                 </div>
             }
-            @*@if (Model.IsEditable && Model.Items.Count > 0)
-                {
-                    var wishlistUrl = Url.RouteUrl("Wishlist", new { customerGuid = Model.CustomerGuid }, webHelper.CurrentRequestProtocol);
-                    <div class="share-info">
-                        <span class="share-label">@T("Wishlist.YourWishlistURL"):</span>
-                        <a href="@wishlistUrl" class="share-link">@wishlistUrl</a>
-                    </div>
-                }*@
+
             <div class="discount-block" alt="">
                 <img v-if="!isMobile" src="~/Themes/@themeName/Content/assets/discount.PNG" alt="">
                 <img v-if="isMobile" src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="">
