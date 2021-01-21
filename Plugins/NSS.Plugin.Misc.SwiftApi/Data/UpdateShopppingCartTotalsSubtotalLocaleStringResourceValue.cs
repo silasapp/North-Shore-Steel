@@ -3,12 +3,12 @@ using Nop.Data.Migrations;
 
 namespace NSS.Plugin.Misc.SwiftApi.Data
 {
-    [NopMigration("2021/01/19 13:03:00", "Swift.Api Update ShoppingCart.Totals.SubTotal Value in LocaleStringResource")]
+    [NopMigration("2021/01/21 01:06:00", "Swift.Api Update ShoppingCart.Totals.SubTotal Value in LocaleStringResource")]
     public class UpdateShopppingCartTotalsSubtotalLocaleStringResourceValue : Migration
     {
         public override void Up()
         {
-            Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'SubTotal' Where [ResourceName] = 'ShoppingCart.Totals.SubTotal'");
+            Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Subtotal' Where [ResourceName] = 'ShoppingCart.Totals.SubTotal'");
         }
 
         public override void Down()
