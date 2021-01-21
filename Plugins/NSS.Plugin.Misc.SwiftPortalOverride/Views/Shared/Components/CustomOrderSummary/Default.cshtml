@@ -677,7 +677,7 @@ Content1 =
         },
         mounted: function () {
             this.items.forEach(item => {
-                item.unitPrice = item.unitPrice?.replace('$', '');
+                item.unitPrice = item.unitPrice?.replace('$', '')?.replace(/,/g,'');
                 item.noteAttr = JSON.parse(item.noteAttr);
                 item.warnings = JSON.parse(item.warnings);
                 item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr)
