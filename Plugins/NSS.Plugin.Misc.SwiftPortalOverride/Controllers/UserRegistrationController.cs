@@ -276,35 +276,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
                 }
 
-                //var userRegistrationResponse = response;
-
-                //generate password
-                //string password = Common.GenerateRandomPassword();
-
-                //create user
-                //var cc = _userRegistrationService.CreateUser(
-                //    userRegistration,
-                //    password,
-                //    (int)UserRegistrationStatus.Approved,
-                //    userRegistrationResponse.CompanyId,
-                //    userRegistrationResponse.CompanyName,
-                //    userRegistrationResponse.SalesContactEmail,
-                //    userRegistrationResponse.SalesContactName,
-                //    userRegistrationResponse.SalesContactPhone,
-                //    userRegistrationResponse.Ap,
-                //    userRegistrationResponse.Buyer,
-                //    userRegistrationResponse.Operations,
-                //    userRegistrationResponse.WintrixId
-                //    );
-
-                // get customer
-                //var customer = _customerService.GetCustomerById(cc.CustomerId);
-
-                //if (customer == null)
-                //    warnings.Add("customer not created successfully");
-
-                // send email
-                //_workflowMessageService.SendCustomerWelcomeMessage(customer, password, _storeContext.CurrentStore.DefaultLanguageId);
             }
 
 
