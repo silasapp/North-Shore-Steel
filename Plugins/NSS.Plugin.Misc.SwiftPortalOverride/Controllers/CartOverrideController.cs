@@ -243,9 +243,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var checkoutError = model.Items.FirstOrDefault(it => it.Warnings.Count > 0);
             if (checkoutError != null)
-                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError, true);
+            {
+                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CartError, true);
+            }
+            else
+            {
+                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CartError, "");
+            }
 
-            _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError, "");
             return View(model);
         }
 
@@ -259,7 +264,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (form.TryGetValue(formControlId, out var value) && !string.IsNullOrEmpty(value))
                 {
                     cartItem.Item.AttributesXml = _productAttributeParser.RemoveProductAttribute(cartItem.Item.AttributesXml, map);
-                    cartItem.Item.AttributesXml =  _productAttributeParser.AddProductAttribute(cartItem.Item.AttributesXml, map, value);
+                    cartItem.Item.AttributesXml = _productAttributeParser.AddProductAttribute(cartItem.Item.AttributesXml, map, value);
                 }
             }
 
@@ -270,7 +275,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             // update cust part No
             var (_, customerCompany) = GetCustomerCompanyDetails();
 
-            if(customerCompany != null)
+            if (customerCompany != null)
             {
                 var controlId = $"customerpartNo{cartItem.Product.Id}";
                 if (form.TryGetValue(controlId, out var value) && !string.IsNullOrEmpty(value.FirstOrDefault()))
@@ -292,7 +297,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
 
             return (eRPCompanyId, customerCompany);
-        } 
+        }
 
 
         //add product to cart using AJAX
@@ -526,10 +531,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             //update cart
             UpdateCart(form);
-            bool checkoutError = _genericAttributeService.GetAttribute<bool>(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError);
+            bool checkoutError = _genericAttributeService.GetAttribute<bool>(currentCustomer, SwiftPortalOverrideDefaults.CartError);
             if (checkoutError)
             {
-                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError, "");
+                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CartError, "");
                 return View();
             }
 
