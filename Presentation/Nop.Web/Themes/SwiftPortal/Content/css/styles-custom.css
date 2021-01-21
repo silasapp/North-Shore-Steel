@@ -1706,9 +1706,11 @@ table input {
 .checkout-button:hover {
     background-color: #1899E1 !important;
 }
+
     .checkout-button-mob, .checkout-button:hover {
         background-color: #033551 !important;
     }
+
 .terms-modal-body {
     text-align: left;
     font: normal normal 600 18px/32px "Exo 2";
@@ -2485,6 +2487,30 @@ table input {
     border-radius: 50%;
 }
 
+.checkout-checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 2px solid #0076b4;
+    background-color: white;
+}
+.e-dlg-header {
+    color: #ffffff;
+    font-family: Teko !important;
+    font-size: 26px !important;
+}
+.use-address {
+    background-color: #f6f6f6;
+    color: #000000;
+    padding: 10px;
+}
+.use-address:hover {
+    background-color: #1899E1;
+    color: #ffffff;
+}
 .radio-button:hover input ~ .rad-checkmark {
     background-color: #ccc;
 }
@@ -2492,14 +2518,17 @@ table input {
 .radio-button input:checked ~ .rad-checkmark {
     background-color: #0076b4;
 }
+.radio-button input:checked ~ .checkout-checkmark {
+    background-color: #ffffff;
+}
 
-.rad-checkmark:after {
+.rad-checkmark:after, .checkout-checkmark:after {
     content: "";
     position: absolute;
     display: none;
 }
 
-.radio-button input:checked ~ .rad-checkmark:after {
+.radio-button input:checked ~ .rad-checkmark:after, .radio-button input:checked ~ .checkout-checkmark:after {
     display: block;
 }
 
@@ -2510,6 +2539,14 @@ table input {
     height: 10px;
     border-radius: 50%;
     background: white;
+}
+.radio-button .checkout-checkmark:after {
+    top: 3px;
+    left: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0076b4;
 }
 
 .menu-toggle {
@@ -3752,11 +3789,16 @@ and also iPads specifically.
 }
 /*// Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
+    .checkout-summary {
+        position: fixed;
+        width: inherit;
+        max-width: inherit;
+}
 }
 
 /*// Large devices (desktops, 992px and up)*/
 @media (min-width: 992px) {
-
+}
 
     /*// Extra large devices (large desktops, 1200px and up)*/
     @media (min-width: 1200px) {
@@ -3766,6 +3808,7 @@ and also iPads specifically.
         .shapes-container {
             margin: 0 30px;
         }
+
         .shape-category {
             padding: 0 !important;
         }
@@ -3773,6 +3816,7 @@ and also iPads specifically.
             .shape-category > div {
                 margin: 20px !important;
             }
+
             .shape-category > div {
                 width: 110px !important;
             }
@@ -3782,7 +3826,7 @@ and also iPads specifically.
                     height: 110px !important;
                 }
     }
-}
+
 
 @media (max-width: 992px) {
     .shape-category {
@@ -3792,6 +3836,7 @@ and also iPads specifically.
         .shape-category > div {
             margin: 10px !important;
         }
+
         .shape-category > div {
             width: 100px !important;
         }
@@ -3832,6 +3877,7 @@ and also iPads specifically.
         padding-bottom: 10px;
         color: #ffffff;
     }
+
     .shapes-container {
         margin: 0 10px;
     }
@@ -3853,6 +3899,9 @@ and also iPads specifically.
                 width: 75px !important;
                 height: 75px !important;
             }
+    .cart-collaterals>div{
+        max-width: 100% !important;
+}
 }
 
 /*// Medium devices (tablets, less than 992px)*/
@@ -3913,4 +3962,4 @@ and also iPads specifically.
 
 .ui-dialog-titlebar-close {
     background: url('../images/icn-close.svg') center no-repeat !important;
-}
+    }
