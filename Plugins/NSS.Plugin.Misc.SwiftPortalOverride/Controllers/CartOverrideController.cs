@@ -157,16 +157,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [FormValueRequired("updatecart")]
         public override IActionResult UpdateCart(IFormCollection form)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var currentCustomer = _workContext.CurrentCustomer;
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!_customerCompanyService.Authorize(currentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
             if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
                 return RedirectToRoute("Homepage");
 
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var cart = _shoppingCartService.GetShoppingCart(currentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
             //get identifiers of items to remove
             var itemIdsToRemove = form["removefromcart"]
@@ -222,7 +223,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }).ToList();
 
             //updated cart
-            cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            cart = _shoppingCartService.GetShoppingCart(currentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
             //parse and save checkout attributes
             ParseAndSaveCheckoutAttributes(cart, form);
@@ -240,6 +241,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     itemModel.Warnings = warningItem.Warnings.Concat(itemModel.Warnings).Distinct().ToList();
             }
 
+            var checkoutError = model.Items.FirstOrDefault(it => it.Warnings.Count > 0);
+            if (checkoutError != null)
+                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError, true);
+
+            _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError, "");
             return View(model);
         }
 
@@ -511,14 +517,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         public override IActionResult StartCheckout(IFormCollection form)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var currentCustomer = _workContext.CurrentCustomer;
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!_customerCompanyService.Authorize(currentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
             //update cart
             UpdateCart(form);
+            bool checkoutError = _genericAttributeService.GetAttribute<bool>(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError);
+            if (checkoutError)
+            {
+                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CheckOutError, "");
+                return View();
+            }
 
             return base.StartCheckout(form);
         }
