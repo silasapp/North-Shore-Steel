@@ -25,7 +25,7 @@
         width: 67rem !important;
         margin: auto;
         position: relative !important;
-        top: -100rem !important;
+        top: -110rem !important;
     }
 
     .text-format {
@@ -270,9 +270,11 @@
                                 });
                     </script>
                     <div class="accept-consent">
-                        <label class=pure-material-checkbox>
+                        <label class="pure-material-checkbox">
                             <input id="accept-consent" type="checkbox" name="accept-consent" />
                             <span class="checkmark"></span>
+                        </label>
+                        <label class="pure-material-checkbox" style="padding-left:3px !important">
                             @if (Model.AcceptPrivacyPolicyPopup)
                             {
                                 <a class="read nss-input-label text-decoration-none">I have read and agree to the</a>
@@ -281,7 +283,6 @@
                                 <a class="read nss-input-label" id="read-privacyinfo">Privacy Policy.</a>
                                 <script asp-location="Footer">
                                     $(document).ready(function () {
-                                        window.scrollTo({ top: 0, behavior: 'smooth' });
                                         $('#read-tos').on('click',
                                             function (e) {
                                             displayPopupContentFromUrl(
@@ -290,7 +291,6 @@
                                         });
                                     });
                                     $(document).ready(function () {
-                                        window.scrollTo({ top: 0, behavior: 'smooth' });
                                         $('#read-privacyinfo').on('click',
                                             function (e) {
                                             displayPopupContentFromUrl(
