@@ -44,7 +44,6 @@
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
 
     var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == Constants.CheckoutPONoAttribute);
-    var deliverychkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == Constants.CheckoutDeliveryOptionAttribute);
 
     List<object> items = new List<object>();
 
@@ -140,20 +139,6 @@ Content1 =
     </div>;
 }
 
-@*<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color:#03175B; color: #fff">
-                    <span class="modal-title">NOTES</span>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
-                </div>
-            </div>
-        </div>
-    </div>*@
-
 
 <div id="cart-section" class="cart-summary-content card" v-cloak>
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
@@ -174,41 +159,6 @@ Content1 =
             }
             @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
             <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
-                @*<div class="d-none d-md-block">
-                        <div style="display: flex; margin: 20px 0; justify-content: space-between;flex-wrap: wrap;">
-
-                            <div class="col-md-5 cart-input-options">
-                                <div class="cart-filter-menu">
-                                    <label for="purchase-order">Purchase Order #</label>
-                                    @if (purchasechkattr != null)
-                                    {
-                                        var controlId = $"checkout_attribute_{purchasechkattr.Id}";
-                                        <input type="text" name="@(controlId)" id="@(controlId)" value="@(purchasechkattr.DefaultValue)" placeholder="ENTER..." />
-                                    }
-                                </div>
-                                <div class="cart-filter-menu">
-                                    <label for="estimated-date">Promise Date</label>
-                                    <input type="text" name="estimated-date" id="estimated-date" onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="TBD" disabled>
-                                </div>
-                            </div>
-
-                            @if (Model.IsEditable)
-                            {
-                                <div class="common-buttons col-md-5 cart-action-options">
-                                    <div class="cart-action-btn">
-                                        <input style="z-index: 1;" type="submit" name="continueshopping" value="Continue Shopping" class="button-2 continue-shopping-button" />
-
-                                        <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/return.svg" width="20" height="20" alt="">
-                                    </div>
-                                    <div class="cart-action-btn">
-                                        <input style="z-index: 1;" type="submit" name="updatecart" value="Update Cart" class="button-2 update-cart-button" />
-
-                                        <img style="position: absolute" src="Themes/SwiftPortal/Content/assets/reload.svg" width="20" height="20" alt="">
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>*@
 
                 <div>
                     <div class="d-flex flex-column">
@@ -386,40 +336,6 @@ Content1 =
                                         @*@await Html.PartialAsync("_DiscountBox", Model.DiscountBox)*@
                                         @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
 
-                                        <div class="pickup-options">
-                                            @if (deliverychkattr != null)
-                                            {
-                                                var controlId = $"checkout_attribute_{deliverychkattr.Id}";
-                                                @foreach (var attributeValue in deliverychkattr.Values)
-                                                {
-                                                    <div>
-                                                        <label for="@(controlId)_@(attributeValue.Id)" class="radio control-label radio-button">
-                                                            <input id="@(controlId)_@(attributeValue.Id)" type="radio" name="@(controlId)" value="@attributeValue.Id" checked="@attributeValue.IsPreSelected">
-                                                            <span class="rad-checkmark"></span>
-                                                            @attributeValue.Name
-                                                        </label>
-                                                    </div>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <div>
-                                                    <label for="pickup" class="radio control-label radio-button">
-                                                        <input type="radio" id="customer" name="ship" value="customer">
-                                                        <span class="rad-checkmark"></span>
-                                                        Ship to Customer
-                                                    </label>
-                                                </div>
-                                                <div>
-                                                    <label for="pickup" class="radio control-label radio-button">
-                                                        <input type="radio" id="pickup" name="ship" value="pickup">
-                                                        <span class="rad-checkmark"></span>
-                                                        Pickup from North Shore Steel
-                                                    </label>
-                                                </div>
-                                            }
-
-                                        </div>
                                         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
                                     </div>
                                 </div>
