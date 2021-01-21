@@ -24,7 +24,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
 
         public static string OldPassword => "OldPassword";
 
-        public static string CheckOutError => "CheckOutError";
+        public static string CartError => "CartError";
         public static string ERPCompanyId => "ERPCompanyId";
 
 

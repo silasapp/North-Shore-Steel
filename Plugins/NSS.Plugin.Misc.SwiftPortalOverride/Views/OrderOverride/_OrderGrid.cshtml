@@ -46,7 +46,7 @@
                 @if (Model.IsClosed)
                 {
                     <e-grid-column field="DeliveryDate" headerText="Delivery Date" minWidth="110" width="120" maxWidth="130" format="M/d/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column template="#viewTicket" headerText="Delivery Ticket" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
+                    <e-grid-column template="#viewTicket" headerText="MTR/POD" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
@@ -137,7 +137,7 @@
                             <label class="fs12-white mb-0"></label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-link mb-0"><a href="">View Ticket</a></label>
+                            <label class="fs12-link mb-0"><a href="">View</a></label>
                         </div>
                     </div>
                 }
@@ -359,7 +359,7 @@
 </script>
 <script id="viewTicket" type="text/x-template">
     ${if(DeliveryTicketCount > 0)}
-    <a href="${DeliveryTicketFile}" target="_blank">View Ticket</a>
+    <a href="${DeliveryTicketFile}" target="_blank">View</a>
     ${/if}
 </script>
 <ejs-scripts></ejs-scripts>
