@@ -3962,4 +3962,5 @@ and also iPads specifically.
 
 .ui-dialog-titlebar-close {
     background: url('../images/icn-close.svg') center no-repeat !important;
-    }
+    outline: none !important;
+}
