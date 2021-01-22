@@ -29,6 +29,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string DeliveryMethodName { get; set; }
         public string DeliveryTicketFile { get; set; }
         public string OrderFile { get; set; }
+        public string SalespersonName { get; set; }
+        public string BuyerName { get; set; }
         public string InvoiceFile { get; set; }
         public int MtrCount { get; set; }
 

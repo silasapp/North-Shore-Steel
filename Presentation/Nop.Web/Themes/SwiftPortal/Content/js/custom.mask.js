@@ -43,4 +43,11 @@ const formatToPhone = (event) => {
     else if (input.length > 0) { target.value = `(${zip}`; }
 };
 
-//exports = { enforceFormat, formatToPhone }
+// remove class from close icon
+$(document).ready(function () {
+    const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].classList.remove('e-dlg-closeicon-btn');
+    }
+    
+})

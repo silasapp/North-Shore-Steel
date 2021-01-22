@@ -123,6 +123,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 model.Source = orderDetailsResponse.Source;
                 model.OrderStatusName = orderDetailsResponse.OrderStatusName;
                 model.DeliveryMethodName = orderDetailsResponse.DeliveryMethodName;
+                model.SalespersonName = orderDetailsResponse.SalespersonName;
+                model.BuyerName = orderDetailsResponse.BuyerName;
 
                 model.DeliveryTicketFile = orderDetailsResponse.DeliveryTicketFile;
                 if (!string.IsNullOrEmpty(model.DeliveryTicketFile))

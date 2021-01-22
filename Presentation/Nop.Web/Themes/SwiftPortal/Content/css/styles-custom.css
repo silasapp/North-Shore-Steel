@@ -3828,7 +3828,7 @@ and also iPads specifically.
                     width: 110px !important;
                     height: 110px !important;
                 }*/
-    }
+                }
 
 
 @media (max-width: 992px) {
@@ -3848,7 +3848,7 @@ and also iPads specifically.
                 width: 100px !important;
                 height: 100px !important;
             }*/
-}
+            }
 /*// Small devices (landscape phones, less than 768px)*/
 @media (max-width: 767.98px) {
     .check-out-card {
@@ -3965,11 +3965,25 @@ and also iPads specifically.
     display: none;
 }
 
-.ui-dialog-titlebar-close {
-    background: url('../images/icn-close.svg') center no-repeat !important;
-    }
 @media (max-width: 330px) {
     .shape-category {
         grid-template-columns: repeat(3,1fr) !important;
     }
+}
+
+.ui-dialog-titlebar-close {
+    background: url('../images/icn-close.svg') center no-repeat !important;
+    outline: none !important;
+}
+
+.e-control.e-btn.e-lib.e-flat.e-icon-btn {
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 50%;
+    bottom: 0;
+    float: right;
+    height: 30px;
+    left: 6px;
+    position: relative;
+    width: 30px;
 }
