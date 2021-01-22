@@ -53,41 +53,41 @@
     Func<object, object>
     Content1 =
     @<div id="viewMtrModal">
-         <div class="d-flex flex-column">
-             <div class="d-flex flex-column mt-4 mb-2">
-                 <table class="table table-striped w3-animate-left nss-table">
-                     <thead class="thead-default">
-                         <tr>
-                             <td scope="col">MTR #</td>
-                             <td scope="col">Heat #</td>
-                             <td scope="col" class="text-center">Line #</td>
-                             <td scope="col">Description</td>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         <template v-for="p in orderMTRs">
-                             <tr>
-                                 <td><a v-bind:href="p.MtrFile" target="_blank" scope="row">{{p.MtrId}}</a></td>
-                                 <td>{{p.HeatNo}}</td>
-                                 <td class="text-center">{{p.LineNo}}</td>
-                                 <td>{{p.Description}}</td>
-                             </tr>
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <table class="table table-striped w3-animate-left nss-table">
+                    <thead class="thead-default">
+                        <tr>
+                            <td scope="col">MTR #</td>
+                            <td scope="col">Heat #</td>
+                            <td scope="col" class="text-center">Line #</td>
+                            <td scope="col">Description</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="p in orderMTRs">
+                            <tr>
+                                <td><a v-bind:href="p.MtrFile" target="_blank" scope="row">{{p.MtrId}}</a></td>
+                                <td>{{p.HeatNo}}</td>
+                                <td class="text-center">{{p.LineNo}}</td>
+                                <td>{{p.Description}}</td>
+                            </tr>
 
-                             @*<a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
-                                 <div class="d-flex flex-row mt-4 cursor-pointer">
-                                     <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
-                                 </div>
-                             </a>*@
-                         </template>
-                         <template v-if="orderMTRs.length == 0">
-                             No available MTR report.
-                         </template>
-                     </tbody>
-                 </table>
-             </div>
-                
-             </div>
-         </div>;
+                            @*<a v-bind:href="p.MtrFile" target="_blank" class="text-decoration-none">
+                                    <div class="d-flex flex-row mt-4 cursor-pointer">
+                                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View MTR {{p.MtrId}}</label>
+                                    </div>
+                                </a>*@
+                        </template>
+                        <template v-if="orderMTRs.length == 0">
+                            No available MTR report.
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>;
 }
 <style>
     .m-b2 {
@@ -113,7 +113,6 @@
         color: #03175B;
         opacity: 1;
     }
-
 </style>
 
 
@@ -194,7 +193,7 @@
                                     </div>
                                 </div>
                             </div>
-                                <div class="nss-dark text-center">Combines online and offline orders.</div>
+                            <div class="nss-dark text-center">Combines online and offline orders.</div>
                         </div>
                     </div>
                 }
@@ -206,8 +205,7 @@
                             <div class="avatar-block">
                                 <img class="avatar rounded-circle" src="~/Themes/@(themeName)/Content/images/call-avatar.png" alt="profile-default">
                             </div>
-                            <h6 class="h4-primary-600-teko mb-2 mt-2 mx-3 nss-dark-blue">Outstanding</h6>
-                            <h6 class="h4-primary-600-teko mb-3 mx-3 nss-dark-blue">Customer Service</h6>
+                            <h6 class="h4-primary-600-teko mb-2 mt-2 mx-3 nss-dark-blue" style="margin: 20px 0 !important; font-size: 26px;">Marcelo</h6>
                             <h6 class="h5-default">I'm here to provide you with</h6>
                             <h6 class="h5-default mb-3">exceptional customer service.</h6>
                             <div class="d-flex flex-row align-items-center justify-content-center pb-2" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
@@ -336,13 +334,13 @@
                     </div>
                 }
 
-            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
+                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'></span>
 
 
 
             </div>
             <div class="discount-block" alt="">
-                <img src="~/Themes/@(themeName)/Content/assets/discount.PNG" alt="">
+                <img src="~/Themes/@(themeName)/Content/assets/discounts-feature.PNG" alt="">
                 <div class="action">
                     <button class="white-btn">
                         <img src="~/Themes/@(themeName)/Content/assets/menu.svg" height="20"
@@ -545,7 +543,7 @@
             </div>
             <div class="bg-white d-flex flex-column w-100 align-items-center pb-3 pt-1">
                 <div class="d-flex flex-column w-100 align-items-center" v-on:click="isCustomerServiceOpen = !isCustomerServiceOpen">
-                    <label class="title">Outstanding Customer Service</label>
+                    <label class="title">Marcelo</label>
                     <img src="~/Themes/@(themeName)/Content/assets/icn-arrow-up.svg" v-bind:style="{'transform': isCustomerServiceOpen ? 'rotate(180deg)' : ''}" alt="arrow up" width="28">
                 </div>
 

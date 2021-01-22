@@ -452,7 +452,8 @@ a:not([href]):not([class]) {
 }
 
 .catalog-page {
-    margin-top: 50px;
+    margin-top: 0;
+    
     position: relative;
 }
 
@@ -595,7 +596,9 @@ a:not([href]):not([class]) {
 .account-select-page {
     margin-bottom: 300px;
 }
-
+.account-select {
+    z-index: auto !important;
+}
 .account-btn {
     background: #f5f7ff 0% 0% no-repeat padding-box;
     box-shadow: 0px 1px 16px #0000001a;
@@ -2014,8 +2017,8 @@ table input {
 
     .footer-logo > div > img {
         margin-bottom: 6px;
-        width: 116px;
-        height: 70px;
+        /*width: 116px;*/
+        height: 90px;
     }
 
     .footer-logo > div > p {
@@ -3784,9 +3787,9 @@ and also iPads specifically.
     .cart-total > tbody > tr {
         padding: 0px 20px !important;
     }*/
-.shapes-container {
+/*.shapes-container {
     margin: 0 50px;
-}
+}*/
 /*// Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
     .checkout-summary {
@@ -3805,7 +3808,7 @@ and also iPads specifically.
     }
 
     @media (max-width: 1200px) {
-        .shapes-container {
+        /*.shapes-container {
             margin: 0 30px;
         }
 
@@ -3824,12 +3827,12 @@ and also iPads specifically.
                 .shape-category > div > img, .icon-shape {
                     width: 110px !important;
                     height: 110px !important;
-                }
+                }*/
     }
 
 
 @media (max-width: 992px) {
-    .shape-category {
+    /*.shape-category {
         padding: 0 !important;
     }
 
@@ -3844,7 +3847,7 @@ and also iPads specifically.
             .shape-category > div > img, .icon-shape {
                 width: 100px !important;
                 height: 100px !important;
-            }
+            }*/
 }
 /*// Small devices (landscape phones, less than 768px)*/
 @media (max-width: 767.98px) {
@@ -3877,14 +3880,17 @@ and also iPads specifically.
         padding-bottom: 10px;
         color: #ffffff;
     }
-
-    .shapes-container {
+    .shape-category > div,.shape-category > div>img {
+        width: 70px !important;
+    }
+    /* .shapes-container {
         margin: 0 10px;
     }
 
+    
     .shape-category {
-        padding: 0 !important;
-        justify-content: center;
+        grid-template-columns: repeat(3,1fr);
+        grid-gap: 15px;
     }
 
         .shape-category > div {
@@ -3898,15 +3904,14 @@ and also iPads specifically.
             .shape-category > div > img, .icon-shape {
                 width: 75px !important;
                 height: 75px !important;
-            }
+            }*/
     .cart-collaterals>div{
         max-width: 100% !important;
 }
 }
 
 /*// Medium devices (tablets, less than 992px)*/
-@media (max-width: 991.98px) {
-}
+
 
 /* #region Custom Loading */
 
@@ -3963,3 +3968,8 @@ and also iPads specifically.
 .ui-dialog-titlebar-close {
     background: url('../images/icn-close.svg') center no-repeat !important;
     }
+@media (max-width: 330px) {
+    .shape-category {
+        grid-template-columns: repeat(3,1fr) !important;
+    }
+}
