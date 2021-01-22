@@ -48,6 +48,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses
         [JsonProperty("orderFile")]
         public string OrderFile { get; set; }
 
+        [JsonProperty("buyerName")]
+        public string BuyerName { get; set; }
+
+        [JsonProperty("salespersonName")]
+        public string SalespersonName { get; set; }
+
         [JsonProperty("mtrCount")]
         //[JsonConverter(typeof(ParseStringConverter))]
         public string MtrCount { get; set; }
