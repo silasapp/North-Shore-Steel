@@ -54,7 +54,7 @@
                     <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="80" width="100" maxWidth="120" format="M/d/yy" allowFiltering="false"></e-grid-column>
                     <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="80" width="100" maxWidth="120"></e-grid-column>
                 }
-                <e-grid-column type="checkbox" width="30"></e-grid-column>
+                <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>
         </ejs-grid>
     </div>
@@ -285,17 +285,13 @@
         }
         console.log('mobileExcelData', mobileExcelInvoiceData);
     }
+
     function toolbarClick() {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
-        var exceldata = gridObj.getSelectedRecords();
-        if (exceldata.length > 0) {
-            var exportProperties = {
-                dataSource: exceldata,
-                fileName: "InvoiceExport.xlsx"
-            };
-            gridObj.excelExport(exportProperties);
-        }
+       gridObj.excelExport();
+
     }
+
     function exportExcelMobile() {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
         //var exceldata = gridObj.getSelectedRecords();
