@@ -29,13 +29,19 @@
     .shape-icon-img:hover {
         transform: scale(1.05);
     }
+
+    .shape-category {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 24px;
+    }
 </style>
 <div id="app" class="page catalog-page" v-cloak>
     <div v-show="filterTags.length === 0">
         <div class="d-flex flex-column align-items-center text-center shapes-container">
             <label class="h2-primary mb-4">SELECT A SHAPE</label>
             <div class="d-flex flex-row flex-wrap px-5 shape-category">
-                <div class="d-flex flex-column align-items-center mb-3 mx-5" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
+                <div class="d-flex flex-column align-items-center" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
                     <img v-if="shape.icon" class="shape-icon-img" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
                     <div v-if="!shape.icon" class="icon-shape"></div>
                     <label class="h4-default-500 text-capitalize mt-2">{{ shape.name }}</label>
@@ -46,6 +52,24 @@
     <div v-show="filterTags.length > 0">
         <div class="page-body">
             <div class="row">
+                <div class="col-lg-12 col-xl-3"></div>
+                <div class="col-lg-12 col-xl-9">
+                    <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
+                        <label class="h5-default-normal mb-2 mr-3">Applied Filters:</label>
+                        <div v-for="(tag, i) in filterTags" class="d-flex flex-row mb-2" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
+                            <span class="filter-tag">
+                                {{ tag.type === 'query' ? `"${tag.text}"` : tag.text }}
+                                <button v-on:click='removeFilter(tag)'>
+                                    <img alt="close icon" src="Themes/SwiftPortal/Content/assets/close-filled.svg" width="15" height="15" />
+                                </button>
+                            </span>
+                        </div>
+                        <div v-if="filterTags.length === 0" class="d-flex flex-row mb-2">
+                            <span class="filter-tag">None</span>
+                        </div>
+                        <button v-if="filterTags.length > 0" v-on:click="clearFilters" class="clear-filter mb-2">Clear filters</button>
+                    </div>
+                </div>
                 <div class="col-lg-12 col-xl-3 shapes-treeview">
 
                     <div class="cat-side-drawer" id="drawerPane">
@@ -104,21 +128,7 @@
                     </div>
                 </div>
                 <div class="col-lg-12 col-xl-9">
-                    <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
-                        <label class="h5-default-normal mb-2 mr-3">Applied Filters:</label>
-                        <div v-for="(tag, i) in filterTags" class="d-flex flex-row mb-2" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
-                            <span class="filter-tag">
-                                {{ tag.type === 'query' ? `"${tag.text}"` : tag.text }}
-                                <button v-on:click='removeFilter(tag)'>
-                                    <img alt="close icon" src="Themes/SwiftPortal/Content/assets/close-filled.svg" width="15" height="15" />
-                                </button>
-                            </span>
-                        </div>
-                        <div v-if="filterTags.length === 0" class="d-flex flex-row mb-2">
-                            <span class="filter-tag">None</span>
-                        </div>
-                        <button v-if="filterTags.length > 0" v-on:click="clearFilters" class="clear-filter mb-2">Clear filters</button>
-                    </div>
+
                     <div id="partialview"></div>
                     <div id="dialog"></div>
                 </div>
@@ -214,21 +224,21 @@
 
             shapeIcon: {
                 angle: 'img-angle.svg',
-                beam: 'img-ibeam.png',
+                beam: 'img-ibeam.svg',
                 channel: 'img-channel.svg',
                 flatbar: 'img-angle.svg',
                 pipe: 'img-pipe.svg',
-                roundbar: 'img-roundbar.png',
-                squarebar: 'img-squarebar.png',
-                hexbar: 'img-hexbar.png',
-                rebar: 'img-rebar.png',
+                roundbar: 'img-roundbar.svg',
+                squarebar: 'img-squarebar.svg',
+                hexbar: 'img-hexbar.svg',
+                rebar: 'img-rebar.svg',
                 tubing: 'img-tubing.svg',
                 expandedmetal: 'img-expanded-metal.svg',
                 grating: 'img-grating.svg',
-                plate: 'img-plate.png',
-                sheet: 'img-sheet.png',
-                cylinder: 'img-roundbar.png',
-                plateindividual: 'img-plate.png',
+                plate: 'img-plate.svg',
+                sheet: 'img-sheet.svg',
+                cylinder: 'img-pipe.svg',
+                plateindividual: 'img-plate.svg',
             },
 
             constants: {
