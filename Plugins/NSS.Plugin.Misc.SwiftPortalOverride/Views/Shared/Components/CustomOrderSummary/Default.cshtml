@@ -287,7 +287,7 @@ Content1 =
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Unit Price</label>
                                     <div class="d-flex flex-row align-items-center">
-                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice | amount(0) }} / </label>
+                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice | amount(2) }} / </label>
                                         <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                 v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                             <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
