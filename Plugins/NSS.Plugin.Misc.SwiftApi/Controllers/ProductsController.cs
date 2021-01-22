@@ -342,6 +342,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         #region Attribute Methods
         private void MapProductSpecificationAttributeOption(Product entity, Dictionary<string, object> data)
         {
+            // shapeId
+            data.TryGetValue(Constants.shapeFieldAttribute, out var shapeId);
             // get value option id for maping
             var attributes = _specificationAttributeService.GetSpecificationAttributes();
 
@@ -353,31 +355,86 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
                 if (containsValue && !string.IsNullOrEmpty(value.ToString()))
                 {
-                    var option = options.FirstOrDefault(x => x.Name == value.ToString());
-
-                    if (option == null)
+                    // not plate individual shape id - 13 should have metal and coating filter omly
+                    if (shapeId?.ToString() != "13")
                     {
-                        //create option
+                        if (attr.Name == Constants.CoatingFieldAttribute || attr.Name == Constants.MetalFieldAttribute)
+                            CreateProductSpecFilter(entity, attr, options, value);
+                    }
+                    else
+                    {
                         if (attr.Name == Constants.CountryOfOriginFieldAttribute)
+                        {
                             value = value.ToString().ToUpper();
 
-                        option = new SpecificationAttributeOption { Name = value.ToString(), SpecificationAttributeId = attr.Id };
-                        _specificationAttributeService.InsertSpecificationAttributeOption(option);
+                            CreateProductSpecFilter(entity, attr, options, value);
+                        }
+                        else if (attr.Name == Constants.DisplayWidthFieldAttribute)
+                        {
+                            if (int.TryParse(value?.ToString(), out int width))
+                            {
+                                // min width - 36, 48, 60, 72
+                                if (width >= 36)
+                                {
+                                    value = 36;
+
+                                    CreateProductSpecFilter(entity, attr, options, value);
+                                }
+
+                                if (width >= 48)
+                                {
+                                    value = 48;
+
+                                    CreateProductSpecFilter(entity, attr, options, value);
+                                }
+
+                                if (width >= 60)
+                                {
+                                    value = 60;
+
+                                    CreateProductSpecFilter(entity, attr, options, value);
+                                }
+
+                                if (width >= 72)
+                                {
+                                    value = 72;
+
+                                    CreateProductSpecFilter(entity, attr, options, value);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            CreateProductSpecFilter(entity, attr, options, value);
+                        }
                     }
 
-                    //map
-                    var prodSpec = new ProductSpecificationAttribute
-                    {
-                        AllowFiltering = true,
-                        ProductId = entity.Id,
-                        SpecificationAttributeOptionId = option.Id,
-                        AttributeType = SpecificationAttributeType.Option,
-                        ShowOnProductPage = true 
-                    };
-                    _specificationAttributeService.InsertProductSpecificationAttribute(prodSpec);
+                   
                 }
-
             }
+        }
+
+        private void CreateProductSpecFilter(Product entity, SpecificationAttribute attr, IList<SpecificationAttributeOption> options, object value)
+        {
+            var option = options.FirstOrDefault(x => x.Name == value.ToString());
+
+            if (option == null)
+            {
+                //create option
+                option = new SpecificationAttributeOption { Name = value.ToString(), SpecificationAttributeId = attr.Id };
+                _specificationAttributeService.InsertSpecificationAttributeOption(option);
+            }
+
+            //map
+            var prodSpec = new ProductSpecificationAttribute
+            {
+                AllowFiltering = true,
+                ProductId = entity.Id,
+                SpecificationAttributeOptionId = option.Id,
+                AttributeType = SpecificationAttributeType.Option,
+                ShowOnProductPage = true
+            };
+            _specificationAttributeService.InsertProductSpecificationAttribute(prodSpec);
         }
 
         private void MapProductAttributes(Product product)
@@ -395,11 +452,11 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
                     if (productAttribute.Name == Constants.CutOptionsAttribute)
                     {
-                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.RadioList, ProductAttributeId = productAttribute.Id, ProductId = product.Id };
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.RadioList, ProductAttributeId = productAttribute.Id, ProductId = product.Id, IsRequired = true };
                         _productAttributeService.InsertProductAttributeMapping(attributeMapping);
 
                         // options
-                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in half", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 1, IsPreSelected = true });
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in half", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 1});
                         _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in thirds", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 2 });
                         _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in quarters", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 3 });
                         _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Other", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 4 });

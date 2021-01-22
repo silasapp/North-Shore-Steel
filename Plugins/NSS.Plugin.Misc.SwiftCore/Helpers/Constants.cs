@@ -46,6 +46,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string ConditionFieldAttribute => "condition";
         public static string CountryOfOriginFieldAttribute => "countryOfOrigin";
         public static string DisplayWidthFieldAttribute => "displayWidth";
+        public static string shapeFieldAttribute => "shapeId";
         #endregion
 
         #region UnitOfPurchase
