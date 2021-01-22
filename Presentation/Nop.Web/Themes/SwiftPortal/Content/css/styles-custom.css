@@ -3964,3 +3964,17 @@ and also iPads specifically.
     background: url('../images/icn-close.svg') center no-repeat !important;
     outline: none !important;
 }
+
+.e-control.e-btn.e-lib.e-flat.e-icon-btn {
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 50%;
+    bottom: 0;
+    float: right;
+    height: 30px;
+    left: 6px;
+    position: relative;
+    width: 30px;
+}
+
+

@@ -197,7 +197,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         public TransactionModel PrepareCustomerHomeModel(string companyId)
         {
             var token = string.Empty;
-            List<Invoice> recentInvoices = new List<Invoice>();
             var openOrdersResponse = new List<ERPSearchOrdersResponse>();
             var closedOrdersResponse = new List<ERPSearchOrdersResponse>();
             var request = new ERPSearchOrdersRequest()
@@ -230,27 +229,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 DeliveryStatus = order.DeliveryStatus
             }).Take(5).ToList();
 
-            model.RecentOrders = _nSSApiProvider.GetRecentOrders(companyId);
-            (token, recentInvoices) = _nSSApiProvider.GetRecentInvoices(companyId);
-
-            if (recentInvoices != null && recentInvoices.Count > 0)
-            {
-                foreach (var invoice in recentInvoices)
-                {
-                    var recentInvoice = new Invoice
-                    {
-                        InvoiceId = invoice.InvoiceId,
-                        OrderNo = invoice.OrderNo,
-                        InvoiceAmount = invoice.InvoiceAmount,
-                        InvoiceDate = invoice.InvoiceDate,
-                        InvoiceDueDate = invoice.InvoiceDueDate,
-                        InvoiceStatusName = invoice.InvoiceStatusName,
-                        InvoiceFile = $"{invoice.InvoiceFile}{token}"
-                    };
-
-                    model.RecentInvoices.Add(recentInvoice);
-                }
-            }
 
             model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
             model.OpenOrders = openOrders;
@@ -276,7 +254,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, Convert.ToInt32(companyId));
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
             {
-                //ApplyForCreditUrl = string.IsNullOrEmpty(_swiftCoreSettings.ApplyForCreditUrl) ? "https://www.nssco.com/assets/files/newaccountform.pdf" : _swiftCoreSettings.ApplyForCreditUrl,
                 CanCredit = customerCompany?.CanCredit ?? false
             };
 
@@ -350,13 +327,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 var addy = _addressService.GetAddressById(addressId);
                 addresses.Add(addy);
             }
-
-
-
-            //var addresses = _customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id)
-            //    //enabled for the current store
-            //    .Where(a => a.CountryId == null || _storeMappingService.Authorize(_countryService.GetCountryByAddress(a)))
-            //    .ToList();
 
 
             var model = new Nop.Web.Models.Customer.CustomerAddressListModel();
