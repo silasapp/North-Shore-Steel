@@ -132,9 +132,9 @@
                                                     <tr>
                                                         <td scope="col">Order #</td>
                                                         <td scope="col">PO #</td>
-                                                        <td scope="col">Promise Date</td>
-                                                        <td scope="col">Scheduled Date</td>
-                                                        <td scope="col">Status</td>
+                                                        <td scope="col" class="text-center">Promise Date</td>
+                                                        <td scope="col" class="text-center">Scheduled Date</td>
+                                                        <td scope="col" class="text-center">Status</td>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -143,8 +143,8 @@
                                                         <tr>
                                                             <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                             <td>@order.PoNo</td>
-                                                            <td>@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
-                                                            <td>@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
+                                                            <td class="text-center">@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
+                                                            <td class="text-center">@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
                                                             <td class="text-center cursor-pointer">@order.OrderStatusName</td>
                                                         </tr>
                                                     }
@@ -208,8 +208,8 @@
                                                     <tr>
                                                         <td scope="col">Order #</td>
                                                         <td scope="col">PO #</td>
-                                                        <td scope="col">Delivery Date</td>
-                                                        <td scope="col">Delivered</td>
+                                                        <td scope="col" class="text-center">Delivery Date</td>
+                                                        <td scope="col" class="text-center">Delivered</td>
                                                         <td scope="col" class="text-center">MTR/POD</td>
                                                     </tr>
                                                 </thead>
@@ -219,8 +219,8 @@
                                                         <tr>
                                                             <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                             <td>@order.PoNo</td>
-                                                            <td>@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
-                                                            <td>@order.DeliveryStatus</td>
+                                                            <td class="text-center">@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
+                                                            <td class="text-center">@order.DeliveryStatus</td>
                                                             <td class="text-center cursor-pointer" v-on:mouseover="isHoveringViewMTR = true;" v-on:mouseleave="isHoveringViewMTR = false;">
                                                                 <img alt="MTR Icon" v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" src='/Themes/@themeName/Content/assets/icn-mt-report.svg' />
                                                             </td>
