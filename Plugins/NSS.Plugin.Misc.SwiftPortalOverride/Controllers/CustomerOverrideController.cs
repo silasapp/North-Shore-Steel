@@ -801,8 +801,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [CheckAccessPublicStore(true)]
         public virtual IActionResult NewCustomerChangePassword(ChangePasswordModel model)
         {
-            string newUserEmailForPasswordChange = Request.Cookies[SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange].ToString();
-            var customer = _customerService.GetCustomerByEmail(newUserEmailForPasswordChange);
+            var newUserEmail = Request.Cookies[SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange];
+            Customer customer = new Customer();
+            if(!string.IsNullOrEmpty(newUserEmail))
+                customer = _customerService.GetCustomerByEmail(newUserEmail);
 
             if (ModelState.IsValid)
             {
