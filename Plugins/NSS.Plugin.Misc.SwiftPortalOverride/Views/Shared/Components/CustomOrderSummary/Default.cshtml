@@ -188,7 +188,7 @@ Content1 =
                                         <th scope="col" width="9%">Total Price</th>
                                         <th scope="col" width="9%">Weight (lb)</th>
                                         <th scope="col" width="8%" class="text-center">Qty.</th>
-                                        <th scope="col" width="8%" class="text-center">Saw Options</th>
+                                        @*<th scope="col" width="8%" class="text-center">Saw Options</th>*@
                                         <th scope="col" width="5%" class="text-center">Notes</th>
                                         <th scope="col" width="5%" class="text-center">Remove</th>
                                     </tr>
@@ -230,9 +230,9 @@ Content1 =
                                                    aria-label="@T("ShoppingCart.Quantity")"
                                                    min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
                                         </td>
-                                        <td class="text-center">
+                                        @*<td class="text-center">
                                             <a href="">View Options</a>
-                                        </td>
+                                        </td>*@
                                         <td class="text-center">
                                             <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
                                                v-on:click="handleNotesModal(item)" data-target="#noteModal">
@@ -283,7 +283,7 @@ Content1 =
                                            v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'" aria-label="@T("ShoppingCart.Quantity")"
                                            min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
                                 </div>
-                                <a class="fs12-link-500 mb-3">View Options</a>
+                                @*<a class="fs12-link-500 mb-3">View Options</a>*@
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Unit Price</label>
                                     <div class="d-flex flex-row align-items-center">
