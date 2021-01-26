@@ -356,7 +356,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 if (containsValue && !string.IsNullOrEmpty(value.ToString()))
                 {
                     // not plate individual shape id - 13 should have metal and coating filter omly
-                    if (shapeId?.ToString() != "13")
+                    if (!shapeId?.ToString()?.StartsWith("13") ?? false)
                     {
                         if (attr.Name == Constants.CoatingFieldAttribute || attr.Name == Constants.MetalFieldAttribute)
                             CreateProductSpecFilter(entity, attr, options, value);

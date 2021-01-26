@@ -63,11 +63,11 @@
         </div>
 
         <div v-for="order in paginatedData" class="d-flex">
-            <label v-if="isExportMode" class="pure-material-checkbox mr-3 d-flex align-items-center" style="position: relative;">
-                <input type="checkbox" name="order-checkox"
-                       v-on:click="onCheck(order.orderId)">
-                <span class="checkmark"></span>
-            </label>
+            @*<label v-if="isExportMode" class="pure-material-checkbox mr-3 d-flex align-items-center" style="position: relative;">
+                    <input type="checkbox" name="order-checkox"
+                           v-on:click="onCheck(order.orderId)">
+                    <span class="checkmark"></span>
+                </label>*@
             <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
 
                 <div class="d-flex flex-row">
@@ -252,71 +252,61 @@
 </script>
 <script>
     var pageModel = @Html.Raw(Serialize(Model));
-    var mobileExcelData = [];
+    //var mobileExcelData = [];
     function formatDate(date) {
         date = new Date(date);
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
-    function onCheck(orderId) {
-        var found = mobileExcelData.find(x => x.OrderId == orderId);
-        var exportBtn = document.getElementById('export-mob-btn');
-        if (!found) {
-            var data = pageModel.orders.find(x => x.orderId == orderId);
-            var newData = { ...data };
-            Object.keys(newData).map(function (key, index) {
-                newData["orderDate"] = formatDate(newData["orderDate"] );
-                newData["deliveryDate"] = formatDate(newData["deliveryDate"] );
-                newData["promiseDate"] = formatDate(newData["promiseDate"] );
-                newData["scheduledDate"] = formatDate(newData["scheduledDate"]);
-            });
-            for (var key in newData) {
-                var temp;
-                if (newData.hasOwnProperty(key)) {
-                    temp = newData[key];
-                    delete newData[key];
-                    newData[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
-                }
-            }
-            mobileExcelData.push(newData);
-            exportBtn.innerHTML = "EXPORT" + " " + mobileExcelData.length + " " + "ORDERS";
-        } else {
-            mobileExcelData = mobileExcelData.filter(x => x.OrderId != orderId);
-            exportBtn.innerHTML = "EXPORT" + " " + mobileExcelData.length + " " + "ORDERS";
-            document.getElementById('select-all-orders').checked = false;
-        }
-        console.log('mobileExcelData', mobileExcelData);
-    }
+
     function toolbarClick() {
         var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
         gridObj.excelExport();
 
     }
-    function exportExcelMobile() {
+
+    async function cloneArray(orders) {
+        return orders.slice();
+    }
+    async function updateArray(orders) {
+        var newOrders = [];
+        for (var i in orders) {
+            var _order = { ...orders[i] };
+            _order.OrderDate = formatDate(_order.OrderDate);
+            _order.DeliveryDate = formatDate(_order.DeliveryDate);
+            _order.PromiseDate = formatDate(_order.PromiseDate);
+            _order.ScheduledDate = formatDate(_order.ScheduledDate);
+            newOrders.push(_order);
+        }
+        return newOrders;
+    }
+    async function keyToUpperCase(orders) {
+        var newOrders = [];
+        for (var i in orders) {
+            var order = { ...orders[i] };
+            for (var key in order) {
+                var upper = key.charAt(0).toUpperCase() + key.slice(1);;
+                // check if it already wasn't uppercase
+                if (upper !== key) {
+                    order[upper] = order[key];
+                    delete order[key];
+                }
+            }
+            newOrders.push(order);
+        }
+        return newOrders;
+    }
+    async function exportExcelMobile() {
+        var _orders = await cloneArray(ordergridvm.paginatedData);
         var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
-        //var exceldata = gridObj.getSelectedRecords();
-        console.log(mobileExcelData);
-        if (mobileExcelData.length > 0) {
+        _orders = await keyToUpperCase(_orders);
+        _orders = await updateArray(_orders);
+
+        if (_orders.length > 0) {
             var exportProperties = {
-                dataSource: mobileExcelData,
+                dataSource: _orders,
                 fileName: "OrdersExport.xlsx"
             };
             gridObj.excelExport(exportProperties);
-        }
-    }
-    function selectAll(value) {
-        mobileExcelData = [];
-        var checkboxes = document.getElementsByName('order-checkox');
-        for (var i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = value.checked;
-        }
-        if (value.checked) {
-            for (var i = 0; i < ordergridvm.paginatedData.length; i++) {
-                onCheck(ordergridvm.paginatedData[i].orderId);
-            }
-        } else {
-            var exportBtn = document.getElementById('export-mob-btn');
-            exportBtn.innerHTML = "EXPORT 0 ORDER";
-            document.getElementById('select-all-orders').checked = false;
         }
     }
 

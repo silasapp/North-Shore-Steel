@@ -161,6 +161,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
                 new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
                 );
 
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Cart", "/addproducttocart/details/{productId}/{shoppingCartTypeId}",
+            new { controller = "CartOverride", action = "AddProductToCart_Details" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
+
 
             // Checkout
 
