@@ -238,7 +238,6 @@
                 var pageCountRound = Math.round(pageCountDiv);
                 this.pageCount = pageCountRound > pageCountDiv ? pageCountRound : pageCountRound + 1;
 
-
             },
             setPageSize() {
                 this.pageSize = Number(document.getElementById('paginationPageCountInv').value);
@@ -252,73 +251,58 @@
 </script>
 <script>
     var invPageModel = @Html.Raw(Serialize(Model));
-    var mobileExcelInvoiceData = [];
+
     function formatDate(date) {
         date = new Date(date);
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
-    function onCheck(invoiceId) {
-        var found = mobileExcelInvoiceData.find(x => x.InvoiceId == invoiceId);
-        var exportBtn = document.getElementById('export-mob-btn');
-        if (!found) {
-            var data = invPageModel.invoices.find(x => x.invoiceId == invoiceId);
-            var newData = { ...data };
-            Object.keys(newData).map(function (key, index) {
-                newData["invoiceDate"] = formatDate(newData["invoiceDate"]);
-                newData["invoicePaidDate"] = formatDate(newData["invoicePaidDate"]);
-                newData["invoiceDueDate"] = formatDate(newData["invoiceDueDate"]);
-            });
-            for (var key in newData) {
-                var temp;
-                if (newData.hasOwnProperty(key)) {
-                    temp = newData[key];
-                    delete newData[key];
-                    newData[key.charAt(0).toUpperCase() + key.substring(1)] = temp;
-                }
-            }
-            mobileExcelInvoiceData.push(newData);
-            exportBtn.innerHTML = "EXPORT" + " " + mobileExcelInvoiceData.length + " " + "INVOICES";
-        } else {
-            mobileExcelInvoiceData = mobileExcelInvoiceData.filter(x => x.InvoiceId != invoiceId);
-            exportBtn.innerHTML = "EXPORT" + " " + mobileExcelInvoiceData.length + " " + "INVOICES";
-            document.getElementById('select-all-invoices').checked = false;
-        }
-        console.log('mobileExcelData', mobileExcelInvoiceData);
-    }
-
     function toolbarClick() {
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
        gridObj.excelExport();
 
     }
-
-    function exportExcelMobile() {
+    async function cloneArray(invoices) {
+        return invoices.slice();
+    }
+    async function updateArray(invoices) {
+        var newInvoices = [];
+        for (var i in invoices) {
+            var _invoice = { ...invoices[i] };
+            _invoice.InvoiceDate = formatDate(_invoice.InvoiceDate);
+            _invoice.InvoicePaidDate = formatDate(_invoice.InvoicePaidDate);
+            _invoice.InvoiceDueDate = formatDate(_invoice.InvoiceDueDate);
+            newInvoices.push(_invoice);
+        }
+        return newInvoices;
+    }
+    async function keyToUpperCase(invoices) {
+        var newInvoices = [];
+        for (var i in invoices) {
+            var invoice = { ...invoices[i] };
+            for (var key in invoice) {
+                var upper = key.charAt(0).toUpperCase() + key.slice(1);;
+                // check if it already wasn't uppercase
+                if( upper !== key ){
+                    invoice[upper] = invoice[key];
+                    delete invoice[key];
+                }
+            }
+            newInvoices.push(invoice);
+        }
+        return newInvoices;
+    }
+   async function exportExcelMobile() {
+        var _invoices = await cloneArray(invoicegridvm.paginatedData);
         var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
-        //var exceldata = gridObj.getSelectedRecords();
-        console.log(mobileExcelInvoiceData);
-        if (mobileExcelInvoiceData.length > 0) {
+       _invoices = await keyToUpperCase(_invoices);
+       _invoices = await updateArray(_invoices);
+
+        if (_invoices.length > 0) {
             var exportProperties = {
-                dataSource: mobileExcelInvoiceData,
+                dataSource: _invoices,
                 fileName: "InvoiceExport.xlsx"
             };
             gridObj.excelExport(exportProperties);
-        }
-    }
-
-    function selectAll(value) {
-        mobileExcelInvoiceData = [];
-        var checkboxes = document.getElementsByName('invoice-checkox');
-        for (var i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = value.checked;
-        }
-        if (value.checked) {
-            for (var i = 0; i < invoicegridvm.paginatedData.length; i++) {
-                onCheck(invoicegridvm.paginatedData[i].invoiceId);
-            }
-        } else {
-            var exportBtn = document.getElementById('export-mob-btn');
-            exportBtn.innerHTML = "EXPORT 0 INVOICE";
-            document.getElementById('select-all-invoices').checked = false;
         }
     }
 
