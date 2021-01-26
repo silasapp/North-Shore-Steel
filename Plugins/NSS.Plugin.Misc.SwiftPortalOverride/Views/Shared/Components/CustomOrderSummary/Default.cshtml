@@ -208,7 +208,7 @@ Content1 =
                                             <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
                                                    v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
                                         </td>
-                                        <td style="white-space: nowrap;" align="right">
+                                        <td style="white-space: nowrap;">
                                             <div>
                                                 <label style="margin:0; margin-right:8px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
