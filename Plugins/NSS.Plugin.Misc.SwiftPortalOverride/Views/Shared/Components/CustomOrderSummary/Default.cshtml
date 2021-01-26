@@ -61,7 +61,7 @@
         var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
         var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
         var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
-        double weight = 0.0;
+
         //var weightValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out weight) ? DoFormat(weight) : "0.00";
         //var lengthValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out double length) ? DoFormat(length) : "0.00";
 
@@ -78,7 +78,7 @@
 
         var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == Constants.CustomerPartNoAttribute);
         var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
-        var selectedPurchaseUnit = purchaseUnitAttr?.Values?.FirstOrDefault(x => x.IsPreSelected);
+        var selectedPurchaseUnit = purchaseUnitAttr?.Values?.FirstOrDefault(x => x.IsPreSelected) ?? purchaseUnitAttr?.Values?.FirstOrDefault();
         var noteAttr = attributes.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
 
         var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}{item.Id}" : $"itemuom{item.Id}";
