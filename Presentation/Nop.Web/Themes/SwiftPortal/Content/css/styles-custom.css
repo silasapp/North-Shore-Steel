@@ -426,7 +426,7 @@ a:not([href]):not([class]) {
 
     .nss-table > thead,
     .cart-summary-content thead {
-        background-color: #1898E1;
+        background-color: #123250;
         color: #ffffff;
     }
 
@@ -913,12 +913,12 @@ input:-webkit-autofill {
         text-align: center;
         font: normal normal 500 34px/24px "Teko";
         letter-spacing: 0.27px;
-        color: #033551;
+        color: #123250;
         opacity: 1;
     }
 
 .page-title {
-    border-bottom: 2px solid #03175b;
+    border-bottom: 2px solid #123250;
     margin: 0 0 30px !important;
     display: flex;
     justify-content: center;
@@ -931,7 +931,7 @@ input:-webkit-autofill {
         text-align: center;
         font: normal normal 500 34px/24px "Teko";
         letter-spacing: 0.27px;
-        color: #033551;
+        color: #123250;
         opacity: 1;
     }
 
@@ -1273,7 +1273,7 @@ table input {
         content: 'closed';
     }*/
     #accordion > .card > .card-link > .card-header {
-        background: #03175b url(../assets/icn-arrow-down-white.svg) right center no-repeat;
+        background: #123250 url(../assets/icn-arrow-down-white.svg) right center no-repeat;
         text-align: left;
         font: normal normal medium 16px/24px "Teko";
         letter-spacing: 0.13px;
@@ -1355,7 +1355,7 @@ table input {
 }
 
 .e-headercell {
-    background-color: #1898E1 !important;
+    background-color: #123250 !important;
     color: #ffffff !important;
 }
 
@@ -1472,7 +1472,7 @@ table input {
 /* tags */
 
 .filter-tag {
-    background-color: #03175b;
+    background-color: #123250;
     border-radius: 20px;
     padding: 0px 8px;
     margin-right: 8px;
@@ -2807,7 +2807,7 @@ table input {
 .h2-primary {
     font: normal normal 500 26px/24px "Teko";
     letter-spacing: 0.21px;
-    color: #03175b;
+    color: #123250;
     margin-bottom: 0px;
 }
 
