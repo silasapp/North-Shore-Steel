@@ -12,5 +12,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public int? StateProvinceId { get; set; }
         public string City { get; set; }
         public string ZipPostalCode { get; set; }
+
+        public bool SaveToMyAddress { get; set; }
     }
 }

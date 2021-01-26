@@ -657,6 +657,10 @@ a:not([href]):not([class]) {
     color: #000000 !important;
 }
 
+.nss-gray {
+    color: gray !important;
+}
+
 .buttons > .register-button,
 .terms-buttons > button,
 .checkout-card > .actions-1 > button,
