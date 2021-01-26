@@ -452,7 +452,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
                     if (productAttribute.Name == Constants.CutOptionsAttribute)
                     {
-                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.RadioList, ProductAttributeId = productAttribute.Id, ProductId = product.Id, IsRequired = true };
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.RadioList, ProductAttributeId = productAttribute.Id, ProductId = product.Id };
                         _productAttributeService.InsertProductAttributeMapping(attributeMapping);
 
                         // options
