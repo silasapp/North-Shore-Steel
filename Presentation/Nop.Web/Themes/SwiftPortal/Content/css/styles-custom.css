@@ -1721,7 +1721,12 @@ table input {
     color: #2f2f2f;
     opacity: 1;
 }
-
+.discount-tag {
+    border: 1px solid #033551;
+    border-radius: 5px;
+    padding: 0 7px;
+    color: #033551;
+}
 .terms-modal-actions {
     display: flex;
     justify-content: space-between;
