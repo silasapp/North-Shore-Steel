@@ -60,18 +60,18 @@
                 </div>
             </div>
         </div>
-        <div v-if="isMobile && !isExportMode" class="mobile-export">
-            <button class=" ml-lg-5 text-center" v-on:click="switchToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
-        </div>
-        <div v-if="isMobile && isExportMode" class="mobile-export">
-            <button class=" ml-lg-5 text-center mr-2" v-on:click="cancelExportMode()"><img src="~/Themes/@(themeName)/Content/assets/close.svg" alt="" width="25">Cancel</button>
-            <div class="ml-2">
-                <label v-if="isExportMode" class="pure-material-checkbox" style="position: relative;">
-                    <input type="checkbox" class=" mr-2" onclick="selectAll(this)" id="select-all-orders">
-                    <span class="checkmark"></span>Select All
-                </label>
+        @*<div v-if="isMobile && !isExportMode" class="mobile-export">
+                <button class=" ml-lg-5 text-center" v-on:click="switchToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
             </div>
-        </div>
+            <div v-if="isMobile && isExportMode" class="mobile-export">
+                <button class=" ml-lg-5 text-center mr-2" v-on:click="cancelExportMode()"><img src="~/Themes/@(themeName)/Content/assets/close.svg" alt="" width="25">Cancel</button>
+                <div class="ml-2">
+                    <label v-if="isExportMode" class="pure-material-checkbox" style="position: relative;">
+                        <input type="checkbox" class=" mr-2" onclick="selectAll(this)" id="select-all-orders">
+                        <span class="checkmark"></span>Select All
+                    </label>
+                </div>
+            </div>*@
         <div class="d-flex flex-row justify-content-between">
             <div v-bind:style="{'padding-left': isMobile ? '20px':'0'}">
                 <ul class="nav nav-pills mb-1" id=pills-tab role="tablist">
@@ -88,8 +88,8 @@
             <div class="order-export-btn-container" v-if="!isMobile">
                 <button class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
             </div>
-            <div class="order-export-btn-container" v-if="isExportMode && isMobile">
-                <button id="export-mob-btn" class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="exportExcelMobile()" style="background-color: #033551 !important; font-size: 18px;">EXPORT 0 ORDER</button>
+            <div class="order-export-btn-container" v-if="isMobile">
+                <button id="export-mob-btn" class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="exportExcelMobile()" style="background-color: #033551 !important; font-size: 18px;">EXPORT ORDERS</button>
             </div>
         </div>
         <div class="d-flex flex-column p-4 bg-white-shadow" v-bind:style="{'background': isMobile ? 'transparent 0% 0% no-repeat padding-box':'#ffffff 0% 0% no-repeat padding-box'}">
