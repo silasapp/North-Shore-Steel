@@ -705,7 +705,7 @@
                 this.productId = productId;
                 this.sawOptionControlId = prefix + cutOptions.id;
                 this.sawOptions = cutOptions.values;
-                this.sawOption = cutOptions.values.find(x => x.isPreSelected).id;
+                this.sawOption = cutOptions.values.find(x => x.isPreSelected)?.id || cutOptions.values.find(e => true)?.id;
                 this.workOrderInstructions = null;
                 this.workOrderInstructionsId = prefix + at.find(x => x.name === "Work Order Instructions").id;
                 shopVm.dialog.show();
