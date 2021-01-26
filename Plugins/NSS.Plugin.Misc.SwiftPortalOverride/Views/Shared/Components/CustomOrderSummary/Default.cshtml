@@ -231,8 +231,8 @@ Content1 =
                                                    min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
                                         </td>
                                         @*<td class="text-center">
-                                            <a href="">View Options</a>
-                                        </td>*@
+                                                <a href="">View Options</a>
+                                            </td>*@
                                         <td class="text-center">
                                             <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
                                                v-on:click="handleNotesModal(item)" data-target="#noteModal">
@@ -287,7 +287,7 @@ Content1 =
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Unit Price</label>
                                     <div class="d-flex flex-row align-items-center">
-                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice | amount(2) }} / </label>
+                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice }} / </label>
                                         <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                 v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                             <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
@@ -600,7 +600,7 @@ Content1 =
         },
         mounted: function () {
             this.items.forEach(item => {
-                item.unitPrice = item.unitPrice?.replace('$', '')?.replace(/,/g,'');
+                item.unitPrice = item.unitPrice?.replace('$', '');
                 item.noteAttr = JSON.parse(item.noteAttr);
                 item.warnings = JSON.parse(item.warnings);
                 item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr)
@@ -631,23 +631,23 @@ Content1 =
                 let unitPrice = 0.00;
                 switch (itemUnit) {
                     case "EA":
-                        unitPrice = Number(pricePerPiece ? pricePerPiece : '').toFixed(2);
+                        unitPrice = Number(pricePerPiece ? pricePerPiece : '');
                         break;
                     case "FT":
-                        unitPrice = Number(pricePerFt ? pricePerFt : '').toFixed(2);
+                        unitPrice = Number(pricePerFt ? pricePerFt : '');
                         break;
                     case "CWT":
-                        unitPrice = Number(pricePerCWT ? pricePerCWT : '').toFixed(2);
+                        unitPrice = Number(pricePerCWT ? pricePerCWT : '');
                         break;
                     default:
                         break;
                 }
                 this.items.forEach(item => {
                     if (item.id === id) {
-                        item.unitPrice = `${unitPrice}`;
+                        item.unitPrice = this.currencyFormat(unitPrice);
                     }
                 });
-                item.unitPrice = `${unitPrice}`;
+                item.unitPrice = this.currencyFormat(unitPrice);
                 this.calculateItemTotalPrice(item);
             },
             arrayToList: function (arr) {
@@ -677,6 +677,12 @@ Content1 =
                         item.subTotal = `$${totalPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;
                     }
                 });
+            },
+            currencyFormat: function(num) {
+              return num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+            },
+            formatNumber: function(num) {
+              return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
             }
         },
     });
