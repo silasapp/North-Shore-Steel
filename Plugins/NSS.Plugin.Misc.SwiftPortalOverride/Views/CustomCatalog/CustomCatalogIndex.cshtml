@@ -32,7 +32,7 @@
 
     .shape-category {
         display: grid !important;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         grid-gap: 24px;
     }
 </style>
@@ -44,7 +44,7 @@
                 <div class="d-flex flex-column align-items-center" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
                     <img v-if="shape.icon" class="shape-icon-img" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
                     <div v-if="!shape.icon" class="icon-shape"></div>
-                    <label class="h4-default-500 text-capitalize mt-2 font-weight-bolder">{{ shape.name }}</label>
+                    <label class="h4-default-500 mt-2 font-weight-bolder">{{ shape.upperCaseName}}</label>
                 </div>
             </div>
         </div>
@@ -296,8 +296,10 @@
         computed: {
             topShapes: function () {
                 const shapes = this.shared.groupedShapes.filter(x => !x.parentId);
-                shapes.forEach(shape => shape.icon = this.getShapeIcon(shape));
-                console.log(shapes);
+                shapes.forEach(shape => {
+                    shape.icon = this.getShapeIcon(shape);
+                    shape.upperCaseName = shape.name.toUpperCase();
+                });
                 return shapes;
             },
             defaultSpecs: function () {
