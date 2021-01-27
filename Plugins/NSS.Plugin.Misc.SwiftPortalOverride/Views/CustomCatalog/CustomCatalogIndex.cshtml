@@ -326,7 +326,7 @@
                     const isThicknessGroup = specs.some(x => x.specificationAttributeName === 'displayThickness');
                     if (isThicknessGroup) {
                         specs.forEach(spec => {
-                            let value = spec.specificationAttributeOptionName.replace('\'', '').replace('\'', '');
+                            let value = spec.specificationAttributeOptionName.replace('\'', '').replace('\'', '').trim();
                             if (value.includes(' ')) {
                                 const array = value.split(' ');
                                 const wholeNumber = Number(array[0]);
