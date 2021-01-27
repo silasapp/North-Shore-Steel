@@ -15,10 +15,6 @@
 
 <style>
 
-    .e-rowcell.e-templatecell {
-        font-family: 'system-ui' !important;
-    }
-
     .e-dlg-header-content {
         background: #03175B;
     }
@@ -174,6 +170,11 @@
     .e-grid .e-gridheader tr th:last-child {
         position: sticky;
         right: 0;
+    }
+
+    td.e-rowcell.e-templatecell {
+        padding-bottom: 5px;
+        padding-top: 5px;
     }
 </style>
 @{
@@ -394,9 +395,9 @@
             gridColumns,
             gridData,
         },
-        mounted: function() {
+        mounted: function () {
             this.buildGrid();
-
+            this.addCommaToWeight();
         },
         methods: {
             getGridColumns: function () {
@@ -409,7 +410,7 @@
                             field: `${col.sort.toLowerCase()}`, headerText: col.displayName,
                             template: `#${col.code.toLowerCase()}Template`, width: 120,
                         };
-                     else
+                    else
                         column = {
                             field: col.code.toLowerCase(), headerText: col.displayName,
                             template: `#${col.code.toLowerCase()}Template`,
@@ -441,6 +442,9 @@
                     queryCellInfo: this.handleTooltipping,
                 });
                 this.grid.appendTo('#Grid');
+            },
+            addCommaToWeight: function () {
+                gridData.map(g => g.weight = g.weight?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             },
             handleTooltipping: function (args) {
             },
@@ -497,7 +501,7 @@
     ${/if}
 </script>
 <script id="optionsTemplate" type="text/x-template">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center w-100" style="justify-content: space-evenly;">
         <svg id="add-to-wishlist" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mr-1" aria-hidden="true" focusable="false" width="24" height="24"
              style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
              preserveAspectRatio="xMidYMid meet" viewBox="0 0 1024 1024" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`);return false;">
