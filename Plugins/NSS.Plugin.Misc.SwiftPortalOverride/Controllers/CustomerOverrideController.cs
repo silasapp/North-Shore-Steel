@@ -1171,9 +1171,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-
             //custom address attributes
             var customAttributes = _addressAttributeParser.ParseCustomAddressAttributes(form);
             var customAttributeWarnings = _addressAttributeParser.GetAttributeWarnings(customAttributes);
@@ -1198,8 +1195,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
 
 
-                var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
-                var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+                SwiftCore.Domain.Customers.Company company;
+                string companyAddress;
+                getERPCompanyIdAndAddressKey(address, out company, out companyAddress);
                 _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
 
                 return RedirectToRoute("CustomerAddresses");
@@ -1215,6 +1213,47 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             return View(model);
         }
+
+        [HttpPost]
+        [HttpsRequirement]
+        public override IActionResult AddressDelete(int addressId)
+        {
+            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+                return Challenge();
+
+            
+            var customer = _workContext.CurrentCustomer;
+
+            //find address (ensure that it belongs to the current customer)
+            var address = _customerService.GetCustomerAddress(customer.Id, addressId);
+            if (address != null)
+            {
+                _customerService.RemoveCustomerAddress(customer, address);
+                _customerService.UpdateCustomer(customer);
+                //now delete the address record
+                _addressService.DeleteAddress(address);
+
+                SwiftCore.Domain.Customers.Company company;
+                string companyAddress;
+                getERPCompanyIdAndAddressKey(address, out company, out companyAddress);
+                _genericAttributeService.SaveAttribute<string>(company, companyAddress, "");
+            }
+
+            //redirect to the address list page
+            return Json(new
+            {
+                redirect = Url.RouteUrl("CustomerAddresses"),
+            });
+        }
+
+        private void getERPCompanyIdAndAddressKey(Address address, out SwiftCore.Domain.Customers.Company company, out string companyAddress)
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
+            companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+        }
+
         #endregion
 
         #region My account / Notification
