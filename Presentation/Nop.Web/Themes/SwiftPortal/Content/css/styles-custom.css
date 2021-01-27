@@ -2050,11 +2050,16 @@ table input {
 .follow-us {
     margin: 0;
 }
-
-    .follow-us .networks {
-        display: flex;
-        flex-wrap: wrap;
-    }
+.shape-icon-img {
+    background-color: #f6f6f6bf;
+}
+.shape-icon-img:hover {
+    background-color: #ffffff;
+}
+.follow-us .networks {
+    display: flex;
+    flex-wrap: wrap;
+}
 
         .follow-us .networks a {
             background: #0076b4;
@@ -3871,7 +3876,10 @@ and also iPads specifically.
     .check-out-card {
         padding: 0 !important;
     }
-
+    .shape-category {
+        grid-template-columns: repeat(4, 1fr) !important;
+        grid-gap: 18px !important;
+    }
     .orders-search-block > div {
         justify-content: center;
         align-items: center;
@@ -3897,8 +3905,12 @@ and also iPads specifically.
         padding-bottom: 10px;
         color: #ffffff;
     }
-    .shape-category > div,.shape-category > div>img {
+    .shape-category > div {
         width: 70px !important;
+    }
+    .shape-category > div>img {
+        width: 70px !important;
+        height: 70px !important;
     }
     /* .shapes-container {
         margin: 0 10px;
