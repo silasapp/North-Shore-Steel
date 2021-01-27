@@ -2050,11 +2050,16 @@ table input {
 .follow-us {
     margin: 0;
 }
-
-    .follow-us .networks {
-        display: flex;
-        flex-wrap: wrap;
-    }
+.shape-icon-img {
+    background-color: #f6f6f6bf;
+}
+.shape-icon-img:hover {
+    background-color: #ffffff;
+}
+.follow-us .networks {
+    display: flex;
+    flex-wrap: wrap;
+}
 
         .follow-us .networks a {
             background: #0076b4;
