@@ -109,6 +109,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         public OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs, string token)
         {
             var model = new OrderDetailsModel();
+            var orderedMTRs = new List<ERPGetOrderMTRResponse>();
             Nop.Core.Domain.Orders.Order order = null;
 
             if (orderDetailsResponse != null)
@@ -195,8 +196,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     foreach (var item in orderDetailsResponse.OrderItems)
                     {
                         var orderMTR = new OrderDetailsModel.OrderMTRModel();
-
-                        var mtr = orderMTRs.FirstOrDefault(x => x.LineNo == item.LineNo);
+                        orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo).ToList();
+                        var mtr = orderedMTRs.FirstOrDefault(x => x.LineNo == item.LineNo);
                         if (mtr != null)
                             orderMTR = new OrderDetailsModel.OrderMTRModel { LineNo = mtr.LineNo, Description = mtr.Description, HeatNo = mtr.HeatNo, MtrId = mtr.MtrId };
 
@@ -220,7 +221,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     }
 
                 // mtrs
-                foreach (var mtr in orderMTRs)
+                foreach (var mtr in orderedMTRs)
                 {
                     var orderMTR = new OrderDetailsModel.OrderMTRModel
                     {

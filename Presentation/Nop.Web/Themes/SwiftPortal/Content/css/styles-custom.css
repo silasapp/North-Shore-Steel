@@ -2620,7 +2620,7 @@ table input {
 }
 
 .ui-dialog-titlebar {
-    background-color: #03175b;
+    background-color: #123250;
 }
 
 .ui-dialog-title {
@@ -3268,7 +3268,7 @@ hr {
 /* #region SAW OPTIONS MODAL */
 
 .e-dlg-header-content {
-    background: #03175b;
+    background: #123250;
 }
 
     .e-dlg-header-content .e-icon-dlg-close {
