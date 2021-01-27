@@ -1725,6 +1725,14 @@ table input {
     color: #2f2f2f;
     opacity: 1;
 }
+.registration-page .ui-dialog {
+    bottom: 50px;
+    top: 50px !important;
+    left: 0;
+    position: fixed !important;
+    right: 0;
+    margin: auto
+}
 .discount-tag {
     border: 1px solid #033551;
     border-radius: 5px;
@@ -2049,7 +2057,7 @@ table input {
     }
 
         .follow-us .networks a {
-            background: #ffffff;
+            background: #0076b4;
             border-radius: 50%;
             height: 40px;
             width: 40px;
@@ -2059,7 +2067,7 @@ table input {
         }
 
             .follow-us .networks a:hover {
-                background-color: #0076b4;
+                background-color: #ffffff;
             }
 
         .follow-us .networks img {
