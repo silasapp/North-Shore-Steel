@@ -208,9 +208,8 @@ Content1 =
                                             <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
                                                    v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
                                         </td>
-                                        <td style="white-space: nowrap;">
-                                            <div class="text-left">
-                                                <label style="margin:0; margin-right:35px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
+                                        <td>
+                                            <div class="text-right">
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                         v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                                     <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
@@ -219,6 +218,7 @@ Content1 =
                                                         {{ attribute.name }}
                                                     </option>
                                                 </select>
+                                                <label class="float-left" style="margin:4px 8px 0px 0px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
                                             </div>
                                         </td>
                                         <td class="pt-3" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
