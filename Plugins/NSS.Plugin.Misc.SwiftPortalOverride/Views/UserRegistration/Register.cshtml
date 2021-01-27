@@ -150,16 +150,17 @@
 
                         <div class="form-group row">
 
-                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
                                 <label asp-for="Phone" class="nss-input-label">Work Phone</label>
                                 <nop-required />
                                 <input asp-for="Phone" id="work-phone" placeholder="Enter..." maxlength="14" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="Phone" style="display:flex;"></span>
                             </div>
-                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
-                                <label asp-for="CellPhone" class="nss-input-label">Cell Phone (Optional, used to send notifications via text messages)</label>
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                                <label asp-for="CellPhone" class="nss-input-label">Cell Phone (Optional, used to send notifications via text messages.)</label>
                                 <input asp-for="CellPhone" id="cell-phone" placeholder="Enter..." maxlength="14" class="form-control custom-input phone-number" />
                                 <span asp-validation-for="CellPhone" style="display:flex;"></span>
+                                <label class="nss-gray">North Shore Steel won't share your Cell Phone Number with any other party.</label>
                             </div>
                         </div>
                         <div class="form-group row">
