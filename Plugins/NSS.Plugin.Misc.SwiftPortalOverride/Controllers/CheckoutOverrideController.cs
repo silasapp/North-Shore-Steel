@@ -83,11 +83,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICustomerCompanyProductService _customerCompanyProductService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeParser _productAttributeParser;
+        private readonly Factories.ICheckoutModelFactory _overrideCheckoutModelFactory;
+        private readonly ICompanyService _companyService;
 
         #endregion
 
         #region Ctor
-        public CheckoutOverrideController(IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
+        public CheckoutOverrideController(
+            ICompanyService companyService,
+            Factories.ICheckoutModelFactory overrideCheckoutModelFactory,
+            IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -136,6 +141,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _customerCompanyProductService = customerCompanyProductService;
             _productAttributeParser = productAttributeParser;
             _productAttributeService = productAttributeService;
+            _overrideCheckoutModelFactory = overrideCheckoutModelFactory;
+            _companyService = companyService;
         }
         #endregion
 
@@ -244,8 +251,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             CheckoutCompleteOverrideModel model = new CheckoutCompleteOverrideModel
             {
-                BillingAddressModel = _checkoutModelFactory.PrepareOnePageCheckoutModel(cart),
-                ShippingAddressModel = _checkoutModelFactory.PrepareShippingAddressModel(cart, prePopulateNewAddressWithCustomerFields: true),
+                BillingAddressModel = _overrideCheckoutModelFactory.PrepareOnePageCheckoutModel(cart),
+                ShippingAddressModel = _overrideCheckoutModelFactory.PrepareShippingAddressModel(cart, prePopulateNewAddressWithCustomerFields: true),
                 ShippingMethodModel = _checkoutModelFactory.PrepareShippingMethodModel(cart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer)),
                 ConfirmModel = _checkoutModelFactory.PrepareConfirmOrderModel(cart),
                 ShoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, cart),
@@ -572,6 +579,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
                 else
                 {
+                    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+                    int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+
                     //new address
                     var customer = _workContext.CurrentCustomer;
                     //new address
@@ -608,8 +618,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                             address.StateProvinceId = null;
 
                         _addressService.InsertAddress(address);
-
                         _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+
+                        var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
+                        var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+                        _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
                     }
 
                     _workContext.CurrentCustomer.BillingAddressId = address.Id;
@@ -654,6 +667,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
                 else
                 {
+                    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+                    int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+
                     var customer = _workContext.CurrentCustomer;
                     //new address
                     var newAddress = model.ShippingNewAddress;
@@ -683,8 +699,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         address.CreatedOnUtc = DateTime.UtcNow;
 
                         _addressService.InsertAddress(address);
-
                         _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+
+                        var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
+                        var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+                        _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
                     }
 
                     _workContext.CurrentCustomer.ShippingAddressId = address.Id;
