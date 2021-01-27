@@ -118,7 +118,7 @@
                                         <label class="pure-material-checkbox">
                                             <input :id="'checkbox-' + spec.specificationAttributeOptionId"
                                                    type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
-                                            <span class="checkmark"></span>{{ spec.displayName }} ({{ spec.count }})
+                                            <span class="checkmark"></span>{{ spec.displayName.replace('\'', '') }} ({{ spec.count }})
                                         </label>
                                     </div>
                                 </div>
@@ -326,7 +326,7 @@
                     const isThicknessGroup = specs.some(x => x.specificationAttributeName === 'displayThickness');
                     if (isThicknessGroup) {
                         specs.forEach(spec => {
-                            let value = spec.specificationAttributeOptionName;
+                            let value = spec.specificationAttributeOptionName.replace('\'', '').replace('\'', '');
                             if (value.includes(' ')) {
                                 const array = value.split(' ');
                                 const wholeNumber = Number(array[0]);

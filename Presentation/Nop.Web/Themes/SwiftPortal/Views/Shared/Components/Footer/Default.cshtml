@@ -12,8 +12,9 @@
 }
 @if (routeUrl.Contains("login") || routeUrl.Contains("register") || routeUrl.Contains("passwordrecovery"))
 {
-    <div class="linda-block">
-        <img src="~/Themes/@(themeName)/Content/assets/linda-experience-banner.png" />
+    <div class="linda-block" id="linda-block">
+        <img v-if="!isMobile" src="~/Themes/@(themeName)/Content/assets/linda-experience-banner.png" />
+        <img v-if="isMobile" src="~/Themes/@(themeName)/Content/assets/img-linda-experience-banner-mobile.png" />
     </div>
 }
 @if (routeUrl.Contains("/catalog"))
@@ -337,6 +338,35 @@
     </div>*@
 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Footer })
 </div>
+<script>
+    var vm = new Vue({
+        el: '#linda-block',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+        },
+    });
+</script>
 <script asp-location="Footer">
     $(document).ready(function () {
         $('.footer-block .title').on('click', function () {
