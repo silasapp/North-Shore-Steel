@@ -44,7 +44,7 @@
                 <div class="d-flex flex-column align-items-center" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
                     <img v-if="shape.icon" class="shape-icon-img" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
                     <div v-if="!shape.icon" class="icon-shape"></div>
-                    <label class="h4-default-500 text-capitalize mt-2">{{ shape.name }}</label>
+                    <label class="h4-default-500 text-capitalize mt-2 font-weight-bolder">{{ shape.name }}</label>
                 </div>
             </div>
         </div>
