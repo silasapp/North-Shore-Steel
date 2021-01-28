@@ -323,39 +323,23 @@
             prepareGroupedSpecs: function () {
                 this.shared.groupedSpecs.forEach((specs, index) => {
 
-                    // Handle Thickness fractions sorting
-                    const isThicknessGroup = specs.some(x => x.specificationAttributeName === 'displayThickness');
+                    // Handle Thickness sorting
+                    const isThicknessGroup = specs.some(x => x.specificationAttributeName === 'thickness');
                     if (isThicknessGroup) {
                         specs.forEach(spec => {
-                            let value = spec.specificationAttributeOptionName.replace(/["']/g, "");
-                            if (value.includes(' ')) {
-                                const array = value.split(' ');
-                                const wholeNumber = Number(array[0]);
-                                const fraction = eval(array[1]);
-                                spec.sort = wholeNumber + fraction;
-                            } else if (value.includes('/')) {
-                                spec.sort = eval(value);
-                            } else {
-                                spec.sort = Number(value);
-                            }
+                            let value = spec.specificationAttributeOptionName;
+
+                            spec.sort = Number(value);  
                         });
                         specs.sort((a, b) => a.sort - b.sort);
                     }
-                    // Handle Minimum Width fractions sorting
-                    const isWidthGroup = specs.some(x => x.specificationAttributeName === 'displayWidth');
+                    // Handle Minimum Width sorting
+                    const isWidthGroup = specs.some(x => x.specificationAttributeName === 'width');
                     if (isWidthGroup) {
                         specs.forEach(spec => {
                             let value = spec.specificationAttributeOptionName;
-                            if (value.includes(' ')) {
-                                const array = value.split(' ');
-                                const wholeNumber = Number(array[0]);
-                                const fraction = eval(array[1]);
-                                spec.sort = wholeNumber + fraction;
-                            } else if (value.includes('/')) {
-                                spec.sort = eval(value);
-                            } else {
-                                spec.sort = Number(value);
-                            }
+
+                            spec.sort = Number(value);
                         });
                         specs.sort((a, b) => a.sort - b.sort);
                     }
@@ -373,10 +357,10 @@
                             case "countryOfOrigin":
                                 name = "COUNTRY OF ORIGIN";
                                 break;
-                            case "displayThickness":
+                            case "thickness":
                                 name = "THICKNESS (in)";
                                 break;
-                            case "displayWidth":
+                            case "width":
                                 name = "MINIMUM WIDTH (in)";
                                 break;
                             case "grade":

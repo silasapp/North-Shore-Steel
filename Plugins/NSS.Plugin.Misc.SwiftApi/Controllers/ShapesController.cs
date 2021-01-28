@@ -107,13 +107,13 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 // coating
                 _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.CoatingFieldAttribute });
                 //thickness
-                _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.DisplayThicknessFieldAttribute });
+                _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.ThicknessFieldAttribute });
                 // condition
                 _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.ConditionFieldAttribute });
                 // countryOfOrigin
                 _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.CountryOfOriginFieldAttribute });
                 // min_width
-                _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.DisplayWidthFieldAttribute });
+                _specificationAttributeService.InsertSpecificationAttribute(new SpecificationAttribute { Name = Constants.WidthFieldAttribute });
             }
 
 
