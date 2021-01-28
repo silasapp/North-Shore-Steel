@@ -307,10 +307,10 @@
 
 <div id="gridView">
     <div>
-        <div class="d-none d-md-block">
+        <div v-if="!isMobile" class="d-none d-md-block">
             <div id="Grid"></div>
         </div>
-        <div class="d-md-none">
+        <div v-if="isMobile" class="d-md-none">
             <div class="product-sm d-flex flex-column align-items-start mb-2" v-for="data in gridData">
                 <label class="fs12-primary mb-1">Item: {{ data.itemno || data.itemtagno }}</label>
                 <label class="h2-primary my-2">{{ data.itemname }}</label>
@@ -406,12 +406,32 @@
             grid: null,
             gridColumns,
             gridData,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
         },
         mounted: function () {
             this.buildGrid();
             this.addCommaToWeight();
         },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             getGridColumns: function () {
                 let retVal = [];
                 gridColumns.forEach(col => {
@@ -467,9 +487,11 @@
             },
 
             handleIncrementQuantity: function (itemId) {
+                console.log('itemId', itemId);
                 const quantityEl = $('#qty' + itemId);
                 const quantity = Number(quantityEl.val());
                 $('#qty' + itemId).val(quantity ? quantity + 1 : 1);
+                console.log('itemId', '#qty' + itemId, (quantity ? quantity + 1 : 1));
             },
 
             handleAddToWishList: function(data) {
@@ -495,7 +517,7 @@
         if (!qty)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
-        $('#qty' + itemId).val("");
+        $('#qty' + itemId).val("1");
         AjaxCart.addproducttocart_catalog(link);
     }
 
