@@ -66,20 +66,6 @@ Content1 =
             <hr />
             <div class="d-flex flex-row justify-content-between mb-3">
                 <div class="d-flex flex-column">
-                    <label class="h4-primary-500-teko mb-1">LENGTH TOLERANCE CUT</label>
-                    <div class="d-flex flex-row">
-                        <button type="button" class="nss-btn-box"
-                                v-on:click="decrementToleranceCut">
-                            -
-                        </button>
-                        <input type="text" class="nss-input" v-model="lengthToleranceCut" />
-                        <button type="button" class="nss-btn-box"
-                                v-on:click="incrementToleranceCut">
-                            +
-                        </button>
-                    </div>
-                </div>
-                <div class="d-flex flex-column">
                     <label class="h4-primary-500-teko mb-1">ITEM QUANTITY</label>
                     <div class="d-flex flex-row">
                         <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
@@ -284,7 +270,7 @@ Content1 =
                                                                 <path d="M20 15s-1.4 1.3 1.1 2l-2.8 2.8h-2.8s-1.9-.1-.5 2.2h-4l-2-2s-1.3-1.4-2 1.1l-2.8-2.8v-2.8s.1-1.9-2.2-.5v-4l2-2s1.4-1.3-1.2-1.9l2.8-2.9h2.9s1.9.1.5-2.2h4l2 2s1.3 1.4 2-1.2l2.8 2.8v2.9s-.1 1.9 2.2.5v4l-2 2m-6-3a2 2 0 0 0-2-2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2z" />
                                                                 <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                             </svg>*@
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="hover-icon mx-1" width="24" height="24"
+                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" class="hover-icon mx-1" width="24" height="24"
                                                              v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
                                                             <g transform="translate(-580 -80)">
                                                                 <title>Saw Options</title>
@@ -472,7 +458,7 @@ Content1 =
     }
 </script>
 <script>
-    var sawOptionModal, toleranceLength;
+    var sawOptionModal;
 
     var title = 'TESTING...';
      var items = @Html.Raw(Serialize(Model.Items));
@@ -489,8 +475,6 @@ Content1 =
             sawOption: null,
             workOrderInstructions: null,
             workOrderInstructionsId: null,
-            lengthToleranceCut: null,
-            lengthToleranceCutControlId: null,
             quantity: 0,
             quantityId: 0,
             productId: null,
@@ -522,7 +506,6 @@ Content1 =
                 let request = {
                     [this.sawOptionControlId]: this.sawOption,
                     [this.workOrderInstructionsId]: this.workOrderInstructions,
-                    [this.lengthToleranceCutControlId]: this.lengthToleranceCut,
                     [`addtocart_${this.productId}.EnteredQuantity`]: this.quantity,
                 };
                 sawOptionModal.hide();
@@ -552,19 +535,10 @@ Content1 =
                 this.productId = productId;
                 this.sawOptionControlId = prefix + cutOptions.id;
                 this.sawOptions = cutOptions.values;
-                this.sawOption = cutOptions.values.find(x => x.isPreSelected).id;
+                this.sawOption = cutOptions.values.find(x => x.isPreSelected)?.id || cutOptions.values.find(x => true)?.id;
                 this.workOrderInstructions = null;
-                this.workOrderInstructionsId = prefix + _attributes.find(x => x.name === "Work Order Instructions").id;
-                this.lengthToleranceCutControlId = prefix + _attributes.find(x => x.name === "Length Tolerance Cut").id;
-                this.lengthToleranceCut = 0;
+                this.workOrderInstructionsId = prefix + _attributes.find(x => x.name === "Work Order Instructions")?.id;
                 sawOptionModal.show();
-            },
-
-            incrementToleranceCut: function () {
-                this.lengthToleranceCut = Number(this.lengthToleranceCut) + 1;
-            },
-            decrementToleranceCut: function () {
-                this.lengthToleranceCut = this.lengthToleranceCut > 0 ? Number(this.lengthToleranceCut) - 1 : 0;
             },
 
             incrementQuantity: function () {

@@ -343,7 +343,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private void MapProductSpecificationAttributeOption(Product entity, Dictionary<string, object> data)
         {
             // shapeId
-            data.TryGetValue(Constants.shapeFieldAttribute, out var shapeId);
+            data.TryGetValue(Constants.ShapeFieldAttribute, out var shapeId);
             // get value option id for maping
             var attributes = _specificationAttributeService.GetSpecificationAttributes();
 
@@ -369,7 +369,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
                             CreateProductSpecFilter(entity, attr, options, value);
                         }
-                        else if (attr.Name == Constants.DisplayWidthFieldAttribute)
+                        else if (attr.Name == Constants.WidthFieldAttribute)
                         {
                             if (int.TryParse(value?.ToString(), out int width))
                             {

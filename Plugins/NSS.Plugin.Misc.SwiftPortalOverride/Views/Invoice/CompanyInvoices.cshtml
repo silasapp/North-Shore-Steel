@@ -177,6 +177,12 @@
                 this.isExportMode = true;
                 invoicegridvm.switchToExport();
             },
+            setFromDate: function (date) {
+                this.fromDate = date;
+            },
+            setToDate: function (date) {
+                this.toDate = date;
+            },
             cancelExportMode: function () {
                 this.isExportMode = false;
                 invoicegridvm.cancelExportMode();
@@ -229,13 +235,15 @@
         endDate: '+0d',
         autoclose: true
     }).on('changeDate', function (e) {
+        _vm.setFromDate($(this).val());
         vm.fromDate = $(this).val();
     });
-
+    var _vm = vm;
     $('#endDate').datepicker({
         endDate: '+0d',
         autoclose: true
     }).on('changeDate', function (e) {
+        _vm.setToDate($(this).val());
         vm.toDate = $(this).val();
     });
 

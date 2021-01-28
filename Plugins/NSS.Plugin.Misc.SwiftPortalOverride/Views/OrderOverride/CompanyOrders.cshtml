@@ -146,6 +146,12 @@
             hideLoading: function () {
                 $('#custom-loading').hide();
             },
+            setFromDate: function (date) {
+                this.fromDate = date;
+            },
+            setToDate: function (date) {
+                this.toDate = date;
+            },
             searchOrders: function () {
                 const request = {
                     orderId: this.orderId,
@@ -154,6 +160,7 @@
                     pONo: this.poNo,
                     isClosed: this.isClosed,
                 };
+                console.log('fromDate', request);
                 this.showLoading();
                 const self = this;
                 $.ajax({
@@ -180,11 +187,12 @@
 <script>
 
     $.fn.datepicker.defaults.format = "mm/dd/yyyy";
-
+    var _vm = vm;
     $('#startDate').datepicker({
         endDate: '+0d',
         autoclose: true
     }).on('changeDate', function (e) {
+        _vm.setFromDate($(this).val());
         vm.fromDate = $(this).val();
     });
 
@@ -192,6 +200,7 @@
         endDate: '+0d',
         autoclose: true
     }).on('changeDate', function (e) {
+        _vm.setToDate($(this).val());
         vm.toDate = $(this).val();
     });
 

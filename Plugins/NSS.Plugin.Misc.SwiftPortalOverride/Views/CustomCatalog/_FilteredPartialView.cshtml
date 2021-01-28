@@ -307,12 +307,11 @@
 
 <div id="gridView">
     <div>
-        <div class="d-none d-md-block">
+        <div v-if="!isMobile" class="d-none d-md-block">
             <div id="Grid"></div>
         </div>
-        <div class="d-md-none">
+        <div v-if="isMobile" class="d-md-none">
             <div class="product-sm d-flex flex-column align-items-start mb-2" v-for="data in gridData">
-                <label class="fs12-primary mb-1">Item: {{ data.itemno || data.itemtagno }}</label>
                 <label class="h2-primary my-2">{{ data.itemname }}</label>
                 <div class="d-flex flex-row flex-wrap">
                     <label v-if="data.height" class="fs12-default mr-3 mb-1">Height(in): {{ data.height }}</label>
@@ -406,12 +405,32 @@
             grid: null,
             gridColumns,
             gridData,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
         },
         mounted: function () {
             this.buildGrid();
             this.addCommaToWeight();
         },
         methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
             getGridColumns: function () {
                 let retVal = [];
                 gridColumns.forEach(col => {
@@ -467,9 +486,11 @@
             },
 
             handleIncrementQuantity: function (itemId) {
+                console.log('itemId', itemId);
                 const quantityEl = $('#qty' + itemId);
                 const quantity = Number(quantityEl.val());
                 $('#qty' + itemId).val(quantity ? quantity + 1 : 1);
+                console.log('itemId', '#qty' + itemId, (quantity ? quantity + 1 : 1));
             },
 
             handleAddToWishList: function(data) {
@@ -495,7 +516,7 @@
         if (!qty)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
-        $('#qty' + itemId).val("");
+        $('#qty' + itemId).val("1");
         AjaxCart.addproducttocart_catalog(link);
     }
 
@@ -529,13 +550,8 @@
             <path d="M20 15s-1.4 1.3 1.1 2l-2.8 2.8h-2.8s-1.9-.1-.5 2.2h-4l-2-2s-1.3-1.4-2 1.1l-2.8-2.8v-2.8s.1-1.9-2.2-.5v-4l2-2s1.4-1.3-1.2-1.9l2.8-2.9h2.9s1.9.1.5-2.2h4l2 2s1.3 1.4 2-1.2l2.8 2.8v2.9s-.1 1.9 2.2.5v4l-2 2m-6-3a2 2 0 0 0-2-2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2z" />
             <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
         </svg>*@
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="hover-icon mx-1" width="24" height="24"  onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;">
-            <g transform="translate(-580 -80)">
-                <title>Saw Options</title>
-                <path d="M0,0H24V24H0Z" transform="translate(580 80)"  fill="rgba(0, 0, 0, 0)"/>
-                <path  d="M7.031,11.781h2.52l-.72,6.36,1.42,1.42,1.78-1.78,4,5h2v-2.52l6.36.7,1.42-1.42-1.78-1.76,5-4v-2h-2.52l.7-6.36L25.791,4l-1.76,1.78-4-5h-2V3.3l-6.36-.72L10.251,4l1.78,1.78-5,4Zm11-3a3,3,0,1,1-3,3,3,3,0,0,1,3-3Z" transform="translate(574.409 80.409)" />
-            </g>
-        </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" class="hover-icon mx-1" onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" width="24" height="24" viewBox="0 0 24 24"><defs><style>.a{fill:none;}.b{fill:#aaa;}</style></defs><g transform="translate(-580 -80)"><path class="a" d="M0,0H24V24H0Z" transform="translate(580 80)"/><path class="hover-icon" d="M7.031,11.781h2.52l-.72,6.36,1.42,1.42,1.78-1.78,4,5h2v-2.52l6.36.7,1.42-1.42-1.78-1.76,5-4v-2h-2.52l.7-6.36L25.791,4l-1.76,1.78-4-5h-2V3.3l-6.36-.72L10.251,4l1.78,1.78-5,4Zm11-3a3,3,0,1,1-3,3,3,3,0,0,1,3-3Z" transform="translate(574.409 80.409)"/></g></svg>
+
         ${/if}
 
         ${if(_mtr)}
