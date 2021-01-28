@@ -51,12 +51,11 @@
         Formatting = Formatting.None
     });
 
-    var pickupPoints = JsonConvert.SerializeObject(Model.ShippingAddressModel.PickupPointsModel.PickupPoints, new JsonSerializerSettings
+	var pickupPoints = JsonConvert.SerializeObject(Model.ShippingAddressModel.PickupPointsModel.PickupPoints, new JsonSerializerSettings
     {
         ContractResolver = contractResolver,
         Formatting = Formatting.None
     });
-
     var accountCredit = JsonConvert.SerializeObject(Model.AccountCreditModel, new JsonSerializerSettings
     {
         ContractResolver = contractResolver,
@@ -90,13 +89,8 @@
 
 @{
     var customer = workContext.CurrentCustomer;
-    // get cust company
-    var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
-
+    CustomerCompany customerCompany = GetCustomerCompanyDetails();
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
-
-    if (customerCompany == null)
-        customerCompany = new CustomerCompany();
 }
 
 @Html.Raw(Model.PaypalScript)
@@ -508,7 +502,7 @@ Content2 =
                                     var customerPathNo = "";
                                     if (customerCompany != null)
                                     {
-                                        var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                        var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
                                         customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
                                     }
 
@@ -519,23 +513,23 @@ Content2 =
 
                                     var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
 
-                                    <tr>
-                                        <td>@iNo</td>
-                                        <td>
-                                            @item.ProductName
-                                            @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
-                                                {
-                                                    <div class="attributes">
-                                                        @Html.Raw(item.AttributeInfo)
-                                                    </div>
-                                                }*@
-                                        </td>
-                                        <td>@customerPathNo</td>
-                                        <td>@item.UnitPrice / @uom</td>
-                                        <td>@item.SubTotal</td>
-                                        <td>@DoFormat(totalWeight)</td>
-                                        <td class="text-center">@item.Quantity</td>
-                                    </tr>
+                                <tr>
+                                    <td>@iNo</td>
+                                    <td>
+                                        @item.ProductName
+                                        @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                            {
+                                                <div class="attributes">
+                                                    @Html.Raw(item.AttributeInfo)
+                                                </div>
+                                            }*@
+                                    </td>
+                                    <td>@customerPathNo</td>
+                                    <td>@item.UnitPrice / @uom</td>
+                                    <td>@item.SubTotal</td>
+                                    <td>@DoFormat(totalWeight)</td>
+                                    <td class="text-center">@item.Quantity</td>
+                                </tr>
                                 }
 
                             </tbody>
@@ -570,18 +564,18 @@ Content2 =
                             var iNo = serialized == "True" ? itemTagNo : itemNo;
 
                             var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
-                            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
-                                <div class="d-flex flex-row justify-content-between align-items-center">
-                                    <label class="fs12-primary-500">Item: @iNo</label>
-                                </div>
-                                <label class="h2-primary mt-3 mb-2 text-left">@item.ProductName</label>
-                                <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
-                                <label class="h5-default-500 text-left">Unit Price: @item.UnitPrice / @uom </label>
-                                <label class="h5-default-500 text-left">Total Price: @item.SubTotal </label>
-                                <label class="h5-default-500 text-left">Weight: @DoFormat(totalWeight) </label>
-                                <label class="h5-default-500 text-left">Quantity: @item.Quantity </label>
+                        <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
+                            <div class="d-flex flex-row justify-content-between align-items-center">
+                                <label class="fs12-primary-500">Item: @iNo</label>
+                            </div>
+                            <label class="h2-primary mt-3 mb-2 text-left">@item.ProductName</label>
+                            <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
+                            <label class="h5-default-500 text-left">Unit Price: @item.UnitPrice / @uom </label>
+                            <label class="h5-default-500 text-left">Total Price: @item.SubTotal </label>
+                            <label class="h5-default-500 text-left">Weight: @DoFormat(totalWeight) </label>
+                            <label class="h5-default-500 text-left">Quantity: @item.Quantity </label>
 
-                            </div>}
+                        </div>}
                     </div>
 
                 </div>
@@ -643,18 +637,17 @@ Content2 =
         return s;
     }
 
-    (int, CustomerCompany) GetCustomerCompanyDetails()
+    CustomerCompany GetCustomerCompanyDetails()
     {
-        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-
-        int.TryParse(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey), out int eRPCompanyId);
-
-        CustomerCompany customerCompany = null;
+        CustomerCompany customerCompany = new CustomerCompany();
+        var currentCustomer = workContext.CurrentCustomer;
+        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+        int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
 
         if (eRPCompanyId > 0)
-            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(workContext.CurrentCustomer.Id, eRPCompanyId);
+            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(currentCustomer.Id, eRPCompanyId);
 
-        return (eRPCompanyId, customerCompany);
+        return customerCompany;
     }
 }
 <script>

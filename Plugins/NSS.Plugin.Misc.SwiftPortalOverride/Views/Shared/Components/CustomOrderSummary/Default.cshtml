@@ -39,7 +39,7 @@
     var customer = workContext.CurrentCustomer;
 
     // get cust company
-    var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+    CustomerCompany customerCompany = GetCustomerCompanyDetails();
 
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
 
@@ -62,10 +62,7 @@
         var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
         var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
 
-        //var weightValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out weight) ? DoFormat(weight) : "0.00";
-        //var lengthValue = double.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out double length) ? DoFormat(length) : "0.00";
-
-        var customerCompanyProduct = new CustomerCompanyProduct();
+        CustomerCompanyProduct customerCompanyProduct = new CustomerCompanyProduct();
         if (customerCompany != null)
         {
             customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
@@ -148,268 +145,268 @@ Content1 =
         {
             if (Model.Warnings.Count > 0)
             {
-                <div class="message-error">
-                    <ul>
-                        @foreach (var warning in Model.Warnings)
+        <div class="message-error">
+            <ul>
+                @foreach (var warning in Model.Warnings)
                         {
-                            <li>@warning</li>
+                <li>@warning</li>
                         }
-                    </ul>
-                </div>
+            </ul>
+        </div>
             }
-            @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
-            <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
+        @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
+        <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
 
-                <div>
-                    <div class="d-flex flex-column">
-                        <div class="d-flex flex-column flex-md-row justify-content-md-between">
-                            <div v-if="isEditable" class="d-flex flex-row bg-accent bg-md-white justify-content-between mb-3 p-3 p-md-0 order-0 order-md-1 w-100">
-                                <button type="submit" class="nss-btn-white mr-md-4" name="continueshopping">
-                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="">
-                                    {{ isMobile ? 'Keep Shopping' : 'Continue Shopping' }}
-                                </button>
-                                <button type="submit" class="nss-btn-white" name="updatecart">
-                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/icn-refresh-dark-blue.svg" width="24" height="24" alt="">
-                                    Update Cart
-                                </button>
+            <div>
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-column flex-md-row justify-content-md-between">
+                        <div v-if="isEditable" class="d-flex flex-row bg-accent bg-md-white justify-content-between mb-3 p-3 p-md-0 order-0 order-md-1 w-100">
+                            <button type="submit" class="nss-btn-white mr-md-4" name="continueshopping">
+                                <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="">
+                                {{ isMobile ? 'Keep Shopping' : 'Continue Shopping' }}
+                            </button>
+                            <button type="submit" class="nss-btn-white" name="updatecart">
+                                <img class="mr-1" src="Themes/SwiftPortal/Content/assets/icn-refresh-dark-blue.svg" width="24" height="24" alt="">
+                                Update Cart
+                            </button>
+                        </div>
+
+                    </div>
+
+                    @* Cart items - Web View *@
+                    <div v-if="!isMobile" class="table-wrapper">
+                        <table class="table table-bordered cart-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="10%">Item #</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col" width="10%">Customer Part #</th>
+                                    <th scope="col" width="12%">Unit Price</th>
+                                    <th scope="col" width="9%">Total Price</th>
+                                    <th scope="col" width="9%">Weight (lb)</th>
+                                    <th scope="col" width="8%" class="text-center">Qty.</th>
+                                    @*<th scope="col" width="8%" class="text-center">Saw Options</th>*@
+                                    <th scope="col" width="5%" class="text-center">Notes</th>
+                                    <th scope="col" width="5%" class="text-center">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in items">
+                                    <td class="align-middle"><label style="margin:0;">{{ item.iNo }}</label></td>
+                                    <td class="align-middle">
+                                        <label class="mv-value" style="margin:0;">{{ item.productName }}</label>
+                                        <div class="message-error" v-if="item.warnings?.length > 0">
+                                            <ul>
+                                                <li v-for="warning in item.warnings">{{ warning }}</li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td class="">
+                                        <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
+                                               v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
+                                    </td>
+                                    <td>
+                                        <div class="text-right">
+                                            <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
+                                                    v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
+                                                <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
+                                                        v-for="attribute in item.purchaseUnitAttr.values"
+                                                        v-bind:value="attribute.id">
+                                                    {{ attribute.name }}
+                                                </option>
+                                            </select>
+                                            <label class="float-left" style="margin:4px 8px 0px 0px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
+                                        </div>
+                                    </td>
+                                    <td class="pt-3" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
+                                    <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
+                                    <td class="text-center">
+                                        <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
+                                               style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
+                                               v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'"
+                                               aria-label="@T("ShoppingCart.Quantity")"
+                                               min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
+                                    </td>
+                                    @*<td class="text-center">
+                                            <a href="">View Options</a>
+                                        </td>*@
+                                    <td class="text-center">
+                                        <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
+                                           v-on:click="handleNotesModal(item)" data-target="#noteModal">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
+                                                 viewBox="0 0 24 24"
+                                                 style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #2F2F2F; opacity: 0.5;">
+                                                <title>View note</title>
+                                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
+                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                            </svg>
+                                        </a>
+                                        <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
+                                    </td>
+                                    <td class="remove-from-cart text-center pt-3">
+                                        <label class="pure-material-checkbox">
+                                            <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
+                                                   v-bind:value="item.id" style=" position: unset !important;"
+                                                   aria-label="@T("ShoppingCart.Remove")" />
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @* Cart items - Mobile View *@
+                    <div v-if="isMobile">
+                        <div class="cart-item d-flex flex-column bg-accent p-3 mb-3" v-for="item in items">
+                            <div class="d-flex flex-row justify-content-between align-items-center">
+                                <label class="fs12-primary-500">Item: {{ item.iNo }}</label>
+                                <label class="pure-material-checkbox">
+                                    Remove
+                                    <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
+                                           v-bind:value="item.id" style="position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
+                                    <span class="checkmark"></span>
+                                </label>
                             </div>
+                            <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
+                            <label class="h5-default-500">Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
+                            <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
+                            <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
 
-                        </div>
-
-                        @* Cart items - Web View *@
-                        <div v-if="!isMobile" class="table-wrapper">
-                            <table class="table table-bordered cart-table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" width="10%">Item #</th>
-                                        <th scope="col">Description</th>
-                                        <th scope="col" width="10%">Customer Part #</th>
-                                        <th scope="col" width="12%">Unit Price</th>
-                                        <th scope="col" width="9%">Total Price</th>
-                                        <th scope="col" width="9%">Weight (lb)</th>
-                                        <th scope="col" width="8%" class="text-center">Qty.</th>
-                                        @*<th scope="col" width="8%" class="text-center">Saw Options</th>*@
-                                        <th scope="col" width="5%" class="text-center">Notes</th>
-                                        <th scope="col" width="5%" class="text-center">Remove</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="item in items">
-                                        <td class="align-middle"><label style="margin:0;">{{ item.iNo }}</label></td>
-                                        <td class="align-middle">
-                                            <label class="mv-value" style="margin:0;">{{ item.productName }}</label>
-                                            <div class="message-error" v-if="item.warnings?.length > 0">
-                                                <ul>
-                                                    <li v-for="warning in item.warnings">{{ warning }}</li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                        <td class="">
-                                            <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
-                                                   v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
-                                        </td>
-                                        <td>
-                                            <div class="text-right">
-                                                <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
-                                                        v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
-                                                    <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
-                                                            v-for="attribute in item.purchaseUnitAttr.values"
-                                                            v-bind:value="attribute.id">
-                                                        {{ attribute.name }}
-                                                    </option>
-                                                </select>
-                                                <label class="float-left" style="margin:4px 8px 0px 0px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
-                                            </div>
-                                        </td>
-                                        <td class="pt-3" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
-                                        <td class="pt-3"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
-                                        <td class="text-center">
-                                            <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
-                                                   style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
-                                                   v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'"
-                                                   aria-label="@T("ShoppingCart.Quantity")"
-                                                   min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
-                                        </td>
-                                        @*<td class="text-center">
-                                                <a href="">View Options</a>
-                                            </td>*@
-                                        <td class="text-center">
-                                            <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
-                                               v-on:click="handleNotesModal(item)" data-target="#noteModal">
-                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                                     class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
-                                                     viewBox="0 0 24 24"
-                                                     style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #2F2F2F; opacity: 0.5;">
-                                                    <title>View note</title>
-                                                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
-                                                    <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                </svg>
-                                            </a>
-                                            <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
-                                        </td>
-                                        <td class="remove-from-cart text-center pt-3">
-                                            <label class="pure-material-checkbox">
-                                                <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
-                                                       v-bind:value="item.id" style=" position: unset !important;"
-                                                       aria-label="@T("ShoppingCart.Remove")" />
-                                                <span class="checkmark"></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        @* Cart items - Mobile View *@
-                        <div v-if="isMobile">
-                            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3" v-for="item in items">
-                                <div class="d-flex flex-row justify-content-between align-items-center">
-                                    <label class="fs12-primary-500">Item: {{ item.iNo }}</label>
-                                    <label class="pure-material-checkbox">
-                                        Remove
-                                        <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
-                                               v-bind:value="item.id" style="position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-                                <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
-                                <label class="h5-default-500">Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
-                                <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
-                                <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
-
-                                <div class="d-flex flex-row justify-content-between align-items-center">
-                                    <label class="h5-default-500">Quantity</label>
-                                    <input class="cart-qty-input" type="text" v-bind:name="'itemquantity' + item.id" v-bind:id="'itemquantity' + item.id"
-                                           v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'" aria-label="@T("ShoppingCart.Quantity")"
-                                           min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
-                                </div>
-                                @*<a class="fs12-link-500 mb-3">View Options</a>*@
-                                <div class="d-flex flex-row justify-content-between align-items-center my-2">
-                                    <label class="h5-default-500">Unit Price</label>
-                                    <div class="d-flex flex-row align-items-center">
-                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice }} / </label>
-                                        <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
-                                                v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
-                                            <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
+                            <div class="d-flex flex-row justify-content-between align-items-center">
+                                <label class="h5-default-500">Quantity</label>
+                                <input class="cart-qty-input" type="text" v-bind:name="'itemquantity' + item.id" v-bind:id="'itemquantity' + item.id"
+                                       v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'" aria-label="@T("ShoppingCart.Quantity")"
+                                       min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
+                            </div>
+                            @*<a class="fs12-link-500 mb-3">View Options</a>*@
+                            <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                                <label class="h5-default-500">Unit Price</label>
+                                <div class="d-flex flex-row align-items-center">
+                                    <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice }} / </label>
+                                    <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
+                                            v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
+                                        <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
                                                 attribute.name === 'FT' && item.pricePerFt"
-                                                    v-for="attribute in item.purchaseUnitAttr.values" v-bind:value="attribute.id">
-                                                {{ attribute.name }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between align-items-center my-2">
-                                    <label class="h5-default-500">Total Price</label>
-                                    <label class="h2-primary" v-bind:id="'itemsubtotal' + item.id">{{ item.subTotal }}</label>
+                                                v-for="attribute in item.purchaseUnitAttr.values" v-bind:value="attribute.id">
+                                            {{ attribute.name }}
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
+                            <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                                <label class="h5-default-500">Total Price</label>
+                                <label class="h2-primary" v-bind:id="'itemsubtotal' + item.id">{{ item.subTotal }}</label>
+                            </div>
                         </div>
+                    </div>
 
-                        @if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
+                    @if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
                         {
                             var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
                             //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
                             //of course, you can modify appropriate locales to include VAT info there
-                            <div class="tax-shipping-info">
-                                @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
-                            </div>
+                    <div class="tax-shipping-info">
+                        @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                    </div>
                         }
-                        <div class="cart-footer row mt-0 mt-md-2">
+                    <div class="cart-footer row mt-0 mt-md-2">
 
 
-                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
-                            @if (Model.IsEditable)
+                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
+                        @if (Model.IsEditable)
                             {
-                                <div class="cart-collaterals col-sm-12 col-md-5 col-lg-4 mx-0">
-                                    <div class="d-flex flex-row bg-accent bg-md-white p-3 p-md-0 mb-3 order-1 order-md-0">
-                                        <div class="d-flex flex-column mr-2 w-50 w-md-100">
-                                            <label class="fs12-default-500 mb-2">Purchase Order #</label>
-                                            <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
-                                                   v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
-                                        </div>
-                                        @*<div class="d-flex flex-column ml-2 w-50 w-md-100">
-                                                <label class="fs12-default-500 mb-2">Promise Date</label>
-                                                <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
-                                            </div>*@
-                                    </div>
-                                    <div class="deals" style="width: 100%;max-width: 100%;">
-                                        @*@await Html.PartialAsync("_DiscountBox", Model.DiscountBox)*@
-                                        @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
-
-                                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
-                                    </div>
+                        <div class="cart-collaterals col-sm-12 col-md-5 col-lg-4 mx-0">
+                            <div class="d-flex flex-row bg-accent bg-md-white p-3 p-md-0 mb-3 order-1 order-md-0">
+                                <div class="d-flex flex-column mr-2 w-50 w-md-100">
+                                    <label class="fs12-default-500 mb-2">Purchase Order #</label>
+                                    <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
+                                           v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
                                 </div>
+                                @*<div class="d-flex flex-column ml-2 w-50 w-md-100">
+                                        <label class="fs12-default-500 mb-2">Promise Date</label>
+                                        <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
+                                    </div>*@
+                            </div>
+                            <div class="deals" style="width: 100%;max-width: 100%;">
+                                @*@await Html.PartialAsync("_DiscountBox", Model.DiscountBox)*@
+                                @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
+
+                                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
+                            </div>
+                        </div>
                             }
-                            <div class="totals col-sm-12 col-md-offset-1 col-md-6 col-lg-offset-2 col-lg-6 mx-0" style="background: none; padding: 0;">
-                                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
-                                @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.IsEditable })
-                                @if (Model.IsEditable)
+                        <div class="totals col-sm-12 col-md-offset-1 col-md-6 col-lg-offset-2 col-lg-6 mx-0" style="background: none; padding: 0;">
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
+                            @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.IsEditable })
+                            @if (Model.IsEditable)
                                 {
                                     if (!string.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
                                     {
-                                        <div class="min-amount-warning">
-                                            @Model.MinOrderSubtotalWarning
-                                        </div>
+                            <div class="min-amount-warning">
+                                @Model.MinOrderSubtotalWarning
+                            </div>
                                     }
                                 }
-                                @if (Model.IsEditable)
+                            @if (Model.IsEditable)
                                 {
-                                    <div class="checkout-buttons">
-                                        @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
+                            <div class="checkout-buttons">
+                                @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
                                         {
-                                            <script asp-location="Footer">
-                                                $(document).ready(function () {
-                                                    $('#checkout').on('click', function () {
-                                                        //terms of service
-                                                        var termOfServiceOk = true;
-                                                        if ($('#termsofservice').length > 0) {
-                                                            //terms of service element exists
-                                                            if (!$('#termsofservice').is(':checked')) {
-                                                                $("#terms-of-service-warning-box").dialog();
-                                                                termOfServiceOk = false;
-                                                            } else {
-                                                                termOfServiceOk = true;
-                                                            }
-                                                        }
-                                                        return termOfServiceOk;
-                                                    });
-                                                });
-                                            </script>
+                                <script asp-location="Footer">
+                                    $(document).ready(function () {
+                                        $('#checkout').on('click', function () {
+                                            //terms of service
+                                            var termOfServiceOk = true;
+                                            if ($('#termsofservice').length > 0) {
+                                                //terms of service element exists
+                                                if (!$('#termsofservice').is(':checked')) {
+                                                    $("#terms-of-service-warning-box").dialog();
+                                                    termOfServiceOk = false;
+                                                } else {
+                                                    termOfServiceOk = true;
+                                                }
+                                            }
+                                            return termOfServiceOk;
+                                        });
+                                    });
+                                </script>
                                             if (orderSettings.CheckoutDisabled)
                                             {
-                                                <div class="checkout-disabled">
-                                                    @T("Checkout.Disabled")
-                                                </div>
+                                <div class="checkout-disabled">
+                                    @T("Checkout.Disabled")
+                                </div>
                                             }
                                             else
                                             {
-                                                <input type="submit" id="checkout" name="checkout" v-bind:class="{'checkout-button-mob': isMobile}" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset" />
+                                <input type="submit" id="checkout" name="checkout" v-bind:class="{'checkout-button-mob': isMobile}" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset" />
                                             }
                                         }
-                                    </div>
-                                    <div class="addon-buttons">
-                                        @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
-                                        @foreach (var pm in Model.ButtonPaymentMethodViewComponentNames)
-                                        {
-                                            @await Component.InvokeAsync(pm)
-                                        }
-                                    </div>
-                                }
                             </div>
+                            <div class="addon-buttons">
+                                @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
+                                @foreach (var pm in Model.ButtonPaymentMethodViewComponentNames)
+                                        {
+                                @await Component.InvokeAsync(pm)
+                                        }
+                            </div>
+                                }
                         </div>
-                        @if (Model.IsEditable)
-                        {
-                            @await Component.InvokeAsync("CrossSellProducts")
-                        }
                     </div>
+                    @if (Model.IsEditable)
+                        {
+                    @await Component.InvokeAsync("CrossSellProducts")
+                        }
                 </div>
-            </form>
+            </div>
+        </form>
         }
         else
         {
-            <div class="">
-                @T("ShoppingCart.CartIsEmpty")
-            </div>
+        <div class="">
+            @T("ShoppingCart.CartIsEmpty")
+        </div>
         }
     </div>
 
@@ -437,19 +434,19 @@ Content1 =
         return s;
     }
 
-    (int, CustomerCompany) GetCustomerCompanyDetails()
-    {
-        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+CustomerCompany GetCustomerCompanyDetails()
+{
+    CustomerCompany customerCompany = new CustomerCompany();
+    var currentCustomer = workContext.CurrentCustomer;
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
 
-        int.TryParse(Context.Request.Cookies[compIdCookieKey], out int eRPCompanyId);
+    if (eRPCompanyId > 0)
+        customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(currentCustomer.Id, eRPCompanyId);
 
-        CustomerCompany customerCompany = null;
+    return customerCompany;
+}
 
-        if (eRPCompanyId > 0)
-            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(workContext.CurrentCustomer.Id, eRPCompanyId);
-
-        return (eRPCompanyId, customerCompany);
-    }
     #region PrepareProductAttributeModels
     IList<ProductDetailsModel.ProductAttributeModel> PrepareProductAttributeModels(Product product, ShoppingCartItem updatecartitem)
     {
@@ -578,7 +575,6 @@ Content1 =
     var pageModel = @Html.Raw(Serialize(Model));
     var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));
 
-
     new Vue({
         el: '#cart-section',
         data: {
@@ -603,7 +599,8 @@ Content1 =
                 item.unitPrice = item.unitPrice?.replace('$', '');
                 item.noteAttr = JSON.parse(item.noteAttr);
                 item.warnings = JSON.parse(item.warnings);
-                item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr)
+                item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr);
+                item.customerCompanyProduct = JSON.parse(item.customerCompanyProduct);
             });
         },
         computed: {

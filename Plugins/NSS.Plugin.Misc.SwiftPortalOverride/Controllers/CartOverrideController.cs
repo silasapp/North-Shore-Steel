@@ -273,30 +273,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                 cartItem.Item.RentalStartDateUtc, cartItem.Item.RentalEndDateUtc, isNewQuantity ? cartItem.NewQuantity : cartItem.Item.Quantity, true);
 
             // update cust part No
-            var (_, customerCompany) = GetCustomerCompanyDetails();
+            CustomerCompany customerCompany = GetCustomerCompanyDetails();
 
             if (customerCompany != null)
             {
                 var controlId = $"customerpartNo{cartItem.Product.Id}";
                 if (form.TryGetValue(controlId, out var value) && !string.IsNullOrEmpty(value.FirstOrDefault()))
-                    _customerCompanyProductService.UpdateCustomerCompanyProduct(new CustomerCompanyProduct { CustomerCompanyId = customerCompany.CompanyId, ProductId = cartItem.Product.Id, CustomerPartNo = value.FirstOrDefault() });
+                    _customerCompanyProductService.UpdateCustomerCompanyProduct(new CustomerCompanyProduct { CustomerCompanyId = customerCompany.Id, ProductId = cartItem.Product.Id, CustomerPartNo = value.FirstOrDefault() });
             }
 
             return warnings;
         }
 
-        private (int, CustomerCompany) GetCustomerCompanyDetails()
+        private CustomerCompany GetCustomerCompanyDetails()
         {
+            CustomerCompany customerCompany = new CustomerCompany();
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-
-            int.TryParse(Request.Cookies[compIdCookieKey], out int eRPCompanyId);
-
-            CustomerCompany customerCompany = null;
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
             if (eRPCompanyId > 0)
                 customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
 
-            return (eRPCompanyId, customerCompany);
+            return customerCompany;
         }
 
 
