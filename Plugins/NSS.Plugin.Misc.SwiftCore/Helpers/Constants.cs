@@ -43,10 +43,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string GradeFieldAttribute => "grade";
         public static string CoatingFieldAttribute => "coating";
         public static string DisplayThicknessFieldAttribute => "displayThickness";
+        public static string ThicknessFieldAttribute => "thickness";
         public static string ConditionFieldAttribute => "condition";
         public static string CountryOfOriginFieldAttribute => "countryOfOrigin";
         public static string DisplayWidthFieldAttribute => "displayWidth";
-        public static string shapeFieldAttribute => "shapeId";
+
+        public static string WidthFieldAttribute => "width";
+        public static string ShapeFieldAttribute => "shapeId";
         #endregion
 
         #region UnitOfPurchase
