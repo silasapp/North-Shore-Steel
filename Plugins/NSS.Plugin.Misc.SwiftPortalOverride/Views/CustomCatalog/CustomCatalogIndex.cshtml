@@ -329,7 +329,7 @@
                         specs.forEach(spec => {
                             let value = spec.specificationAttributeOptionName;
 
-                            spec.sort = Number(value);  
+                            spec.sort = Number(value);
                         });
                         specs.sort((a, b) => a.sort - b.sort);
                     }
@@ -694,7 +694,7 @@
                 this.sawOptions = cutOptions.values;
                 this.sawOption = cutOptions.values.find(x => x.isPreSelected)?.id || cutOptions.values.find(e => true)?.id;
                 this.workOrderInstructions = null;
-                this.workOrderInstructionsId = prefix + at.find(x => x.name === "Work Order Instructions").id;
+                this.workOrderInstructionsId = prefix + at.find(x => x.name === "Work Order Instructions")?.id;
                 shopVm.dialog.show();
             },
 
