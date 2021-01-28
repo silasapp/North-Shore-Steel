@@ -408,16 +408,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             try
             {
-                var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
-                var savebillingAddress = model.BillingAddress.SaveToAddressBook;
+                //var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
+                //var savebillingAddress = model.BillingAddress.SaveToAddressBook;
 
-                // save shipping address if asked to
-                SaveShippingAddress(model.ShippingAddress);
-
-                // save billing address if asked to
-                if(!model.ShippingAddress.IsPickupInStore)
-                    SaveBillingAddress(model.BillingAddress);
-
+                
                 // payment
                 var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType, model);
 
@@ -430,6 +424,70 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _logger.Error(exc.Message, exc, _workContext.CurrentCustomer);
                 return Json(new { error = 1, message = exc.Message });
             }
+        }
+
+
+        [IgnoreAntiforgeryToken]
+        public JsonResult SaveShippingAddress([FromBody] NewAddress newShippingAddress)
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            bool isExist = true;
+            var customer = _workContext.CurrentCustomer;
+            //new address
+            AddressModel newAddress = new AddressModel();
+
+            // populate fields
+            newAddress.Email = customer.Email;
+            newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
+            newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
+            newAddress.PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute);
+            newAddress.Address1 = newShippingAddress.Address1;
+            newAddress.Address2 = newShippingAddress.Address2;
+            newAddress.City = newShippingAddress.City;
+            newAddress.StateProvinceId = newShippingAddress.StateProvinceId;
+            newAddress.ZipPostalCode = newShippingAddress.ZipPostalCode;
+            newAddress.CountryId = 1;
+
+            //custom address attributes
+            string customAttributes = null;
+            // REMOVED
+
+            //try to find an address with the same values (don't duplicate records)
+            var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
+                newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
+                newAddress.Email, newAddress.FaxNumber, newAddress.Company,
+                newAddress.Address1, newAddress.Address2, newAddress.City,
+                newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
+                newAddress.CountryId, customAttributes);
+
+            if (address == null)
+            {
+                isExist = false;
+                address = newAddress.ToEntity();
+                address.CustomAttributes = customAttributes;
+                address.CreatedOnUtc = DateTime.UtcNow;
+
+                _addressService.InsertAddress(address);
+                _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+
+                var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
+                var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+                _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
+            }
+
+            _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+
+            _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+
+            var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+            var shippingAddresses = JsonConvert.SerializeObject(address, new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver,
+                Formatting = Formatting.None
+            });
+
+            return Json(new { isExist, shippingAddresses });
         }
 
         [IgnoreAntiforgeryToken]
