@@ -196,7 +196,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     foreach (var item in orderDetailsResponse.OrderItems)
                     {
                         var orderMTR = new OrderDetailsModel.OrderMTRModel();
-                        orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo).ToList();
+                        orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo)?.ToList();
                         var mtr = orderedMTRs.FirstOrDefault(x => x.LineNo == item.LineNo);
                         if (mtr != null)
                             orderMTR = new OrderDetailsModel.OrderMTRModel { LineNo = mtr.LineNo, Description = mtr.Description, HeatNo = mtr.HeatNo, MtrId = mtr.MtrId };

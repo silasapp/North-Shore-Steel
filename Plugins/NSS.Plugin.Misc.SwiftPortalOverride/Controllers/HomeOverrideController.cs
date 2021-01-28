@@ -124,7 +124,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
             (token, orderMTRs) = _erpApiProvider.GetOrderMTRs(companyId, orderId);
 
-            var orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo).ToList();
+            var orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo)?.ToList();
 
             foreach (var mtr in orderedMTRs)
             {
