@@ -372,7 +372,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
                 //set order items
                 var itemTotal = decimal.Zero;
-                purchaseUnit.Items = shoppingCart.Select(item =>
+                var items = shoppingCart.Select(item =>
                 {
                     var product = _productService.GetProductById(item.ProductId);
 
@@ -396,26 +396,26 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 }).ToList();
 
                 //add checkout attributes as order items
-                var checkoutAttributeValues = _checkoutAttributeParser.ParseCheckoutAttributeValues(_genericAttributeService
-                    .GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.CheckoutAttributes, _storeContext.CurrentStore.Id));
+                //var checkoutAttributeValues = _checkoutAttributeParser.ParseCheckoutAttributeValues(_genericAttributeService
+                //    .GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.CheckoutAttributes, _storeContext.CurrentStore.Id));
 
-                foreach (var (attribute, values) in checkoutAttributeValues)
-                {
-                    foreach (var attributeValue in values)
-                    {
-                        var attributePrice = _taxService.GetCheckoutAttributePrice(attribute, attributeValue, false, _workContext.CurrentCustomer);
-                        var roundedAttributePrice = Math.Round(attributePrice, 2);
+                //foreach (var (attribute, values) in checkoutAttributeValues)
+                //{
+                //    foreach (var attributeValue in values)
+                //    {
+                //        var attributePrice = _taxService.GetCheckoutAttributePrice(attribute, attributeValue, false, _workContext.CurrentCustomer);
+                //        var roundedAttributePrice = Math.Round(attributePrice, 2);
 
-                        itemTotal += roundedAttributePrice;
-                        purchaseUnit.Items.Add(new Item
-                        {
-                            Name = CommonHelper.EnsureMaximumLength(attribute.Name, 127),
-                            Description = CommonHelper.EnsureMaximumLength($"{attribute.Name} - {attributeValue.Name}", 127),
-                            Quantity = 1.ToString(),
-                            UnitAmount = new PayPalCheckoutSdk.Orders.Money { CurrencyCode = currency, Value = roundedAttributePrice.ToString("0.00", CultureInfo.InvariantCulture) }
-                        });
-                    }
-                }
+                //        itemTotal += roundedAttributePrice;
+                //        purchaseUnit.Items.Add(new Item
+                //        {
+                //            Name = CommonHelper.EnsureMaximumLength(attribute.Name, 127),
+                //            Description = CommonHelper.EnsureMaximumLength($"{attribute.Name} - {attributeValue.Name}", 127),
+                //            Quantity = 1.ToString(),
+                //            UnitAmount = new PayPalCheckoutSdk.Orders.Money { CurrencyCode = currency, Value = roundedAttributePrice.ToString("0.00", CultureInfo.InvariantCulture) }
+                //        });
+                //    }
+                //}
 
                 //set totals
                 itemTotal = Math.Round(itemTotal, 2);
