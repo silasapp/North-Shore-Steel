@@ -446,7 +446,8 @@
                         column = {
                             field: col.code.toLowerCase(), headerText: col.displayName,
                             template: `#${col.code.toLowerCase()}Template`,
-                            width: col.displayName.includes("Description") ? 230 : col.displayName.includes("Item #") ? 170 : 150,
+                            width: col.displayName.includes("Description") ? 230 : col.displayName.includes("Item #") ? 170 : col.displayName.includes("Weight Per Foot") ? 170 : 150,
+                            textAlign: col.displayName.includes("Weight") ? "Right" : col.displayName.includes("Amount") ? "Right" : "Left",
                         };
 
                     retVal = [...retVal, column];

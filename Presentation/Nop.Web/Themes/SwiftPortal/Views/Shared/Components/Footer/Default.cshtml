@@ -12,27 +12,23 @@
 }
 @if (routeUrl.Contains("login") || routeUrl.Contains("register") || routeUrl.Contains("passwordrecovery"))
 {
-    <div class="linda-block" id="linda-block">
+    <div class="linda-block" id="banner-block">
         <img v-if="!isMobile" src="~/Themes/@(themeName)/Content/assets/linda-experience-banner.png" />
         <img v-if="isMobile" src="~/Themes/@(themeName)/Content/assets/img-linda-experience-banner-mobile.png" />
     </div>
 }
 @if (routeUrl.Contains("/catalog"))
 {
-    <div v-if="!isMobile">
-        <img src="~/Themes/@(themeName)/Content/assets/discount-feature.PNG" alt="" width="100%">
-    </div>
-    <div v-if="isMobile" style=">
-        <img src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%">
+    <div id="banner-block">
+        <img v-if="!isMobile"  src="~/Themes/@(themeName)/Content/assets/discount-2.PNG" alt="" width="100%">
+        <img v-if="isMobile"  src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%" style="margin-top: 50px;">
     </div>
 }
 @if (routeUrl.Contains("/cart"))
 {
-    <div v-if="!isMobile">
-        <img src="~/Themes/@(themeName)/Content/assets/discount-feature.PNG" alt="" width="100%">
-    </div>
-    <div v-if="isMobile">
-        <img src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%">
+    <div id="banner-block">
+        <img v-if="!isMobile" src="~/Themes/@(themeName)/Content/assets/discount-2.PNG" alt="" width="100%">
+        <img v-if="isMobile" src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%" style="margin-top: 50px;">
     </div>
 }
 @if (!routeUrl.Contains("login"))
@@ -343,7 +339,7 @@
 </div>
 <script>
     var vm = new Vue({
-        el: '#linda-block',
+        el: '#banner-block',
         data: {
             window: {
                 width: 0,
@@ -359,6 +355,7 @@
         },
         computed: {
             isMobile: function () {
+                console.log('this.window.width <= 767.98', this.window.width <= 767.98);
                 return this.window.width <= 767.98;
             },
         },
