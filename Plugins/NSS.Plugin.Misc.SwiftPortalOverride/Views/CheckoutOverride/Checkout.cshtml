@@ -661,8 +661,6 @@ Content2 =
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
 
-    console.log('orderTotals', orderTotals);
-
     const store = {
         state: {
             shippingAddresses,
@@ -737,7 +735,7 @@ Content2 =
             dirty: false,
             subTotal: orderTotals.subTotal.replace("$", ""),
             shippingAmount: orderTotals.shipping.replace("$", ""),
-            discountAmount: orderTotals.orderTotalDiscount,
+            discountAmount: orderTotals.subTotalDiscount,
             taxAmount: orderTotals.tax.replace("$", ""),
             orderTotal: orderTotals.orderTotal.replace("$", ""),
             disableSubmit: false,
