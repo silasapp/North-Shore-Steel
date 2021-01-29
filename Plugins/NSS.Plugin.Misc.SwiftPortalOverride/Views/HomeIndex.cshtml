@@ -167,7 +167,7 @@
                                         }
                                     </div>
 
-                                    <div class="text-nowrap nss-dark text-center mb-1 @(Model.OpenOrders.Count > 0 ? "": "d-none")">* All orders display the five most recent result from the past 30 days.</div>
+                                    <div class="text-nowrap nss-dark text-center mb-2 @(Model.OpenOrders.Count > 5 ? "": "d-none")">* Five most recent only.</div>
                                 </div>
                             </div>
                         }
@@ -188,7 +188,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="nss-dark text-center">Combines online and offline orders.</div>
                                 </div>
                             </div>
                         }
@@ -334,7 +333,7 @@
 
 
 
-                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
+                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'></span><span class='dialog-header'></span><span class='dialog-header'></span>
 
             </div>
             <a href="/catalog">

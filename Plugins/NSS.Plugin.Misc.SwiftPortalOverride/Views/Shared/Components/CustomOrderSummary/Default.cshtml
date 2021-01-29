@@ -661,17 +661,17 @@ Content1 =
                 let totalPrice = 0.00;
                 const totalLength = evenRound(quantity * length);
                 const totalWeight = evenRound(weight * quantity);
-
+                var _itemUnit = parseInt(itemUnit);
                 switch (itemUnit) {
                     case 'FT':
-                        totalPrice = totalLength * unitPrice;
+                        totalPrice = totalLength * Number(unitPrice.replace(/,/g, ''));
                         break;
                     case 'CWT':
-                        totalPrice = (totalWeight / 100) * unitPrice;
+                        totalPrice = (totalWeight / 100) * parseFloat(unitPrice.replace(/,/g, ''));
                         break;
                     case 'EA':
                     default:
-                        totalPrice = quantity * unitPrice;
+                        totalPrice = quantity * Number(unitPrice.replace(/,/g, ''));
                         break;
                 }
                 this.items.forEach(item => {
