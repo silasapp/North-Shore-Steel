@@ -92,7 +92,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public CheckoutOverrideController(
             ICompanyService companyService,
             Factories.ICheckoutModelFactory overrideCheckoutModelFactory,
-            IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService,SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
+            IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService, SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -276,7 +276,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (customerCompany != null && customerCompany.CanCredit)
             {
                 var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
-                creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero};
+                creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero };
             }
 
             model.AccountCreditModel = creditModel;
@@ -408,15 +408,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             try
             {
-                var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
-                var savebillingAddress = model.BillingAddress.SaveToAddressBook;
+                //var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
+                //var savebillingAddress = model.BillingAddress.SaveToAddressBook;
 
-                // save shipping address if asked to
-                SaveShippingAddress(model.ShippingAddress);
-
-                // save billing address if asked to
-                if(!model.ShippingAddress.IsPickupInStore)
-                    SaveBillingAddress(model.BillingAddress);
 
                 // payment
                 var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType, model);
@@ -430,6 +424,71 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _logger.Error(exc.Message, exc, _workContext.CurrentCustomer);
                 return Json(new { error = 1, message = exc.Message });
             }
+        }
+
+
+        [IgnoreAntiforgeryToken]
+        public JsonResult SaveNewAddress([FromBody] NewAddress nAddress)
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            bool isExist = true;
+            var customer = _workContext.CurrentCustomer;
+            //new address
+            AddressModel newAddress = new AddressModel();
+
+            // populate fields
+            newAddress.Email = customer.Email;
+            newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
+            newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
+            newAddress.PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute);
+            newAddress.Address1 = nAddress.Address1;
+            newAddress.Address2 = nAddress.Address2;
+            newAddress.City = nAddress.City;
+            newAddress.StateProvinceId = nAddress.StateProvinceId;
+            newAddress.ZipPostalCode = nAddress.ZipPostalCode;
+            newAddress.CountryId = 1;
+
+            //custom address attributes
+            string customAttributes = null;
+            // REMOVED
+
+            //try to find an address with the same values (don't duplicate records)
+            var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
+                newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
+                newAddress.Email, newAddress.FaxNumber, newAddress.Company,
+                newAddress.Address1, newAddress.Address2, newAddress.City,
+                newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
+                newAddress.CountryId, customAttributes);
+
+            if (address == null)
+            {
+                isExist = false;
+                address = newAddress.ToEntity();
+                address.CustomAttributes = customAttributes;
+                address.CreatedOnUtc = DateTime.UtcNow;
+
+                _addressService.InsertAddress(address);
+                _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+
+                var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
+                var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+                _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
+            }
+
+
+            var _ = nAddress.AddressType == "billing" ? _workContext.CurrentCustomer.BillingAddressId = address.Id : _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+
+            _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+
+            var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+            var savedAddress = JsonConvert.SerializeObject(address, new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver,
+                Formatting = Formatting.None
+            });
+
+            return Json(new { isExist, savedAddress });
         }
 
         [IgnoreAntiforgeryToken]
@@ -464,7 +523,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             catch (Exception exc)
             {
 
-                return Json(new { error = 2, message =  exc.Message});
+                return Json(new { error = 2, message = exc.Message });
             }
 
         }
@@ -531,10 +590,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 isNum = int.TryParse(attr.FirstOrDefault(x => x.Key == "itemId")?.Value, out int itemId);
                 isNum = decimal.TryParse(attr.FirstOrDefault(x => x.Key == "lengthFt")?.Value, out decimal length);
 
-                request.OrderWeight += (int) Math.Round(weight * item.Quantity, 0);
+                request.OrderWeight += (int)Math.Round(weight * item.Quantity, 0);
 
                 if (length > request.MaxLength)
-                    request.MaxLength = (int) Math.Round(length);
+                    request.MaxLength = (int)Math.Round(length);
 
                 var shape = _shapeService.GetShapeById(shapeId);
 
@@ -550,168 +609,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var response = _nSSApiProvider.GetShippingRate(request, useMock: false);
             return response;
-        }
-
-        private void SaveBillingAddress(ErpCheckoutBillingAddress model)
-        {
-            var SaveToAddressBook = model.SaveToAddressBook;
-            var billingAddressId = model.BillingAddressId;
-
-            if (model.ShipToSameAddress && _workContext.CurrentCustomer.ShippingAddressId.GetValueOrDefault() > 0)
-            {
-                //existing address
-                var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, _workContext.CurrentCustomer.ShippingAddressId.GetValueOrDefault())
-                    ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
-
-                _workContext.CurrentCustomer.BillingAddressId = address.Id;
-                _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-            }
-            else
-            {
-                if (billingAddressId > 0)
-                {
-                    //existing address
-                    var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, billingAddressId)
-                        ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
-
-                    _workContext.CurrentCustomer.BillingAddressId = address.Id;
-                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-                }
-                else
-                {
-                    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-                    int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-
-                    //new address
-                    var customer = _workContext.CurrentCustomer;
-                    //new address
-                    var newAddress = model.BillingNewAddress;
-
-                    // populate fields
-                    newAddress.Email = customer.Email;
-                    newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
-                    newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
-                    newAddress.PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute);
-
-                    string customAttributes = null;
-
-                    //try to find an address with the same values (don't duplicate records)
-                    var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
-                        newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
-                        newAddress.Email, newAddress.FaxNumber, newAddress.Company,
-                        newAddress.Address1, newAddress.Address2, newAddress.City,
-                        newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
-                        newAddress.CountryId, customAttributes);
-
-                    if (address == null)
-                    {
-                        //address is not found. let's create a new one
-                        address = newAddress.ToEntity();
-                        address.CustomAttributes = customAttributes;
-                        address.CreatedOnUtc = DateTime.UtcNow;
-
-                        //some validation
-                        if (address.CountryId == 0)
-                            address.CountryId = null;
-
-                        if (address.StateProvinceId == 0)
-                            address.StateProvinceId = null;
-
-                        _addressService.InsertAddress(address);
-                        _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
-
-                        var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
-                        var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
-                        _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
-                    }
-
-                    _workContext.CurrentCustomer.BillingAddressId = address.Id;
-
-                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-                }
-            }
-
-        }
-
-        private void SaveShippingAddress(ErpCheckoutShippingAddress model)
-        {
-            var pickUpInStore = model.IsPickupInStore;
-
-            if (pickUpInStore)
-            {
-                var pickupPointsResponse = _shippingService.GetPickupPoints(_workContext.CurrentCustomer.BillingAddressId ?? 0,
-                    _workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id);
-
-                if (pickupPointsResponse.Success)
-                {
-                    var pickupOption = pickupPointsResponse.PickupPoints.FirstOrDefault(x => x.Id == model.PickupPoint.Id);
-
-                    SavePickupOption(pickupOption);
-                }
-
-            }
-            else
-            {
-                var SaveToAddressBook = model.SaveToAddressBook;
-                var addressId = model.ShippingAddressId;
-
-                if (addressId > 0)
-                {
-                    // existing
-                    //existing address
-                    var address = _customerService.GetCustomerAddress(_workContext.CurrentCustomer.Id, addressId)
-                        ?? throw new Exception(_localizationService.GetResource("Checkout.Address.NotFound"));
-
-                    _workContext.CurrentCustomer.ShippingAddressId = address.Id;
-                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-                }
-                else
-                {
-                    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-                    int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-
-                    var customer = _workContext.CurrentCustomer;
-                    //new address
-                    var newAddress = model.ShippingNewAddress;
-
-                    // populate fields
-                    newAddress.Email = customer.Email;
-                    newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
-                    newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
-                    newAddress.PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute);
-
-                    //custom address attributes
-                    string customAttributes = null;
-                    // REMOVED
-
-                    //try to find an address with the same values (don't duplicate records)
-                    var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
-                        newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
-                        newAddress.Email, newAddress.FaxNumber, newAddress.Company,
-                        newAddress.Address1, newAddress.Address2, newAddress.City,
-                        newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
-                        newAddress.CountryId, customAttributes);
-
-                    if (address == null)
-                    {
-                        address = newAddress.ToEntity();
-                        address.CustomAttributes = customAttributes;
-                        address.CreatedOnUtc = DateTime.UtcNow;
-
-                        _addressService.InsertAddress(address);
-                        _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
-
-                        var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
-                        var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
-                        _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
-                    }
-
-                    _workContext.CurrentCustomer.ShippingAddressId = address.Id;
-
-                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-                }
-
-            }
         }
 
         private JsonResult ProcessPayment(int paymentMethodtype, ErpCheckoutModel model)
@@ -735,7 +632,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingCostKey, shipObj.ShippingCost);
                 processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingDeliveryDateKey, shipObj.DeliveryDate);
-            }  
+            }
 
             // place order based on payment selected
 
@@ -837,7 +734,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             foreach (var item in discounUsagetList)
             {
                 var discount = _discountService.GetDiscountById(item.DiscountId);
-                if(discount != null)
+                if (discount != null)
                 {
                     decimal amount = decimal.Zero;
                     switch (discount.DiscountType)
@@ -910,7 +807,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     Quantity = item.Quantity,
                     TotalPrice = Math.Round(item.PriceExclTax, 2),
                     UnitPrice = Math.Round(item.UnitPriceExclTax, 2),
-                    TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int) Math.Round(weight * item.Quantity) : 0),
+                    TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int)Math.Round(weight * item.Quantity) : 0),
                     // product attr
                     Notes = notes ?? string.Empty,
                     SawOptions = sawoptions ?? string.Empty,

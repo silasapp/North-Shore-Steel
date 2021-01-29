@@ -51,11 +51,12 @@
         Formatting = Formatting.None
     });
 
-	var pickupPoints = JsonConvert.SerializeObject(Model.ShippingAddressModel.PickupPointsModel.PickupPoints, new JsonSerializerSettings
+    var pickupPoints = JsonConvert.SerializeObject(Model.ShippingAddressModel.PickupPointsModel.PickupPoints, new JsonSerializerSettings
     {
         ContractResolver = contractResolver,
         Formatting = Formatting.None
     });
+
     var accountCredit = JsonConvert.SerializeObject(Model.AccountCreditModel, new JsonSerializerSettings
     {
         ContractResolver = contractResolver,
@@ -143,19 +144,7 @@ Content1 =
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-row mt-3 ">
-                <label class="pure-material-checkbox pt-0">
-                    Save to My Addresses
-                    <input type="checkbox" v-model="newShippingAddress.saveToMyAddresses" v-bind:checked="newShippingAddress.saveToMyAddresses" />
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-            @*<div class="d-flex flex-row mt-3">
-                    <div class="d-flex flex-column w-75 checkout-nickname">
-                        <label class="fs-14 text-black mb-1">Address Nickname</label>
-                        <input type="text" class="nss-form-control shipping-input" placeholder="Ex: 'South Warehouse'" />
-                    </div>
-                </div>*@
+
             <div class="d-flex flex-row mt-4 justify-content-end">
                 <button id="use-shipping" class="use-address">
                     Use Address
@@ -201,19 +190,6 @@ Content2 =
                     <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.zipPostalCode">Zip Code is required</label>
                 </div>
             </div>
-            <div class="d-flex flex-row mt-4">
-                <label class="pure-material-checkbox">
-                    Save to My Addresses
-                    <input type="checkbox" v-model="newBillingAddress.saveToMyAddresses" v-bind:checked="newBillingAddress.saveToMyAddresses" />
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-            @*<div class="d-flex flex-row mt-3">
-                    <div class="d-flex flex-column w-75">
-                        <label class="fs-14 text-black mb-1">Address Nickname</label>
-                        <input type="text" class="nss-form-control" placeholder="Ex: 'South Warehouse'" />
-                    </div>
-                </div>*@
             <div class="d-flex flex-row mt-4 justify-content-end">
                 <button id="use-billing" class="use-address">
                     Use Address
@@ -260,29 +236,10 @@ Content2 =
                         </div>
                     </div>
                 </div>
-                @*<div class="card card-mod">
-                        <label class="h5 text-primary font-weight-bold mb-4">ORDER INFORMATION</label>
-                        <div class="checkout-card-1">
-                            <div class="d-flex flex-column">
-                                <label for="purchaseOrder" class="fs-13 text-black">{{isMobile ? "PO#":"Purchase Order #"}}</label>
-                                <label id="purchaseOrder" class="p-2 text-black" style="min-height: 30px">{{ purchaseOrder }}</label>
-                            </div>
-                            <div class="d-flex flex-column">
-                                <label for="deliveryDate" class="fs-13 text-black">Promise Date</label>
-                                <label id="deliveryDate" class="p-2 text-black">{{ deliveryDate ?? 'N/A' }}</label>
-                            </div>
 
-                        </div>
-                    </div>*@
                 <div class="card card-mod">
                     <label class="h5 text-primary mb-4" style="font:normal normal 500 26px/20px 'Teko';">DELIVERY OR PICKUP</label>
                     <div class="mb-3 d-flex">
-                        @*<button class="fs-14 shipping-tab mr-2" v-bind:class="{'active': isDelivery}" v-on:click="isDelivery = true; getShippingRate();">
-                                Delivery
-                            </button>
-                            <button id="pickup" class="font14 shipping-tab" v-bind:class="{'active': !isDelivery}" v-on:click="isDelivery = false; getShippingRate()">
-                                Pickup
-                            </button>*@
                         <div class="mr-4">
                             <label for="customer" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
                                 <input type="radio" id="customer" v-bind:checked="isDelivery" name="ship" value="customer" v-on:click="isDelivery = true; getShippingRate();">
@@ -302,10 +259,9 @@ Content2 =
                     <div class="d-flex flex-column mb-3" v-if="isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">Shipping Address</label>
                         <div class="d-flex flex-row flex-wrap" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
-                            <select type="text" class="bg-accent text-black px-2 py-2 address-dropdown" id="shippingAddress"
+                            <select type="text" class="bg-accent text-black px-2 py-2 address-dropdown w-75" id="shippingAddress"
                                     v-on:change="showNewShippingAddress = false; $event.target.value ? getShippingRate(false) : null;"
-                                    v-model="shippingAddressId"
-                                    v-bind:class="{'w-100': showNewShippingAddress, 'w-75': !showNewShippingAddress}">
+                                    v-model="shippingAddressId">
                                 <option v-bind:value="null">-Select Address-</option>
                                 <option v-bind:value="address.id" v-for="address in shared.shippingAddresses">
                                     {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
@@ -314,21 +270,12 @@ Content2 =
                                 </option>
                             </select>
                             <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
-                                    v-if="!showNewShippingAddress" v-on:click="handleShowNewShippingAddress(); shippingAddressId = null">
+                                    v-on:click="handleShowNewShippingAddress(); shippingAddressId = null">
                                 Use a new address
                             </button>
 
                         </div>
                         <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required</label>
-
-                        <div class="d-flex flex-column checkout-new-address" v-if="showNewShippingAddress">
-                            <h1 class="h6 text-primary  mb-2 mt-3">New Shipping Address</h1>
-                            <label class="nss-dark">{{newShippingAddress.address1}}, {{newShippingAddress.city}}, {{newShippingAddress.stateProvinceName}}, {{newShippingAddress.zipPostalCode}}</label>
-                            <label class="nss-dark">{{newShippingAddress.address2}}</label>
-                            <button class="fs-14 text-primary text-decoration-underline" v-on:click="handleShowNewShippingAddress(); shippingAddressId = null">
-                                Change shippping address
-                            </button>
-                        </div>
                     </div>
                     <div class="d-flex flex-column mb-3" v-if="!isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
@@ -417,7 +364,7 @@ Content2 =
                             <h1 class="h5 text-primary font-weight-bold mt-3">Billing Address</h1>
                             <div class="d-flex flex-column mt-2" v-if="!shipToSameAddress || !isDelivery">
                                 <div class=" flex-row" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
-                                    <select type="text" class="bg-accent text-black px-2 py-2 nss-form-control w-75"
+                                    <select type="text" class="bg-accent text-black px-2 py-2 w-75"
                                             id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddressId">
                                         <option v-bind:value="null">-Select Address-</option>
                                         <option v-bind:value="address.id" v-for="address in shared.billingAddresses">
@@ -427,20 +374,11 @@ Content2 =
                                         </option>
                                     </select>
                                     <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
-                                            v-if="!showNewBillingAddress" v-on:click="handleShowNewBillingAddress(); billingAddressId = null">
+                                            v-on:click="handleShowNewBillingAddress(); billingAddressId = null">
                                         Use a new address
                                     </button>
                                 </div>
                                 <label class="text-danger mt-1 mb-0" v-if="dirty && !billingAddressId && !showNewBillingAddress">Billing address is required</label>
-
-                                <div class="d-flex flex-column checkout-new-address" v-if="showNewBillingAddress">
-                                    <h1 class="h6 text-primary  mb-2 mt-3">New Billing Address</h1>
-                                    <label class="nss-dark">{{newBillingAddress.address1}}, {{newBillingAddress.city}}, {{newBillingAddress.stateProvinceName}}, {{newBillingAddress.zipPostalCode}}</label>
-                                    <label class="nss-dark">{{newBillingAddress.address2}}</label>
-                                    <button class="fs-14 text-primary text-decoration-underline" v-on:click="handleShowNewBillingAddress(); billingAddressId = null">
-                                        Change billing address
-                                    </button>
-                                </div>
 
                             </div>
 
@@ -513,23 +451,23 @@ Content2 =
 
                                     var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
 
-                                <tr>
-                                    <td>@iNo</td>
-                                    <td>
-                                        @item.ProductName
-                                        @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
-                                            {
-                                                <div class="attributes">
-                                                    @Html.Raw(item.AttributeInfo)
-                                                </div>
-                                            }*@
-                                    </td>
-                                    <td>@customerPathNo</td>
-                                    <td>@item.UnitPrice / @uom</td>
-                                    <td>@item.SubTotal</td>
-                                    <td>@DoFormat(totalWeight)</td>
-                                    <td class="text-center">@item.Quantity</td>
-                                </tr>
+                                    <tr>
+                                        <td>@iNo</td>
+                                        <td>
+                                            @item.ProductName
+                                            @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                                {
+                                                    <div class="attributes">
+                                                        @Html.Raw(item.AttributeInfo)
+                                                    </div>
+                                                }*@
+                                        </td>
+                                        <td>@customerPathNo</td>
+                                        <td>@item.UnitPrice / @uom</td>
+                                        <td>@item.SubTotal</td>
+                                        <td>@DoFormat(totalWeight)</td>
+                                        <td class="text-center">@item.Quantity</td>
+                                    </tr>
                                 }
 
                             </tbody>
@@ -564,18 +502,18 @@ Content2 =
                             var iNo = serialized == "True" ? itemTagNo : itemNo;
 
                             var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
-                        <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
-                            <div class="d-flex flex-row justify-content-between align-items-center">
-                                <label class="fs12-primary-500">Item: @iNo</label>
-                            </div>
-                            <label class="h2-primary mt-3 mb-2 text-left">@item.ProductName</label>
-                            <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
-                            <label class="h5-default-500 text-left">Unit Price: @item.UnitPrice / @uom </label>
-                            <label class="h5-default-500 text-left">Total Price: @item.SubTotal </label>
-                            <label class="h5-default-500 text-left">Weight: @DoFormat(totalWeight) </label>
-                            <label class="h5-default-500 text-left">Quantity: @item.Quantity </label>
+                            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <label class="fs12-primary-500">Item: @iNo</label>
+                                </div>
+                                <label class="h2-primary mt-3 mb-2 text-left">@item.ProductName</label>
+                                <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
+                                <label class="h5-default-500 text-left">Unit Price: @item.UnitPrice / @uom </label>
+                                <label class="h5-default-500 text-left">Total Price: @item.SubTotal </label>
+                                <label class="h5-default-500 text-left">Weight: @DoFormat(totalWeight) </label>
+                                <label class="h5-default-500 text-left">Quantity: @item.Quantity </label>
 
-                        </div>}
+                            </div>}
                     </div>
 
                 </div>
@@ -610,7 +548,8 @@ Content2 =
 
                     <div style="display:flex;justify-content: center;" class="place-order-buttons">
                         <button id="place-order" v-show="paymentMethodIndex !== shared.constants.PAYMENT_METHOD_PAYPAL"
-                                v-on:click="placeOrder" v-bind:disabled="disableSubmit || errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE">
+                                v-on:click="placeOrder" v-bind:disabled="disableSubmit || errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE ||
+                                (paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD && !this.paymentCard.cardHolderName)">
                             PLACE ORDER
                         </button>
                         <div id="paypal-button-container" v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL"></div>
@@ -660,8 +599,6 @@ Content2 =
     var orderTotals = @Html.Raw(orderTotals);
     var purchaseOrder = '@purchaseOrder';
     var isDelivery = '@isDelivery' === 'True';
-
-    console.log('orderTotals', orderTotals);
 
     const store = {
         state: {
@@ -737,7 +674,7 @@ Content2 =
             dirty: false,
             subTotal: orderTotals.subTotal.replace("$", ""),
             shippingAmount: orderTotals.shipping.replace("$", ""),
-            discountAmount: orderTotals.orderTotalDiscount,
+            discountAmount: orderTotals.subTotalDiscount,
             taxAmount: orderTotals.tax.replace("$", ""),
             orderTotal: orderTotals.orderTotal.replace("$", ""),
             disableSubmit: false,
@@ -754,8 +691,8 @@ Content2 =
         destroyed: function () {
             window.removeEventListener("resize", this.handleResize);
         },
-        mounted: function () {
-            this.setupCreditCardMethod();
+         mounted: function () {
+			this.setupCreditCardMethod();
             this.setupPaypalMethod();
             this.getShippingRate(true);
         },
@@ -798,10 +735,85 @@ Content2 =
             handleShowNewBillingAddress: function () {
                 handleShowNewBillingAddress();
             },
-            getShippingRate: function (disableSpinner) {
+
+            saveBillingAddress: function () {
+                if (this.showNewBillingAddress) {
+                    if (!this.newBillingAddress.address1 || !this.newBillingAddress.city || !this.newBillingAddress.zipPostalCode ||
+                        !this.newBillingAddress.stateProvinceId) { this.showNewBillingAddress = false; return false; }
+                }
+
+                const request = {
+                    address1: this.newBillingAddress.address1,
+                    address2: this.newBillingAddress.address2,
+                    stateProvinceId: this.newBillingAddress.stateProvinceId,
+                    city: this.newBillingAddress.city,
+                    zipPostalCode: this.newBillingAddress.zipPostalCode,
+                    addressType: "billing"
+                };
+
+                billingAddressModal.hide();
+                self = this;
+
+                $.ajax({
+                    url: "@Url.Action("SaveNewAddress", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, _, _) {
+                        let address = JSON.parse(data.savedAddress)
+                        let filteredState = checkoutvm.shared.states.filter(fs => fs.id === address.stateProvinceId)
+                        address.stateProvinceName = filteredState.length > 0 ? filteredState[0].name : "";
+                        if (!data.isExist) {
+                            self.shared.shippingAddresses.push(address);
+                            self.shared.billingAddresses.push(address);
+                        }
+                        self.billingAddressId = address ? address.id : null;
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log('data-xhr', xhr)
+                    }
+                });
+
+            },
+            saveShippingAddress: function () {
                 if (this.showNewShippingAddress && (!this.newShippingAddress.address1 ||
                     !this.newShippingAddress.city || !this.newShippingAddress.stateProvinceId ||
                     !this.newShippingAddress.zipPostalCode)) { this.showNewShippingAddress = false; return; }
+
+                const request = {
+                    address1: this.newShippingAddress.address1,
+                    address2: this.newShippingAddress.address2,
+                    stateProvinceId: this.newShippingAddress.stateProvinceId,
+                    city: this.newShippingAddress.city,
+                    zipPostalCode: this.newShippingAddress.zipPostalCode,
+                    addressType: "shipping"
+                };
+
+                shippingAddressModal.hide();
+                self = this;
+
+                $.ajax({
+                    url: "@Url.Action("SaveNewAddress", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, _, _) {
+                        let address = JSON.parse(data.savedAddress)
+                        let filteredState = checkoutvm.shared.states.filter(fs => fs.id === address.stateProvinceId)
+                        address.stateProvinceName = filteredState.length > 0 ? filteredState[0].name : "";
+                        if (!data.isExist) {
+                            self.shared.shippingAddresses.push(address);
+                            self.shared.billingAddresses.push(address);
+                        }
+                        self.shippingAddressId = address ? address.id : null;
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log('data-xhr', xhr)
+                    }
+                });
+
+            },
+            getShippingRate: function (disableSpinner) {
 
                 if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) { this.showNewShippingAddress = false; return; }
 
@@ -814,6 +826,7 @@ Content2 =
                     address = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
                     address.address1 = address.address;
                 }
+
 
                 const request = {
                     isPickup: !this.isDelivery,
@@ -829,6 +842,7 @@ Content2 =
 
                 if (self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
                     self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+
 
                 $.ajax({
                     url: "@Url.Action("GetShippingRate", "CheckoutOverride")",
@@ -1121,17 +1135,16 @@ Content2 =
         billingAddressModal.show();
     }
     $('#use-shipping').on('click', function () {
+        checkoutvm.dirty = true;
         checkoutvm.showNewShippingAddress = true;
-        let shippingFiltered = checkoutvm.shared.states.filter(m => m.id === checkoutvm.newShippingAddress.stateProvinceId)
-        checkoutvm.newShippingAddress.stateProvinceName = shippingFiltered.length > 0 ? shippingFiltered[0].name : "";
+        checkoutvm.saveShippingAddress();
         checkoutvm.getShippingRate();
-        shippingAddressModal.hide();
+
     });
     $('#use-billing').on('click', function () {
+        checkoutvm.dirty = true;
         checkoutvm.showNewBillingAddress = true;
-        let billingFiltered = checkoutvm.shared.states.filter(m => m.id === checkoutvm.newBillingAddress.stateProvinceId)
-        checkoutvm.newBillingAddress.stateProvinceName = billingFiltered.length > 0 ? billingFiltered[0].name : "";
-        billingAddressModal.hide();
+        checkoutvm.saveBillingAddress();
     });
 </script>
 <ejs-scripts></ejs-scripts>
