@@ -113,7 +113,7 @@ Content1 =
                 <div class="d-flex flex-column checkout-new-address-field">
                     <label class="fs-14 text-black mb-1">Address Line 1</label>
                     <input type="text" class="nss-form-control shipping-input" v-model="newShippingAddress.address1" placeholder="Ex: 1234 Main St." />
-                    <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.address1">Address Line 1 is required</label>
+                    <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.address1">Address Line 1 is required.</label>
                 </div>
                 <div class="d-flex flex-column  checkout-new-address-field">
                     <label class="fs-14 text-black mb-1">Address Line 2</label>
@@ -124,7 +124,7 @@ Content1 =
                 <div class="d-flex flex-column  checkout-new-address-field mb-0">
                     <label class="fs-14 text-black mb-1">City</label>
                     <input type="text" class="nss-form-control shipping-input" v-model="newShippingAddress.city" placeholder="Ex: Dallas" />
-                    <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.city">City is required</label>
+                    <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.city">City is required.</label>
                 </div>
                 <div class=" checkout-new-address-field d-flex flex-row flex-wrap justify-content-between">
                     <div class="col-xs-12 col-md-7 d-flex flex-column p-0 mb-3">
@@ -135,12 +135,12 @@ Content1 =
                                 {{ option.name }}
                             </option>
                         </select>
-                        <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.stateProvinceId">State is required</label>
+                        <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.stateProvinceId">State is required.</label>
                     </div>
                     <div class="col-xs-12 col-md-4 d-flex flex-column p-0">
                         <label class="fs-14 text-black mb-1">Zip Code</label>
                         <input type="text" class="nss-form-control shipping-input" v-model="newShippingAddress.zipPostalCode" placeholder="Ex: 77014" />
-                        <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.zipPostalCode">Zip Code is required</label>
+                        <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.zipPostalCode">Zip Code is required.</label>
                     </div>
                 </div>
             </div>
@@ -161,7 +161,7 @@ Content2 =
                 <div class="d-flex flex-column w-50 mr-2">
                     <label class="fs-14 text-black mb-1">Address Line 1</label>
                     <input type="text" class="nss-form-control" v-model="newBillingAddress.address1" placeholder="Ex: 1234 Main St." />
-                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.address1">Address Line 1 is required</label>
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.address1">Address Line 1 is required.</label>
                 </div>
                 <div class="d-flex flex-column w-50 ml-2">
                     <label class="fs-14 text-black mb-1">Address Line 2</label>
@@ -172,7 +172,7 @@ Content2 =
                 <div class="col-md-6 d-flex flex-column pr-2">
                     <label class="fs-14 text-black mb-1">City</label>
                     <input type="text" class="nss-form-control" v-model="newBillingAddress.city" placeholder="Ex: Dallas" />
-                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.city">City is required</label>
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.city">City is required.</label>
                 </div>
                 <div class="col-md-4 d-flex flex-column px-2">
                     <label class="fs-14 text-black mb-1">State</label>
@@ -182,12 +182,12 @@ Content2 =
                             {{ option.name }}
                         </option>
                     </select>
-                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.stateProvinceId">State is required</label>
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.stateProvinceId">State is required.</label>
                 </div>
                 <div class="col-md-2 d-flex flex-column pl-2">
                     <label class="fs-14 text-black mb-1">Zip Code</label>
                     <input type="text" class="nss-form-control" v-model="newBillingAddress.zipPostalCode" placeholder="Ex: 77014" />
-                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.zipPostalCode">Zip Code is required</label>
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.zipPostalCode">Zip Code is required.</label>
                 </div>
             </div>
             <div class="d-flex flex-row mt-4 justify-content-end">
@@ -275,7 +275,7 @@ Content2 =
                             </button>
 
                         </div>
-                        <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required</label>
+                        <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required.</label>
                     </div>
                     <div class="d-flex flex-column mb-3" v-if="!isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
@@ -289,7 +289,7 @@ Content2 =
                                 </option>
                             </select>
                         </div>
-                        <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Pickup Location is required</label>
+                        <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Pickup Location is required.</label>
                     </div>
 
                 </div>
@@ -337,7 +337,7 @@ Content2 =
                                 <div class="col-md-7 d-flex flex-column">
                                     <label class="fs-14 text-black mb-1">Cardholder name</label>
                                     <input id="cardholdername" type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
-                                    <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardHolderName">Cardholder name is required</label>
+                                    <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardHolderName">Cardholder name is required.</label>
                                 </div>
                                 <div class="col-md-4 d-flex" v-if="!isPaymentSelection">
                                     <button class="fs-14 text-primary justify-content-end text-decoration-underline"
@@ -378,7 +378,7 @@ Content2 =
                                         Use a new address
                                     </button>
                                 </div>
-                                <label class="text-danger mt-1 mb-0" v-if="dirty && !billingAddressId && !showNewBillingAddress">Billing address is required</label>
+                                <label class="text-danger mt-1 mb-0" v-if="dirty && !billingAddressId && !showNewBillingAddress">Billing address is required.</label>
 
                             </div>
 

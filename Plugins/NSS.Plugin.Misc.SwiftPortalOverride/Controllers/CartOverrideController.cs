@@ -772,7 +772,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if (products.Any(p => !p.Published))
             {
-                _notificationService.ErrorNotification("Remove products that are no longer available");
+                _notificationService.ErrorNotification("Remove products that are no longer available.");
             }
         }
 

@@ -90,29 +90,29 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 registration = _userRegistrationService.GetById(userDelta.Dto.RegistrationId.Value);
 
                 if (registration == null)
-                    return Error(HttpStatusCode.NotFound, "userRegistration", "not found");
+                    return Error(HttpStatusCode.NotFound, "userRegistration", "not found.");
 
                 if (registration.StatusId == (int)UserRegistrationStatus.Rejected)
-                    return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is rejected");
+                    return Error(HttpStatusCode.BadRequest, "userRegistration", "user registration is rejected.");
 
                 if (_customerService.GetCustomerByEmail(registration.WorkEmail) != null)
-                    return Error(HttpStatusCode.BadRequest, "userRegistration", "email is already registered");
+                    return Error(HttpStatusCode.BadRequest, "userRegistration", "email is already registered.");
             }
 
             if (userDelta.Dto.WorkEmail == null)
-                return Error(HttpStatusCode.BadRequest, "user", "work email required");
+                return Error(HttpStatusCode.BadRequest, "user", "work email required.");
 
             if (userDelta.Dto.WintrixId == 0)
-                return Error(HttpStatusCode.BadRequest, "user", "wintrix id is required");
+                return Error(HttpStatusCode.BadRequest, "user", "wintrix id is required.");
 
             if (_customerService.GetCustomerByEmail(userDelta.Dto.WorkEmail) != null)
-                return Error(HttpStatusCode.BadRequest, "user", "email is already registered");
+                return Error(HttpStatusCode.BadRequest, "user", "email is already registered.");
 
             int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, userDelta.Dto.WintrixId.ToString(), nameof(Customer))?.EntityId ?? 0;
             var customer = _customerApiService.GetCustomerEntityById(customerId);
 
             if (customer != null)
-                return Error(HttpStatusCode.BadRequest, "user", "user with same wintrix id already exists");
+                return Error(HttpStatusCode.BadRequest, "user", "user with same wintrix id already exists.");
 
             if (registration == null)
             {
