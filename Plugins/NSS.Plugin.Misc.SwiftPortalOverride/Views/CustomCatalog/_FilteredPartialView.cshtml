@@ -307,10 +307,10 @@
 
 <div id="gridView">
     <div>
-        <div v-if="!isMobile" class="d-none d-md-block">
+        <div v-bind:style="{height: isMobile ? '0px' : 'auto',visibility: isMobile ? 'hidden' : 'visible'}">
             <div id="Grid"></div>
         </div>
-        <div v-if="isMobile" class="d-md-none">
+        <div v-if="isMobile">
             <div class="product-sm d-flex flex-column align-items-start mb-2" v-for="data in gridData">
                 <label class="h2-primary my-2">{{ data.itemname }}</label>
                 <div class="d-flex flex-row flex-wrap">
