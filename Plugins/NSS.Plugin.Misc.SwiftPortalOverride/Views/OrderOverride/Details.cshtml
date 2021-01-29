@@ -298,7 +298,7 @@
                     <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewTicket = true;" v-on:mouseleave="isHoveringViewTicket = false;">
                         <img alt="Ticket Icon"
                              v-bind:src="isHoveringViewTicket ? '/Themes/@themeName/Content/assets/icn-delivery-ticket-dark.svg' : '/Themes/@themeName/Content/assets/icn-delivery-ticket.svg'" />
-                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View Delivery Ticket</label>
+                        <label class="h4-primary mb-0 ml-1 cursor-pointer">View POD</label>
                     </div>
                 </a>
             }
@@ -356,10 +356,10 @@
                         <td class="sku">@item.LineNo</td>
                         <td class="product">@item.Description</td>
                         <td>@item.CustomerPartNo</td>
-                        <td>$@DoFormat(item.UnitPrice)</td>
+                        <td class="text-right">$@DoFormat(item.UnitPrice)</td>
                         <td class="text-center">@item.UOM</td>
-                        <td>$@DoFormat(item.TotalPrice)</td>
-                        <td>@string.Format("{0:N0}", item.TotalWeight)</td>
+                        <td class="text-right">$@DoFormat(item.TotalPrice)</td>
+                        <td class="text-right">@string.Format("{0:N0}", item.TotalWeight)</td>
                         <td>@Model.PoNo</td>
                         <td class="text-center">@item.Quantity</td>
                     </tr>
