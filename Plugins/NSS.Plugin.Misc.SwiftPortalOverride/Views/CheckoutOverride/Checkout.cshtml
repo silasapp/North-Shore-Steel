@@ -548,7 +548,8 @@ Content2 =
 
                     <div style="display:flex;justify-content: center;" class="place-order-buttons">
                         <button id="place-order" v-show="paymentMethodIndex !== shared.constants.PAYMENT_METHOD_PAYPAL"
-                                v-on:click="placeOrder" v-bind:disabled="disableSubmit || errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE">
+                                v-on:click="placeOrder" v-bind:disabled="disableSubmit || errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE ||
+                                (paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD && !this.paymentCard.cardHolderName)">
                             PLACE ORDER
                         </button>
                         <div id="paypal-button-container" v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL"></div>
@@ -690,8 +691,8 @@ Content2 =
         destroyed: function () {
             window.removeEventListener("resize", this.handleResize);
         },
-        mounted: function () {
-            this.setupCreditCardMethod();
+         mounted: function () {
+			this.setupCreditCardMethod();
             this.setupPaypalMethod();
             this.getShippingRate(true);
         },
