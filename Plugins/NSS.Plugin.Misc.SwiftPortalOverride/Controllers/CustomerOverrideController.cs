@@ -872,7 +872,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             int preferredLocationId = int.Parse(pLocationId);
 
             if (string.IsNullOrEmpty(cellPhone) && string.IsNullOrEmpty(model.Phone))
-                ModelState.AddModelError("", "Cell or Work Phone is required");
+                ModelState.AddModelError("", "Cell or Work Phone is required.");
 
             var oldCustomerModel = new CustomerInfoModel();
 
@@ -885,10 +885,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //custom customer attributes
             var customerAttributesXml = ParseCustomCustomerAttributes(form);
             var customerAttributeWarnings = _customerAttributeParser.GetAttributeWarnings(customerAttributesXml);
-            //foreach (var error in customerAttributeWarnings)
-            //{
-            //    ModelState.AddModelError("", error);
-            //}
+
 
             //GDPR
             if (_gdprSettings.GdprEnabled)
