@@ -51,6 +51,11 @@
         Formatting = Formatting.None
     });
 
+    var pickupPoints = JsonConvert.SerializeObject(Model.ShippingAddressModel.PickupPointsModel.PickupPoints, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
 
     var accountCredit = JsonConvert.SerializeObject(Model.AccountCreditModel, new JsonSerializerSettings
     {
@@ -141,7 +146,7 @@ Content1 =
             </div>
 
             <div class="d-flex flex-row mt-4 justify-content-end">
-                <button id="use-shipping" class="use-address disabled">
+                <button id="use-shipping" class="use-address">
                     Use Address
                 </button>
             </div>
@@ -254,10 +259,9 @@ Content2 =
                     <div class="d-flex flex-column mb-3" v-if="isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">Shipping Address</label>
                         <div class="d-flex flex-row flex-wrap" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
-                            <select type="text" class="bg-accent text-black px-2 py-2 address-dropdown" id="shippingAddress"
+                            <select type="text" class="bg-accent text-black px-2 py-2 address-dropdown w-75" id="shippingAddress"
                                     v-on:change="showNewShippingAddress = false; $event.target.value ? getShippingRate(false) : null;"
-                                    v-model="shippingAddressId"
-                                    v-bind:class="{'w-100': showNewShippingAddress, 'w-75': !showNewShippingAddress}">
+                                    v-model="shippingAddressId">
                                 <option v-bind:value="null">-Select Address-</option>
                                 <option v-bind:value="address.id" v-for="address in shared.shippingAddresses">
                                     {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
@@ -266,7 +270,7 @@ Content2 =
                                 </option>
                             </select>
                             <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
-                                    v-if="!showNewShippingAddress" v-on:click="handleShowNewShippingAddress(); shippingAddressId = null">
+                                    v-on:click="handleShowNewShippingAddress(); shippingAddressId = null">
                                 Use a new address
                             </button>
 
@@ -360,7 +364,7 @@ Content2 =
                             <h1 class="h5 text-primary font-weight-bold mt-3">Billing Address</h1>
                             <div class="d-flex flex-column mt-2" v-if="!shipToSameAddress || !isDelivery">
                                 <div class=" flex-row" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
-                                    <select type="text" class="bg-accent text-black px-2 py-2 nss-form-control w-75"
+                                    <select type="text" class="bg-accent text-black px-2 py-2 w-75"
                                             id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddressId">
                                         <option v-bind:value="null">-Select Address-</option>
                                         <option v-bind:value="address.id" v-for="address in shared.billingAddresses">
@@ -370,7 +374,7 @@ Content2 =
                                         </option>
                                     </select>
                                     <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
-                                            v-if="!showNewBillingAddress" v-on:click="handleShowNewBillingAddress(); billingAddressId = null">
+                                            v-on:click="handleShowNewBillingAddress(); billingAddressId = null">
                                         Use a new address
                                     </button>
                                 </div>
@@ -587,7 +591,7 @@ Content2 =
 <script>
     var shippingAddresses = @Html.Raw(shippingAddresses);
     var billingAddresses = @Html.Raw(billingAddresses);
-    var pickupPoints = "123";
+    var pickupPoints = @Html.Raw(pickupPoints);
     var accountCredit = @Html.Raw(accountCredit);
     var states = @Html.Raw(states);
     var cart = @Html.Raw(cart);
@@ -730,38 +734,76 @@ Content2 =
             handleShowNewBillingAddress: function () {
                 handleShowNewBillingAddress();
             },
+
+            saveBillingAddress: function () {
+                if (this.showNewBillingAddress) {
+                    if (!this.newBillingAddress.address1 || !this.newBillingAddress.city || !this.newBillingAddress.zipPostalCode ||
+                        !this.newBillingAddress.stateProvinceId) { this.showNewBillingAddress = false; return false; }
+                }
+
+                const request = {
+                    address1: this.newBillingAddress.address1,
+                    address2: this.newBillingAddress.address2,
+                    stateProvinceId: this.newBillingAddress.stateProvinceId,
+                    city: this.newBillingAddress.city,
+                    zipPostalCode: this.newBillingAddress.zipPostalCode,
+                    addressType: "billing"
+                };
+
+                billingAddressModal.hide();
+                self = this;
+
+                $.ajax({
+                    url: "@Url.Action("SaveNewAddress", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, _, _) {
+                        let address = JSON.parse(data.savedAddress)
+                        let filteredState = checkoutvm.shared.states.filter(fs => fs.id === address.stateProvinceId)
+                        address.stateProvinceName = filteredState.length > 0 ? filteredState[0].name : "";
+                        if (!data.isExist) {
+                            self.shared.shippingAddresses.push(address);
+                            self.shared.billingAddresses.push(address);
+                        }
+                        self.billingAddressId = address ? address.id : null;
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log('data-xhr', xhr)
+                    }
+                });
+
+            },
             saveShippingAddress: function () {
                 if (this.showNewShippingAddress && (!this.newShippingAddress.address1 ||
                     !this.newShippingAddress.city || !this.newShippingAddress.stateProvinceId ||
                     !this.newShippingAddress.zipPostalCode)) { this.showNewShippingAddress = false; return; }
 
-                let address;
-                if (this.isDelivery) {
-                    if (this.showNewShippingAddress) address = this.newShippingAddress;
-                }
                 const request = {
-                    address1: address.address1,
-                    address2: address.address2,
-                    stateProvinceId: address.stateProvinceId,
-                    city: address.city,
-                    zipPostalCode: address.zipPostalCode,
+                    address1: this.newShippingAddress.address1,
+                    address2: this.newShippingAddress.address2,
+                    stateProvinceId: this.newShippingAddress.stateProvinceId,
+                    city: this.newShippingAddress.city,
+                    zipPostalCode: this.newShippingAddress.zipPostalCode,
+                    addressType: "shipping"
                 };
 
                 shippingAddressModal.hide();
                 self = this;
 
                 $.ajax({
-                    url: "@Url.Action("SaveShippingAddress", "CheckoutOverride")",
+                    url: "@Url.Action("SaveNewAddress", "CheckoutOverride")",
                     type: 'POST',
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data, _, _) {
-                        let address = JSON.parse(data.shippingAddresses)
+                        let address = JSON.parse(data.savedAddress)
                         let filteredState = checkoutvm.shared.states.filter(fs => fs.id === address.stateProvinceId)
                         address.stateProvinceName = filteredState.length > 0 ? filteredState[0].name : "";
-                        if (!data.isExist)
+                        if (!data.isExist) {
                             self.shared.shippingAddresses.push(address);
-
+                            self.shared.billingAddresses.push(address);
+                        }
                         self.shippingAddressId = address ? address.id : null;
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
@@ -771,9 +813,6 @@ Content2 =
 
             },
             getShippingRate: function (disableSpinner) {
-                if (this.showNewShippingAddress && (!this.newShippingAddress.address1 ||
-                    !this.newShippingAddress.city || !this.newShippingAddress.stateProvinceId ||
-                    !this.newShippingAddress.zipPostalCode)) { this.showNewShippingAddress = false; return; }
 
                 if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) { this.showNewShippingAddress = false; return; }
 
@@ -802,7 +841,6 @@ Content2 =
 
                 if (self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
                     self.errorType = self.shared.constants.ERROR_TYPE_NONE;
-
 
 
                 $.ajax({
@@ -1098,17 +1136,14 @@ Content2 =
     $('#use-shipping').on('click', function () {
         checkoutvm.dirty = true;
         checkoutvm.showNewShippingAddress = true;
-        //let shippingFiltered = checkoutvm.shared.states.filter(m => m.id === checkoutvm.newShippingAddress.stateProvinceId)
-        //checkoutvm.newShippingAddress.stateProvinceName = shippingFiltered.length > 0 ? shippingFiltered[0].name : "";
         checkoutvm.saveShippingAddress();
         checkoutvm.getShippingRate();
 
     });
     $('#use-billing').on('click', function () {
+        checkoutvm.dirty = true;
         checkoutvm.showNewBillingAddress = true;
-        //let billingFiltered = checkoutvm.shared.states.filter(m => m.id === checkoutvm.newBillingAddress.stateProvinceId)
-        //checkoutvm.newBillingAddress.stateProvinceName = billingFiltered.length > 0 ? billingFiltered[0].name : "";
-        billingAddressModal.hide();
+        checkoutvm.saveBillingAddress();
     });
 </script>
 <ejs-scripts></ejs-scripts>

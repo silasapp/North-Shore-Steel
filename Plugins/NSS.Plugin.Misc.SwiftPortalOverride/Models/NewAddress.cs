@@ -18,5 +18,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public int? StateProvinceId { get; set; }
         public string City { get; set; }
         public string ZipPostalCode { get; set; }
+        public string AddressType { get; set; }
     }
 }
