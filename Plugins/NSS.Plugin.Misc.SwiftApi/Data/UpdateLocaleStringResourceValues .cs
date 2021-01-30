@@ -16,7 +16,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Change password.' Where [ResourceName] = 'Account.ChangePassword'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Email is not entered.' Where [ResourceName] = 'Account.ChangePassword.Errors.EmailIsNotProvided'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'The specified email could not be found.' Where [ResourceName] = 'Account.ChangePassword.Errors.EmailNotFound'");
-            Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Old password doesn\'t match.' Where [ResourceName] = 'Account.ChangePassword.Errors.OldPasswordDoesntMatch'");
+            Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Old password does not match.' Where [ResourceName] = 'Account.ChangePassword.Errors.OldPasswordDoesntMatch'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Password is not entered.' Where [ResourceName] = 'Account.ChangePassword.Errors.PasswordIsNotProvided'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'You entered the password that is the same as one of the last passwords you used. Please create a new password.' Where [ResourceName] = 'Account.ChangePassword.Errors.PasswordMatchesWithPrevious'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Password is required.' Where [ResourceName] = 'Account.ChangePassword.Fields.ConfirmNewPassword.Required'");
@@ -43,7 +43,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Data
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Change password' Where [ResourceName] = 'Account.ChangePassword'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Email is not entered' Where [ResourceName] = 'Account.ChangePassword.Errors.EmailIsNotProvided'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'The specified email could not be found' Where [ResourceName] = 'Account.ChangePassword.Errors.EmailNotFound'");
-            Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Old password doesn\'t match' Where [ResourceName] = 'Account.ChangePassword.Errors.OldPasswordDoesntMatch'");
+            Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Old password does not match' Where [ResourceName] = 'Account.ChangePassword.Errors.OldPasswordDoesntMatch'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Password is not entered' Where [ResourceName] = 'Account.ChangePassword.Errors.PasswordIsNotProvided'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'You entered the password that is the same as one of the last passwords you used. Please create a new password' Where [ResourceName] = 'Account.ChangePassword.Errors.PasswordMatchesWithPrevious'");
             Execute.Sql("Update [LocaleStringResource] Set [ResourceValue] = 'Password is required' Where [ResourceName] = 'Account.ChangePassword.Fields.ConfirmNewPassword.Required'");
