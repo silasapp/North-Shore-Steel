@@ -672,11 +672,11 @@ Content2 =
                 countryId: 1,
             },
             dirty: false,
-            subTotal: orderTotals.subTotal.replace("$", ""),
-            shippingAmount: orderTotals.shipping.replace("$", ""),
+            subTotal: orderTotals.subTotal?.replace("$", ""),
+            shippingAmount: orderTotals.shipping?.replace("$", ""),
             discountAmount: orderTotals.subTotalDiscount,
-            taxAmount: orderTotals.tax.replace("$", ""),
-            orderTotal: orderTotals.orderTotal.replace("$", ""),
+            taxAmount: orderTotals.tax?.replace("$", ""),
+            orderTotal: orderTotals.orderTotal?.replace("$", ""),
             disableSubmit: false,
             window: {
                 width: 0,
@@ -719,6 +719,9 @@ Content2 =
                 $('#custom-loading').hide();
             },
             formatMoney: function (input) {
+                if (!input)
+                    return input;
+
                 return input.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
@@ -835,6 +838,7 @@ Content2 =
                     stateProvinceId: address.stateProvinceId,
                     city: address.city,
                     zipPostalCode: address.zipPostalCode,
+                    pickupPointId: !this.isDelivery ? address.Id : null,
                 };
                 const self = this;
                 if (!disableSpinner)
@@ -850,9 +854,12 @@ Content2 =
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data, _, _) {
+                        console.log('shipping resp', data);
                         self.disableSubmit = false;
-                        self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
-                        self.orderTotal = data.orderTotal;
+                        //self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
+                        self.orderTotal = data.orderTotal?.replace("$", "");
+                        self.taxAmount = data.tax?.replace("$", "");
+                        self.shippingAmount = data.shipping?.replace("$", "");
                         self.deliveryDate = data.shippingCalculatorResponse.date ? data.shippingCalculatorResponse.date : 'N/A';
                         if (!data.shippingCalculatorResponse.allowed)
                             self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
@@ -911,6 +918,7 @@ Content2 =
                         checkoutPaymentMethodType: self.paymentMethodIndex,
                     },
                     hasError: false,
+                    deliveryDate: this.deliveryDate,
                 };
                 await $.ajax({
                     url: "@Url.Action("CreatePayPalOrder", "CheckoutOverride")",
@@ -961,6 +969,7 @@ Content2 =
                         checkoutPaymentMethodType: this.paymentMethodIndex,
                     },
                     hasError: false,
+                    deliveryDate: this.deliveryDate,
                 };
                 const self = this;
                 $.ajax({
