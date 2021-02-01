@@ -123,7 +123,7 @@
                         @if (isOperations || isBuyer)
                         {
                             <div class="col-md-7 col-sm-6 col-12 m-b2">
-                                <div class="tab-content" id="pills-tabContent" style="height: 22.7rem">
+                                <div class="tab-content @(Model.OpenOrders.Count > 0 ? "": "open-orders-bg")" id="pills-tabContent" style="height: 22.7rem">
                                     <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="height: 19.4rem">
                                         @if (Model.OpenOrders.Count > 0)
                                         {
@@ -360,7 +360,7 @@
         <div class="mt-2 mx-4">
             <div v-if="showRecentOrders">
                 <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                    <div class="text-center p-t6">
+                    <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
                         <div class="action">
                             <a href="/catalog">
                                 <button class="swift-color-btn" style="width: 159px;height: 53px;">
@@ -416,7 +416,7 @@
             </div>
             <div v-if="!showRecentOrders">
                 <div v-if="closedOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                    <div class="text-center p-t6">
+                    <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
                         <div class="action">
                             <a href="/catalog">
                                 <button class="swift-color-btn" style="width: 159px;height: 53px;">
