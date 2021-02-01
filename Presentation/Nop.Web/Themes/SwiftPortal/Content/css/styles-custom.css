@@ -1265,6 +1265,9 @@ table input {
     margin: 0;
 }
 
+.open-orders-bg {
+    background-image: url(../assets/shape-icon-pattern-bg.svg)
+}
 #accordion > .card {
     margin-top: 0.015rem;
     box-shadow: none !important;

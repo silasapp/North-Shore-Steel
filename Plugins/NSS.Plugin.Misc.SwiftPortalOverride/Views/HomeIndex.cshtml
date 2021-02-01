@@ -87,6 +87,9 @@
     .m-b2 {
         margin-bottom: 2rem;
     }
+    .p-t9 {
+        padding-top: 9rem;
+    }
 
     .p-t6 {
         padding: 5.7rem 0;
@@ -120,7 +123,7 @@
                         @if (isOperations || isBuyer)
                         {
                             <div class="col-md-7 col-sm-6 col-12 m-b2">
-                                <div class="tab-content" id="pills-tabContent" style="height: 22.7rem">
+                                <div class="tab-content @(Model.OpenOrders.Count > 0 ? "": "open-orders-bg")" id="pills-tabContent" style="height: 22.7rem">
                                     <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="height: 19.4rem">
                                         @if (Model.OpenOrders.Count > 0)
                                         {
@@ -153,12 +156,10 @@
                                         }
                                         else
                                         {
-                                            <div class="text-center p-t6">
-                                                <h2 class="nss-no-orders">You have not placed an</h2>
-                                                <h2 class="nss-no-orders">order in the last 30 days.</h2>
-                                                <div class="action pt-3">
+                                            <div class="text-center p-t9">
+                                                <div class="action">
                                                     <a href="/catalog">
-                                                        <button class="swift-color-btn">
+                                                        <button class="swift-color-btn" style="width: 159px;height: 53px;">
                                                             <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
                                                         </button>
                                                     </a>
@@ -176,7 +177,7 @@
                         {
 
                             <div class="col-md-5 col-sm-6 col-12 m-b2">
-                                <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-content" id="pills-tabContent" style="height: 22.7rem">
                                     <div class=" text-center tab-pane fade show active" id="" role="tabpanel" style="height:19.6rem" aria-labelledby="">
                                         <div class="card-title border-bottom-0">
                                             <h1 style="font: normal normal 500 34px/24px 'Teko';">STATISTICS</h1>
@@ -359,12 +360,10 @@
         <div class="mt-2 mx-4">
             <div v-if="showRecentOrders">
                 <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                    <div class="text-center p-t6">
-                        <h2 class="nss-no-orders">You have not placed an</h2>
-                        <h2 class="nss-no-orders">order in the last 30 days.</h2>
-                        <div class="action pt-3">
+                    <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
+                        <div class="action">
                             <a href="/catalog">
-                                <button class="swift-color-btn">
+                                <button class="swift-color-btn" style="width: 159px;height: 53px;">
                                     <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
                                 </button>
                             </a>
@@ -417,12 +416,10 @@
             </div>
             <div v-if="!showRecentOrders">
                 <div v-if="closedOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                    <div class="text-center p-t6">
-                        <h2 class="nss-no-orders">You have not placed an</h2>
-                        <h2 class="nss-no-orders">order in the last 30 days.</h2>
-                        <div class="action pt-3">
+                    <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
+                        <div class="action">
                             <a href="/catalog">
-                                <button class="swift-color-btn">
+                                <button class="swift-color-btn" style="width: 159px;height: 53px;">
                                     <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
                                 </button>
                             </a>
