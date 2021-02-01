@@ -299,11 +299,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                         {
                                             if (val.Name.ToLower() == "houston")
                                             {
-                                                val.Id = 1;
+                                                val.Id = 2;
                                             }
                                             else if (val.Name.ToLower() == "beaumont")
                                             {
-                                                val.Id = 2;
+                                                val.Id = 1;
                                             }
                                             request.PreferredLocationid = val.Id.ToString();
                                         }

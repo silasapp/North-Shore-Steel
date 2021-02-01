@@ -574,7 +574,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 State = shipStateProvince?.Abbreviation,
                 City = shippingCity,
                 PostalCode = shippingZipPostalCode,
-                PickupLocationId = model.ShippingAddress.IsPickupInStore ? (model.ShippingAddress.PickupPoint?.City?.ToLower() == "houston" ? 1 : (model.ShippingAddress.PickupPoint?.City?.ToLower() == "beaumont" ? 2 : 0)) : 0
+                PickupLocationId = model.ShippingAddress.IsPickupInStore ? (model.ShippingAddress.PickupPoint?.City?.ToLower() == "houston" ? 2 : (model.ShippingAddress.PickupPoint?.City?.ToLower() == "beaumont" ? 1 : 0)) : 0
             };
             return request;
         }
@@ -597,7 +597,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     State = _stateProvinceService.GetStateProvinceById(address.StateProvinceId ?? 0)?.Abbreviation,
                     City = address.City,
                     PostalCode = address.ZipPostalCode,
-                    PickupLocationId = address.IsPickup ? (address?.City?.ToLower() == "houston" ? 1 : (address?.City?.ToLower() == "beaumont" ? 2 : 0)) : 0
+                    PickupLocationId = address.IsPickup ? (address?.City?.ToLower() == "houston" ? 2 : (address?.City?.ToLower() == "beaumont" ? 1 : 0)) : 0
                 };
 
             var orderItems = new List<Item>();
@@ -857,7 +857,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 ShippingAddressCity = shippingAddress?.City,
                 ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
                 PickupInStore = order.PickupInStore,
-                PickupLocationId = order.PickupInStore && pickupAddress?.City?.ToLower() == "houston" ? 1 : order.PickupInStore && pickupAddress?.City?.ToLower() == "beaumont" ? 2 : (order.PickupInStore ? 1 : 0),
+                PickupLocationId = order.PickupInStore && pickupAddress?.City?.ToLower() == "houston" ? 2 : order.PickupInStore && pickupAddress?.City?.ToLower() == "beaumont" ? 1 : (order.PickupInStore ? 1 : 0),
 
                 DeliveryDate = deliveryDate ?? string.Empty,
                 ShippingTotal = Math.Round(order.OrderShippingExclTax, 2),
