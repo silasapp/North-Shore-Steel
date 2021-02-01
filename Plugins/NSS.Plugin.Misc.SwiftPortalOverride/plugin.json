@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Misc",
+  "FriendlyName": "Swift Portal Override",
+  "SystemName": "Misc.SwiftPortalOverride",
+  "Version": "1.00",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "Chaione team",
+  "DisplayOrder": 1,
+  "FileName": "NSS.Plugin.Misc.SwiftPortalOverride.dll",
+  "Description": "This plugin will override existing nopCommerce features and implement new features for the NSS Swift STore project"
+}

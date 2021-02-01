@@ -1,0 +1,1159 @@
+﻿@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using Nop.Core.Domain.Catalog
+@using Nop.Core.Domain.Orders
+@using Nop.Services.Common
+@using Nop.Core
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using Nop.Services.Catalog
+@using Nop.Services.Orders
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
+@using Syncfusion.EJ2
+
+@inject IGenericAttributeService genericAttributeService
+@inject IProductService productService
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
+@inject ICompanyService companyService
+@inject ICustomerCompanyProductService customerCompanyProductService
+@inject IProductAttributeParser productAttributeParser
+@inject IProductAttributeService productAttributeService
+@inject IShoppingCartService shoppingCartService
+@using Nop.Web.Framework.Themes
+@inject IThemeContext themeContext
+@model CheckoutCompleteOverrideModel
+@{
+    Layout = "_ColumnsOne";
+    var themeName = themeContext.WorkingThemeName;
+
+    //title
+    Html.AddTitleParts("Checkout");
+    //page class
+    Html.AppendPageCssClassParts("html-home-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/checkout.css");
+}
+
+@{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+    var shippingAddresses = JsonConvert.SerializeObject(Model.ShippingAddressModel.ExistingAddresses, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+
+    var billingAddresses = JsonConvert.SerializeObject(Model.BillingAddressModel.BillingAddress.ExistingAddresses, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+
+    var pickupPoints = JsonConvert.SerializeObject(Model.ShippingAddressModel.PickupPointsModel.PickupPoints, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+
+    var accountCredit = JsonConvert.SerializeObject(Model.AccountCreditModel, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+
+    var states = JsonConvert.SerializeObject(Model.StateProvinces, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+    var cart = JsonConvert.SerializeObject(Model.ShoppingCartModel, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+    var orderTotals = JsonConvert.SerializeObject(Model.OrderTotals, new JsonSerializerSettings
+    {
+        ContractResolver = contractResolver,
+        Formatting = Formatting.None
+    });
+}
+
+@{
+    var checkoutAttributes = Model.ShoppingCartModel.CheckoutAttributes;
+    var purchaseOrder = checkoutAttributes.FirstOrDefault(x => x.Name == "Purchase Order #")?.DefaultValue;
+    var shippingMethodsSelected = checkoutAttributes.FirstOrDefault(x => x.Name == "Delivery Option")?.Values;
+    var isDelivery = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Ship to Me")?.IsPreSelected ?? false;
+    var isPickup = shippingMethodsSelected?.FirstOrDefault(x => x.Name == "Pickup from North Shore Steel")?.IsPreSelected;
+}
+
+@{
+    var customer = workContext.CurrentCustomer;
+    CustomerCompany customerCompany = GetCustomerCompanyDetails();
+    var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
+}
+
+@Html.Raw(Model.PaypalScript)
+<style>
+    .paypal-button.paypal-button-color-blue, .paypal-button-row.paypal-button-color-blue .menu-button {
+        background: red !important;
+    }
+
+    select {
+        height: 100%;
+    }
+</style>
+@{
+    Func<object, object>
+Content1 =
+    @<div id="shippingAddressModal">
+        <div class="modal-body">
+            <div class="d-flex flex-row mt-3 justify-content-between flex-wrap  m-0">
+                <div class="d-flex flex-column checkout-new-address-field">
+                    <label class="fs-14 text-black mb-1">Address Line 1</label>
+                    <input type="text" class="nss-form-control shipping-input" v-model="newShippingAddress.address1" placeholder="Ex: 1234 Main St." />
+                    <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.address1">Address Line 1 is required.</label>
+                </div>
+                <div class="d-flex flex-column  checkout-new-address-field">
+                    <label class="fs-14 text-black mb-1">Address Line 2</label>
+                    <input type="text" class="nss-form-control shipping-input" v-model="newShippingAddress.address2" placeholder="Ex: Ste. 800" />
+                </div>
+            </div>
+            <div class=" d-flex flex-row justify-content-between flex-wrap  m-0">
+                <div class="d-flex flex-column  checkout-new-address-field mb-0">
+                    <label class="fs-14 text-black mb-1">City</label>
+                    <input type="text" class="nss-form-control shipping-input" v-model="newShippingAddress.city" placeholder="Ex: Dallas" />
+                    <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.city">City is required.</label>
+                </div>
+                <div class=" checkout-new-address-field d-flex flex-row flex-wrap justify-content-between">
+                    <div class="col-xs-12 col-md-7 d-flex flex-column p-0 mb-3">
+                        <label class="fs-14 text-black mb-1 shipping-input">State</label>
+                        <select type="text" class="nss-form-control" name="state" v-model="newShippingAddress.stateProvinceId">
+                            <option v-bind:value="null">-Select-</option>
+                            <option v-bind:value="option.id" v-for="option in shared.states">
+                                {{ option.name }}
+                            </option>
+                        </select>
+                        <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.stateProvinceId">State is required.</label>
+                    </div>
+                    <div class="col-xs-12 col-md-4 d-flex flex-column p-0">
+                        <label class="fs-14 text-black mb-1">Zip Code</label>
+                        <input type="text" class="nss-form-control shipping-input" v-model="newShippingAddress.zipPostalCode" placeholder="Ex: 77014" />
+                        <label class="text-danger mt-1 mb-0" v-if="isDelivery && dirty && !newShippingAddress.zipPostalCode">Zip Code is required.</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-row mt-4 justify-content-end">
+                <button id="use-shipping" class="use-address">
+                    Use Address
+                </button>
+            </div>
+        </div>
+    </div>;
+}@{
+    Func<object, object>
+Content2 =
+    @<div id="billingAddressModal">
+        <div class="modal-body">
+            <div class="d-flex flex-row mt-3">
+                <div class="d-flex flex-column w-50 mr-2">
+                    <label class="fs-14 text-black mb-1">Address Line 1</label>
+                    <input type="text" class="nss-form-control" v-model="newBillingAddress.address1" placeholder="Ex: 1234 Main St." />
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.address1">Address Line 1 is required.</label>
+                </div>
+                <div class="d-flex flex-column w-50 ml-2">
+                    <label class="fs-14 text-black mb-1">Address Line 2</label>
+                    <input type="text" class="nss-form-control" v-model="newBillingAddress.address2" placeholder="Ex: Ste. 800" />
+                </div>
+            </div>
+            <div class="row d-flex flex-row mt-4">
+                <div class="col-md-6 d-flex flex-column pr-2">
+                    <label class="fs-14 text-black mb-1">City</label>
+                    <input type="text" class="nss-form-control" v-model="newBillingAddress.city" placeholder="Ex: Dallas" />
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.city">City is required.</label>
+                </div>
+                <div class="col-md-4 d-flex flex-column px-2">
+                    <label class="fs-14 text-black mb-1">State</label>
+                    <select type="text" class="nss-form-control" v-model="newBillingAddress.stateProvinceId">
+                        <option v-bind:value="null">-Select-</option>
+                        <option v-bind:value="option.id" v-for="option in shared.states">
+                            {{ option.name }}
+                        </option>
+                    </select>
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.stateProvinceId">State is required.</label>
+                </div>
+                <div class="col-md-2 d-flex flex-column pl-2">
+                    <label class="fs-14 text-black mb-1">Zip Code</label>
+                    <input type="text" class="nss-form-control" v-model="newBillingAddress.zipPostalCode" placeholder="Ex: 77014" />
+                    <label class="text-danger mt-1 mb-0" v-if="dirty && !newBillingAddress.zipPostalCode">Zip Code is required.</label>
+                </div>
+            </div>
+            <div class="d-flex flex-row mt-4 justify-content-end">
+                <button id="use-billing" class="use-address">
+                    Use Address
+                </button>
+            </div>
+        </div>
+    </div>;
+}
+
+<div id="checkout" class="page home-page" v-cloak>
+    <div v-if="isMobile" class="edit-shop-container">
+        <button class="h6 text-primary edit-shop-mob" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
+            <img src="Themes/@themeName/Content/assets/return.svg" alt="" width="20" class="mr-2">
+            Edit Shopping Cart
+        </button>
+    </div>
+    <div class=page-title>
+        <h1>CHECKOUT</h1>
+    </div>
+    <div class="page-body">
+        <div class="row m-0" style="justify-content: space-between;">
+            <div class="col-md-9">
+                <div v-show="errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE">
+                    <div class="d-flex flex-row align-items-center mb-3 nss-alert-danger">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
+                        <span class="ml-2">We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select “Pickup”.</span>
+                    </div>
+                </div>
+                <div v-show="errorType === shared.constants.ERROR_TYPE_REGULAR">
+                    <div class="d-flex flex-row mb-3 nss-alert-danger">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
+                        <span class="ml-2">{{ errorMessage }}</span>
+                    </div>
+                </div>
+                <div v-show="errorType === shared.constants.ERROR_TYPE_CREDIT_CARD">
+                    <div class="d-flex flex-row align-items-start mb-3 nss-alert-danger">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
+                        <div class="ml-2">
+                            <span>The following error(s) occured:</span>
+                            <ul class="ml-3">
+                                <li v-for="error in errorMessages" style="list-style: disc">{{ error }}</li>
+                            </ul>
+                            <span class="ml-2">{{ errorMessage }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-mod">
+                    <label class="h5 text-primary mb-4" style="font:normal normal 500 26px/20px 'Teko';">DELIVERY OR PICKUP</label>
+                    <div class="mb-3 d-flex">
+                        <div class="mr-4">
+                            <label for="customer" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
+                                <input type="radio" id="customer" v-bind:checked="isDelivery" name="ship" value="customer" v-on:click="isDelivery = true; getShippingRate();">
+                                <span class="checkout-checkmark"></span>
+                                Deliver to me
+                            </label>
+                        </div>
+                        <div>
+                            <label for="pickup" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
+                                <input type="radio" id="pickup" v-bind:checked="!isDelivery" name="ship" value="pickup" v-on:click="isDelivery = false; getShippingRate()">
+                                <span class="checkout-checkmark"></span>
+                                Pickup
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column mb-3" v-if="isDelivery">
+                        <label for="shippingAddress" class="fs-14 text-black mb-1">Shipping Address</label>
+                        <div class="d-flex flex-row flex-wrap" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
+                            <select type="text" class="bg-accent text-black px-2 py-2 address-dropdown w-75" id="shippingAddress"
+                                    v-on:change="showNewShippingAddress = false; $event.target.value ? getShippingRate(false) : null;"
+                                    v-model="shippingAddressId">
+                                <option v-bind:value="null">-Select Address-</option>
+                                <option v-bind:value="address.id" v-for="address in shared.shippingAddresses">
+                                    {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
+                                    {{ address.city }}{{ address.city ? ', ' : '' }}
+                                    {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                </option>
+                            </select>
+                            <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
+                                    v-on:click="handleShowNewShippingAddress(); shippingAddressId = null">
+                                Use a new address
+                            </button>
+
+                        </div>
+                        <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required.</label>
+                    </div>
+                    <div class="d-flex flex-column mb-3" v-if="!isDelivery">
+                        <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
+                        <div class="d-flex flex-row flex-wrap">
+                            <select type="text" class="bg-accent text-black w-100 px-2 py-2 address-dropdown"
+                                    name="shipping-address" id="shippingAddress"
+                                    v-on:change="$event.target.value ? getShippingRate() : null;" v-model="pickupPointId">
+                                <option v-bind:value="null">-Select Address-</option>
+                                <option v-bind:value="address.id" v-for="address in shared.pickupPoints">
+                                    {{ address.name }}, {{ address.address }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                </option>
+                            </select>
+                        </div>
+                        <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Pickup Location is required.</label>
+                    </div>
+
+                </div>
+                <div class="card card-mod">
+                    <label class="h5 text-primary mb-4" style="font:normal normal 500 26px/20px 'Teko';">PAYMENT METHOD</label>
+                    <div class="d-flex flex-column mb-3">
+                        <div class="d-flex flex-row flex-wrap justify-content-between" v-if="isPaymentSelection">
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4"
+                                 v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD}"
+                                 v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_CREDIT_CARD">
+                                <img src="Themes/@themeName/Content/assets/credit-card.svg" alt="" width="24">
+                                <div class="d-flex flex-column ml-2">
+                                    <label class="fs-18 font-weight-bold mb-1">Credit/Debit</label>
+                                    <label class="fs-12 mb-0">Pay with credit/debit card</label>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4"
+                                 v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL}"
+                                 v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_PAYPAL">
+                                <img src="Themes/@themeName/Content/assets/paypal.svg" alt="" width="24">
+                                <div class="d-flex flex-column ml-2">
+                                    <label class="fs-18 font-weight-bold mb-1">Paypal</label>
+                                    <label class="fs-12 mb-0">Pay with PayPal account</label>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4"
+                                 v-bind:class="{
+                                 'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT,
+                                 'disabled': lineOfCreditDisabled
+                                 }"
+                                 v-on:click="lineOfCreditDisabled ? null : paymentMethodIndex = shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT"
+                                 v-if="shared.accountCredit.canCredit">
+                                <img src="Themes/@themeName/Content/assets/dollar.svg" alt="" width="24">
+                                <div class="d-flex flex-column ml-2">
+                                    <label class="fs-18 font-weight-bold mb-1">Line of Credit</label>
+                                    <label class="fs-12 mb-0">Balance: ${{ formatMoney(shared.accountCredit.creditAmount) }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD">
+                        <div class="d-flex flex-column">
+                            <div class="row d-flex flex-row mt-3">
+                                <div class="col-md-7 d-flex flex-column">
+                                    <label class="fs-14 text-black mb-1">Cardholder name</label>
+                                    <input id="cardholdername" type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
+                                    <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardHolderName">Cardholder name is required.</label>
+                                </div>
+                                <div class="col-md-4 d-flex" v-if="!isPaymentSelection">
+                                    <button class="fs-14 text-primary justify-content-end text-decoration-underline"
+                                            v-on:click="isPaymentSelection=true;">
+                                        View payment options
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row d-flex flex-row mt-3">
+                                <div class="col-md-6 d-flex flex-column">
+                                    <label for="card-number" class="fs-14 text-black mb-1">Card Number</label>
+                                    <div id="card-number" class="nss-form-control" style="height: 40px;"></div>
+                                </div>
+                                <div class="col-md-4 d-flex flex-column">
+                                    <label for="expiration-date" class="fs-14 text-black mb-1">Expiration Date</label>
+                                    <div id="expiration-date" class="nss-form-control" style="height: 40px;"></div>
+                                </div>
+                                <div class="col-md-2 d-flex flex-column">
+                                    <label for="cvv" class="fs-14 text-black mb-1">CVV</label>
+                                    <div id="cvv" class="nss-form-control" style="height: 40px;"></div>
+                                </div>
+                            </div>
+
+                            <h1 class="h5 text-primary font-weight-bold mt-3">Billing Address</h1>
+                            <div class="d-flex flex-column mt-2" v-if="!shipToSameAddress || !isDelivery">
+                                <div class=" flex-row" v-bind:class="{'d-block': isMobile, 'd-flex' : !isMobile}">
+                                    <select type="text" class="bg-accent text-black px-2 py-2 w-75"
+                                            id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddressId">
+                                        <option v-bind:value="null">-Select Address-</option>
+                                        <option v-bind:value="address.id" v-for="address in shared.billingAddresses">
+                                            {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
+                                            {{ address.city }}{{ address.city ? ', ' : '' }}
+                                            {{ address.stateProvinceName }} {{ address.zipPostalCode }}
+                                        </option>
+                                    </select>
+                                    <button class="fs-14 text-primary justify-content-end text-decoration-underline" v-bind:style="{'margin-top': isMobile ? '10px':'0'}" v-bind:class="{'w-100': isMobile, 'w-25' : !isMobile}"
+                                            v-on:click="handleShowNewBillingAddress(); billingAddressId = null">
+                                        Use a new address
+                                    </button>
+                                </div>
+                                <label class="text-danger mt-1 mb-0" v-if="dirty && !billingAddressId && !showNewBillingAddress">Billing address is required.</label>
+
+                            </div>
+
+                            <div class="mt-3 d-flex align-items-center" v-if="isDelivery">
+                                <label class="nss-checkbox mb-0 mr-3">
+                                    Same as shipping address
+                                    <input type="checkbox" v-bind:checked="shipToSameAddress"
+                                           v-on:change="shipToSameAddress = !shipToSameAddress;">
+                                    <span class="checkmark"></span>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL">
+                        <label class="text-primary">
+                            You will be redirected to a paypal page where you'll be able to make payment when you click "PLACE ORDER".
+                        </label>
+                    </div>
+                    <div v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT">
+                        <label class="text-primary">Line of credit payment method will be used when you click "PLACE ORDER".</label>
+                    </div>
+                </div>
+                <div class="d-flex flex-column">
+
+                    <div class=page-title>
+                        <h1>ORDER SUMMARY</h1>
+                    </div>
+                    @* Cart items - Web View *@
+                    <div v-if="!isMobile" class="table-wrapper">
+                        <table class="table table-striped nss-table checkout-table" id="catalogTable" onload="sortTable(0)">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Item #</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Customer Part #</th>
+                                    <th scope="col">Unit Price</th>
+                                    <th scope="col">Total Price</th>
+                                    <th scope="col">Weight (lb)</th>
+                                    <th scope="col" class="text-center">Qty.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.ShoppingCartModel.Items)
+                                {
+                                    var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
+
+                                    var product = productService.GetProductById(item.ProductId);
+                                    var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                                    var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                                    var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
+                                    var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
+                                    var uom = "EA";
+                                    if (mapping != null)
+                                        uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
+
+                                    var customerPathNo = "";
+                                    if (customerCompany != null)
+                                    {
+                                        var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
+                                        customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
+                                    }
+
+                                    var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                    var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                    string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                    var iNo = serialized == "True" ? itemTagNo : itemNo;
+
+                                    var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
+
+                                    <tr>
+                                        <td>@iNo</td>
+                                        <td>
+                                            @item.ProductName
+                                            @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                                {
+                                                    <div class="attributes">
+                                                        @Html.Raw(item.AttributeInfo)
+                                                    </div>
+                                                }*@
+                                        </td>
+                                        <td>@customerPathNo</td>
+                                        <td>@item.UnitPrice / @uom</td>
+                                        <td>@item.SubTotal</td>
+                                        <td>@DoFormat(totalWeight)</td>
+                                        <td class="text-center">@item.Quantity</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                    @* Cart items - Mobile View *@
+                    <div v-if="isMobile">
+                        @foreach (var item in Model.ShoppingCartModel.Items)
+                        {
+                            var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
+
+                            var product = productService.GetProductById(item.ProductId);
+                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+                            var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                            var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
+                            var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
+                            var uom = "EA";
+                            if (mapping != null)
+                                uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
+
+                            var customerPathNo = "";
+                            if (customerCompany != null)
+                            {
+                                var customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.CompanyId, item.ProductId);
+                                customerPathNo = customerCompanyProduct != null ? customerCompanyProduct.CustomerPartNo : "";
+                            }
+
+                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                            string serialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                            var iNo = serialized == "True" ? itemTagNo : itemNo;
+
+                            var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
+                            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <label class="fs12-primary-500">Item: @iNo</label>
+                                </div>
+                                <label class="h2-primary mt-3 mb-2 text-left">@item.ProductName</label>
+                                <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
+                                <label class="h5-default-500 text-left">Unit Price: @item.UnitPrice / @uom </label>
+                                <label class="h5-default-500 text-left">Total Price: @item.SubTotal </label>
+                                <label class="h5-default-500 text-left">Weight: @DoFormat(totalWeight) </label>
+                                <label class="h5-default-500 text-left">Quantity: @item.Quantity </label>
+
+                            </div>}
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-3" v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
+                <div class="card card-mod checkout-summary">
+                    <label class="fs-14 text-primary text-center" style="font:normal normal 500 18px/12px 'Teko';">ORDER SUMMARY</label>
+                    <div class="order-summary mt-2">
+                        <div class="price-summary">
+                            <label class="text-muted">@T("Order.SubTotal"):</label>
+                            <label class="text-black">${{ subTotal }}</label>
+                        </div>
+                        <div class="price-summary">
+                            <label class="text-muted">Shipping:</label>
+                            <label class="text-black">${{ formatMoney(shippingAmount) }}</label>
+                        </div>
+                        <div class="price-summary" v-if="discountAmount">
+                            <label class="text-muted">Discount:</label>
+                            <label class="text-black">{{ discountAmount }}</label>
+                        </div>
+                        <div class="price-summary">
+                            <label class="text-muted">Tax:</label>
+                            <label class="text-black">
+                                ${{ taxAmount }}
+                            </label>
+                        </div>
+                        <div class="price-summary">
+                            <label class="h5 text-black" style="font:normal normal 500 30px/20px 'Teko';">TOTAL</label>
+                            <label class="h5 text-black" style="font:normal normal 500 30px/20px 'Teko';">${{ formatMoney(orderTotal) }}</label>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content: center;" class="place-order-buttons">
+                        <button id="place-order" v-show="paymentMethodIndex !== shared.constants.PAYMENT_METHOD_PAYPAL"
+                                v-on:click="placeOrder" v-bind:disabled="disableSubmit || errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE ||
+                                (paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD && !this.paymentCard.cardHolderName)">
+                            PLACE ORDER
+                        </button>
+                        <div id="paypal-button-container" v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL"></div>
+                    </div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <button v-if="!isMobile" class="h6 text-primary" onclick="setLocation('@Url.Action("Cart", "CartOverride")')">
+                            <img src="Themes/@themeName/Content/assets/return.svg" alt="" width="20" class="mr-2">
+                            Edit Shopping Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onShippingDialogCreated").Header("NEW ADDRESS").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("800px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onBillingDialogCreated").Header("NEW ADDRESS").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("800px").Target("body").Render()
+</div>
+@functions{
+    string DoFormat(double myNumber)
+    {
+        var s = string.Format("{0:N0}", myNumber);
+
+        return s;
+    }
+
+    CustomerCompany GetCustomerCompanyDetails()
+    {
+        CustomerCompany customerCompany = new CustomerCompany();
+        var currentCustomer = workContext.CurrentCustomer;
+        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+        int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+
+        if (eRPCompanyId > 0)
+            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(currentCustomer.Id, eRPCompanyId);
+
+        return customerCompany;
+    }
+}
+<script>
+    var shippingAddresses = @Html.Raw(shippingAddresses);
+    var billingAddresses = @Html.Raw(billingAddresses);
+    var pickupPoints = @Html.Raw(pickupPoints);
+    var accountCredit = @Html.Raw(accountCredit);
+    var states = @Html.Raw(states);
+    var cart = @Html.Raw(cart);
+    var orderTotals = @Html.Raw(orderTotals);
+    var purchaseOrder = '@purchaseOrder';
+    var isDelivery = '@isDelivery' === 'True';
+
+    const store = {
+        state: {
+            shippingAddresses,
+            billingAddresses,
+            pickupPoints,
+            accountCredit,
+            states,
+            cart,
+            orderTotals,
+
+            constants: {
+                PAYMENT_METHOD_CREDIT_CARD: 1,
+                PAYMENT_METHOD_PAYPAL: 2,
+                PAYMENT_METHOD_LINE_OF_CREDIT: 3,
+
+                ERROR_TYPE_NONE: 0,
+                ERROR_TYPE_REGULAR: 1,
+                ERROR_TYPE_SHIPPING_RATE: 2,
+                ERROR_TYPE_ERP_PLACE_ORDER: 3,
+                ERROR_TYPE_CREDIT_CARD: 4,
+            },
+        },
+    };
+
+    var checkoutvm =new Vue({
+        el: '#checkout',
+        data: {
+            errorType: 0,
+            errorMessage: null,
+            errorMessages: [],
+            shared: store.state,
+            deliveryDate: null,
+            purchaseOrder,
+            isDelivery,
+            shippingAddressId: shippingAddresses.length > 0 ? shippingAddresses[0].id : null,
+            pickupPointId: pickupPoints.length > 0 ? pickupPoints[0].id : null,
+            showNewShippingAddress: false,
+            newShippingAddress: {
+                address1: null,
+                address2: null,
+                city: null,
+                stateProvinceId: null,
+                zipPostalCode: null,
+                saveToMyAddresses: false,
+                countryId: 1,
+            },
+            paymentMethodIndex: 1,
+            paymentCard: {
+                cardType: null,
+                cardHolderName: null,
+                cardNumber: null,
+                cardExpirationMonth: null,
+                cardExpirationYear: null,
+                expirationDate: null,
+                cardCode: null,
+            },
+            shipToSameAddress: true,
+            expirationMonths: [],
+            expirationYears: [],
+            billingAddressId: null,
+            showNewBillingAddress: false,
+            newBillingAddress: {
+                address1: null,
+                address2: null,
+                city: null,
+                stateProvinceId: null,
+                stateProvinceName: null,
+                zipPostalCode: null,
+                saveToMyAddresses: false,
+                countryId: 1,
+            },
+            dirty: false,
+            subTotal: orderTotals.subTotal?.replace("$", ""),
+            shippingAmount: orderTotals.shipping?.replace("$", ""),
+            discountAmount: orderTotals.subTotalDiscount,
+            taxAmount: orderTotals.tax?.replace("$", ""),
+            orderTotal: orderTotals.orderTotal?.replace("$", ""),
+            disableSubmit: false,
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isPaymentSelection: false,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+         mounted: function () {
+			this.setupCreditCardMethod();
+            this.setupPaypalMethod();
+            this.getShippingRate(true);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+            lineOfCreditDisabled: function () {
+                return this.shared.accountCredit.creditAmount < Number(this.orderTotal);
+            },
+            switchToPaymentSelection: function () {
+                isPaymentSelection = true;
+            }
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            showLoading: function () {
+                $('#custom-loading').show();
+            },
+            hideLoading: function () {
+                $('#custom-loading').hide();
+            },
+            formatMoney: function (input) {
+                if (!input)
+                    return input;
+
+                return input.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            },
+            formatDate: function (date) {
+                if (!date) return 'N/A';
+                const localTime = moment.utc(date).toDate();
+                return moment(localTime).format("MM/DD/YYYY");
+            },
+            handleShowNewShippingAddress: function () {
+                handleShowNewShippingAddress();
+            },
+            handleShowNewBillingAddress: function () {
+                handleShowNewBillingAddress();
+            },
+
+            saveBillingAddress: function () {
+                if (this.showNewBillingAddress) {
+                    if (!this.newBillingAddress.address1 || !this.newBillingAddress.city || !this.newBillingAddress.zipPostalCode ||
+                        !this.newBillingAddress.stateProvinceId) { this.showNewBillingAddress = false; return false; }
+                }
+
+                const request = {
+                    address1: this.newBillingAddress.address1,
+                    address2: this.newBillingAddress.address2,
+                    stateProvinceId: this.newBillingAddress.stateProvinceId,
+                    city: this.newBillingAddress.city,
+                    zipPostalCode: this.newBillingAddress.zipPostalCode,
+                    addressType: "billing"
+                };
+
+                billingAddressModal.hide();
+                self = this;
+
+                $.ajax({
+                    url: "@Url.Action("SaveNewAddress", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, _, _) {
+                        let address = JSON.parse(data.savedAddress)
+                        let filteredState = checkoutvm.shared.states.filter(fs => fs.id === address.stateProvinceId)
+                        address.stateProvinceName = filteredState.length > 0 ? filteredState[0].name : "";
+                        if (!data.isExist) {
+                            self.shared.shippingAddresses.push(address);
+                            self.shared.billingAddresses.push(address);
+                        }
+                        self.billingAddressId = address ? address.id : null;
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log('data-xhr', xhr)
+                    }
+                });
+
+            },
+            saveShippingAddress: function () {
+                if (this.showNewShippingAddress && (!this.newShippingAddress.address1 ||
+                    !this.newShippingAddress.city || !this.newShippingAddress.stateProvinceId ||
+                    !this.newShippingAddress.zipPostalCode)) { this.showNewShippingAddress = false; return; }
+
+                const request = {
+                    address1: this.newShippingAddress.address1,
+                    address2: this.newShippingAddress.address2,
+                    stateProvinceId: this.newShippingAddress.stateProvinceId,
+                    city: this.newShippingAddress.city,
+                    zipPostalCode: this.newShippingAddress.zipPostalCode,
+                    addressType: "shipping"
+                };
+
+                shippingAddressModal.hide();
+                self = this;
+
+                $.ajax({
+                    url: "@Url.Action("SaveNewAddress", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, _, _) {
+                        let address = JSON.parse(data.savedAddress)
+                        let filteredState = checkoutvm.shared.states.filter(fs => fs.id === address.stateProvinceId)
+                        address.stateProvinceName = filteredState.length > 0 ? filteredState[0].name : "";
+                        if (!data.isExist) {
+                            self.shared.shippingAddresses.push(address);
+                            self.shared.billingAddresses.push(address);
+                        }
+                        self.shippingAddressId = address ? address.id : null;
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log('data-xhr', xhr)
+                    }
+                });
+
+            },
+            getShippingRate: function (disableSpinner) {
+
+                if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) { this.showNewShippingAddress = false; return; }
+
+                this.disableSubmit = true;
+                let address;
+                if (this.isDelivery) {
+                    if (this.showNewShippingAddress) address = this.newShippingAddress;
+                    else address = this.shared.shippingAddresses.find(x => x.id === this.shippingAddressId);
+                } else {
+                    address = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
+                    address.address1 = address.address;
+                }
+
+
+                const request = {
+                    isPickup: !this.isDelivery,
+                    address1: address.address1,
+                    address2: address.address2,
+                    stateProvinceId: address.stateProvinceId,
+                    city: address.city,
+                    zipPostalCode: address.zipPostalCode,
+                    pickupPointId: !this.isDelivery ? address.Id : null,
+                };
+                const self = this;
+                if (!disableSpinner)
+                    this.showLoading();
+
+                if (self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
+                    self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+
+
+                $.ajax({
+                    url: "@Url.Action("GetShippingRate", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, _, _) {
+                        console.log('shipping resp', data);
+                        self.disableSubmit = false;
+                        //self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
+                        self.orderTotal = data.orderTotal?.replace("$", "");
+                        self.taxAmount = data.tax?.replace("$", "");
+                        self.shippingAmount = data.shipping?.replace("$", "");
+                        self.deliveryDate = data.shippingCalculatorResponse.date ? data.shippingCalculatorResponse.date : 'N/A';
+                        if (!data.shippingCalculatorResponse.allowed)
+                            self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
+
+                        if (!disableSpinner)
+                            self.hideLoading();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        self.showNewShippingAddress = false;
+                        self.disableSubmit = false;
+                        self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
+                        if (!disableSpinner)
+                            self.hideLoading();
+                    }
+                });
+            },
+
+            placeOrder: function () {
+
+                this.dirty = true;
+                if (this.paymentMethodIndex !== this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
+                    || this.errorType === this.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
+
+                this.errorType = this.shared.constants.ERROR_TYPE_NONE;
+                if (!this.validate()) return ;
+                this.showLoading();
+                this.finalizeOrder();
+            },
+            initializeOrder: async function () {
+                const self = this;
+                let orderId = '';
+                const shippingAddressId = self.shippingAddressId ? self.shippingAddressId : 0;
+                let shippingNewAddress = { ...self.newShippingAddress };
+                let pickupPoint = self.shared.pickupPoints.find(x => x.id === self.pickupPointId);
+
+                const shipToSameAddress = self.paymentMethodIndex === self.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
+                    ? true : self.shipToSameAddress;
+                const billingAddressId = shipToSameAddress ? shippingAddressId : (self.billingAddressId ? self.billingAddressId : 0);
+                const billingNewAddress = { ...self.newBillingAddress };
+
+                const request = {
+                    shippingAddress: {
+                        shippingNewAddress,
+                        pickupPoint,
+                        shippingAddressId,
+                        saveToAddressBook: self.newShippingAddress.saveToMyAddresses,
+                        isPickupInStore: !self.isDelivery,
+                    },
+                    billingAddress: {
+                        shipToSameAddress,
+                        billingNewAddress,
+                        billingAddressId,
+                        saveToAddressBook: self.newBillingAddress.saveToMyAddresses,
+                    },
+                    paymentMethodModel: {
+                        checkoutPaymentMethodType: self.paymentMethodIndex,
+                    },
+                    hasError: false,
+                    deliveryDate: this.deliveryDate,
+                };
+                await $.ajax({
+                    url: "@Url.Action("CreatePayPalOrder", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        if (data.error === self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR) {
+                            self.errorType = self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR;
+                            self.errorMessage = data.message;
+                        }
+
+                        orderId = data.orderId;
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        self.errorType = self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR;
+                        self.errorMessage = 'An error occured.';
+                    }
+                });
+                return orderId;
+            },
+            finalizeOrder: function () {
+                this.showLoading();
+                const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
+                let shippingNewAddress = {...this.newShippingAddress};
+                let pickupPoint = this.shared.pickupPoints.find(x => x.id === this.pickupPointId);
+
+                const shipToSameAddress = this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
+                    ? true : this.shipToSameAddress;
+                const billingAddressId = shipToSameAddress ? shippingAddressId : (this.billingAddressId ? this.billingAddressId : 0);
+                const billingNewAddress = {...this.newBillingAddress};
+
+                const request = {
+                    shippingAddress: {
+                        shippingNewAddress,
+                        pickupPoint,
+                        shippingAddressId,
+                        saveToAddressBook: this.newShippingAddress.saveToMyAddresses,
+                        isPickupInStore: !this.isDelivery,
+                    },
+                    billingAddress: {
+                        shipToSameAddress,
+                        billingNewAddress,
+                        billingAddressId,
+                        saveToAddressBook: this.newBillingAddress.saveToMyAddresses,
+                    },
+                    paymentMethodModel: {
+                        checkoutPaymentMethodType: this.paymentMethodIndex,
+                    },
+                    hasError: false,
+                    deliveryDate: this.deliveryDate,
+                };
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("PlaceOrder", "CheckoutOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        if (data?.error === 1) {
+                            alert(data.message);
+                            return;
+                        }
+                        if (data.error === self.shared.constants.ERROR_TYPE_ERP_PLACE_ORDER) {
+                            window.location.href = '/Rejected';
+                            return;
+                        }
+                        window.location.href = '/Completed';
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        self.hideLoading();
+                    }
+                });
+            },
+
+            validate: function () {
+                if ((!this.pickupPointId && !this.isDelivery) || (this.isDelivery && !this.showNewShippingAddress && !this.shippingAddressId))
+                    return false;
+                if (this.showNewShippingAddress && this.isDelivery) {
+                    if (!this.newShippingAddress.address1 || !this.newShippingAddress.city || !this.newShippingAddress.zipPostalCode ||
+                        !this.newShippingAddress.stateProvinceId)
+                        return false;
+                }
+                if (this.showNewBillingAddress) {
+                    if (!this.newBillingAddress.address1 || !this.newBillingAddress.city || !this.newBillingAddress.zipPostalCode ||
+                        !this.newBillingAddress.stateProvinceId)
+                        return false;
+                }
+                if (this.paymentMethodIndex === this.shared.constants.PAYMENT_METHOD_CREDIT_CARD) {
+                    if (!this.paymentCard.cardHolderName ||
+                        (this.isDelivery && !this.shipToSameAddress && !this.showNewBillingAddress && !this.billingAddressId) ||
+                        (!this.isDelivery && !this.showNewBillingAddress && !this.billingAddressId))
+                        return false;
+                }
+				return true;
+            },
+
+            setupCreditCardMethod: function () {
+                if (paypal.HostedFields.isEligible()) {
+                    const self = this;
+                    paypal.HostedFields.render({
+                        createOrder: async function () {
+                            return await self.initializeOrder();
+                        }, // replace order-ID with the order ID
+                        styles: {
+                            ':focus': {
+                                color: 'black',
+                            },
+                            '::placeholder': {
+                                'font- style': 'italic',
+                                'color': '#C3C3C3',
+                            }
+                        },
+                        fields: {
+                            number: {
+                                selector: '#card-number',
+                                placeholder: 'Ex: 0000 0000 0000 0000',
+                            },
+                            cvv: {
+                                selector: '#cvv',
+                                placeholder: 'Ex: 000',
+                            },
+                            expirationDate: {
+                                selector: '#expiration-date',
+                                placeholder: 'Ex: MM/YY',
+                            },
+                        },
+                    }).then(function (hf) {
+                        $('#place-order').click(function (event) {
+                            event.preventDefault();
+                            if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD || !self.validate() ||
+                                self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
+
+                            self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+                            self.showLoading();
+
+                            hf.submit({
+                                cardholderName: self.paymentCard.cardHolderName,
+                            }).then(function (data) {
+                                    self.finalizeOrder();
+                                })
+                                .catch(function (err) {
+                                    self.hideLoading();
+                                    self.errorMessage = err.message;
+                                    self.errorMessages = err.details.map(x => x.description);
+                                    self.errorType = self.shared.constants.ERROR_TYPE_CREDIT_CARD;
+                                });
+                        });
+                    });
+                } else {
+                    //$('#my-sample-form').hide(); // hides the advanced credit and debit card payments fields if merchant isn't eligible
+                }
+            },
+
+            setupPaypalMethod: function () {
+                const self = this;
+                paypal
+                    .Buttons({
+                        commit: false,
+                        style: {
+                            layout: 'vertical',
+                            color: 'blue',
+                            shape: 'rect',
+                        },
+                        onClick: function (e, actions) {
+                            self.dirty = true;
+                            if (!self.validate() || self.disableSubmit || self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE)
+                                return actions.reject();
+                            else return actions.resolve();
+                        },
+                        createOrder: async function (data, actions) {
+                            // This function sets up the details of the transaction, including the amount and line item details
+                            self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+                            return await self.initializeOrder();
+                        },
+                        onCancel: function (data) {
+                            // Show a cancel page, or return to cart
+                        },
+                        onApprove: function (data, actions) {
+                            // This function captures the funds from the transaction
+                            return self.finalizeOrder();
+                        },
+                    }).render('#paypal-button-container');
+            },
+            switchToPaymentSelection: function () {
+                isPaymentSelection = true;
+            }
+        },
+    });
+    function onShippingDialogCreated() {
+        shippingAddressModal = this;
+    }
+    function onBillingDialogCreated() {
+        billingAddressModal = this;
+    }
+
+    function handleShowNewShippingAddress() {
+        checkoutvm.newShippingAddress = {
+            address1: null,
+            address2: null,
+            city: null,
+            stateProvinceId: null,
+            zipPostalCode: null,
+            saveToMyAddresses: false,
+            countryId: 1,
+        }
+        shippingAddressModal.show();
+    }
+    function handleShowNewBillingAddress() {
+        checkoutvm.newBillingAddress = {
+            address1: null,
+            address2: null,
+            city: null,
+            stateProvinceId: null,
+            zipPostalCode: null,
+            saveToMyAddresses: false,
+            countryId: 1,
+        }
+        const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
+        for (var i = 0; i < elements.length; i++) {
+            $(elements[i]).removeClass("e-dlg-closeicon-btn");
+        }
+        billingAddressModal.show();
+    }
+    $('#use-shipping').on('click', function () {
+        checkoutvm.dirty = true;
+        checkoutvm.showNewShippingAddress = true;
+        checkoutvm.saveShippingAddress();
+        checkoutvm.getShippingRate();
+
+    });
+    $('#use-billing').on('click', function () {
+        checkoutvm.dirty = true;
+        checkoutvm.showNewBillingAddress = true;
+        checkoutvm.saveBillingAddress();
+    });
+</script>
+<ejs-scripts></ejs-scripts>

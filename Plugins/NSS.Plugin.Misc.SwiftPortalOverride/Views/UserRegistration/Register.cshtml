@@ -1,0 +1,400 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using Nop.Services.Customers
+@using NSS.Plugin.Misc.SwiftCore.Helpers;
+@using Syncfusion.EJ2
+@model RegisterModel
+@{
+    Layout = "";
+
+
+}
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Register").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-registration-page");
+}
+
+
+<style>
+    .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
+        width: 67rem !important;
+        margin: auto;
+        /*position: relative !important;*/
+        /*top: -126rem !important;*/
+    }
+
+    .ui-dialog {
+        width: 67rem !important;
+        bottom: 50px;
+        top: 50px !important;
+        left: 0;
+        position: fixed !important;
+        right: 0;
+        margin: auto;
+        height: 70% !important;
+    }
+
+        .ui-dialog .ui-dialog-content {
+            max-height: 100% !important;
+        }
+
+    .text-format {
+        font-weight: bold;
+        text-decoration: underline
+    }
+
+    .e-dlg-header {
+        color: #fff !important;
+        text-align: center;
+    }
+
+    .e-dialog .e-dlg-header {
+        width: 97% !important;
+    }
+
+    .ui-dialog .ui-dialog-title {
+        text-align: center !important;
+        margin: .6em 0;
+        font-size: 25px !important;
+        width: -webkit-fill-available !important;
+    }
+
+    .p-t4 {
+        padding-top: .4rem !important;
+    }
+
+    #ph-title {
+        display: none;
+    }
+</style>
+
+
+
+@{
+
+    Func<object, object>
+    Content2 =
+    @<div id="acceptTOSModal">
+        <div class="">
+            <p class="pt-4">Please accept the terms of service before the next step.</p>
+        </div>
+    </div>;
+}
+
+<div class="page registration-page">
+    <div class="page-title">
+        <h1>REGISTER</h1>
+    </div>
+
+    <div class="page-body">
+        <form asp-route="Register" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+            <div class="fieldset">
+
+                <div class="form-fields">
+                    <div class="title">
+                        <strong>PERSONAL INFORMATION</strong>
+                    </div>
+                    <div asp-validation-summary="ModelOnly" class="message-error" style="font-size:16px"></div>
+
+                    <div>
+                        <div class="form-group row">
+                            @if (Model.FirstNameEnabled)
+                            {
+                                <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                    <label asp-for="FirstName" class="nss-input-label">First Name</label>
+                                    <nop-required />
+                                    <input asp-for="FirstName" placeholder="Enter..." class="form-control custom-input" />
+                                    <span asp-validation-for="FirstName" style="display:flex;"></span>
+                                </div>
+                            }
+
+
+                            @if (Model.LastNameEnabled)
+                            {
+                                <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                                    <label asp-for="LastName" class="nss-input-label">Last Name</label>
+                                    <nop-required />
+                                    <input asp-for="LastName" placeholder="Enter..." class="form-control custom-input" />
+                                    <span asp-validation-for="LastName" style="display: flex;"></span>
+                                </div>
+                            }
+
+
+
+                        </div>
+
+
+                        <div class="form-group row">
+
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="Email" class="nss-input-label">Work Email</label>
+                                <nop-required />
+                                <input asp-for="Email" placeholder="Ex: john.smith@acme.com" class="form-control custom-input" />
+                                <span asp-validation-for="Email" style="display:flex;"></span>
+                            </div>
+
+                            @if (Model.EnteringEmailTwice)
+                            {
+                                <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                                    <label asp-for="ConfirmEmail" class="nss-input-label">Confirm Email</label>
+                                    <nop-required />
+                                    <input asp-for="ConfirmEmail" placeholder="Enter..." class="form-control custom-input" />
+                                    <span asp-validation-for="ConfirmEmail" style="display:flex;"></span>
+                                </div>
+                            }
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="Phone" class="nss-input-label">Work Phone</label>
+                                <nop-required />
+                                <input asp-for="Phone" id="work-phone" placeholder="Enter..." maxlength="14" class="form-control custom-input phone-number" />
+                                <span asp-validation-for="Phone" style="display:flex;"></span>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                                <label asp-for="CellPhone" class="nss-input-label">Cell Phone (Optional, used to send notifications via text messages.)</label>
+                                <input asp-for="CellPhone" id="cell-phone" placeholder="Enter..." maxlength="14" class="form-control custom-input phone-number" />
+                                <span asp-validation-for="CellPhone" style="display:flex;"></span>
+                                <label class="nss-gray">North Shore Steel won't share your Cell Phone Number with any other party.</label>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3">
+                                <label asp-for="Company" class="nss-input-label">Company Name</label>
+                                <nop-required />
+                                <input asp-for="Company" placeholder="Enter..." class="form-control custom-input" />
+                                <span asp-validation-for="Company" style="display:flex;"></span>
+                                <div class="pt-3">
+                                    <label class="pure-material-checkbox" id="current-customer">
+                                        <input onclick="customerCheck()" id="is_current_customer" asp-for="IsExistingCustomer" type="checkbox" />
+                                        <span class="checkmark"></span>
+                                        <span class="pl-2">I am a current customer.</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-12 col-xs-12 text-left mb-3" id="user_roles" style="display:none">
+                                <label asp-for="Company">Select Company Roles</label>
+                                <ul class="option-list d-flex">
+                                    <li>
+                                        <label class="pure-material-checkbox">
+                                            <input asp-for="BuyerRole" class="mb-2 checkmark" type="checkbox" checked />
+                                            <span class="checkmark"></span>
+                                            <label asp-for="BuyerRole" class="pr-3 p-t4" id="buyer_role">Buyer</label>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pure-material-checkbox">
+                                            <input asp-for="OperationsRole" class="mb-2 checkmark" type="checkbox" checked />
+                                            <span class="checkmark"></span>
+                                            <label asp-for="OperationsRole" class="pr-3 p-t4" id="operations_role">Operations</label>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pure-material-checkbox">
+                                            <input asp-for="APRole" class="mb-2 checkmark" type="checkbox" checked />
+                                            <span class="checkmark"></span>
+                                            <label asp-for="APRole" class="pr-3 p-t4" id="ap_role">AP</label>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="fieldset">
+                <div class="form-fields">
+                    <div class="title">
+                        <strong>OTHER INFORMATION</strong>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div style="margin-bottom: 2em">
+                                <label class="nss-input-label">How did you hear about us? (Optional)</label>
+                                <select asp-for="HearAboutUs" asp-items="Html.GetEnumSelectList<HearAboutUs>()" class="form-control custom-input about-us" onchange="otherMethodCheck(this);"> </select>
+                                <span asp-validation-for="HearAboutUs"></span>
+                            </div>
+
+                            <div style="margin-bottom: 2em">
+                                <div id="other-method" style="display:none">
+                                    <label class="nss-input-label"> Let us know how you found us</label>
+                                    <input asp-for="Other" placeholder="Enter how you found us" class="textbox form-control custom-input found-us" />
+                                    <label id="found-us-text-error" style="display:none" class="text-danger mt-1 mb-0">How you found us is required.</label>
+                                    @*<span asp-validation-for="Other" style="display:flex;"></span>*@
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="nss-input-label">Preferred pickup location (Optional)</label>
+                                <select asp-for="PreferredPickupLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
+                                <span asp-validation-for="PreferredPickupLocationId"></span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div>
+                                <label class="nss-input-label">How can we help? (Optional)</label>
+                                <textarea asp-for="ItemsForNextProject" placeholder="What items are you considering for your next project?" class="form-control custom-input"></textarea>
+                                <span asp-validation-for="ItemsForNextProject" style="display:flex;"></span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                @if (Model.AcceptPrivacyPolicyEnabled)
+                {
+                    <script asp-location="Footer">
+                                $(document).ready(function() {
+                                    $('#register-button').on('click', function () {
+                                        if ($(".help-text").val() == "") {
+                                            $("#help-text-error").css("display", "block")
+                                        } else {
+                                            $("#help-text-error").css("display", "none")
+                                        }
+                                        if ($("#found-us-container").is(":visible") && $(".found-us").val() == "") {
+                                            $("#found-us-text-error").css("display", "block")
+                                        } else {
+                                            $("#found-us-text-error").css("display", "none")
+                                        }
+                                        if (!validatePhoneNumbers()) {
+                                            return false;
+                                        }
+                                        if ($('#accept-consent').is(':checked')) {
+                                            //do some stuff
+                                            return true;
+                                        } else {
+                                            handleAcceptTOSModal();
+                                            //just show validation errors, don't post
+                                            //alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Account.Fields.AcceptPrivacyPolicy.Required").Text))');
+                                            return false;
+                                        }
+                                    });
+                                });
+                    </script>
+                    <div class="accept-consent">
+                        <label class="pure-material-checkbox">
+                            <input id="accept-consent" type="checkbox" name="accept-consent" />
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="pure-material-checkbox" style="padding-left:3px !important">
+                            @if (Model.AcceptPrivacyPolicyPopup)
+                            {
+                                <a class="read nss-input-label text-decoration-none">I have read and agree to the</a>
+                                <a class="read nss-input-label" id="read-tos">Terms and Conditions</a>
+                                <a class="read nss-input-label text-decoration-none">and</a>
+                                <a class="read nss-input-label" id="read-privacyinfo">Privacy Policy.</a>
+                                <script asp-location="Footer">
+                                    $(document).ready(function () {
+                                        $('#read-tos').on('click',
+                                            function (e) {
+                                            displayPopupContentFromUrl(
+                                                '@Url.RouteUrl("TopicPopup", new {SystemName = "ConditionsOfUse" })',
+                                                'TERMS AND CONDITIONS');
+                                        });
+                                    });
+                                    $(document).ready(function () {
+                                        $('#read-privacyinfo').on('click',
+                                            function (e) {
+                                            displayPopupContentFromUrl(
+                                                '@Url.RouteUrl("TopicPopup", new {SystemName = "PrivacyInfo" })',
+                                                'PRIVACY POLICY');
+                                        });
+                                    });
+                                </script>
+                            }
+                            else
+                            {
+                                @*<a class="read" id="read-privacyinfo" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("privacyinfo") })">@T("Account.Fields.AcceptPrivacyPolicy.Read")</a>*@
+                            }
+                        </label>
+                    </div>
+                }
+
+                <div class="buttons">
+                    <input type="submit" id="register-button" class="button-1 register-next-step-button" value="@T("Account.Register.Button")" name="register-button" />
+                </div>
+            </div>
+        </form>
+        <div class="external-authentication">
+            @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
+        </div>
+    </div>
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
+</div>
+
+
+
+<script>
+
+
+    function onAcceptCreated() {
+        acceptTOSModal = this;
+    }
+
+
+    function handleAcceptTOSModal() {
+        acceptTOSModal.show();
+    }
+
+    $(document).ready(function () {
+        const cellPhoneElement = document.getElementById('cell-phone');
+        const workPhoneElement = document.getElementById('work-phone');
+        cellPhoneElement.addEventListener('keydown', enforceFormat);
+        cellPhoneElement.addEventListener('keyup', formatToPhone);
+        workPhoneElement.addEventListener('keydown', enforceFormat);
+        workPhoneElement.addEventListener('keyup', formatToPhone);
+
+        var hearAboutUsContainer = $(".about-us");
+        if (hearAboutUsContainer.children("option:selected")[0].label == "Other") {
+            $("#found-us-container").css("display", "block")
+        } else {
+            $("#found-us-container").css("display", "none")
+        }
+    });
+
+    function otherMethodCheck(option) {
+        let optionName = option.options[option.selectedIndex].text;
+        if (optionName == "Other") {
+            document.getElementById("other-method").style.display = "block";
+        } else {
+            document.getElementById("other-method").style.display = "none";
+        }
+    }
+
+    function customerCheck(option) {
+        var checked = document.getElementById("is_current_customer").checked;
+        if (checked) {
+            document.getElementById("user_roles").style.display = "block";
+        } else {
+            document.getElementById("user_roles").style.display = "none";
+        }
+    }
+
+    function validatePhoneNumbers() {
+        var elements = document.getElementsByClassName("phone-number");
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].value != "") {
+                re = /^[(]\d{3}[)][\s.-]\d{3}[\s.-]\d{4}$/igm;
+                if (!re.test(elements[i].value)) {
+                    alert('Please enter a valid phone number.');
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+</script>
+<ejs-scripts></ejs-scripts>

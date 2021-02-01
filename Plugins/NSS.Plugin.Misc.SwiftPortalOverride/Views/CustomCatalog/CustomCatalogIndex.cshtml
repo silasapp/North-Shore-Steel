@@ -1,0 +1,742 @@
+﻿@using Syncfusion.EJ2
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using Nop.Services.Catalog
+@using Nop.Core.Domain.Orders
+@model CatalogModel
+
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts("Shop");
+
+    //page class
+    Html.AppendPageCssClassParts("html-home-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
+
+    var groupedSpecs = Model.AllFilters.GroupBy(sf => sf.SpecificationAttributeName).Select(x => x.OrderBy(y => y.SpecificationAttributeOptionName));
+    var shapesCountData = Model.PagingFilteringContext.ShapeFilter.FilterItems;
+}
+<style>
+    .clear-filter {
+        color: black;
+    }
+
+    .e-control.e-dialog.e-lib.e-dlg-modal.e-popup.e-popup-open {
+        max-height: 532px !important;
+    }
+
+    .shape-icon-img:hover {
+        transform: scale(1.05);
+    }
+
+    .shape-category {
+        display: grid !important;
+        grid-template-columns: repeat(6, 1fr);
+        grid-row-gap: 32px;
+        grid-column-gap: 24px;
+    }
+</style>
+<div id="app" class="page catalog-page" v-cloak>
+    <div v-show="filterTags.length === 0">
+        <div class="d-flex flex-column align-items-center text-center shapes-container">
+            <label class="h2-primary mb-4">SELECT A SHAPE</label>
+            <div class="d-flex flex-row flex-wrap px-5 shape-category">
+                <div class="d-flex flex-column align-items-center" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
+                    <img v-if="shape.icon" class="shape-icon-img" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
+                    <div v-if="!shape.icon" class="icon-shape"></div>
+                    <label class="h4-default-500 mt-2 font-weight-bolder">{{ shape.upperCaseName}}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-show="filterTags.length > 0">
+        <div class="page-body">
+            <div class="row">
+                <div class="col-lg-12 col-xl-3"></div>
+                <div class="col-lg-12 col-xl-9">
+                    <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
+                        <label class="h5-default-normal mb-2 mr-3">Applied Filters:</label>
+                        <div v-for="(tag, i) in filterTags" class="d-flex flex-row mb-2" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
+                            <span class="filter-tag">
+                                {{ tag.type === 'query' ? `"${tag.text}"` : tag.text }}
+                                <button v-on:click='removeFilter(tag)'>
+                                    <img alt="close icon" src="Themes/SwiftPortal/Content/assets/close-filled.svg" width="15" height="15" />
+                                </button>
+                            </span>
+                        </div>
+                        <div v-if="filterTags.length === 0" class="d-flex flex-row mb-2">
+                            <span class="filter-tag">None</span>
+                        </div>
+                        <button v-if="filterTags.length > 0" v-on:click="clearFilters" class="clear-filter mb-2">Clear filters</button>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-xl-3 shapes-treeview">
+
+                    <div class="cat-side-drawer" id="drawerPane">
+                        <div class="d-xl-none">
+                            <div class="bg-primary d-flex flex-row justify-content-center py-4 px-3">
+                                <label class="h2-white text-center mb-0 flex-fill">FILTERS</label>
+                                <img src="Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close filter"
+                                     v-on:click="closeFiltersDrawer" width="24">
+                            </div>
+                        </div>
+                        <div id="accordion">
+                            <div class="card">
+                                <a class="card-link" data-toggle="collapse" href="#collapseOne" id="shapes-header"
+                                   v-on:click="toggleHeader('shapes-header')">
+                                    <div class="card-header">SHAPES</div>
+                                </a>
+                                <div id="collapseOne" class="collapse show">
+                                    <div>
+                                        <div id="treeview"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card" style="display: flex" v-for="(specs, index) in defaultSpecs">
+                                <a :id="'default-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#default-spec-collapse-' + index"
+                                   v-on:click="toggleHeader('default-spec-header-' + index)">
+                                    <div class="card-header">{{ specs[0].name }}</div>
+                                </a>
+                                <div :id="'default-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
+                                    <div class="card-body">
+                                        <label class="pure-material-checkbox">
+                                            <input :id="'checkbox-' + spec.specificationAttributeOptionId"
+                                                   type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
+                                            <span class="checkmark"></span>{{ spec.displayName }} ({{ spec.count }})
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card" style="display: flex" v-if="showOtherSpecs" v-for="(specs, index) in otherSpecs">
+                                <a :id="'other-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#other-spec-collapse-' + index"
+                                   v-on:click="toggleHeader('other-spec-header-' + index)">
+                                    <div class="card-header">{{ specs[0].name }}</div>
+                                </a>
+                                <div :id="'other-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
+                                    <div class="card-body">
+                                        <label class="pure-material-checkbox">
+                                            <input :id="'checkbox-' + spec.specificationAttributeOptionId"
+                                                   type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
+                                            <span class="checkmark"></span>{{ spec.displayName }} ({{ spec.count }})
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-xl-9">
+
+                    <div id="partialview"></div>
+                    <div id="dialog"></div>
+                </div>
+            </div>
+        </div>
+        <div class="overlay-off-canvas" v-bind:style="{'display': isFilterOpen ? 'block' : 'none' }" v-on:click="closeFiltersDrawer"></div>
+
+        <div class="filter-options d-flex flex-row justify-content-around">
+            <div class="d-flex flex-row flex-fill p-3 align-items-center justify-content-center" v-on:click="openFiltersDrawer">
+                <img src="Themes/SwiftPortal/Content/assets/icn-filter.svg" alt="" width="20">
+                <label class="ml-1">Filters</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
+
+<script>
+   let dialogContent = `
+        <form id="sawOptionModal">
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-column mt-4 mb-2">
+                        <label class="nss-modal-title">SAW OPTIONS</label>
+                        <div class="d-flex flex-row">
+                            <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
+                                    class="mr-3 d-flex align-items-center cursor-pointer">
+                                <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
+                                        v-bind:value="option.id" v-model="sawOption">
+                                {{ option.name }}
+                            </label>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="d-flex flex-column">
+                        <label class="nss-modal-title">Work Order Instructions (tolerance, etc.)</label>
+                        <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
+                    </div>
+                    <hr />
+                    <div class="d-flex flex-row justify-content-between mb-3">
+                       <div class="d-flex flex-column">
+                            <label class="nss-modal-title">ITEM QUANTITY</label>
+                            <div class="d-flex flex-row">
+                                <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
+                                <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
+                                <button type="button" class="nss-btn-box" v-on:click="incrementQuantity">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row-reverse mt-4">
+                        <button type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
+                                v-on:click="addToCart">
+                            ADD TO CART
+                        </button>
+                    </div>
+                </div>
+            </form>
+        `;
+
+    let dialogHeader = `
+        <span class='dialog-header'>SAW OPTIONS FOR <span id='dialog-product-description'></span></span>
+    `;
+</script>
+
+<script>
+    const shapes = @Html.Raw(Serialize(Model.Shapes));
+    const specs = @Html.Raw(Serialize(groupedSpecs));
+    const shapesCountData = @Html.Raw(Serialize(shapesCountData));
+
+    console.log("shapes: ", shapes);
+    console.log("specs: ", specs);
+    console.log("shapesCountData: ", shapesCountData);
+
+    let gridData = [];
+    let gridColumns = [];
+    const store = {
+        state: {
+            groupedSpecs: specs,
+            groupedShapes: shapes,
+            defaultShapesCount: shapesCountData,
+
+            shapeIcon: {
+                angle: 'img-angle.svg',
+                beam: 'img-ibeam.svg',
+                channel: 'img-channel.svg',
+                flatbar: 'img-angle.svg',
+                pipe: 'img-pipe.svg',
+                roundbar: 'img-roundbar.svg',
+                squarebar: 'img-squarebar.svg',
+                hexbar: 'img-hexbar.svg',
+                rebar: 'img-rebar.svg',
+                tubing: 'img-tubing.svg',
+                expandedmetal: 'img-expanded-metal.svg',
+                grating: 'img-grating.svg',
+                platenonserialized: 'img-plate.svg',
+                sheet: 'img-sheet.svg',
+                cylinder: 'img-pipe.svg',
+                plateserialized: 'img-plate.svg',
+            },
+
+            constants: {
+                SPEC_TYPE_DEFAULT: 1,
+                SPEC_TYPE_OTHERS: 2,
+            },
+        },
+    }
+
+    const shopVm = new Vue({
+        el: '#app',
+        data: {
+            shared: store.state,
+            showShapeCategories: true,
+            specNames: [],
+            shapeNames: [],
+            specIDs: [],
+            shapeIDs: [],
+            filterTags: [],
+            groupedSpecs: [],
+            treeview: null,
+            checkedNodes: [],
+            dialog: null,
+
+            isFilterOpen: false,
+            sortOption: null,
+            sortOptions: [],
+
+            activeSpecGroup: null,
+
+            shouldRebuildShapes: false,
+            shouldRebuildSpecs: false,
+        },
+        mounted: function () {
+            this.buildDialog();
+            this.updateShapesCount(this.shared.defaultShapesCount);
+            this.buildTreeview();
+            this.prepareGroupedSpecs();
+
+            let query = getUrlParameter('q');
+            if (query) {
+                const tag = {
+                    id: query,
+                    text: query,
+                    type: 'query',
+                };
+                this.filterTags = [tag];
+
+                this.shouldRebuildShapes = true;
+                this.shouldRebuildSpecs = true;
+
+                this.getFilteredProduuts();
+            }
+        },
+        computed: {
+            topShapes: function () {
+                const shapes = this.shared.groupedShapes.filter(x => !x.parentId);
+                shapes.forEach(shape => {
+                    shape.icon = this.getShapeIcon(shape);
+                    shape.upperCaseName = shape.name.toUpperCase();
+                });
+                return shapes;
+            },
+            defaultSpecs: function () {
+                return this.groupedSpecs.filter(x => x && x[0] && x[0].type === this.shared.constants.SPEC_TYPE_DEFAULT);
+            },
+            otherSpecs: function () {
+                return this.groupedSpecs.filter(x => x && x[0] && x[0].type === this.shared.constants.SPEC_TYPE_OTHERS);
+            },
+            showOtherSpecs: function () {
+                return this.filterTags.some(x => x.type === 'shape' && (x.id === 13 || x.parentId === 13));
+            },
+        },
+        methods: {
+            showLoading: function () {
+                $('#custom-loading').show();
+            },
+            hideLoading: function () {
+                $('#custom-loading').hide();
+            },
+            prepareGroupedSpecs: function () {
+                this.shared.groupedSpecs.forEach((specs, index) => {
+
+                    // Handle Thickness sorting
+                    const isThicknessGroup = specs.some(x => x.specificationAttributeName === 'thickness');
+                    if (isThicknessGroup) {
+                        specs.forEach(spec => {
+                            let value = spec.specificationAttributeOptionName;
+
+                            spec.sort = Number(value);
+                        });
+                        specs.sort((a, b) => a.sort - b.sort);
+                    }
+                    // Handle Minimum Width sorting
+                    const isWidthGroup = specs.some(x => x.specificationAttributeName === 'width');
+                    if (isWidthGroup) {
+                        specs.forEach(spec => {
+                            let value = spec.specificationAttributeOptionName;
+
+                            spec.sort = Number(value);
+                        });
+                        specs.sort((a, b) => a.sort - b.sort);
+                    }
+                    specs.forEach(spec => {
+                        let name = '';
+                        let type = this.shared.constants.SPEC_TYPE_OTHERS;
+                        switch (spec.specificationAttributeName) {
+                            case "coating":
+                                name = "COATING";
+                                type = this.shared.constants.SPEC_TYPE_DEFAULT;
+                                break;
+                            case "condition":
+                                name = "CONDITION";
+                                break;
+                            case "countryOfOrigin":
+                                name = "COUNTRY OF ORIGIN";
+                                break;
+                            case "thickness":
+                                name = "THICKNESS (in)";
+                                break;
+                            case "width":
+                                name = "MINIMUM WIDTH (in)";
+                                break;
+                            case "grade":
+                                name = "GRADES";
+                                break;
+                            case "metal":
+                                name = "METAL";
+                                type = this.shared.constants.SPEC_TYPE_DEFAULT;
+                                break;
+                            default:
+                                name = spec.specificationAttributeName;
+                                break;
+                        }
+                        spec.name = name;
+                        spec.type = type;
+                        spec.displayName = `${spec.specificationAttributeOptionName}`;
+                        spec.checked = this.filterTags.some(x => x.type === 'spec' && x.id === spec.specificationAttributeOptionId);
+                        spec.count = 0;
+                    });
+                });
+                this.groupedSpecs = this.shared.groupedSpecs;
+            },
+            updateSpecsCount: function (specsCount) {
+                console.log("updateSpecsCount: ", specsCount, this.activeSpecGroup);
+                this.shared.groupedSpecs.forEach(specs => {
+                    if (specs[0].specificationAttributeName !== this.activeSpecGroup) {
+                        specs.forEach(spec => {
+                            const data = specsCount.find(x => x.specificationAttributeOptionId === spec.specificationAttributeOptionId);
+                            spec.count = data && data.productCount ? data.productCount : 0;
+                        });
+                    }
+                });
+                this.groupedSpecs = this.shared.groupedSpecs.map(specs => {
+                    specs = specs.filter(x => x.count > 0);
+                    return specs.map(spec => spec)
+                });
+            },
+
+            getShapeIcon: function (shape) {
+                const name = shape.name.replaceAll(' ', '').replaceAll('-', '').toLowerCase();
+                return this.shared.shapeIcon[name];
+            },
+
+            handleCategoryClicked: function (shape) {
+                shape.isChecked = 'true';
+                this.toggleShape(shape);
+            },
+
+            buildDialog: function () {
+                this.dialog = new ej.popups.Dialog({
+                    header: dialogHeader,
+                    content: dialogContent,
+                    target: 'body',
+                    showCloseIcon: true,
+                    visible: false,
+                    width: '650px',
+                    isModal: true,
+                });
+                this.dialog.appendTo('#dialog');
+            },
+            buildTreeview: function () {
+                ej.base.enableRipple(false);
+
+                //Initialize TreeView component
+                this.treeview = new ej.navigations.TreeView({
+                    fields: { dataSource: this.shared.groupedShapes, id: 'id', parentID: 'parentId', text: 'displayName', hasChildren: 'hasChild' },
+                    showCheckBox: true, autoCheck: false, cssClass: 'custom', nodeChecked: this.nodeChecked,
+                });
+
+                //Render initialized TreeView
+                this.treeview.appendTo("#treeview");
+            },
+
+            nodeChecked: function (args) {
+                if (!args.isInteracted) return;
+                this.toggleShape(args.data[0]);
+            },
+            toggleShape: function (node) {
+                const shape = this.shared.groupedShapes.find(x => x.id == node.id);
+                let resultShapes = [];
+                let resultNodes = [];
+
+                if (node.isChecked === 'true') {
+                    if (!shape.parentId) { // topmost node
+                        resultShapes = this.shared.groupedShapes.filter(x => x.parentId === shape.id || x.id === shape.id);
+                        resultNodes = resultShapes.map(x => x.id.toString());
+                    } else { // child node
+                        const children = this.shared.groupedShapes.filter(x => x.parentId === shape.parentId).map(x => x.id.toString());
+                        let checkedNodes = this.treeview.checkedNodes.filter(x => children.includes(x));
+                        const allChildrenSelected = children.length === checkedNodes.length;
+                        if (allChildrenSelected)
+                            checkedNodes = [...checkedNodes, node.parentID];
+                        resultNodes = [...checkedNodes];
+                        resultShapes = this.shared.groupedShapes.filter(x => resultNodes.includes(x.id.toString()));
+                    }
+                } else {
+                    if (!shape.parentId) { // topmost node
+                        resultNodes = [];
+                        resultShapes = [];
+                    } else { // child node
+                        const checkedNodes = this.treeview.checkedNodes;
+                        resultNodes = checkedNodes.filter(x => x !== node.id && x !== node.parentID);
+                        resultShapes = this.shared.groupedShapes.filter(x => resultNodes.includes(x.id.toString()));
+                    }
+                }
+                const shapeFilters = resultShapes.map(shape => {
+                    return { id: shape.id, parentId: shape.parentId, text: shape.name, type: 'shape' };
+                });
+                this.filterTags = this.filterTags.filter(x => x.type !== 'shape');
+                this.filterTags = [...this.filterTags, ...shapeFilters];
+
+                this.activeSpecGroup = null;
+                this.shouldRebuildShapes = this.filterTags.some(x => x.type !== 'shape');
+                this.shouldRebuildSpecs = true;
+
+                this.getFilteredProduuts();
+            },
+            toggleSpec: function (spec) {
+                console.log("spec: ", spec);
+                spec.checked = !spec.checked;
+                if (spec.checked) {
+                    const tag = {
+                        id: spec.specificationAttributeOptionId,
+                        text: spec.specificationAttributeOptionName,
+                        type: 'spec',
+                        data: spec,
+                    };
+                    this.filterTags = [...this.filterTags, tag];
+                } else {
+                    this.filterTags = this.filterTags.filter(x => x.id !== spec.specificationAttributeOptionId || x.type !== 'spec');
+                }
+
+                this.activeSpecGroup = spec.specificationAttributeName;
+                this.shouldRebuildShapes = true;
+                this.shouldRebuildSpecs = true;
+
+                this.getFilteredProduuts();
+            },
+
+            removeFilter: function (tag) {
+                const { id, type, data } = tag;
+                console.log("removeFilter: ", this.filterTags);
+                if (this.filterTags.length === 1) {
+                    this.clearFilters();
+                    return;
+                }
+                if (type === 'shape') {
+                    const parentID = this.shared.groupedShapes.find(x => x.id === id).parentId;
+                    const shapeData = {
+                        id: id.toString(),
+                        parentID: parentID ? parentID.toString() : null,
+                        isChecked: 'false',
+                    };
+                    this.toggleShape(shapeData);
+                } else if (type === 'spec') {
+                    this.toggleSpec(data);
+                } else if (type === 'query') {
+                    this.filterTags = this.filterTags.filter(x => x.type !== 'query');
+                    window.history.pushState({}, document.title, window.location.pathname);
+
+                    this.activeSpecGroup = null;
+                    this.shouldRebuildShapes = true;
+                    this.shouldRebuildSpecs = true;
+
+                    this.getFilteredProduuts();
+                }
+            },
+            clearFilters: function () {
+                this.filterTags = [];
+                if (this.treeview) this.treeview.uncheckAll();
+                this.groupedSpecs.forEach(specs => specs.forEach(spec => spec.checked = false));
+
+                window.history.pushState("object or string", "Title", "/" + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]);
+
+                this.shouldRebuildShapes = false;
+                this.shouldRebuildSpecs = false;
+
+                this.updateShapesCount(this.shared.defaultShapesCount);
+                this.resetTreeview();
+            },
+
+            getFilteredProduuts: function () {
+                this.showLoading();
+
+                let searchKeyword = getUrlParameter('q');
+                const shapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
+                let activeShapeAttributes = [];
+                let sawOption = false;
+                if (shapeIds.length > 0) {
+                    const shape = this.shared.groupedShapes.find(x => x.id === shapeIds[0]);
+                    activeShapeAttributes = shape.shapeAttributes;
+                    sawOption = shape.sawOption;
+                }
+                const specIds = this.filterTags.filter(x => x.type === 'spec').map(x => x.id);
+                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes, sawOption };
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(filterParams),
+                    success: function (data) {
+                        if (data != null) {
+                            $('#partialview').html(data.partialView);
+
+                            if (self.shouldRebuildShapes) {
+                                self.updateShapesCount(JSON.parse(data.shapes));
+                            }
+                            self.resetTreeview();
+                            if (self.shouldRebuildSpecs) {
+                                self.updateSpecsCount(JSON.parse(data.specs));
+                            }
+                        }
+                        self.hideLoading();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        $('#partialview').html('an error has occured here');
+                        self.hideLoading();
+                    }
+                });
+                this.closeFiltersDrawer();
+            },
+
+            updateShapesCount: function (shapes) {
+                this.shared.groupedShapes = this.shared.groupedShapes.map(groupedShape => {
+                    const { id, name, parentId, hasChild } = groupedShape;
+                    let shapeCount = 0;
+                    if (!parentId && hasChild) {
+                        const children = this.shared.groupedShapes.filter(x => x.parentId === id).map(x => x.id);
+                        const childrenCount = shapes.filter(x => children.includes(x.shapeId)).map(x => x.productCount);
+                        shapeCount = childrenCount.reduce((a, b) => a + b, 0);
+                    } else {
+                        const shape = shapes.find(x => x.shapeId === id);
+                        shapeCount = shape && shape.productCount ? shape.productCount : 0;
+                    }
+                    groupedShape.displayName = `${name} (${shapeCount})`;
+                    return groupedShape;
+                });
+            },
+
+            resetTreeview: function () {
+                const filterShapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
+                this.shared.groupedShapes = this.shared.groupedShapes.map(shape => {
+                    const childrenIds = this.shared.groupedShapes.filter(x => x.parentId === shape.id).map(x => x.id);
+                    const exists = childrenIds.some(x => filterShapeIds.includes(x));
+                    shape.expanded = exists;
+                    shape.isChecked = filterShapeIds.includes(shape.id);
+                    return shape;
+                });
+                this.treeview.fields = {
+                    dataSource: this.shared.groupedShapes, id: 'id', parentID: 'parentId',
+                    text: 'displayName', hasChildren: 'hasChild',
+                };
+            },
+
+            toggleHeader: function (id) {
+                const collapsed = $('#' + id).hasClass('collapsed');
+                if (collapsed) $('#' + id).removeClass('collapsed');
+                else $('#' + id).addClass('collapsed');
+            },
+
+            openFiltersDrawer: function () {
+                const drawer = document.getElementById("drawerPane");
+                drawer.style.width = '351px';
+                drawer.style.maxWidth = '90%';
+                drawer.style.minWidth = '30%';
+                drawer.style.transform = 'translateX(0)';
+                this.isFilterOpen = true;
+            },
+            closeFiltersDrawer: function () {
+                const drawer = document.getElementById("drawerPane");
+                drawer.style.width = '0px';
+                drawer.style.minWidth = '0px';
+                this.isFilterOpen = false;
+            },
+
+            buildSortOptions: function (columns) {
+                let retVal = [];
+                const itemNo = columns.find(x => x.code.toLowerCase() === 'itemno');
+                const itemName = columns.find(x => x.code.toLowerCase() === 'itemname');
+                const tagNo = columns.find(x => x.code.toLowerCase() === 'itemtagno');
+                if (itemNo) {
+                    const { displayName, sort } = itemNo;
+                    const ascColumn = { name: `${displayName}: Ascending`, sort, sortType: 'Ascending' };
+                    const descColumn = { name: `${displayName}: Descending`, sort, sortType: 'Descending' };
+                    retVal = [...retVal, ascColumn, descColumn];
+                }
+                if (itemName) {
+                    const { displayName, sort } = itemName;
+                    const ascColumn = { name: `${displayName}: Ascending`, sort, sortType: 'Ascending' };
+                    const descColumn = { name: `${displayName}: Descending`, sort, sortType: 'Descending' };
+                    retVal = [...retVal, ascColumn, descColumn];
+                }
+                if (tagNo) {
+                    const { displayName, sort } = tagNo;
+                    const ascColumn = { name: `${displayName}: Ascending`, sort, sortType: 'Ascending' };
+                    const descColumn = { name: `${displayName}: Descending`, sort, sortType: 'Descending' };
+                    retVal = [...retVal, ascColumn, descColumn];
+                }
+                this.sortOptions = retVal;
+            },
+            handleSortChanged: function () {
+                gridVm.grid.sortColumn(this.sortOption.sort.toLowerCase(), this.sortOption.sortType, false);
+            },
+        },
+    });
+
+    const modalVm = new Vue({
+        el: '#sawOptionModal',
+        data: {
+            currentProductDescription: 'Init',
+            sawOptionControlId: null,
+            sawOptions: [],
+            sawOption: null,
+            workOrderInstructions: null,
+            workOrderInstructionsId: null,
+            quantity: 0,
+            quantityId: 0,
+            productId: null,
+        },
+        methods: {
+            handleSawOption: function (productId, attributes, productName) {
+                const at = JSON.parse(attributes);
+                $('#dialog-product-description').html(productName);
+                let qty = $('#qty' + productId).val();
+                const cutOptions = at.find(x => x.name === "Cut Options");
+                const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
+                this.quantity = qty ? qty : 1;
+                this.productId = productId;
+                this.sawOptionControlId = prefix + cutOptions.id;
+                this.sawOptions = cutOptions.values;
+                this.sawOption = cutOptions.values.find(x => x.isPreSelected)?.id || cutOptions.values.find(e => true)?.id;
+                this.workOrderInstructions = null;
+                this.workOrderInstructionsId = prefix + at.find(x => x.name === "Work Order Instructions")?.id;
+                shopVm.dialog.show();
+            },
+
+            addToCart: function () {
+                let request = {
+                    [this.sawOptionControlId]: this.sawOption,
+                    [this.workOrderInstructionsId]: this.workOrderInstructions,
+                    [`addtocart_${this.productId}.EnteredQuantity`]: this.quantity,
+                };
+                shopVm.dialog.hide();
+                shopVm.showLoading();
+                $.ajax({
+                    cache: false,
+                    url: `/addproducttocart/details/${this.productId}/@Html.Raw((int)ShoppingCartType.ShoppingCart)`,
+                    type: 'POST',
+                    data: request,
+                    success: function (data) {
+                        shopVm.hideLoading();
+                        if (data != null) {
+                            AjaxCart.success_process(data);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        shopVm.hideLoading();
+                    }
+                });
+            },
+
+            incrementQuantity: function () {
+                this.quantity = Number(this.quantity) + 1;
+            },
+            decrementQuantity: function () {
+                this.quantity = this.quantity > 1 ? Number(this.quantity) - 1 : 1;
+            },
+        },
+    });
+
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    };
+</script>
+<ejs-scripts></ejs-scripts>

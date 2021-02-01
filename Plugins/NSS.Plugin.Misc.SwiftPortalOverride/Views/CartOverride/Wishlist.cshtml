@@ -1,0 +1,595 @@
+@using Nop.Web.Models.ShoppingCart
+@model WishlistModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Web.Framework.Themes
+@using Nop.Services.Catalog
+@using Nop.Services.Common
+@using Nop.Core.Domain.Catalog
+@using Nop.Core.Domain.Orders
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
+@inject IWebHelper webHelper
+@inject IWorkContext workContext
+@inject IThemeContext themeContext
+@inject IProductService productService
+@inject IGenericAttributeService genericAttributeService
+@inject IProductAttributeService productAttributeService
+@inject IShapeService shapeService
+@using Syncfusion.EJ2
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Wishlist").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-wishlist-page");
+    Html.AddCssFileParts("~/Plugins/Misc.SwiftPortalOverride/Content/catalog.css");
+}
+
+@{
+    var themeName = themeContext.WorkingThemeName;
+    var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    var eRPCompanyId = genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey);
+    var eRPCompanyIdExist = false;
+    eRPCompanyIdExist = !string.IsNullOrEmpty(eRPCompanyId) && true;
+}
+
+<style>
+    .hover-icon {
+        margin-right: 0.5rem;
+    }
+</style>
+@{
+    Func<object, object>
+Content1 =
+    @<form id="sawOptionModal">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <label class="h4-default-500-teko mb-1">SAW OPTIONS</label>
+                <div class="d-flex flex-row">
+                    <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
+                           class="mr-3 d-flex align-items-center cursor-pointer mb-0">
+                        <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
+                               v-bind:value="option.id" v-model="sawOption">
+                        {{ option.name }}
+                    </label>
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex flex-column">
+                <label class="h4-primary-500-teko mb-1">WORK ORDER INSTRUCTIONS</label>
+                <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
+            </div>
+            <hr />
+            <div class="d-flex flex-row justify-content-between mb-3">
+                <div class="d-flex flex-column">
+                    <label class="h4-primary-500-teko mb-1">ITEM QUANTITY</label>
+                    <div class="d-flex flex-row">
+                        <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
+                        <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
+                        <button type="button" class="nss-btn-box" v-on:click="incrementQuantity">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-row-reverse mt-4">
+                <button type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
+                        v-on:click="addToCart">
+                    ADD TO CART
+                </button>
+            </div>
+        </div>
+    </form>;
+}
+<div id="wishlist" class="page wishlist-page">
+    <div class="page-title">
+
+        @if (Model.IsEditable)
+        {
+            <h1>FAVORITE ITEMS</h1>
+        }
+        else
+        {
+            <h1>Favorite Items of @Model.CustomerFullname</h1>
+        }
+
+    </div>
+    <div class="page-body">
+        <div>
+            @if (Model.Items.Count > 0)
+            {
+                <div class="wishlist-content">
+                    @if (Model.Warnings.Count > 0)
+                    {
+                        <div class="message-error">
+                            <ul>
+                                @foreach (var warning in Model.Warnings)
+                                {
+                                    <li>@warning</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <form asp-route="Wishlist" method="post">
+                        <div v-if="!isMobile" class="responsive-table-container tab-content mb-5" id=pills-tabContent>
+                            <div class="tab-pane fade show active" id=pills-home role=tabpanel aria-labelledby=pills-home-tab>
+                                <table class="table table-striped w3-animate-left nss-table">
+                                    <thead class=thead-default>
+
+                                        <tr>
+                                            <td scope=col>Item #</td>
+                                            <td scope=col class="product">Description</td>
+                                            <td scope=col>Dimensions</td>
+                                            <td scope=col class="quantity text-center">Qty.</td>
+                                            <td scope=col style="width: 12rem">Actions</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Items)
+                                        {
+                                            var product = productService.GetProductById(item.ProductId);
+                                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                                            var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
+                                            var hasSawOption = false;
+                                            if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
+                                            {
+                                                var shape = shapeService.GetShapeById(shapeId);
+                                                hasSawOption = shape != null ? shape.SawOption : false;
+                                            }
+                                            var itemId = item.Id;
+                                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                            string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                            var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
+                                            var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
+
+                                            var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
+
+                                            var mappingIds = mappings.Select(x => x.Id).ToArray();
+
+                                            var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
+                                            var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
+                                            var _productAttributes = GetJson(attrs);
+                                            var prodAttrs = new List<SawOptionsAttribute>();
+
+
+                                            foreach (var it in attrs)
+                                            {
+                                                var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
+                                                var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
+                                                var obj = new SawOptionsAttribute
+                                                {
+                                                    Name = it.Name,
+                                                    Values = xValues,
+                                                    Id = xMapping.Id,
+                                                };
+
+                                                prodAttrs.Add(obj);
+                                            }
+
+                                            <tr>
+                                                <td class="align-middle">@iNo</td>
+                                                <td class="product align-middle">
+                                                    @item.ProductName
+                                                    @*<a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>*@
+                                                    @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                                        {
+                                                            <div class="attributes">
+                                                                @Html.Raw(item.AttributeInfo)
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.RecurringInfo))
+                                                        {
+                                                            <div class="recurring-info">
+                                                                @Html.Raw(item.RecurringInfo)
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(item.RentalInfo))
+                                                        {
+                                                            <div class="rental-info">
+                                                                @Html.Raw(item.RentalInfo)
+                                                            </div>
+                                                        }
+                                                        @if (Model.IsEditable && item.AllowItemEditing)
+                                                        {
+                                                            var editCartItemUrl = Url.RouteUrl("Product", new { SeName = item.ProductSeName }, webHelper.CurrentRequestProtocol);
+                                                            editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid", item.Id.ToString());
+                                                            <div class="edit-item">
+                                                                <a href="@editCartItemUrl">@T("Common.Edit")</a>
+                                                            </div>
+                                                        }*@
+                                                    @if (item.Warnings.Count > 0)
+                                                    {
+                                                        <div class="message-error">
+                                                            <ul>
+                                                                @foreach (var warning in item.Warnings)
+                                                                {
+                                                                    <li>@warning</li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                </td>
+                                                <td class="align-middle">@dimensions</td>
+                                                <td class="quantity text-center">
+                                                    @if (Model.IsEditable)
+                                                    {
+                                                        if (item.AllowedQuantities.Count > 0)
+                                                        {
+                                                            <select name="itemquantity@(item.Id)" class="qty-dropdown">
+                                                                @foreach (var qty in item.AllowedQuantities)
+                                                                {
+                                                                    <option selected="@qty.Selected" value="@qty.Value">@qty.Value</option>
+                                                                }
+                                                            </select>
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (isSerialized?.ToLower() == "true")
+                                                            {
+                                                                <label style="width: 100px; height: 30px" name="itemquantity@(item.Id)" id="itemquantity@(item.ProductId)" type="number" for="" aria-label="@T("ShoppingCart.Quantity")">1</label>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input name="itemquantity@(item.Id)" type="text" width="20" id="itemquantity@(item.ProductId)" value="@(item.Quantity)" min="1" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="product-quantity">@item.Quantity</span>
+                                                    }
+                                                </td>
+                                                <td style="text-align:left" class="d-flex flex-row">
+                                                    <div class="table-action-button">
+                                                        <label class="mb-0">
+                                                            <span style="cursor:pointer">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" aria-hidden="true" focusable="false" width="24" height="24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+                                                                    <title>Remove favorite</title>
+                                                                    <path d="M2.808 1.393l18.384 18.385l-1.414 1.414l-3.747-3.747L12 21.485l-8.48-8.492a6 6 0 0 1 .034-8.023L1.393 2.808l1.415-1.415zm17.435 3.364a6 6 0 0 1 .236 8.236l-1.635 1.636L7.26 3.046a5.986 5.986 0 0 1 4.741 1.483a5.998 5.998 0 0 1 8.242.228z" />
+                                                                </svg>
+                                                            </span>
+                                                            <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
+                                                        </label>
+                                                    </div>
+                                                    @if (eRPCompanyIdExist)
+                                                    {
+                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                            <title>Add to cart</title>
+                                                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
+                                                            <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                        </svg>
+                                                    }
+                                                    @if (hasSawOption)
+                                                    {
+                                                        @*<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                                <title>Saw Options</title>
+                                                                <path d="M20 15s-1.4 1.3 1.1 2l-2.8 2.8h-2.8s-1.9-.1-.5 2.2h-4l-2-2s-1.3-1.4-2 1.1l-2.8-2.8v-2.8s.1-1.9-2.2-.5v-4l2-2s1.4-1.3-1.2-1.9l2.8-2.9h2.9s1.9.1.5-2.2h4l2 2s1.3 1.4 2-1.2l2.8 2.8v2.9s-.1 1.9 2.2.5v4l-2 2m-6-3a2 2 0 0 0-2-2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2z" />
+                                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                            </svg>*@
+                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" class="hover-icon mx-1" width="24" height="24"
+                                                             v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
+                                                            <g transform="translate(-580 -80)">
+                                                                <title>Saw Options</title>
+                                                                <path d="M0,0H24V24H0Z" transform="translate(580 80)" fill="rgba(0, 0, 0, 0)" />
+                                                                <path d="M7.031,11.781h2.52l-.72,6.36,1.42,1.42,1.78-1.78,4,5h2v-2.52l6.36.7,1.42-1.42-1.78-1.76,5-4v-2h-2.52l.7-6.36L25.791,4l-1.76,1.78-4-5h-2V3.3l-6.36-.72L10.251,4l1.78,1.78-5,4Zm11-3a3,3,0,1,1-3,3,3,3,0,0,1,3-3Z" transform="translate(574.409 80.409)" />
+                                                            </g>
+                                                        </svg>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(mtr))
+                                                    {
+                                                        <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="hover-icon mx-1">
+                                                                <title>View MTRs</title>
+                                                                <path d="M0,0H24V24H0Z" fill="rgba(0, 0, 0, 0)" />
+                                                                <path d="M3.667,3.333v15H17V20H3.667A1.672,1.672,0,0,1,2,18.333v-15H3.667m9.167,2.5h4.583L12.833,1.25V5.833M7,0h6.667l5,5V15A1.661,1.661,0,0,1,17,16.667H7A1.666,1.666,0,0,1,5.333,15V1.667A1.661,1.661,0,0,1,7,0m7.5,13.333V11.667H7v1.667h7.5M17,10V8.333H7V10Z" transform="translate(2 2)" />
+                                                            </svg>
+                                                            @*<a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon  mx-1" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                                    <title>View MTRs</title>
+                                                                    <path d="M13 16H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2zm-4-6h2a1 1 0 0 0 0-2H9a1 1 0 0 0 0 2zm12 2h-3V3a1 1 0 0 0-.5-.87a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0A1 1 0 0 0 2 3v16a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-6a1 1 0 0 0-1-1zM5 20a1 1 0 0 1-1-1V4.73l2 1.14a1.08 1.08 0 0 0 1 0l3-1.72l3 1.72a1.08 1.08 0 0 0 1 0l2-1.14V19a3 3 0 0 0 .18 1zm15-1a1 1 0 0 1-2 0v-5h2zm-7-7H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2z" />
+                                                                    <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                                </svg>*@
+                                                        </a>
+                                                    }
+
+                                                    @*@if (string.IsNullOrEmpty(mtr))
+                                                        {
+                                                            <div class=""></div>
+                                                        }
+                                                        @if (!eRPCompanyIdExist)
+                                                        {
+                                                            <div class=""></div>
+                                                        }
+                                                        @if (!hasSawOption)
+                                                        {
+                                                            <div></div>
+                                                        }*@
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div v-if="isMobile">
+                            @foreach (var item in Model.Items)
+                            {
+                                var product = productService.GetProductById(item.ProductId);
+                                var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                                var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
+                                var hasSawOption = false;
+                                if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
+                                {
+                                    var shape = shapeService.GetShapeById(shapeId);
+                                    hasSawOption = shape != null ? shape.SawOption : false;
+                                }
+                                var itemId = item.Id;
+                                var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+                                var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+                                string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+                                var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
+                                var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
+
+                                var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
+
+                                var mappingIds = mappings.Select(x => x.Id).ToArray();
+
+                                var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
+                                var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
+                                var _productAttributes = GetJson(attrs);
+                                var prodAttrs = new List<SawOptionsAttribute>();
+
+
+                                foreach (var it in attrs)
+                                {
+                                    var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
+                                    var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
+                                    var obj = new SawOptionsAttribute
+                                    {
+                                        Name = it.Name,
+                                        Values = xValues,
+                                        Id = xMapping.Id,
+                                    };
+
+                                    prodAttrs.Add(obj);
+                                }
+                                <div class="product-sm d-flex flex-column align-items-start mb-2">
+                                    <label class="fs12-primary mb-1">Item: @iNo</label>
+                                    <label class="h2-primary my-2">@item.ProductName</label>
+                                    <div class="d-flex flex-row">
+                                        <label class="fs12-default mr-3 mb-0">Dimension: @dimensions</label>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between w-100 my-3">
+                                        <div class="d-flex flex-row align-items-center">
+                                            @*@if (eRPCompanyIdExist)
+                                                {
+                                                    <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="product-action-sm"
+                                                         v-on:click="handleAddToWishList(data)" title="add to wishlist" width="24" height="24" alt="">
+                                                }*@
+                                            <div class="table-action-button">
+                                                <label class="mb-0">
+                                                    <span style="cursor:pointer">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" aria-hidden="true" focusable="false" width="24" height="24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+                                                            <title>Remove favorite</title>
+                                                            <path d="M2.808 1.393l18.384 18.385l-1.414 1.414l-3.747-3.747L12 21.485l-8.48-8.492a6 6 0 0 1 .034-8.023L1.393 2.808l1.415-1.415zm17.435 3.364a6 6 0 0 1 .236 8.236l-1.635 1.636L7.26 3.046a5.986 5.986 0 0 1 4.741 1.483a5.998 5.998 0 0 1 8.242.228z" />
+                                                        </svg>
+                                                    </span>
+                                                    <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
+                                                </label>
+                                            </div>
+                                            @if (hasSawOption)
+                                            {
+                                                <img src="Themes/SwiftPortal/Content/assets/icn-saw.svg" class="product-action-sm" width="24" height="24" alt=""
+                                                     v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
+                                            }
+                                            @if (!string.IsNullOrEmpty(mtr))
+                                            {
+                                                <a class="table-action-button" style="text-decoration: none" href="@mtr" target="_blank">
+                                                    <img class="product-action-sm" src="Themes/SwiftPortal/Content/assets/icn-mt-report.svg" title="mtr report" width="24" height="24" alt="">
+                                                </a>}
+                                        </div>
+                                        <div class="d-flex flex-row">
+                                            <button type="button" class="btn-sm-step" v-on:click="handleDecrementQuantity(@(item.ProductId))">-</button>
+                                            <input name="itemquantity@(item.Id)" type="number" width="20" id="itemquantity@(item.ProductId)" value="@(item.Quantity)" min="1" class="form-control-sm" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
+                                            <button type="button" class="btn-sm-step" v-on:click="handleIncrementQuantity(@(item.ProductId))">+</button>
+                                        </div>
+                                    </div>
+                                    @if (eRPCompanyIdExist)
+                                    {
+                                        <button type="button" class="btn-sm-add-to-cart" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);">
+                                            <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" class="product-action-sm" width="24" height="24" alt="">
+                                            Add to cart
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div class="buttons">
+                            @if (Model.IsEditable)
+                            {
+                                <input type="submit" hidden name="updatecart" id="updatecart" value="@T("Wishlist.UpdateCart")" style="opacity: 0" class="button-2 update-wishlist-button invisible" />
+                            }
+                        </div>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="tab-content p-0">
+                    <div class="no-data mx-4 my-4">
+                        @T("Wishlist.CartIsEmpty")
+                    </div>
+                </div>
+            }
+
+            <a href="/catalog">
+                <div class="discount-block" alt="">
+                    <img v-if="!isMobile" src="~/Themes/@(themeName)/Content/assets/discounts-feature.PNG" alt="">
+                    <img v-if="isMobile" src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="">
+                </div>
+            </a>
+        </div>
+    </div>
+
+    @{ var title = "<span class='dialog-header'>SAW OPTIONS FOR PRODUCT</span>"; }
+
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header(title).ContentTemplate(
+@Content1).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
+</div>
+
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
+<script>
+    function removeFromFavorites() {
+        $('#custom-loading').show();
+        $("#updatecart").click();
+    }
+</script>
+<script>
+    var sawOptionModal;
+
+    var title = 'TESTING...';
+     var items = @Html.Raw(Serialize(Model.Items));
+    var pageModel = @Html.Raw(Serialize(Model));
+    @*var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));*@
+    var modalVm = new Vue({
+        el: '#wishlist',
+        data: {
+            items,
+            pageModel,
+            isEditable: pageModel.isEditable,
+            sawOptionControlId: null,
+            sawOptions: [],
+            sawOption: null,
+            workOrderInstructions: null,
+            workOrderInstructionsId: null,
+            quantity: 0,
+            quantityId: 0,
+            productId: null,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        mounted: function () {
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            addToCart: function () {
+                let request = {
+                    [this.sawOptionControlId]: this.sawOption,
+                    [this.workOrderInstructionsId]: this.workOrderInstructions,
+                    [`addtocart_${this.productId}.EnteredQuantity`]: this.quantity,
+                };
+                sawOptionModal.hide();
+                AjaxCart.setLoadWaiting(true);
+                $.ajax({
+                    cache: false,
+                    url: `/addproducttocart/details/${this.productId}/@Html.Raw((int)ShoppingCartType.ShoppingCart)`,
+                    type: 'POST',
+                    data: request,
+                    success: function (data, textStatus, XMLHttpRequest) {
+                        AjaxCart.setLoadWaiting(false);
+                        if (data != null) {
+                            AjaxCart.success_process(data);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        AjaxCart.setLoadWaiting(false);
+                    }
+                });
+            },
+
+            handleSawOption: function (productId, attributes) {
+                const _attributes = attributes;
+                const cutOptions = _attributes.find(x => x.name === "Cut Options");
+                const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
+                this.quantity = 1;
+                this.productId = productId;
+                this.sawOptionControlId = prefix + cutOptions.id;
+                this.sawOptions = cutOptions.values;
+                this.sawOption = cutOptions.values.find(x => x.isPreSelected)?.id || cutOptions.values.find(x => true)?.id;
+                this.workOrderInstructions = null;
+                this.workOrderInstructionsId = prefix + _attributes.find(x => x.name === "Work Order Instructions")?.id;
+                sawOptionModal.show();
+            },
+
+            incrementQuantity: function () {
+                this.quantity = Number(this.quantity) + 1;
+            },
+            decrementQuantity: function () {
+                this.quantity = this.quantity > 1 ? Number(this.quantity) - 1 : 1;
+            },
+            handleDecrementQuantity: function (itemId) {
+                const quantityEl = $('#itemquantity' + itemId);
+                const quantity = Number(quantityEl.val());
+                quantityEl.val(quantity && quantity - 1 > 1 ? quantity - 1 : 1);
+            },
+
+            handleIncrementQuantity: function (itemId) {
+                const quantityEl = $('#itemquantity' + itemId);
+                const quantity = Number(quantityEl.val());
+                quantityEl.val(quantity ? quantity + 1 : 1);
+            },
+        },
+    });
+    function getInputQuantity(itemId, cartId) {
+        event.preventDefault();
+        let qty = $('#itemquantity' + itemId).val();
+        if (!qty)
+            qty = 1;
+        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
+        $('#qty' + itemId).val("");
+        AjaxCart.addproducttocart_catalog(link);
+    }
+
+    function onDialogCreated() {
+        sawOptionModal = this;
+    }
+</script>
+<ejs-scripts></ejs-scripts>
+
+@functions {
+    String GetJson(object input)
+    {
+        @using Newtonsoft.Json.Serialization;
+        @using Newtonsoft.Json;
+
+        var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = contractResolver,
+            Formatting = Formatting.None
+        });
+    }
+}

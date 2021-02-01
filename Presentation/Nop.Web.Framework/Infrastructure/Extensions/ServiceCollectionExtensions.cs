@@ -232,6 +232,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = NopAuthenticationDefaults.LoginPath;
                 options.AccessDeniedPath = NopAuthenticationDefaults.AccessDeniedPath;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
 
                 //whether to allow the use of authentication cookies from SSL protected page on the other store pages which are not
                 options.Cookie.SecurePolicy = DataSettingsManager.DatabaseIsInstalled && EngineContext.Current.Resolve<IStoreContext>().CurrentStore.SslEnabled

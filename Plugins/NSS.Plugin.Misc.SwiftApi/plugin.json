@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Misc",
+  "FriendlyName": "Swift Api",
+  "SystemName": "Misc.SwiftApi",
+  "Version": "1.0.0",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "Chaione team",
+  "DisplayOrder": -1,
+  "FileName": "NSS.Plugin.Misc.SwiftApi.dll",
+  "Description": "This plugin provides Restful APIs for Swift nopCommerce"
+}

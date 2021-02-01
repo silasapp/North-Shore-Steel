@@ -1,0 +1,348 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+
+@model CompanyOrderListModel
+@using Syncfusion.EJ2
+@using Nop.Core
+@using Nop.Services.Common
+
+<style>
+    .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
+        padding-left: 0.6rem
+    }
+
+    .colorRed {
+        color: red !important;
+    }
+
+    .home-table-sm-header {
+        width: 110px !important;
+        background-color: #1899E1 !important;
+        /* border-bottom: 0.1px solid white; */
+    }
+
+    .invisible-grid {
+        height: 0 !important;
+        visibility: hidden;
+    }
+
+    .active-page {
+        background-color: #1899E1 !important;
+        color: #ffffff;
+    }
+</style>
+<div id="ordersGrid">
+    <div v-bind:class="{'invisible-grid': isMobile}">
+        <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" rowHeight="38" allowExcelExport="true"
+                  allowPaging="true" allowFiltering="true" rowSelected="onRowSelected" rowDeselected="onRowDeselected">
+            <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+            <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
+            <e-grid-columns>
+                <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PoNo" headerText="PO #" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="Weight" textAlign="Right" headerText="Weight (lb)" minWidth="120" format="N0" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="OrderTotal" textAlign="Right" headerText="Order Amount" minWidth="110" width="120" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="OrderDate" headerText="Order Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                @if (Model.IsClosed)
+                {
+                    <e-grid-column field="DeliveryDate" headerText="Delivery Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column template="#viewTicket" headerText="MTR/POD" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
+                }
+                else
+                {
+                    <e-grid-column field="ScheduledDate" headerText="Scheduled Date" minWidth="120" width="130" maxWidth="140" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="110" width="120" maxWidth="130"></e-grid-column>
+                }
+                <e-grid-column width="1"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+    </div>
+    <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
+        <div v-if="paginatedData.length == 0" style="background:#ffffff; padding: 10px;">
+            <label class=".fs12-default"> No records to display</label>
+        </div>
+
+        <div v-for="order in paginatedData" class="d-flex">
+            @*<label v-if="isExportMode" class="pure-material-checkbox mr-3 d-flex align-items-center" style="position: relative;">
+                    <input type="checkbox" name="order-checkox"
+                           v-on:click="onCheck(order.orderId)">
+                    <span class="checkmark"></span>
+                </label>*@
+            <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
+
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Order #</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <a class="fs12-link" v-bind:href="'/orders/'+order.orderId">{{order.orderId}}</a>
+                    </div>
+                </div><div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Purchase Order #</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <a class="fs12-link">{{order.poNo}}</a>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Tot. Weight (lbs)</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">{{order.weight}}</label>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Order Amount</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">{{order.orderTotal}}</label>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Order Date</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">
+                            {{order.orderDate|date}}
+                        </label>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Promise Date</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">
+                            {{order.promiseDate|date}}
+                        </label>
+                    </div>
+                </div>
+                @if (Model.IsClosed)
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Delivery Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{order.deliveryDate|date}}</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0"></label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-link mb-0"><a href="">View</a></label>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Scheduled Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0" style="color: #DB0606 !important;">{{order.scheduledDate|date}}</label>
+                        </div>
+                    </div><div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Status</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{order.orderStatusName}}</label>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+        </div>
+        <div class="pagination-mobile  d-flex bg-white-shadow py-3 px-2 justify-content-between align-items-center" v-if="isMobile">
+            <select id="paginationPageCount" v-on:change="setPageSize(); paginate(currentPage, pageSize);" style="border: none;">
+                <option value="10">10 per page</option>
+                <option value="20">20 per page</option>
+                <option value="50">50 per page</option>
+            </select>
+            <div>
+                <span class="mx-1" style="padding: 2px 1px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-if="currentPage>1" v-on:click="currentPage -= 1; paginate(currentPage, pageSize);"><img style="transform: rotate(270deg);" src="~/Themes/SwiftPortal/Content/assets/icn-arrow-up.svg" alt=""></span>
+                <span v-for="page in pageCount" class="mx-1" v-bind:class="{'active-page': currentPage == page}" style="padding: 2px 10px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-on:click="currentPage = page; paginate(page, pageSize);">{{page}}</span>
+                <span class="mx-1" style="padding: 2px 1px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-if="currentPage<pageCount" v-on:click="currentPage += 1; paginate(currentPage, pageSize);"><img style="transform: rotate(90deg);" src="~/Themes/SwiftPortal/Content/assets/icn-arrow-up.svg" alt=""></span>
+
+            </div>
+        </div>
+    </div>
+</div>
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
+<script>
+    var pageModel = @Html.Raw(Serialize(Model));
+    var ordergridvm = new Vue({
+        el: '#ordersGrid',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+            paginatedData: [],
+            currentPage: 1,
+            pageSize: 10,
+            pageCount: 0,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+            this.paginate(this.currentPage, this.pageSize);
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            switchToExport: function () {
+                this.isExportMode = true;
+            },
+            cancelExportMode: function () {
+                this.isExportMode = false;
+                mobileExcelData = [];
+            },
+            paginate: function (page_number, page_size) {
+                page_number = page_number > 0 ? page_number : 1;
+                this.currentPage = page_number;
+                this.paginatedData = pageModel.orders.slice((page_number - 1) * page_size, page_number * page_size);
+                var pageCountDiv = pageModel.orders.length / page_size;
+                var pageCountRound = Math.round(pageCountDiv);
+                this.pageCount = pageCountRound > pageCountDiv ? pageCountRound : pageCountRound + 1;
+
+            },
+            setPageSize() {
+                this.pageSize = Number(document.getElementById('paginationPageCount').value);
+                if (this.isExportMode) {
+                    selectAll(false);
+                }
+            }
+
+        },
+    });
+</script>
+<script>
+    var pageModel = @Html.Raw(Serialize(Model));
+    //var mobileExcelData = [];
+    function formatDate(date) {
+        date = new Date(date);
+        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    }
+
+    function toolbarClick() {
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        gridObj.excelExport();
+
+    }
+
+    async function cloneArray(orders) {
+        return orders.slice();
+    }
+    async function updateArray(orders) {
+        var newOrders = [];
+        for (var i in orders) {
+            var _order = { ...orders[i] };
+            _order.OrderDate = formatDate(_order.OrderDate);
+            _order.DeliveryDate = formatDate(_order.DeliveryDate);
+            _order.PromiseDate = formatDate(_order.PromiseDate);
+            _order.ScheduledDate = formatDate(_order.ScheduledDate);
+            newOrders.push(_order);
+        }
+        return newOrders;
+    }
+    async function keyToUpperCase(orders) {
+        var newOrders = [];
+        for (var i in orders) {
+            var order = { ...orders[i] };
+            for (var key in order) {
+                var upper = key.charAt(0).toUpperCase() + key.slice(1);;
+                // check if it already wasn't uppercase
+                if (upper !== key) {
+                    order[upper] = order[key];
+                    delete order[key];
+                }
+            }
+            newOrders.push(order);
+        }
+        return newOrders;
+    }
+    async function exportExcelMobile() {
+        var _orders = await cloneArray(ordergridvm.paginatedData);
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        _orders = await keyToUpperCase(_orders);
+        _orders = await updateArray(_orders);
+
+        if (_orders.length > 0) {
+            var exportProperties = {
+                dataSource: _orders,
+                fileName: "OrdersExport.xlsx"
+            };
+            gridObj.excelExport(exportProperties);
+        }
+    }
+
+    function excelQueryCellInfo(args) {
+        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
+        if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
+    }
+
+    function onRowSelected(args) {
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        vm.selectedRowCount = exceldata.length;
+    }
+
+    function onRowDeselected(args) {
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        vm.selectedRowCount = exceldata.length;
+    }
+
+    function customiseCell(args) {
+        if (args.column.field === 'OrderStatusName') {
+            if (args.data['OrderStatusName'].indexOf("past due") > -1) {
+                args.cell.classList.add('colorRed');
+            }
+        }
+    }
+
+</script>
+
+<script id="orderNo" type="text/x-template">
+    <a href="/orders/${OrderId}">${OrderId}</a>
+</script>
+<script id="viewTicket" type="text/x-template">
+    ${if(DeliveryTicketCount > 0)}
+    <a href="${DeliveryTicketFile}" target="_blank">View</a>
+    ${/if}
+</script>
+<ejs-scripts></ejs-scripts>

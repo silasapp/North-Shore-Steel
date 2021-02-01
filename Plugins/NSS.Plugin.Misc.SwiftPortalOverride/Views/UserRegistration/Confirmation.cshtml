@@ -1,0 +1,73 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@model RegisterModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts("Confirmation");
+    //page class
+    Html.AppendPageCssClassParts("html-registration-page");
+
+}
+
+<style>
+    .header-menu {
+        display: none !important;
+    }
+
+    .header-upper {
+        background-color: transparent !important;
+        border-bottom: none !important;
+    }
+
+    .nav-bar-search {
+        display: none !important;
+    }
+
+    .header-links-wrapper {
+        display: none !important;
+    }
+
+    .master-wrapper-content {
+        display: block !important;
+    }
+
+    div.text > iframe {
+        width: -webkit-fill-available !important;
+    }
+
+    .welcome-fieldset p, div {
+        text-align: center;
+        font: normal normal normal 20px/32px "Exo 2";
+        letter-spacing: 0px;
+        color: #242424;
+        opacity: 1;
+    }
+</style>
+
+<div class="page registration-result-page">
+    <div class=page-title>
+        <h1>WELCOME!</h1>
+    </div>
+    <div class="page-body">
+        <div class="fieldset welcome-fieldset">
+            @if (!Model.IsExistingCustomer)
+            {
+                @Html.Raw(T("Plugins.Misc.SwiftPortalOverride.Fields.NewCustomerWelcomeMessage.Text"))
+                <div class="text">
+                    <iframe height="315"
+                            src=@Model.MarketingVideoUrl
+                            frameborder="0"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+            }
+            else
+            {
+                @Html.Raw(T("Plugins.Misc.SwiftPortalOverride.Fields.OldCustomerWelcomeMessage.Text"))
+            }
+        </div>
+
+    </div>
+    <br />
+</div>

@@ -1,0 +1,133 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@model CustomerNavigationModel
+
+<style>
+    .clickable {
+        width: -webkit-fill-available;
+    }
+
+    .mob-nav-tab {
+        background: #fff !important;
+        padding: 5px 10px !important;
+        height: 70px;
+        width: 70px;
+    }
+
+    .mob-nav-link {
+        display: flex !important;
+        flex-direction: column;
+        text-align: center !important;
+        line-height: 1 !important;
+        font-size: 12px !important;
+    }
+
+    .no-border {
+        border: none !important;
+    }
+
+    .grey-bg {
+        background-color: #f6f6f6 !important;
+        padding: 20px;
+    }
+
+    .active {
+        background-color: #1899E1 !important;
+    }
+
+    .side-2 {
+        margin-bottom: 20px;
+    }
+</style>
+<div id="account-page">
+    <div v-if="isMobile">
+        <ul class="nav nav-pills mb-2 justify-content-center" id=pills-tab role="tablist">
+            <li class=nav-item role="presentation" style="margin-right: .3em;">
+                <a class="nav-link " v-bind:class="{'active': pageModel.selectedTab == 0 || pageModel.selectedTab== 70}" id=pills-home-tab
+                   href="@Url.RouteUrl("CustomerInfo")">My Preferences</a>
+            <li class=nav-item role="presentation">
+                <a class=nav-link v-bind:class="{'active': pageModel.selectedTab == 10 || pageModel.selectedTab== 140}" id=pills-profile-tab
+                   href="@Url.RouteUrl("CustomerAddresses")">Company Preferences</a>
+        </ul>
+    </div>
+    <div class="account-page-card" v-bind:class="{'grey-bg': isMobile,  'mb-2': isMobile}">
+        <h6 v-if="!isMobile">My Preferences</h6>
+        <div class="block block-account-navigation" v-if="!isMobile || (pageModel.selectedTab == 0 || pageModel.selectedTab== 70)">
+            <div class="listbox" v-bind:class="{'no-border': isMobile}">
+                <ul class="list" v-bind:class="{'d-flex': isMobile}">
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationBefore })
+                    @foreach (var item in Model.CustomerNavigationItems)
+                    {
+                        <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")" v-bind:class="{'mob-nav-tab': isMobile, 'mr-2': isMobile}">
+                            <a href="@Url.RouteUrl(item.RouteName)" class="clickable" v-bind:class="{'mob-nav-link': isMobile}">
+                                <img src="@item.ItemLogo" alt="">@(item.Title)
+                            </a>
+                        </li>
+                    }
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationAfter })
+                </ul>
+            </div>
+        </div>
+
+        <div class="block block-account-navigation " v-if="!isMobile || (pageModel.selectedTab == 10 || pageModel.selectedTab== 140)" v-bind:class="{'pt-5': !isMobile}">
+            <h6 v-if="!isMobile">Company Preferences</h6>
+            <div class="listbox" v-bind:class="{'no-border': isMobile}">
+                <ul class="list" v-bind:class="{'d-flex': isMobile}">
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationBefore })
+                    @foreach (var item in Model.CompanyNavigationItems)
+                    {
+                        <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")" v-bind:class="{'mob-nav-tab': isMobile, 'mr-2': isMobile}">
+                            <a href="@Url.RouteUrl(item.RouteName)" class="clickable" v-bind:class="{'mob-nav-link': isMobile}">
+                                <img src="@item.ItemLogo" alt="">@(item.Title)
+                            </a>
+                        </li>
+                    }
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationAfter })
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
+<script>
+        var pageModel = @Html.Raw(Serialize(Model));
+        var vm = new Vue({
+            el: '#account-page',
+            data: {
+                window: {
+                    width: 0,
+                    height: 0,
+                },
+                isMyPref: true,
+            },
+            created: function () {
+                window.addEventListener("resize", this.handleResize);
+                this.handleResize();
+            },
+            destroyed: function () {
+                window.removeEventListener("resize", this.handleResize);
+            },
+            computed: {
+                isMobile: function () {
+                    return this.window.width <= 767.98;
+                },
+            },
+            methods: {
+                handleResize: function () {
+                    this.window.width = window.innerWidth;
+                    this.window.height = window.innerHeight;
+                },
+            },
+        });
+</script>

@@ -1,0 +1,53 @@
+﻿@using Nop.Web.Models.Checkout;
+
+@model CheckoutCompletedModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-checkout-page");
+    Html.AppendPageCssClassParts("html-order-completed-page");
+
+    Model.CustomProperties.TryGetValue("ErpOrderNo", out var erpOrderNo);
+}
+
+<style>
+    .success-text {
+        text-align: center;
+    }
+
+    .text-primary {
+        color: #03175B !important;
+    }
+
+    .page-title {
+        border-bottom: 2px solid #03175B;
+    }
+</style>
+
+<div class="page checkout-page order-completed-page px-5">
+    <div class=page-title>
+        <h1>THANK YOU!</h1>
+    </div>
+    <div class="page-body">
+        <div class="fieldset order-result-fieldset">
+            <p class="boldText">YOUR ORDER HAS BEEN SUCCESSFULLY PROCESSED</p>
+            <p class="text">
+                We appreciate your business. You will receive an order confirmation email shortly. Please confirm all details.
+                Our goal is to provide you with the most convenient easy-to-use shopping experience in the industry.
+                We always welcome your feedback.
+            </p>
+        </div>
+        <div class="fieldset order-result-fieldset">
+            <p class="boldText">ORDER NUMBER: @(erpOrderNo)</p>
+            <p class="link"><a href="/orders/@erpOrderNo">CLICK HERE TO VIEW ORDER DETAILS</a>
+        </div>
+
+        </p>
+        <div class="buttons" style="text-align: right;">
+            <a href="/"><input class="button-1 login-button" type="submit" value="Continue"></a>
+        </div>
+    </div>
+</div>

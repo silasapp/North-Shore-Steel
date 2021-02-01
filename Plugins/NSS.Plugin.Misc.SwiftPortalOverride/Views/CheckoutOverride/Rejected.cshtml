@@ -1,0 +1,45 @@
+﻿
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-checkout-page");
+    Html.AppendPageCssClassParts("html-order-completed-page");
+}
+
+<style>
+    .success-text {
+        text-align: center;
+    }
+
+    .text-primary {
+        color: #03175B !important;
+    }
+
+    .page-title {
+        border-bottom: 2px solid #03175B;
+    }
+</style>
+
+<div class="page checkout-page order-completed-page px-5">
+    <div class=page-title>
+        <h1>REJECTED ORDER</h1>
+    </div>
+    <div class="page-body">
+        <div class="fieldset order-result-fieldset">
+            <p class="boldText">AN ERROR OCCURRED</p>
+            <p class="text">
+                Something went wrong while placing the order.
+                Please contact admin.
+            </p>
+        </div>
+
+        </p>
+        <div class="buttons" style="text-align: right;">
+            <a href="/"><input class="button-1 login-button" type="submit" value="Continue"></a>
+        </div>
+    </div>
+
+</div>

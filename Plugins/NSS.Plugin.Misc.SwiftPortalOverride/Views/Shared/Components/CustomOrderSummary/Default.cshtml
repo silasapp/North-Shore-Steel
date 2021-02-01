@@ -1,0 +1,729 @@
+﻿@model ShoppingCartModel
+@using Nop.Core
+@using Syncfusion.EJ2
+@using Nop.Core.Domain.Orders
+@using Nop.Core.Domain.Tax
+@using Nop.Web.Models.ShoppingCart
+@using Nop.Web.Extensions
+@using Nop.Services.Common
+@using Nop.Core.Domain.Catalog
+@using Nop.Web.Factories
+@using Nop.Services.Catalog
+@using Nop.Web.Models.Catalog
+@using Nop.Services.Localization
+@using Nop.Core.Domain
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
+@using Nop.Services.Orders
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using Nop.Web.Framework.Themes
+@inject IThemeContext themeContext
+@inject IWebHelper webHelper
+@inject IWorkContext workContext
+@inject OrderSettings orderSettings
+@inject IGenericAttributeService genericAttributeService
+@inject IProductModelFactory productModelFactory
+@inject IProductAttributeParser productAttributeParser
+@inject IProductAttributeService productAttributeService
+@inject ILocalizationService localizationService
+@inject IProductService productService
+@inject IShoppingCartService shoppingCartService
+@inject ICustomerCompanyProductService customerCompanyProductService
+@inject ICustomerCompanyService customerCompanyService
+@inject ICompanyService companyService
+
+@{
+
+    var themeName = themeContext.WorkingThemeName;
+    var customer = workContext.CurrentCustomer;
+
+    // get cust company
+    CustomerCompany customerCompany = GetCustomerCompanyDetails();
+
+    var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
+
+    var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == Constants.CheckoutPONoAttribute);
+
+    List<object> items = new List<object>();
+
+    foreach (var item in Model.Items)
+    {
+        var _cartItem = new Dictionary<string, object>();
+
+        var product = productService.GetProductById(item.ProductId);
+        var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+
+        var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
+        var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
+        string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
+        var iNo = isSerialized == "True" ? itemTagNo : itemNo;
+        var pricePerFt = attr.FirstOrDefault(x => x.Key == "pricePerFt")?.Value;
+        var pricePerCWT = attr.FirstOrDefault(x => x.Key == "pricePerCWT")?.Value;
+        var pricePerPiece = attr.FirstOrDefault(x => x.Key == "pricePerPiece")?.Value;
+
+        CustomerCompanyProduct customerCompanyProduct = new CustomerCompanyProduct();
+        if (customerCompany != null)
+        {
+            customerCompanyProduct = customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId);
+        }
+
+        // get attribute
+
+        var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
+        var attributes = PrepareProductAttributeModels(product, cartItem);
+
+        var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == Constants.CustomerPartNoAttribute);
+        var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+        var selectedPurchaseUnit = purchaseUnitAttr?.Values?.FirstOrDefault(x => x.IsPreSelected) ?? purchaseUnitAttr?.Values?.FirstOrDefault();
+        var noteAttr = attributes.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
+
+        var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}{item.Id}" : $"itemuom{item.Id}";
+        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
+
+        _cartItem.Add("id", item.Id);
+        _cartItem.Add("productName", item.ProductName);
+        _cartItem.Add("productId", item.ProductId);
+        _cartItem.Add("unitPrice", item.UnitPrice);
+        _cartItem.Add("quantity", item.Quantity);
+        _cartItem.Add("subTotal", item.SubTotal);
+        _cartItem.Add("itemTagNo", itemTagNo);
+        _cartItem.Add("itemNo", itemNo);
+        _cartItem.Add("isSerialized", isSerialized?.ToLower());
+        _cartItem.Add("iNo", iNo);
+        _cartItem.Add("pricePerFt", pricePerFt);
+        _cartItem.Add("pricePerCWT", pricePerCWT);
+        _cartItem.Add("pricePerPiece", pricePerPiece);
+        _cartItem.Add("weight", product.Weight);
+        _cartItem.Add("length", product.Length);
+        _cartItem.Add("customerCompanyProduct", Serialize(customerCompanyProduct));
+        _cartItem.Add("cartItem", Serialize(cartItem));
+        _cartItem.Add("custPartNoAttr", Serialize(custPartNoAttr));
+        _cartItem.Add("purchaseUnitAttr", Serialize(purchaseUnitAttr));
+        _cartItem.Add("selectedPurchaseUnit", selectedPurchaseUnit?.Id);
+        _cartItem.Add("noteAttr", Serialize(noteAttr));
+        _cartItem.Add("unitControlId", unitControlId);
+        _cartItem.Add("controlId", controlId);
+        _cartItem.Add("warnings", Serialize(item.Warnings));
+
+        items.Add(_cartItem);
+    }
+}
+
+<!-- Modal -->
+<div id="overlay"></div>
+
+@{
+    Func<object, object>
+Content1 =
+    @<div id="viewNotesModal">
+        <div class="modal-body">
+            <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
+            <div class="buttons float-right pt-3" id="saveNote">
+                <input type="button" class="button-1 register-button" value="Add" />
+            </div>
+        </div>
+    </div>;
+}
+@{
+
+    Func<object, object>
+    Content2 =
+    @<div id="acceptTOSModal">
+        <div class="">
+            <p class="pt-4">Please accept the terms of service before the next step.</p>
+        </div>
+    </div>;
+}
+
+
+<div id="cart-section" class="cart-summary-content card" v-cloak>
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
+    @await Html.PartialAsync("_OrderReviewData", Model.OrderReviewData)
+    <div>
+        @if (Model.Items.Count > 0)
+        {
+            if (Model.Warnings.Count > 0)
+            {
+                <div class="message-error">
+                    <ul>
+                        @foreach (var warning in Model.Warnings)
+                        {
+                            <li>@warning</li>
+                        }
+                    </ul>
+                </div>
+            }
+            @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
+            <form asp-route="ShoppingCart" method="post" enctype="multipart/form-data" id="shopping-cart-form">
+
+                <div>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex flex-column flex-md-row justify-content-md-between">
+                            <div v-if="isEditable" class="d-flex flex-row bg-accent bg-md-white justify-content-between mb-3 p-3 p-md-0 order-0 order-md-1 w-100">
+                                <button type="submit" class="nss-btn-white mr-md-4" name="continueshopping">
+                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="">
+                                    {{ isMobile ? 'Keep Shopping' : 'Continue Shopping' }}
+                                </button>
+                                <button type="submit" class="nss-btn-white" name="updatecart">
+                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/icn-refresh-dark-blue.svg" width="24" height="24" alt="">
+                                    Update Cart
+                                </button>
+                            </div>
+
+                        </div>
+
+                        @* Cart items - Web View *@
+                        <div v-if="!isMobile" class="table-wrapper">
+                            <table class="table table-bordered cart-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="10%">Item #</th>
+                                        <th scope="col">Description</th>
+                                        <th scope="col" width="10%">Customer Part #</th>
+                                        <th scope="col" width="12%">Unit Price</th>
+                                        <th scope="col" width="9%">Total Price</th>
+                                        <th scope="col" width="9%">Weight (lb)</th>
+                                        <th scope="col" width="8%" class="text-center">Qty.</th>
+                                        @*<th scope="col" width="8%" class="text-center">Saw Options</th>*@
+                                        <th scope="col" width="5%" class="text-center">Notes</th>
+                                        <th scope="col" width="5%" class="text-center">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in items">
+                                        <td class="align-middle"><label style="margin:0;">{{ item.iNo }}</label></td>
+                                        <td class="align-middle">
+                                            <label class="mv-value" style="margin:0;">{{ item.productName }}</label>
+                                            <div class="message-error" v-if="item.warnings?.length > 0">
+                                                <ul>
+                                                    <li v-for="warning in item.warnings">{{ warning }}</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td class="">
+                                            <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
+                                                   v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
+                                        </td>
+                                        <td>
+                                            <div class="text-right">
+                                                <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
+                                                        v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
+                                                    <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
+                                                            v-for="attribute in item.purchaseUnitAttr.values"
+                                                            v-bind:value="attribute.id">
+                                                        {{ attribute.name }}
+                                                    </option>
+                                                </select>
+                                                <label class="float-left" style="margin:4px 8px 0px 0px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
+                                            </div>
+                                        </td>
+                                        <td class="pt-3 text-right" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
+                                        <td class="pt-3 text-right"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
+                                        <td class="text-center">
+                                            <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
+                                                   style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
+                                                   v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'"
+                                                   aria-label="@T("ShoppingCart.Quantity")"
+                                                   min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
+                                        </td>
+                                        @*<td class="text-center">
+                                                <a href="">View Options</a>
+                                            </td>*@
+                                        <td class="text-center">
+                                            <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
+                                               v-on:click="handleNotesModal(item)" data-target="#noteModal">
+                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                     class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
+                                                     viewBox="0 0 24 24"
+                                                     style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #2F2F2F; opacity: 0.5;">
+                                                    <title>View note</title>
+                                                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
+                                                    <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                </svg>
+                                            </a>
+                                            <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
+                                        </td>
+                                        <td class="remove-from-cart text-center pt-3">
+                                            <label class="pure-material-checkbox">
+                                                <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
+                                                       v-bind:value="item.id" style=" position: unset !important;"
+                                                       aria-label="@T("ShoppingCart.Remove")" />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @* Cart items - Mobile View *@
+                        <div v-if="isMobile">
+                            <div class="cart-item d-flex flex-column bg-accent p-3 mb-3" v-for="item in items">
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <label class="fs12-primary-500">Item: {{ item.iNo }}</label>
+                                    <label class="pure-material-checkbox">
+                                        Remove
+                                        <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
+                                               v-bind:value="item.id" style="position: unset !important;" aria-label="@T("ShoppingCart.Remove")" />
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
+                                <div style="color: #e4434b; font-size:12px" v-if="item.warnings?.length > 0">
+                                    <ul>
+                                        <li v-for="warning in item.warnings">{{ warning }}</li>
+                                    </ul>
+                                </div>
+                                <label class="h5-default-500">Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
+                                <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
+                                <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
+
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <label class="h5-default-500">Quantity</label>
+                                    <input class="cart-qty-input" type="text" v-bind:name="'itemquantity' + item.id" v-bind:id="'itemquantity' + item.id"
+                                           v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'" aria-label="@T("ShoppingCart.Quantity")"
+                                           min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
+                                </div>
+                                @*<a class="fs12-link-500 mb-3">View Options</a>*@
+                                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                                    <label class="h5-default-500">Unit Price</label>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice }} / </label>
+                                        <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
+                                                v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
+                                            <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
+                                                attribute.name === 'FT' && item.pricePerFt"
+                                                    v-for="attribute in item.purchaseUnitAttr.values" v-bind:value="attribute.id">
+                                                {{ attribute.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                                    <label class="h5-default-500">Total Price</label>
+                                    <label class="h2-primary" v-bind:id="'itemsubtotal' + item.id">{{ item.subTotal }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
+                        {
+                            var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+                            //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+                            //of course, you can modify appropriate locales to include VAT info there
+                            <div class="tax-shipping-info">
+                                @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                            </div>
+                        }
+                        <div class="cart-footer row mt-0 mt-md-2">
+
+
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryCartFooter })
+                            @if (Model.IsEditable)
+                            {
+                                <div class="cart-collaterals col-sm-12 col-md-5 col-lg-4 mx-0">
+                                    <div class="d-flex flex-row bg-accent bg-md-white p-3 p-md-0 mb-3 order-1 order-md-0">
+                                        <div class="d-flex flex-column mr-2 w-50 w-md-100">
+                                            <label class="fs12-default-500 mb-2">Purchase Order #</label>
+                                            <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
+                                                   v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-bind:value="purchasechkattr.defaultValue" />
+                                        </div>
+                                        @*<div class="d-flex flex-column ml-2 w-50 w-md-100">
+                                                <label class="fs12-default-500 mb-2">Promise Date</label>
+                                                <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
+                                            </div>*@
+                                    </div>
+                                    <div class="deals" style="width: 100%;max-width: 100%;">
+                                        @*@await Html.PartialAsync("_DiscountBox", Model.DiscountBox)*@
+                                        @await Html.PartialAsync("_GiftCardBox", Model.GiftCardBox)
+
+                                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentDeals })
+                                    </div>
+                                </div>
+                            }
+                            <div class="totals col-sm-12 col-md-offset-1 col-md-6 col-lg-offset-2 col-lg-6 mx-0" style="background: none; padding: 0;">
+                                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryTotals })
+                                @await Component.InvokeAsync("OrderTotals", new { isEditable = Model.IsEditable })
+                                @if (Model.IsEditable)
+                                {
+                                    if (!string.IsNullOrEmpty(Model.MinOrderSubtotalWarning))
+                                    {
+                                        <div class="min-amount-warning">
+                                            @Model.MinOrderSubtotalWarning
+                                        </div>
+                                    }
+                                }
+                                @if (Model.IsEditable)
+                                {
+                                    <div class="checkout-buttons">
+                                        @if (string.IsNullOrEmpty(Model.MinOrderSubtotalWarning) && !Model.HideCheckoutButton)
+                                        {
+                                            <script asp-location="Footer">
+                                                $(document).ready(function () {
+                                                    $('#checkout').on('click', function () {
+                                                        //terms of service
+                                                        var termOfServiceOk = true;
+                                                        if ($('#termsofservice').length > 0) {
+                                                            //terms of service element exists
+                                                            if (!$('#termsofservice').is(':checked')) {
+                                                                $("#terms-of-service-warning-box").dialog();
+                                                                termOfServiceOk = false;
+                                                            } else {
+                                                                termOfServiceOk = true;
+                                                            }
+                                                        }
+                                                        return termOfServiceOk;
+                                                    });
+                                                });
+                                            </script>
+                                            if (orderSettings.CheckoutDisabled)
+                                            {
+                                                <div class="checkout-disabled">
+                                                    @T("Checkout.Disabled")
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <input type="submit" id="checkout" name="checkout" v-bind:class="{'checkout-button-mob': isMobile}" value="PROCEED TO CHECKOUT" class="button-1 checkout-button" style="border-radius:unset" />
+                                            }
+                                        }
+                                    </div>
+                                    <div class="addon-buttons">
+                                        @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
+                                        @foreach (var pm in Model.ButtonPaymentMethodViewComponentNames)
+                                        {
+                                            @await Component.InvokeAsync(pm)
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @if (Model.IsEditable)
+                        {
+                            @await Component.InvokeAsync("CrossSellProducts")
+                        }
+                    </div>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="">
+                @T("ShoppingCart.CartIsEmpty")
+            </div>
+        }
+    </div>
+
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("500px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
+</div>
+
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+    string DoFormat(double myNumber)
+    {
+        var s = string.Format("{0:0.00}", myNumber);
+
+        return s;
+    }
+
+    CustomerCompany GetCustomerCompanyDetails()
+    {
+        CustomerCompany customerCompany = new CustomerCompany();
+        var currentCustomer = workContext.CurrentCustomer;
+        var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+        int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+
+        if (eRPCompanyId > 0)
+            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(currentCustomer.Id, eRPCompanyId);
+
+        return customerCompany;
+    }
+
+    #region PrepareProductAttributeModels
+    IList<ProductDetailsModel.ProductAttributeModel> PrepareProductAttributeModels(Product product, ShoppingCartItem updatecartitem)
+    {
+        if (product == null)
+            throw new ArgumentNullException(nameof(product));
+
+        var model = new List<ProductDetailsModel.ProductAttributeModel>();
+
+        var productAttributeMapping = productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+        foreach (var attribute in productAttributeMapping)
+        {
+            var productAttrubute = productAttributeService.GetProductAttributeById(attribute.ProductAttributeId);
+
+            var attributeModel = new ProductDetailsModel.ProductAttributeModel
+            {
+                Id = attribute.Id,
+                ProductId = product.Id,
+                ProductAttributeId = attribute.ProductAttributeId,
+                Name = localizationService.GetLocalized(productAttrubute, x => x.Name),
+                Description = localizationService.GetLocalized(productAttrubute, x => x.Description),
+                TextPrompt = localizationService.GetLocalized(attribute, x => x.TextPrompt),
+                IsRequired = attribute.IsRequired,
+                AttributeControlType = attribute.AttributeControlType,
+                DefaultValue = updatecartitem != null ? null : localizationService.GetLocalized(attribute, x => x.DefaultValue),
+                HasCondition = !string.IsNullOrEmpty(attribute.ConditionAttributeXml)
+            };
+
+
+            if (attribute.ShouldHaveValues())
+            {
+                //values
+                var attributeValues = productAttributeService.GetProductAttributeValues(attribute.Id);
+                foreach (var attributeValue in attributeValues)
+                {
+                    var valueModel = new ProductDetailsModel.ProductAttributeValueModel
+                    {
+                        Id = attributeValue.Id,
+                        Name = localizationService.GetLocalized(attributeValue, x => x.Name),
+                        ColorSquaresRgb = attributeValue.ColorSquaresRgb, //used with "Color squares" attribute type
+                        IsPreSelected = attributeValue.IsPreSelected,
+                        CustomerEntersQty = attributeValue.CustomerEntersQty,
+                        Quantity = attributeValue.Quantity
+                    };
+                    attributeModel.Values.Add(valueModel);
+                }
+            }
+
+            //set already selected attributes (if we're going to update the existing shopping cart item)
+            if (updatecartitem != null)
+            {
+                switch (attribute.AttributeControlType)
+                {
+                    case AttributeControlType.DropdownList:
+                    case AttributeControlType.RadioList:
+                    case AttributeControlType.Checkboxes:
+                    case AttributeControlType.ColorSquares:
+                    case AttributeControlType.ImageSquares:
+                        {
+                            if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
+                            {
+                                //clear default selection
+                                foreach (var item in attributeModel.Values)
+                                    item.IsPreSelected = false;
+
+                                //select new values
+                                var selectedValues = productAttributeParser.ParseProductAttributeValues(updatecartitem.AttributesXml);
+                                foreach (var attributeValue in selectedValues)
+                                    foreach (var item in attributeModel.Values)
+                                        if (attributeValue.Id == item.Id)
+                                        {
+                                            item.IsPreSelected = true;
+
+                                            //set customer entered quantity
+                                            if (attributeValue.CustomerEntersQty)
+                                                item.Quantity = attributeValue.Quantity;
+                                        }
+                            }
+                        }
+
+                        break;
+                    case AttributeControlType.ReadonlyCheckboxes:
+                        {
+                            //values are already pre-set
+
+                            //set customer entered quantity
+                            if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
+                            {
+                                foreach (var attributeValue in productAttributeParser.ParseProductAttributeValues(updatecartitem.AttributesXml)
+                                    .Where(value => value.CustomerEntersQty))
+                                {
+                                    var item = attributeModel.Values.FirstOrDefault(value => value.Id == attributeValue.Id);
+                                    if (item != null)
+                                        item.Quantity = attributeValue.Quantity;
+                                }
+                            }
+                        }
+
+                        break;
+                    case AttributeControlType.TextBox:
+                    case AttributeControlType.MultilineTextbox:
+                        {
+                            if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
+                            {
+                                var enteredText = productAttributeParser.ParseValues(updatecartitem.AttributesXml, attribute.Id);
+                                if (enteredText.Any())
+                                    attributeModel.DefaultValue = enteredText[0];
+                            }
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            model.Add(attributeModel);
+        }
+
+        return model;
+    }
+    #endregion
+}
+
+<script>
+    var items = @Html.Raw(Serialize(items));
+    var pageModel = @Html.Raw(Serialize(Model));
+    var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));
+
+    new Vue({
+        el: '#cart-section',
+        data: {
+            items,
+            pageModel,
+            isEditable: pageModel.isEditable,
+            purchasechkattr,
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        mounted: function () {
+            this.items.forEach(item => {
+                item.unitPrice = item.unitPrice?.replace('$', '');
+                item.noteAttr = JSON.parse(item.noteAttr);
+                item.warnings = JSON.parse(item.warnings);
+                item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr);
+                item.customerCompanyProduct = JSON.parse(item.customerCompanyProduct);
+            });
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            handleNotesModal: function ({ controlId }) {
+                //$("#productNote").val($(`#${controlId}`).val());
+                //viewNotesModal.show();
+
+                handleNotesModal(controlId);
+            },
+            toggleUnitPrice: function (item) {
+                const { unitControlId, id, pricePerCWT, pricePerPiece, pricePerFt } = item;
+
+                const el = document.getElementById(unitControlId);
+                const itemUnit = el.options[el.selectedIndex].text;
+
+                let unitPrice = 0.00;
+                switch (itemUnit) {
+                    case "EA":
+                        unitPrice = Number(pricePerPiece ? pricePerPiece : '');
+                        break;
+                    case "FT":
+                        unitPrice = Number(pricePerFt ? pricePerFt : '');
+                        break;
+                    case "CWT":
+                        unitPrice = Number(pricePerCWT ? pricePerCWT : '');
+                        break;
+                    default:
+                        break;
+                }
+                this.items.forEach(item => {
+                    if (item.id === id) {
+                        item.unitPrice = this.currencyFormat(unitPrice);
+                    }
+                });
+                item.unitPrice = this.currencyFormat(unitPrice);
+                this.calculateItemTotalPrice(item);
+            },
+            arrayToList: function (arr) {
+                return arr.reduceRight((rest, value) => ({ value, rest }), null);
+            },
+            calculateItemTotalPrice: function ({ unitControlId, id, length, weight, quantity, unitPrice }) {
+                const el = document.getElementById(unitControlId);
+                const itemUnit = el.options[el.selectedIndex].text;
+                let totalPrice = 0.00;
+                const totalLength = evenRound(quantity * length);
+                const totalWeight = evenRound(weight * quantity);
+                var _itemUnit = parseInt(itemUnit);
+                switch (itemUnit) {
+                    case 'FT':
+                        totalPrice = totalLength * Number(unitPrice.replace(/,/g, ''));
+                        break;
+                    case 'CWT':
+                        totalPrice = (totalWeight / 100) * parseFloat(unitPrice.replace(/,/g, ''));
+                        break;
+                    case 'EA':
+                    default:
+                        totalPrice = quantity * Number(unitPrice.replace(/,/g, ''));
+                        break;
+                }
+                this.items.forEach(item => {
+                    if (item.id === id) {
+                        item.subTotal = `$${totalPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;
+                    }
+                });
+            },
+            currencyFormat: function(num) {
+              return num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+            },
+            formatNumber: function(num) {
+              return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+            }
+        },
+    });
+
+    function onDialogCreated() {
+        viewNotesModal = this;
+    }
+
+
+    function onAcceptCreated() {
+        acceptTOSModal = this;
+    }
+
+
+    function handleAcceptTOSModal() {
+        acceptTOSModal.show();
+    }
+
+    let itemNoteId;
+    function handleNotesModal(itemId) {
+        itemNoteId = itemId;
+        $("#productNote").val($(`#${itemNoteId}`).val());
+        viewNotesModal.show();
+    }
+
+    $('#saveNote').on('click', function () {
+        $(`#${itemNoteId}`).val($("#productNote").val());
+        $(this).find("textarea").val('').end();
+        viewNotesModal.hide();
+    });
+    function evenRound(num, decimalPlaces) {
+        var d = decimalPlaces || 0;
+        var m = Math.pow(10, d);
+        var n = +(d ? num * m : num).toFixed(8); // Avoid rounding errors
+        var i = Math.floor(n), f = n - i;
+        var e = 1e-8; // Allow for rounding errors in f
+        var r = (f > 0.5 - e && f < 0.5 + e) ?
+            ((i % 2 == 0) ? i : i + 1) : Math.round(n);
+        return d ? r / m : r;
+    }
+</script>
+<ejs-scripts></ejs-scripts>

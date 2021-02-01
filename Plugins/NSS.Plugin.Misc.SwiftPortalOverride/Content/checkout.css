@@ -1,0 +1,605 @@
+﻿
+.font12 {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.font14 {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.font20 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.fs-12 {
+    font-size: 12px;
+}
+
+.fs-13 {
+    font-size: 13px;
+}
+
+.fs-14 {
+    font-size: 14px;
+}
+
+.fs-18 {
+    font-size: 18px;
+}
+
+.fs-20 {
+    font-size: 20px;
+}
+
+#purchaseOrder {
+    background: #F6F6F6;
+}
+
+.shipping-tab {
+    background-color: #F6F6F6;
+    color: #000;
+    padding: 7px 16px;
+}
+
+    .shipping-tab.active {
+        background-color: #0076B4;
+        color: #FFF;
+    }
+
+button, button:focus {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    box-shadow: none;
+    outline: none;
+}
+
+.payment-type-btn, .payment-type-btn:focus {
+    flex-basis: 30%;
+    margin-left: 2px;
+    padding: 25px 15px;
+    border: 2px solid grey;
+    display: flex;
+    align-items: start;
+    border-radius: 5px;
+}
+
+.active, .active:focus {
+    /* background-color: rgb(7, 7, 107);
+    border: none;
+    color: #ffffff;*/
+}
+
+.heading1 {
+    color: rgb(7, 7, 107);
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+    font-size: 26px;
+}
+
+.heading2 {
+    color: rgb(7, 7, 107);
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+    font-size: 20px;
+}
+
+.heading3 {
+    color: rgb(7, 7, 107);
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+    font-size: 16px;
+}
+
+#shippingAddress {
+    border: none;
+    height: 38px;
+}
+
+    #shippingAddress:focus {
+        outline: none;
+    }
+
+.card-mod {
+    padding: 20px;
+    border-radius: 0;
+    margin-bottom: 30px;
+    box-shadow: 5px 10px #888888;
+    box-shadow: 0px 0px 8px -5px #000;
+}
+
+#checkout .nss-form-control {
+    background: #F6F6F6;
+    border: none;
+    color: #000;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+
+#checkout select.nss-form-control {
+    display: inline-block;
+    box-sizing: border-box;
+    font-size: 16px;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: #F6F6F6;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='4d6575' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-position-y: 8px;
+    padding: 4px 12px;
+    transition: border .1s linear;
+    min-height: 36px;
+    color: #000;
+    -webkit-transition: all 0.30s ease-in-out;
+    -moz-transition: all 0.30s ease-in-out;
+    -ms-transition: all 0.30s ease-in-out;
+    -o-transition: all 0.30s ease-in-out;
+    outline: none;
+}
+
+#checkout .nss-form-control::placeholder {
+    font-style: italic;
+    color: #777;
+}
+
+#checkout .nss-form-control::-webkit-input-placeholder {
+    font-style: italic;
+    color: #C3C3C3;
+}
+
+#checkout .nss-form-control:-moz-placeholder { /* Firefox 18- */
+    font-style: italic;
+    color: #C3C3C3;
+}
+
+#checkout .nss-form-control::-moz-placeholder { /* Firefox 19+ */
+    font-style: italic;
+    color: #C3C3C3;
+}
+
+#checkout .nss-form-control:-ms-input-placeholder {
+    font-style: italic;
+    color: #C3C3C3;
+}
+
+#checkout .nss-form-control::placeholder {
+    font-style: italic;
+    color: #C3C3C3;
+}
+
+/* #region Radio button */
+
+/* Customize the label (the container) */
+
+.nss-radio-button {
+    display: block;
+    position: relative;
+    padding-left: 28px;
+    padding-top: 3px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    color: #000;
+    font-size: 14px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+    /* Hide the browser's default radio button */
+    .nss-radio-button input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    /* Create a custom radio button */
+    .nss-radio-button .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: transparent;
+        border-radius: 50%;
+        border: 2px solid #C3C3C3;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .nss-radio-button:hover input ~ .checkmark {
+        background-color: #ccc;
+    }
+
+    /* When the radio button is checked, add a blue background */
+    .nss-radio-button input:checked ~ .checkmark {
+        background-color: #0076B4;
+        border: 2px solid #0076B4;
+    }
+
+    /* Create the indicator (the dot/circle - hidden when not checked) */
+    .nss-radio-button .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the indicator (dot/circle) when checked */
+    .nss-radio-button input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    /* Style the indicator (dot/circle) */
+    .nss-radio-button .checkmark:after {
+        top: 4.5px;
+        left: 4.5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: white;
+    }
+
+/* #endregion */
+
+/* #region Checkbox */
+
+/* Customize the label (the container) */
+.nss-checkbox {
+    display: block;
+    position: relative;
+    padding-left: 28px;
+    padding-top: 3px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #000;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+    /* Hide the browser's default checkbox */
+    .nss-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    /* Create a custom checkbox */
+    .nss-checkbox .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #eee;
+        border: 2px solid #C3C3C3;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .nss-checkbox:hover input ~ .checkmark {
+        background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    .nss-checkbox input:checked ~ .checkmark {
+        background-color: #0076B4;
+        border: 2px solid #0076B4;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .nss-checkbox .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the checkmark when checked */
+    .nss-checkbox input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    .nss-checkbox .checkmark:after {
+        left: 5px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+/* #endregion */
+
+
+/* #region Payment Method */
+
+.payment-item-card {
+    border: 2px solid #C3C3C3;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .payment-item-card * {
+        cursor: pointer;
+    }
+
+    .payment-item-card label {
+        color: #03175B;
+        line-height: 1;
+    }
+
+    .payment-item-card.active {
+        border: 2px solid #03175B;
+        background: #03175B;
+    }
+
+        .payment-item-card.active label {
+            color: #FFF;
+        }
+
+        .payment-item-card.active img {
+            filter: brightness(0) invert(1);
+        }
+
+    .payment-item-card.disabled {
+        border: 2px solid #C3C3C3;
+        background: #C3C3C3;
+        cursor: not-allowed;
+    }
+
+        .payment-item-card.disabled * {
+            cursor: not-allowed;
+        }
+
+        .payment-item-card.disabled label {
+            color: #FFF;
+        }
+
+        .payment-item-card.disabled img {
+            filter: brightness(0) invert(1);
+        }
+
+/* #endregion */
+
+/* Table sort indicators */
+.catalog-table {
+    border: 2px solid #ffffff !important;
+    margin-bottom: 50px;
+}
+
+    .catalog-table thead > tr > th {
+        background-color: rgb(7, 7, 107) !important;
+        color: #ffffff;
+    }
+
+td {
+    color: rgb(7, 7, 107);
+}
+
+.table-action-button, .table-action-button:focus {
+    background: none;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    padding: 1px;
+}
+
+.sort-button, .sort-button:focus {
+    background: none;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.no-backgroud-button {
+    border: none;
+    background-color: transparent;
+}
+
+    .no-backgroud-button > img {
+        margin-right: 3px;
+        height: 20px;
+        width: 20px;
+    }
+
+.cart-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.detail-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.discount, .cart-summary {
+    background-color: #F6F6F6;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+    .discount > label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+
+.left-detail {
+    min-width: 30%;
+}
+
+.discount > div > input {
+    border: none;
+    font-style: italic;
+    font-size: 14;
+    box-shadow: 0px 0px 3px 1px #e7e5e5;
+    padding: 5px;
+    margin-right: 10px;
+    width: 100%;
+}
+
+.discount-tag {
+    border: 1px solid rgb(7, 7, 107);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-bottom: 10px;
+    background-color: rgb(226, 231, 243);
+}
+
+.discount > div > button {
+    border: none;
+    background-color: #DEDEDE;
+    font-weight: 500;
+    padding: 0 15px;
+}
+
+.pickup-options > div {
+    display: flex;
+    align-items: center;
+}
+
+    .pickup-options > div > label {
+        font-size: 14px;
+        margin-left: 5px;
+    }
+
+    .pickup-options > div > input {
+        height: 15px;
+        width: 15px;
+    }
+
+.price-summary {
+    display: flex;
+    justify-content: space-between;
+}
+
+    .price-summary > .title {
+        color: #B1B1B1;
+        font-size: 14px;
+        margin: 2px 0;
+    }
+
+    .price-summary > .amount {
+        color: #000000;
+        font-size: 14px;
+        margin: 2px 0;
+        font-weight: 500;
+    }
+
+    .price-summary > .total {
+        color: #000000;
+        font-size: 24px;
+        margin: 5px 0 0 0;
+        font-weight: 500;
+    }
+
+.right-detail {
+    min-width: 50%;
+}
+
+.agree-terms {
+    display: flex;
+    align-items: center;
+}
+
+    .agree-terms > label {
+        font-size: 14px;
+        margin-left: 5px;
+    }
+
+    .agree-terms > a {
+        font-size: 14px;
+        color: #858585;
+    }
+
+    .agree-terms > input {
+        width: 15px;
+        height: 15px;
+    }
+
+.check-out {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 30px;
+}
+
+    .check-out > button {
+        border: none;
+        background-color: #DEDEDE;
+        color: #585858;
+        font-size: 18px;
+        font-weight: 500;
+        padding: 5px 15px;
+    }
+
+        .check-out > button:hover {
+            background-color: #585858;
+            color: #ffffff;
+        }
+
+.text-primary {
+    color: #03175B !important;
+}
+
+.text-black {
+    color: #000;
+}
+
+.text-decoration-underline {
+    text-decoration: underline;
+}
+
+.bg-accent {
+    background-color: #F6F6F6;
+}
+
+.w-30 {
+    width: 30% !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-notallowed {
+    cursor: not-allowed;
+}
+
+#place-order {
+    background-color: #03175B !important;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #FFF;
+}
+
+    #place-order:hover {
+        background-color: #0076B4 !important;
+    }
+
+    #place-order:disabled {
+        background-color: #C3C3C3 !important;
+        cursor: not-allowed;
+    }
+
+[v-cloak] {
+    display: none;
+}

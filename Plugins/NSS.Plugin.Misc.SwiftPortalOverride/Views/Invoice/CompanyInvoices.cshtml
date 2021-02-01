@@ -1,0 +1,273 @@
+﻿@inject IThemeContext themeContext
+@using Nop.Web.Framework.Themes
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+
+@model CompanyInvoiceListModel
+@{
+    Layout = "_ColumnsOne";
+    //title
+    Html.AddTitleParts("Invoices");
+}
+@{ var themeName = themeContext.WorkingThemeName; }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css" integrity="sha512-rxThY3LYIfYsVCWPCW9dB0k+e3RZB39f23ylUYTEuZMDrN/vRqLdaCBo/FbvVT6uC2r0ObfPzotsfKF9Qc5W5g==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" integrity="sha512-TQQ3J4WkE/rwojNFo6OJdyu6G8Xe9z8rMrlF9y7xpFbQfW5g8aSWcygCQ4vqRiJqFsDsE1T6MoAOMJkFXlrI9A==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" />
+<div id="invoices" class="page orders-page">
+    <div class=page-body>
+        @if (Model.CreditSummary.CanCredit)
+        {
+            <div class="bg-white-shadow d-flex flex-row flex-wrap align-items-center mb-3 p-4" v-bind:style="{'background': isMobile ? '#f6f6f6': '#ffffff'}">
+                <label class="h2-primary my-4 text-center" v-bind:style="{'width':isMobile ? '100%':'auto'}">CREDIT SUMMARY</label>
+
+                <div class="d-flex flex-row flex-wrap flex-fill justify-content-around invoice-summary-content">
+                    <div class="d-flex flex-column mx-3 my-1">
+                        <label class="fs12-default mb-2">Credit Limit</label>
+                        <label class="h5-default mb-0" v-bind:class="{'ml-2': !isMobile}">$@DoFormat(Model.CreditSummary.CreditLimit)</label>
+                    </div>
+                    <div class="d-flex flex-column mx-3 my-1">
+                        <label class="fs12-default mb-2">Total Open Invoices</label>
+                        <label class="h5-default mb-0" v-bind:class="{'ml-2': !isMobile}">$@DoFormat(Model.CreditSummary.OpenInvoiceAmount)</label>
+                    </div>
+                    <div class="d-flex flex-column mx-3 my-1">
+                        <label class="fs12-default mb-2">Total Past Due</label>
+                        <label class="h5-danger mb-0" v-bind:class="{'ml-2': !isMobile}">$@DoFormat(Model.CreditSummary.PastDueAmount)</label>
+                    </div>
+                    <div class="d-flex flex-column mx-3 my-1">
+                        <label class="fs12-default mb-2">Open Credit</label>
+                        <label class="h5-default mb-0" v-bind:class="{'ml-2': !isMobile}">$@DoFormat(Model.CreditSummary.CreditAmount)</label>
+                    </div>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="mb-2 p-2 text-right nss-input-label nss-dark">
+                <a href="@Model.CreditSummary.ApplyForCreditUrl" target="_blank"><img src="~/Themes/@(themeName)/Content/assets/icn-chevrons.svg" alt="" style="height:1rem;" class="pr-2">Apply For Credit</a>
+            </div>
+        }
+
+        <div class="orders-search-block bg-white-shadow" id=ordersTableBlock role="tabpanel" aria-labelledby="ordersTableBlock">
+            <div>
+                <div class="orders-title">SEARCH INVOICES</div>
+                <div class="orders-export cursor-pointer" v-on:click="isSearchExpanded = !isSearchExpanded;">
+                    <img class="collapse-icon" v-bind:class="{'down': isSearchExpanded}" id="collapseIcon"
+                         src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
+                </div>
+            </div>
+
+            <div v-show="isSearchExpanded" class="row m-0 py-0 px-2">
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=orderFromDate>Invoice Dates</label>
+                    <div class="input-with-icon">
+                        <input style="height: 36px; border-radius: 0;" id="startDate" v-model="fromDate" class="datepicker nss-form-control"
+                               data-date-format="mm/dd/yyyy" placeholder="From (mm/dd/yyyy)"
+                               v-on:change="!$event.target.value ? (fromDate = null) : null" maxlength="10" onpaste="return false;">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+                    </div>
+
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6d-flex flex-column my-3 py-0">
+                    <label for=orderToDate> &nbsp;</label>
+                    <div class="input-with-icon">
+                        <input style="height: 36px; border-radius: 0;" id="endDate" v-model="toDate" class="datepicker nss-form-control"
+                               data-date-format="mm/dd/yyyy" placeholder="To (mm/dd/yyyy)"
+                               v-on:change="!$event.target.value ? (toDate = null) : null" maxlength="10" onpaste="return false;">
+                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+                    </div>
+
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=purchaseOrder>Invoice #</label>
+                    <input class="nss-form-control" type="text" v-model="invoiceId" placeholder="Enter...">
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=purchaseOrder>Order #</label>
+                    <input class=nss-form-control type="text" v-model="orderId" placeholder="Enter...">
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                    <label for=purchaseOrder>Purchase Order #</label>
+                    <input class=nss-form-control type="text" v-model="poNo" placeholder="Enter...">
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
+                    <button class="nss-btn-default ml-lg-5 w-100 text-center" style=" padding: 10px 16px !important;" v-on:click="searchInvoices">Search</button>
+                </div>
+            </div>
+        </div>
+        @*<div v-if="isMobile && !isExportMode" class="mobile-export">
+                <button class=" ml-lg-5 text-center" v-on:click="switchToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+            </div>
+            <div v-if="isMobile && isExportMode" class="mobile-export">
+                <button class=" ml-lg-5 text-center mr-2" v-on:click="cancelExportMode()"><img src="~/Themes/@(themeName)/Content/assets/close.svg" alt="" width="25">Cancel</button>
+                <div class="ml-2">
+                    <label v-if="isExportMode" class="pure-material-checkbox" style="position: relative;">
+                        <input type="checkbox" class=" mr-2" onclick="selectAll(this)" id="select-all-invoices">
+                        <span class="checkmark"></span>Select All
+                    </label>
+                </div>
+            </div>*@
+        <div class="d-flex flex-row justify-content-between">
+            <div v-bind:style="{'padding-left': isMobile ? '20px':'0'}">
+                <ul class="nav nav-pills mb-1" id=pills-tab role="tablist">
+                    <li class=nav-item role="presentation" style=margin-right:.3em>
+                        <a class="nav-link active" id=pills-home-tab data-toggle=pill
+                           href=#pills-home role=tab aria-controls=pills-home
+                           aria-selected=true v-on:click="isClosed = false; searchInvoices(); selectedRowCount = 0;isExportMode=false;">Open Invoices</a>
+                    <li class=nav-item role="presentation">
+                        <a class=nav-link id=pills-profile-tab
+                           data-toggle=pill href=#pills-profile role=tab
+                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchInvoices(); selectedRowCount = 0;isExportMode=false;">Closed Invoices</a>
+                </ul>
+            </div>
+            <div class="order-export-btn-container" v-if="!isMobile">
+                <button class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+            </div>
+            <div class="order-export-btn-container" v-if="isMobile">
+                <button id="export-mob-btn" class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="exportExcelMobile()" style="background-color: #033551 !important; font-size: 18px;">EXPORT INVOICES</button>
+            </div>
+        </div>
+        <div class="d-flex flex-column p-4 " v-bind:class="{'bg-white-shadow': !isMobile}">
+
+            <div id="invoice-grid"></div>
+        </div>
+    </div>
+</div>
+@functions{
+    string DoFormat(decimal myNumber)
+    {
+        var s = string.Format("{0:N2}", myNumber);
+
+        return s;
+    }
+}
+
+<script>
+    var vm = new Vue({
+        el: '#invoices',
+        data: {
+            isLoading: false,
+            isSearchExpanded: true,
+            isClosed: false,
+            fromDate: null,
+            toDate: null,
+            invoiceId: null,
+            orderId: null,
+            poNo: null,
+            selectedRowCount: 0,
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        mounted: function () {
+            this.searchInvoices();
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            switchToExport: function () {
+                this.isExportMode = true;
+                invoicegridvm.switchToExport();
+            },
+            setFromDate: function (date) {
+                this.fromDate = date;
+            },
+            setToDate: function (date) {
+                this.toDate = date;
+            },
+            cancelExportMode: function () {
+                this.isExportMode = false;
+                invoicegridvm.cancelExportMode();
+            },
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            showLoading: function () {
+                $('#custom-loading').show();
+            },
+            hideLoading: function () {
+                $('#custom-loading').hide();
+            },
+            searchInvoices: function () {
+                const request = {
+                    invoiceId: this.invoiceId,
+                    orderId: this.orderId,
+                    fromDate: this.fromDate,
+                    toDate: this.toDate,
+                    pONo: this.poNo,
+                    isClosed: this.isClosed,
+                };
+                this.showLoading();
+                this.selectedRowCount = 0;
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("SearchCompanyInvoices", "Invoice")",
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(request),
+                    success: function (data) {
+                        $('#invoice-grid').html(data);
+                        self.hideLoading();
+                    },
+                    error: function (xhr, thrownError) {
+                        $('#invoice-grid').html('an error has occured here');
+                        self.hideLoading();
+                    }
+                });
+            }
+        },
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous"></script>
+<script>
+
+    $.fn.datepicker.defaults.format = "mm/dd/yyyy";
+    $('#startDate').datepicker({
+        endDate: '+0d',
+        autoclose: true
+    }).on('changeDate', function (e) {
+        _vm.setFromDate($(this).val());
+        vm.fromDate = $(this).val();
+    });
+    var _vm = vm;
+    $('#endDate').datepicker({
+        endDate: '+0d',
+        autoclose: true
+    }).on('changeDate', function (e) {
+        _vm.setToDate($(this).val());
+        vm.toDate = $(this).val();
+    });
+
+    $(document).ready(function () {
+        $('.datepicker').keypress(function (e) {
+            if (((e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 47) && (!e.shiftKey && !e.altKey && !e.ctrlKey))) {
+                if (e.keyCode != 8) {
+                    var text = this.value;
+                    if ((text.length < 2 || text.length > 5 || (text.length > 2 || text.length < 5)) && e.keyCode == 47) {
+                        return false;
+                    }
+                    if (text.length == 2) {
+                        this.value = text + '/';
+                    }
+                    if (text.length == 5) {
+                        this.value = text + '/';
+                    }
+                }
+
+                return true;
+            }
+            e.preventDefault();
+            return false;
+        });
+    });
+</script>
+<ejs-scripts></ejs-scripts>

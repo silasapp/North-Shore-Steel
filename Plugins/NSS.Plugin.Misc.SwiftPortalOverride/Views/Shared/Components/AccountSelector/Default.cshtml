@@ -1,0 +1,126 @@
+﻿@using Nop.Core
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using NSS.Plugin.Misc.SwiftCore.Domain.Customers
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using Nop.Services.Common
+
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
+@inject IGenericAttributeService genericAttributeService
+@{
+    var currentCustomer = workContext.CurrentCustomer;
+    int customerId = currentCustomer.Id;
+    // get all companies assigned to customer
+    IEnumerable<CustomerCompany> customerCompanies = customerCompanyService.GetCustomerCompanies(customerId);
+
+    CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
+    selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
+    selectAccountModel.loggedInCustomerId = customerId;
+    selectAccountModel.Count = customerCompanies.Count();
+}
+
+@{
+    // get cust company
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+}
+
+
+<div v-if="!isCheckout" id="top-menu-drawer">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center mb-0">
+        <div class="d-lg-none d-flex flex-row align-items-center justify-content-center bg-primary px-3 py-4 flex-fill">
+            <label class="h2-white-500 text-center ml-3 mb-0 pt-1 flex-fill">MENU</label>
+            <img src="~/Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close menu" v-on:click="closeMenuDrawer" width="24">
+        </div>
+        @if (selectAccountModel.Count > 1)
+        {
+            <select id="accountSelect" name="options" class="account-select" data-role="accountSelect" onchange="SelectCompany(this)">
+                <option selected disabled>Accounts </option>
+                @foreach (var company in selectAccountModel.Companies)
+                {
+                    <option value="@company.ErpCompanyId" id=@company.ErpCompanyId>@company.Name</option>
+                }
+            </select>
+        }
+        @await Component.InvokeAsync("CustomTopMenu")
+        <div v-if="!isMobile" id="custom-search-box-container" class="d-flex flex-row  align-items-center justify-content-center bg-primary bg-md-transparent">
+            <div class="nav-bar-search">
+                @await Component.InvokeAsync("CustomSearchBox")
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type='text/javascript'>
+        @*function SelectCompany(option) {
+            let ErpId = option.options[option.selectedIndex].id;
+            let cookieKey = `ERPCompanyId${@{@selectAccountModel.loggedInCustomerId}}=`
+            document.cookie = cookieKey + ErpId;
+            document.location.href = "/";
+        }*@
+
+    function SelectCompany(option) {
+        let ErpId = option.options[option.selectedIndex].id;
+        request = { ERPCompanyId: ErpId.toString() }
+        $('#custom-loading').show();
+        //const self = this;
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("SelectCompany", "HomeOverride")",
+            data: request,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data, _, _) {
+                document.location.href = "/";
+                $('#custom-loading').hide();
+            },
+            error: function (xhr, thrownError) {
+                document.location.href = "/";
+            }
+        });
+    }
+
+        var erpCompId = @Html.Raw(eRPCompanyId);
+        $(document).ready(function () {
+            $('select[name="options"]').find('option[value='+erpCompId+']').attr("selected", true);
+        });
+
+    var vm = new Vue({
+        el: '#top-menu-drawer',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+            isCheckout: function () {
+                return (window.location.href.indexOf("onepagecheckout") > -1 || window.location.href.indexOf("Completed") > -1 || window.location.href.indexOf("Rejected") > -1);
+            }
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            closeMenuDrawer: function () {
+                headerLinksVm.closeDrawer();
+            },
+
+        },
+    });
+</script>
+

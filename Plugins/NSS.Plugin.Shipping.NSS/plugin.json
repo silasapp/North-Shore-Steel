@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Shipping rate computation",
+  "FriendlyName": "NSS Shipping Charge",
+  "SystemName": "Shipping.NSS",
+  "Version": "1.00",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "Chaione team",
+  "DisplayOrder": 1,
+  "FileName": "NSS.Plugin.Shipping.NSS.dll",
+  "Description": "This plugin will return NSS shipping charge"
+}

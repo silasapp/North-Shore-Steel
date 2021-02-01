@@ -1,0 +1,344 @@
+﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
+
+@model CompanyInvoiceListModel
+@using Syncfusion.EJ2
+
+<style>
+    .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
+        padding-left: 0.6rem
+    }
+
+    .colorRed {
+        color: red !important;
+    }
+
+    .home-table-sm-header {
+        width: 110px !important;
+        background-color: #1899E1 !important;
+        /* border-bottom: 0.1px solid white; */
+    }
+
+    .invisible-grid {
+        height: 0 !important;
+        visibility: hidden;
+    }
+
+    .active-page {
+        background-color: #1899E1 !important;
+        color: #ffffff;
+    }
+</style>
+<div id="invoicesGrid">
+    <div v-bind:class="{'invisible-grid': isMobile}">
+        <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo"
+                  queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true"
+                  rowSelected="onRowSelected" rowDeselected="onRowDeselected">
+            <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
+            <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
+            <e-grid-columns>
+                <e-grid-column template="#invoiceNo" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#orderNo" headerText="Order #" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="InvoiceAmount" textAlign="Right" headerText="Invoice Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                @if (!Model.IsClosed)
+                {
+                    <e-grid-column field="BalanceAmount" textAlign="Right" headerText="Balance Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                }
+                <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                @if (Model.IsClosed)
+                {
+                    <e-grid-column field="InvoicePaidDate" headerText="Paid Date" minWidth="80" width="100" maxWidth="120" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                }
+                else
+                {
+                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="80" width="100" maxWidth="120" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="80" width="100" maxWidth="120"></e-grid-column>
+                }
+                <e-grid-column width="1"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+    </div>
+    <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
+        <div v-if="@Model.Invoices.Count == 0" style="background:#ffffff; padding: 10px;">
+            <label class=".fs12-default"> No records to display</label>
+        </div>
+
+        <div v-for="invoice in paginatedData" class="d-flex">
+            <label v-if="isExportMode" class="pure-material-checkbox mr-3  d-flex align-items-center" style="position: relative;">
+                <input type="checkbox" name="invoice-checkox"
+                       v-on:click="onCheck(invoice.invoiceId)">
+                <span class="checkmark"></span>
+            </label>
+            <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
+
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Invoice #</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <a v-bind:href="invoice.invoiceFile" class="fs12-link" target="_blank">{{invoice.invoiceId}}</a>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Order #</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <a class="fs12-link" v-bind:href="'/orders/'+invoice.orderNo">{{invoice.orderNo}}</a>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Purchase Order #</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <a class="fs12-default">{{invoice.poNo}}</a>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Invoice Amount</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">{{invoice.invoiceAmount}}</label>
+                    </div>
+                </div>
+
+
+                @if (!Model.IsClosed)
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Balance Amount</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.balanceAmount}}</label>
+                        </div>
+                    </div>
+
+                }
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Invoice Date</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0">{{invoice.invoiceDate|date}}</label>
+                    </div>
+                </div>
+
+                @if (Model.IsClosed)
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Paid Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.invoicePaidDate|date}}</label>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Due Date</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.invoiceDueDate|date}}</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">Status</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-default mb-0">{{invoice.invoiceStatusName}}</label>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+        </div>
+
+        <div class="pagination-mobile  d-flex bg-white-shadow py-3 px-2 justify-content-between align-items-center" v-if="isMobile">
+            <select id="paginationPageCount" v-on:change="setPageSize(); paginate(currentPage, pageSize);" style="border: none;">
+                <option value="10">10 per page</option>
+                <option value="20">20 per page</option>
+                <option value="50">50 per page</option>
+            </select>
+            <div>
+                <span class="mx-1" style="padding: 2px 1px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-if="currentPage>1" v-on:click="currentPage -= 1; paginate(currentPage, pageSize);"><img style="transform: rotate(270deg);" src="~/Themes/SwiftPortal/Content/assets/icn-arrow-up.svg" alt=""></span>
+                <span v-for="page in pageCount" class="mx-1" v-bind:class="{'active-page': currentPage == page}" style="padding: 2px 10px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-on:click="currentPage = page; paginate(page, pageSize);">{{page}}</span>
+                <span class="mx-1" style="padding: 2px 1px; background-color: #f6f6f6;font: normal normal 500 16px/18px 'Teko';" v-if="currentPage<pageCount" v-on:click="currentPage += 1; paginate(currentPage, pageSize);"><img style="transform: rotate(90deg);" src="~/Themes/SwiftPortal/Content/assets/icn-arrow-up.svg" alt=""></span>
+
+            </div>
+        </div>
+    </div>
+</div>
+@functions{
+    @using Newtonsoft.Json.Serialization;
+    @using Newtonsoft.Json;
+
+    string Serialize(object input)
+    {
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
+            Formatting = Formatting.None
+        });
+    }
+}
+<script>
+    var invPageModel = @Html.Raw(Serialize(Model));
+    var invoicegridvm = new Vue({
+        el: '#invoicesGrid',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+            paginatedData: [],
+            currentPage: 1,
+            pageSize: 10,
+            pageCount: 0,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+            this.paginate(this.currentPage, this.pageSize);
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+            switchToExport: function () {
+                this.isExportMode = true;
+            },
+            cancelExportMode: function () {
+                this.isExportMode = false;
+                mobileExcelInvoiceData = [];
+            },
+            paginate: function (page_number, page_size) {
+                page_number = page_number > 0 ? page_number : 1;
+                this.currentPage = page_number;
+                this.paginatedData = invPageModel.invoices.slice((page_number - 1) * page_size, page_number * page_size);
+                var pageCountDiv = invPageModel.invoices.length / page_size;
+                var pageCountRound = Math.round(pageCountDiv);
+                this.pageCount = pageCountRound > pageCountDiv ? pageCountRound : pageCountRound + 1;
+
+            },
+            setPageSize() {
+                this.pageSize = Number(document.getElementById('paginationPageCountInv').value);
+                if (this.isExportMode) {
+                    selectAll(false);
+                }
+            }
+
+        },
+    });
+</script>
+<script>
+    var invPageModel = @Html.Raw(Serialize(Model));
+
+    function formatDate(date) {
+        date = new Date(date);
+        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    }
+    function toolbarClick() {
+        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+       gridObj.excelExport();
+
+    }
+    async function cloneArray(invoices) {
+        return invoices.slice();
+    }
+    async function updateArray(invoices) {
+        var newInvoices = [];
+        for (var i in invoices) {
+            var _invoice = { ...invoices[i] };
+            _invoice.InvoiceDate = formatDate(_invoice.InvoiceDate);
+            _invoice.InvoicePaidDate = formatDate(_invoice.InvoicePaidDate);
+            _invoice.InvoiceDueDate = formatDate(_invoice.InvoiceDueDate);
+            newInvoices.push(_invoice);
+        }
+        return newInvoices;
+    }
+    async function keyToUpperCase(invoices) {
+        var newInvoices = [];
+        for (var i in invoices) {
+            var invoice = { ...invoices[i] };
+            for (var key in invoice) {
+                var upper = key.charAt(0).toUpperCase() + key.slice(1);;
+                // check if it already wasn't uppercase
+                if( upper !== key ){
+                    invoice[upper] = invoice[key];
+                    delete invoice[key];
+                }
+            }
+            newInvoices.push(invoice);
+        }
+        return newInvoices;
+    }
+   async function exportExcelMobile() {
+        var _invoices = await cloneArray(invoicegridvm.paginatedData);
+        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+       _invoices = await keyToUpperCase(_invoices);
+       _invoices = await updateArray(_invoices);
+
+        if (_invoices.length > 0) {
+            var exportProperties = {
+                dataSource: _invoices,
+                fileName: "InvoiceExport.xlsx"
+            };
+            gridObj.excelExport(exportProperties);
+        }
+    }
+
+    function excelQueryCellInfo(args) {
+        if (args.column.headerText == "Invoice #" && args.value.length === 0) { args.value = args.data.InvoiceId; }
+        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderNo; }
+        if (args.column.headerText == "Invoice Amount" && args.value.length === 0) { args.value = args.data.InvoiceAmount; }
+        if (args.column.headerText == "Balance Amount" && args.value.length === 0) { args.value = args.data.BalanceAmount; }
+    }
+
+    function onRowSelected(args) {
+        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        vm.selectedRowCount = exceldata.length;
+    }
+
+    function onRowDeselected(args) {
+        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+        var exceldata = gridObj.getSelectedRecords();
+        vm.selectedRowCount = exceldata.length;
+    }
+
+    function customiseCell(args) {
+        if (args.column.field === 'InvoiceStatusName') {
+            if (args.data['InvoiceStatusName'].indexOf("past due") > -1) {
+                args.cell.classList.add('colorRed');
+            }
+        }
+    }
+
+</script>
+
+<script id="invoiceNo" type="text/x-template">
+    <a href="${InvoiceFile}" target="_blank">${InvoiceId}</a>
+</script>
+<script id="orderNo" type="text/x-template">
+    <a href="/orders/${OrderNo}">${OrderNo}</a>
+</script>
+<ejs-scripts></ejs-scripts>

@@ -1,0 +1,198 @@
+﻿@using Nop.Core
+@using Nop.Web.Models.Customer
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using Nop.Services.Common
+@model CustomerInfoModel
+@inject Nop.Core.IWebHelper webHelper
+@inject IWorkContext workContext
+@inject IGenericAttributeService genericAttributeService
+@inject ICustomerCompanyService customerCompanyService
+
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-customer-info-page");
+}
+
+@{
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
+    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+}
+
+
+
+@section left
+    {
+    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Info, isABuyer = isBuyer })
+}
+
+@{
+    var customer = workContext.CurrentCustomer;
+    int ErpId = genericAttributeService.GetAttribute<int>(customer, Constants.ErpKeyAttribute);
+    string CellPhone = genericAttributeService.GetAttribute<string>(customer, Constants.CellAttribute);
+    int preferredLocationId = genericAttributeService.GetAttribute<int>(customer, Constants.PreferredLocationIdAttribute);
+}
+<style>
+    .grey-bg {
+        background-color: #f6f6f6 !important;
+        padding: 20px;
+    }
+
+    .color-white {
+        color: #ffffff !important;
+        ;
+    }
+</style>
+<div id="customer-info-page" class="page account-page customer-info-page">
+    <div class="page-body">
+        <form asp-route="CustomerInfo" method="post">
+            <div class="account-page-card" v-bind:class="{'text-left': isMobile,'grey-bg':isMobile}">
+                <div class="title" v-bind:class="{'justify-content-center': isMobile}"><strong>PERSONAL INFORMATION</strong></div>
+                <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                <div class="form-fields">
+                    <div class="input-block">
+                        <label asp-for="FirstName">First Name</label>
+                        @if (Model.FirstNameRequired)
+                        {
+                            <nop-required />
+                        }
+                        <input asp-for="FirstName" placeholder="Enter first name" class="form-control custom-input" />
+                        <span asp-validation-for="FirstName"></span>
+                    </div>
+
+                    <div class="">
+                        <label asp-for="LastName">Last Name</label>
+                        @if (Model.LastNameRequired)
+                        {
+                            <nop-required />
+                        }
+                        <input asp-for="LastName" placeholder="Enter last name" class="form-control custom-input" />
+                        <span asp-validation-for="LastName"></span>
+                    </div>
+
+                    <div class="">
+                        <label asp-for="Phone">Work Phone</label>
+                        <input asp-for="Phone" id="work-phone" placeholder="Enter work phone" maxlength="14" class="form-control custom-input phone-number" />
+                        <span asp-validation-for="Phone"></span>
+                    </div>
+
+                    <div class="">
+                        <label asp-for="Phone">Cell Phone</label>
+                        <input name="cell-phone" id="cell-phone" placeholder="Enter cell phone" maxlength="14" class="form-control custom-input phone-number" value="@CellPhone" />
+                        <span asp-validation-for="Phone"></span>
+                    </div>
+
+                    <div class="">
+                        <label asp-for="Email">Work Email</label>
+                        <input asp-for="Email" class="form-control custom-input" style="cursor:unset" readonly />
+                    </div>
+
+                    <div class="">
+                        <label asp-for="Company">Company Name</label>
+                        <input asp-for="Company" class="form-control custom-input" style="cursor:unset" readonly />
+                    </div>
+
+                    @if (!String.IsNullOrEmpty(ErpId.ToString()))
+                    {
+                        <div class="">
+                            <label>Customer Number</label>
+                            <label class="form-control custom-input" style="cursor:unset" readonly>@ErpId</label>
+                        </div>
+                    }
+
+                    <div class="" hidden>
+                        <label>Preferred Pickup Location</label>
+                        <select name="preferred-location-id" asp-for="@preferredLocationId" asp-items="Html.GetEnumSelectList<PreferredLocation>()" class="form-control custom-input"></select>
+                    </div>
+
+                </div>
+                <div class="buttons save-customer-info-button" v-bind:class="{'justify-content-center': isMobile}">
+                    <input type=submit id=save-info-button value='Save Changes' onClick="return validatePhoneNumbers();" name="save-info-button" class="button-2 " v-bind:class="{'bg-primary': isMobile,'color-white': isMobile}">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#customer-info-page',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+        },
+    });
+</script>
+<script asp-location="Footer">
+    function removeexternalassociation(itemId) {
+        if (confirm('@T("Common.AreYouSure")')) {
+            var postData = {
+                id: itemId
+            };
+            addAntiForgeryToken(postData);
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@Url.Action("RemoveExternalAssociation", "Customer")",
+                data: postData,
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {
+                    location.href = data.redirect;
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('Failed to delete');
+                }
+            });
+        }
+        return false;
+    }
+
+    $(document).ready(function () {
+
+        const cellPhoneElement = document.getElementById('cell-phone');
+        const workPhoneElement = document.getElementById('work-phone');
+        cellPhoneElement.addEventListener('keydown', enforceFormat);
+        cellPhoneElement.addEventListener('keyup', formatToPhone);
+        workPhoneElement.addEventListener('keydown', enforceFormat);
+        workPhoneElement.addEventListener('keyup', formatToPhone);
+    });
+
+    function validatePhoneNumbers() {
+        var elements = document.getElementsByClassName("phone-number");
+        for (var i = 0; i < elements.length; i++) {
+            if (elements[i].value != "") {
+                re = /^[(]\d{3}[)][\s.-]\d{3}[\s.-]\d{4}$/igm;
+                if (!re.test(elements[i].value)) {
+                    alert('Please enter a valid phone number.');
+                    return false;
+                }
+            }
+        }
+    }
+</script>

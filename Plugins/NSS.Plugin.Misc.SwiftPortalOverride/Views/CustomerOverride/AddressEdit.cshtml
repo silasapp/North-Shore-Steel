@@ -1,0 +1,109 @@
+﻿@using Nop.Core
+@using Nop.Web.Models.Customer
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using Nop.Services.Common
+@inject IWorkContext workContext
+@inject ICustomerCompanyService customerCompanyService
+@inject IGenericAttributeService genericAttributeService
+@model CustomerAddressEditModel
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-address-edit-page");
+
+}
+
+@{
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
+    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+}
+
+@section left
+{
+    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses, isABuyer = isBuyer })
+}
+<style>
+    .grey-bg {
+        background-color: #f6f6f6 !important;
+        padding: 20px;
+    }
+
+    .color-white {
+        color: #ffffff !important;
+    }
+</style>
+<form asp-route="CustomerAddressEdit" method="post" id="edit-address">
+    <div class="page account-page" v-bind:class="{'text-left': isMobile,'grey-bg':isMobile}">
+        <div v-bind:class="{'p-0': isMobile,'grey-bg':isMobile,'page-body': !isMobile}">
+            <div class=" " v-bind:class="{'p-0': isMobile,'grey-bg':isMobile,'address-edit-page': !isMobile,'account-page-card': !isMobile}">
+                <div class="title" v-bind:class="{'justify-content-center': isMobile}"><strong>ADDRESS DETAILS</strong></div>
+                <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                @{
+                    var dataDictAddress = new ViewDataDictionary(ViewData);
+                    dataDictAddress.TemplateInfo.HtmlFieldPrefix = "Address";
+                    @await Html.PartialAsync("_CreateOrUpdateAddress", Model.Address, dataDictAddress)
+                }
+                <div class="buttons" v-bind:class="{'justify-content-center': isMobile,'text-center': isMobile}">
+                    <input type="submit" class="cancel-button" style="background-color: transparent !important;" value="Cancel" />
+                    <input type="submit" onClick="return validatePhoneNumbers();" class="button-1 save-address-button" value="@T("Common.Save")" v-bind:class="{'bg-primary': isMobile,'color-white': isMobile}" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script>
+    var vm = new Vue({
+        el: '#edit-address',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+        },
+    });
+</script>
+<script>
+    let phoneElement = "";
+    $(document).ready(function () {
+        phoneElement = document.getElementById('phone-number');
+        phoneElement.addEventListener('keydown', enforceFormat);
+        phoneElement.addEventListener('keyup', formatToPhone);
+    });
+
+    function validatePhoneNumbers() {
+        if (phoneElement.value != "") {
+            re = /^[(]\d{3}[)][\s.-]\d{3}[\s.-]\d{4}$/igm;
+            if (!re.test(phoneElement.value)) {
+                alert('Please enter a valid phone number.');
+                return false;
+            }
+        }
+    }
+</script>
