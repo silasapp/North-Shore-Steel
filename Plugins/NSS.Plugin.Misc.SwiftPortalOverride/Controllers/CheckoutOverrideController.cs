@@ -742,7 +742,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Json(new { success = 1, orderId = placeOrderResult.PlacedOrder.Id });
             }
 
-            return Json(new { error = 1, message = "Order was not placed successfuly" });
+            return Json(new { error = 1, message = "Order was not placed successfully" });
         }
 
         private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod, string deliveryDate)
