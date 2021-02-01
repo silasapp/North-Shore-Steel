@@ -258,7 +258,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         /// <param name="settings">Plugin settings</param>
         /// <param name="orderGuid">Order GUID</param>
         /// <returns>Created order; error message if exists</returns>
-        public (Order Order, string ErrorMessage) CreateOrder(SwiftCoreSettings settings, Guid orderGuid, ErpCheckoutModel model, decimal shippingCost)
+        public (Order Order, string ErrorMessage) CreateOrder(SwiftCoreSettings settings, Guid orderGuid, ErpCheckoutModel model)
         {
             return HandleFunction(settings, () =>
             {
@@ -420,10 +420,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 //set totals
                 itemTotal = Math.Round(itemTotal, 2);
                 var discountTotal = Math.Round(itemTotal + taxTotal + shippingTotal - orderTotal, 2);
-
-                // set shipping cost
-                shippingTotal += shippingCost;
-                orderTotal += shippingTotal; 
 
                 purchaseUnit.AmountWithBreakdown = new AmountWithBreakdown
                 {

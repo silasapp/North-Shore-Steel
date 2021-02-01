@@ -277,6 +277,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
                 creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero };
+
+                // save credit bal, cached purposes
+                _genericAttributeService.SaveAttribute<decimal?>(_workContext.CurrentCustomer, PaypalDefaults.CreditBalanceKey, creditModel.CreditAmount, _storeContext.CurrentStore.Id);
             }
 
             model.AccountCreditModel = creditModel;
@@ -351,22 +354,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var paymentRequest = new ProcessPaymentRequest();
                 _paymentService.GenerateOrderGuid(paymentRequest);
 
-                // get shipping cost
-                // shipping
-                ERPCalculateShippingRequest request = BuildShippingCostRequest(model);
+                //// get shipping cost
+                //// shipping
+                //ERPCalculateShippingRequest request = BuildShippingCostRequest(model);
 
-                var shipObj = GetShippingCost(requestOverride: request);
-                if (!shipObj.Allowed)
-                    shipObj.ShippingCost = decimal.Zero;
+                //var shipObj = GetShippingCost(requestOverride: request);
+                //if (!shipObj.Allowed)
+                //    shipObj.ShippingCost = decimal.Zero;
 
                 //try to create an order
-                var (order, errorMessage) = _payPalServiceManager.CreateOrder(_settings, paymentRequest.OrderGuid, model, shipObj.ShippingCost);
+                var (order, errorMessage) = _payPalServiceManager.CreateOrder(_settings, paymentRequest.OrderGuid, model);
                 if (order != null)
                 {
                     //save order details for future using
                     paymentRequest.CustomValues.Add(PaypalDefaults.PayPalOrderIdKey, order.Id);
-                    paymentRequest.CustomValues.Add(PaypalDefaults.ShippingCostKey, shipObj.ShippingCost);
-                    paymentRequest.CustomValues.Add(PaypalDefaults.ShippingDeliveryDateKey, shipObj.DeliveryDate);
+                    paymentRequest.CustomValues.Add(PaypalDefaults.ShippingDeliveryDateKey, model.DeliveryDate);
 
                     result = Json(new { success = 1, orderId = order.Id });
                 }
@@ -501,23 +503,45 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (!response.Allowed)
                     response.ShippingCost = decimal.Zero;
 
+                //if pickup
+                if (address.IsPickup)
+                {
+                    var pickupPoints = _shippingService.GetPickupPoints(_workContext.CurrentCustomer.BillingAddressId ?? 0, _workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id).PickupPoints.ToList();
+                    var pickupPoint = string.IsNullOrEmpty(address.PickupPointId) ? pickupPoints.FirstOrDefault() : pickupPoints.FirstOrDefault(x => x.Id == address.PickupPointId);
+
+                    SavePickupOption(pickupPoint);
+                }
+                else
+                {
+                    var shippingOptions = _genericAttributeService.GetAttribute<List<ShippingOption>>(_workContext.CurrentCustomer,
+                    NopCustomerDefaults.OfferedShippingOptionsAttribute, _storeContext.CurrentStore.Id);
+
+                    var shippingOption = shippingOptions.FirstOrDefault(x => x.ShippingRateComputationMethodSystemName == "Shipping.NSS");
+
+                    if (shippingOption != null)
+                        _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption, _storeContext.CurrentStore.Id);
+
+                    _genericAttributeService.SaveAttribute<PickupPoint>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedPickupPointAttribute, null, _storeContext.CurrentStore.Id);
+                }
+
+                //if shipping
+
                 //if (response.Allowed)
                 //    return Json(new { error = 2, message = "We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select \"Pickup\"" });
 
                 var shoppingCart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
-                var orderTotal = _orderTotalCalculationService.GetShoppingCartTotal(shoppingCart, out var orderDiscountAmount, out var orderAppliedDiscounts, out var appliedGiftCards, out var redeemedRewardPoints, out var redeemedRewardPointsAmount);
-                orderTotal += response.ShippingCost;
+                var orderTotals = _shoppingCartModelFactory.PrepareOrderTotalsModel(shoppingCart, false);
+
+                //var orderTotal = _orderTotalCalculationService.GetShoppingCartTotal(shoppingCart, out var orderDiscountAmount, out var orderAppliedDiscounts, out var appliedGiftCards, out var redeemedRewardPoints, out var redeemedRewardPointsAmount);
+                //orderTotal += response.ShippingCost;
 
                 return Json(new
                 {
                     shippingCalculatorResponse = response,
-                    orderTotal,
-                    orderDiscountAmount,
-                    orderAppliedDiscounts,
-                    appliedGiftCards,
-                    redeemedRewardPoints,
-                    redeemedRewardPointsAmount
+                    orderTotal = orderTotals.OrderTotal,
+                    shipping = orderTotals.Shipping,
+                    tax = orderTotals.Tax,
                 });
             }
             catch (Exception exc)
@@ -624,14 +648,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 processPaymentRequest = new ProcessPaymentRequest();
 
                 // get shipping cost
-                var request = BuildShippingCostRequest(model);
-                var shipObj = GetShippingCost(requestOverride: request);
+                //var request = BuildShippingCostRequest(model);
+                //var shipObj = GetShippingCost(requestOverride: request);
 
-                if (!shipObj.Allowed)
-                    shipObj.ShippingCost = decimal.Zero;
+                //if (!shipObj.Allowed)
+                //    shipObj.ShippingCost = decimal.Zero;
 
-                processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingCostKey, shipObj.ShippingCost);
-                processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingDeliveryDateKey, shipObj.DeliveryDate);
+                //processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingCostKey, shipObj.ShippingCost);
+                processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingDeliveryDateKey, model.DeliveryDate);
             }
 
             // place order based on payment selected
@@ -673,8 +697,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 //nss get credit amount
                 var (erpCompId, _) = GetCustomerCompanyDetails();
-                var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId);
-                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditResult?.CreditAmount ?? decimal.Zero);
+                // get credit balance from cache
+                var creditAmount = _genericAttributeService.GetAttribute<decimal>(_workContext.CurrentCustomer, PaypalDefaults.CreditBalanceKey, _storeContext.CurrentStore.Id, decimal.Zero);
+                processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditAmount);
             }
 
             var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
@@ -686,6 +711,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 {
                     Order = placeOrderResult.PlacedOrder
                 };
+
+                // reset credit balance
+                _genericAttributeService.SaveAttribute<decimal?>(_workContext.CurrentCustomer, PaypalDefaults.CreditBalanceKey, null, _storeContext.CurrentStore.Id);
 
                 // call nss place Order
                 processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.ShippingDeliveryDateKey, out var deliveryDate);
@@ -755,7 +783,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, amount), 2), Code = discount.CouponCode ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
                 }
-
             }
 
             // order items

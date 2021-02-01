@@ -12,6 +12,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public ErpCheckoutShippingAddress ShippingAddress { get; set; }
         public ErpCheckoutPaymentMethodModel PaymentMethodModel { get; set; }
         public bool HasError { get; set; }
+        public string DeliveryDate { get; set; }
     }
 
     public class ErpCheckoutBillingAddress

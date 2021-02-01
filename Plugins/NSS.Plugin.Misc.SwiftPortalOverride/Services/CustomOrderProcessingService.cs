@@ -154,13 +154,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 var details = PreparePlaceOrderDetails(processPaymentRequest);
 
                 //override shipping cost and total
-                decimal shippingCost = decimal.Zero;
-                var isNum = processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.ShippingCostKey, out var shippingCostObj) && decimal.TryParse(shippingCostObj?.ToString(), out shippingCost);
+                //decimal shippingCost = decimal.Zero;
+                //var isNum = processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.ShippingCostKey, out var shippingCostObj) && decimal.TryParse(shippingCostObj?.ToString(), out shippingCost);
 
-                details.OrderShippingTotalExclTax += shippingCost;
-                details.OrderShippingTotalInclTax += shippingCost;
+                //details.OrderShippingTotalExclTax += shippingCost;
+                //details.OrderShippingTotalInclTax += shippingCost;
 
-                details.OrderTotal += shippingCost;
+                //details.OrderTotal += shippingCost;
 
                 var processPaymentResult = GetProcessPaymentResult(processPaymentRequest, details);
 
@@ -590,8 +590,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 switch (paymentMethodType.ToString())
                 {
                     case "CREDITCARD":
-                        processPaymentResult = ProcessPayPalPayment(processPaymentRequest);
-                        break;
                     case "PAYPAL":
                         processPaymentResult = ProcessPayPalPayment(processPaymentRequest);
                         break;

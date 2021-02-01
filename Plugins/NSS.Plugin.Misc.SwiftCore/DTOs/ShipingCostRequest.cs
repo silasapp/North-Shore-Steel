@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
+namespace NSS.Plugin.Misc.SwiftCore.DTOs
 {
     public class ShippingCostRequest
     {
@@ -14,7 +14,5 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public string ZipPostalCode { get; set; }
 
         public bool SaveToMyAddress { get; set; }
-
-        public string PickupPointId { get; set; }
     }
 }
