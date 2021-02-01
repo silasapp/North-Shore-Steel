@@ -14,8 +14,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 
     public enum PreferredLocation
     {
-        Houston = 1,
-        Beaumont = 2
+        Houston = 2,
+        Beaumont = 1
     }
 
     public enum HearAboutUs
