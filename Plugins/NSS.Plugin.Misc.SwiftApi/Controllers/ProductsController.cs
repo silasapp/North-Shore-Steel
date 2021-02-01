@@ -115,12 +115,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 }
                 else
                 {
-                    if (attribute.Sort?.ToLower() == "millname" || attribute.Sort?.ToLower() == "countryoforigin")
-                    {
-                        if (value == null)
-                            ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
-                    }
-                    else
+                    if (attribute.Sort?.ToLower() != "millname" && attribute.Sort?.ToLower() != "countryoforigin")
                     {
                         if (string.IsNullOrWhiteSpace(value?.ToString()))
                             ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
@@ -353,59 +348,51 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
                 bool containsValue = data.TryGetValue(attr.Name, out object value);
 
-                if (containsValue && !string.IsNullOrEmpty(value.ToString()))
+                if (containsValue && !string.IsNullOrEmpty(value?.ToString()))
                 {
+                    string stringVal = value.ToString().Trim();
+
                     // not plate individual shape id - 13 should have metal and coating filter omly
                     if (!shapeId?.ToString()?.StartsWith("13") ?? false)
                     {
                         if (attr.Name == Constants.CoatingFieldAttribute || attr.Name == Constants.MetalFieldAttribute)
-                            CreateProductSpecFilter(entity, attr, options, value);
+                            CreateProductSpecFilter(entity, attr, options, stringVal);
                     }
                     else
                     {
                         if (attr.Name == Constants.CountryOfOriginFieldAttribute)
                         {
-                            value = value.ToString().ToUpper();
-
-                            CreateProductSpecFilter(entity, attr, options, value);
+                            CreateProductSpecFilter(entity, attr, options, stringVal.ToUpper());
                         }
                         else if (attr.Name == Constants.WidthFieldAttribute)
                         {
-                            if (int.TryParse(value?.ToString(), out int width))
+                            if (int.TryParse(stringVal, out int width))
                             {
                                 // min width - 36, 48, 60, 72
                                 if (width >= 36)
                                 {
-                                    value = 36;
-
-                                    CreateProductSpecFilter(entity, attr, options, value);
+                                    CreateProductSpecFilter(entity, attr, options, "36");
                                 }
 
                                 if (width >= 48)
                                 {
-                                    value = 48;
-
-                                    CreateProductSpecFilter(entity, attr, options, value);
+                                    CreateProductSpecFilter(entity, attr, options, "48");
                                 }
 
                                 if (width >= 60)
                                 {
-                                    value = 60;
-
-                                    CreateProductSpecFilter(entity, attr, options, value);
+                                    CreateProductSpecFilter(entity, attr, options, "60");
                                 }
 
                                 if (width >= 72)
                                 {
-                                    value = 72;
-
-                                    CreateProductSpecFilter(entity, attr, options, value);
+                                    CreateProductSpecFilter(entity, attr, options, "72");
                                 }
                             }
                         }
                         else
                         {
-                            CreateProductSpecFilter(entity, attr, options, value);
+                            CreateProductSpecFilter(entity, attr, options, stringVal);
                         }
                     }
 
@@ -414,14 +401,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
         }
 
-        private void CreateProductSpecFilter(Product entity, SpecificationAttribute attr, IList<SpecificationAttributeOption> options, object value)
+        private void CreateProductSpecFilter(Product entity, SpecificationAttribute attr, IList<SpecificationAttributeOption> options, string optionName)
         {
-            var option = options.FirstOrDefault(x => x.Name == value.ToString());
+            var option = options.FirstOrDefault(x => x.Name == optionName);
 
             if (option == null)
             {
                 //create option
-                option = new SpecificationAttributeOption { Name = value.ToString(), SpecificationAttributeId = attr.Id };
+                option = new SpecificationAttributeOption { Name = optionName, SpecificationAttributeId = attr.Id };
                 _specificationAttributeService.InsertSpecificationAttributeOption(option);
             }
 
