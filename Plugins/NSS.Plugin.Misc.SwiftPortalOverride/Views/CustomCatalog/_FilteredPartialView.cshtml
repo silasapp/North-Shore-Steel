@@ -307,7 +307,7 @@
 
 <div id="gridView">
     <div>
-        <div v-bind:style="{height: isMobile ? '0px' : 'auto',visibility: isMobile ? 'hidden' : 'visible'}">
+        <div  v-if="!isMobile" v-bind:style="{height: isMobile ? '0px' : 'auto',visibility: isMobile ? 'hidden' : 'visible'}">
             <div id="Grid"></div>
         </div>
         <div v-if="isMobile">
@@ -425,7 +425,7 @@
         },
         mounted: function () {
             this.buildGrid();
-            this.addCommaToWeight();
+            this.formatText();
         },
         methods: {
             handleResize: function () {
@@ -476,8 +476,10 @@
                 });
                 this.grid.appendTo('#Grid');
             },
-            addCommaToWeight: function () {
+            formatText: function () {
                 gridData.map(g => g.weight = g.weight?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                gridData.map(g => g.millname = g.millname == null ? '' : g.millname);
+                gridData.map(g => g.countryoforigin = g.countryoforigin == null ? '' : g.countryoforigin);
             },
             handleTooltipping: function (args) {
             },
