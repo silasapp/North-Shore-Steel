@@ -243,7 +243,7 @@ Content1 =
                                                         <span class="product-quantity">@item.Quantity</span>
                                                     }
                                                 </td>
-                                                <td style="text-align:left" class="d-flex flex-row">
+                                                <td style="text-align:left" class="d-flex flex-row align-items-center">
                                                     <div class="table-action-button">
                                                         <label class="mb-0">
                                                             <span style="cursor:pointer">
@@ -255,14 +255,6 @@ Content1 =
                                                             <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
                                                         </label>
                                                     </div>
-                                                    @if (eRPCompanyIdExist)
-                                                    {
-                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                            <title>Add to cart</title>
-                                                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
-                                                            <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                        </svg>
-                                                    }
                                                     @if (hasSawOption)
                                                     {
                                                         @*<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
@@ -294,6 +286,24 @@ Content1 =
                                                                     <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                                 </svg>*@
                                                         </a>
+                                                    }
+                                                    @if (eRPCompanyIdExist)
+                                                    {
+                                                        @*<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                                <title>Add to cart</title>
+                                                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
+                                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                            </svg>*@
+                                                        <button onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" style="border: none;background-color: #1899E1;color:#ffffff;display: flex;align-items: center;padding: 5px 10px;margin-left: 5px;">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" width="24" height="24"
+                                                                 preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
+                                                                 style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
+                                                                <title>Add to cart</title>
+                                                                <path style="fill: #ffffff;" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
+                                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
+                                                            </svg>
+                                                            Add to cart
+                                                        </button>
                                                     }
 
                                                     @*@if (string.IsNullOrEmpty(mtr))
