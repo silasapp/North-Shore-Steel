@@ -226,7 +226,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 OrderId = order.OrderId,
                 PoNo = order.PoNo,
                 DeliveryDate = order.DeliveryDate,
-                DeliveryStatus = order.DeliveryStatus
+                DeliveryStatus = order.DeliveryStatus,
+                DeliveryTicketFile = $"{order.DeliveryTicketFile}{token}",
+                DeliveryTicketCount = order.DeliveryTicketCount
             }).Take(5).ToList();
 
 

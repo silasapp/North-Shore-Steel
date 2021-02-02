@@ -202,6 +202,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             foreach (var sci in cart)
             {
                 var product = _productService.GetProductById(sci.ProductId);
+                product.OrderMaximumQuantity = product.OrderMaximumQuantity > 0 ? product.OrderMaximumQuantity : 0;
 
                 var sciWarnings = _shoppingCartService.GetShoppingCartItemWarnings(_workContext.CurrentCustomer,
                     sci.ShoppingCartType,
