@@ -38,6 +38,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftCore;
+using System.Diagnostics;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -350,6 +351,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             try
             {
+                _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"start create paypal order process time stamp - {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}");
+                var sw1 = new Stopwatch();
+                sw1.Start();
+
+
                 var result = Json(new { });
                 //prepare order GUID
                 var paymentRequest = new ProcessPaymentRequest();
@@ -379,6 +385,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
 
                 HttpContext.Session.Set("OrderPaymentInfo", paymentRequest);
+                sw1.Stop();
+
+                _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"emd create paypal order process time stamp - {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")} | time elapsed - {sw1.ElapsedMilliseconds} ms");
 
                 return result;
             }
@@ -391,6 +400,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [IgnoreAntiforgeryToken]
         public virtual JsonResult PlaceOrder([FromBody] ErpCheckoutModel model)
         {
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"start place order process time stamp - {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}");
+            var sw1 = new Stopwatch();
+            sw1.Start();
+
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Checkout Model is null");
 
@@ -411,12 +424,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             try
             {
-                //var saveShippingAddress = model.ShippingAddress.SaveToAddressBook;
-                //var savebillingAddress = model.BillingAddress.SaveToAddressBook;
+                // save shipping
+                if(!model.ShippingAddress.IsPickupInStore)
+                    _workContext.CurrentCustomer.ShippingAddressId = model.ShippingAddress.ShippingAddressId;
 
+                // save billing
+                if (model.BillingAddress.BillingAddressId > 0)
+                {
+                    _workContext.CurrentCustomer.BillingAddressId = model.BillingAddress.BillingAddressId;
+                }
+                else if(!model.ShippingAddress.IsPickupInStore)
+                {
+                    _workContext.CurrentCustomer.BillingAddressId = model.ShippingAddress.ShippingAddressId;
+                }
+
+                _customerService.UpdateCustomer(_workContext.CurrentCustomer);
 
                 // payment
                 var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType, model);
+
+                sw1.Stop();
+
+                _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"place order after paypal took {sw1.ElapsedMilliseconds} ms");
 
                 return result;
 
@@ -721,7 +750,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 try
                 {
+                    var sw1 = new Stopwatch();
+                    sw1.Start();
                     NSSPlaceOrderRequest(placeOrderResult.PlacedOrder, paymentMethod, deliveryDate?.ToString());
+                    sw1.Stop();
+
+                    _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Total NSS place order time {sw1.ElapsedMilliseconds} ms");
                 }
                 catch (Exception ex)
                 {
@@ -748,6 +782,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod, string deliveryDate)
         {
+            var sw1 = new Stopwatch();
+            sw1.Start();
+
             var shippingAddress = _addressService.GetAddressById(order.ShippingAddressId ?? 0);
             var pickupAddress = _addressService.GetAddressById(order.PickupAddressId ?? 0);
 
@@ -880,8 +917,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 PoNo = poValues.FirstOrDefault()
             };
 
+            sw1.Stop();
+
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"build order request to call nss api time - {sw1.ElapsedMilliseconds} ms");
+
+            var sw2 = new Stopwatch();
+            sw1.Start();
             // api call
             var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
+            sw2.Stop();
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"nss api time elapsed - {sw2.ElapsedMilliseconds} ms");
 
             if (resp.NSSOrderNo > 0)
                 _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo);
