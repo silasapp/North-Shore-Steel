@@ -518,7 +518,7 @@
         if (!qty)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
-        $('#qty' + itemId).val("1");
+        $('#qty' + itemId).val("");
         AjaxCart.addproducttocart_catalog(link);
     }
 

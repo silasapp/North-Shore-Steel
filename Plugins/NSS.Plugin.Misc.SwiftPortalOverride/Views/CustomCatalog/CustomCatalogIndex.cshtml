@@ -706,6 +706,7 @@
                 };
                 shopVm.dialog.hide();
                 shopVm.showLoading();
+                self = this;
                 $.ajax({
                     cache: false,
                     url: `/addproducttocart/details/${this.productId}/@Html.Raw((int)ShoppingCartType.ShoppingCart)`,
@@ -714,6 +715,7 @@
                     success: function (data) {
                         shopVm.hideLoading();
                         if (data != null) {
+                            $('#qty' + self.productId).val("");
                             AjaxCart.success_process(data);
                         }
                     },

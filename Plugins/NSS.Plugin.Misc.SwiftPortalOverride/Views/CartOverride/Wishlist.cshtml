@@ -233,7 +233,7 @@ Content1 =
                                                             }
                                                             else
                                                             {
-                                                                <input name="itemquantity@(item.Id)" type="text" width="20" id="itemquantity@(item.ProductId)" value="@(item.Quantity)" min="1" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
+                                                                <input name="itemquantity@(item.Id)" type="text" width="20" id="itemquantity@(item.ProductId)" value="" min="1" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" oninput="this.value = !!this.value && Math.abs(this.value)>= 0 ? Math.abs(this.value) : null" />
                                                             }
 
                                                         }
