@@ -111,7 +111,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 if (!requestData.TryGetValue(attribute.Sort, out var value))
                 {
-                    ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
+                    if (attribute.Sort?.ToLower() != "millname" && attribute.Sort?.ToLower() != "countryoforigin")
+                        ModelState.AddModelError(nameof(attribute), $"{attribute.Sort} attribute requires a value.");
                 }
                 else
                 {
