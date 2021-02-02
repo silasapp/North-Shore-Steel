@@ -838,7 +838,7 @@ Content2 =
                     stateProvinceId: address.stateProvinceId,
                     city: address.city,
                     zipPostalCode: address.zipPostalCode,
-                    pickupPointId: !this.isDelivery ? address.Id : null,
+                    pickupPointId: !this.isDelivery ? this.pickupPointId : null,
                 };
                 const self = this;
                 if (!disableSpinner)
@@ -853,7 +853,9 @@ Content2 =
                     type: 'POST',
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
-                    success: function (data, _, _) {
+                    success: function (data, status, xhqr) {
+                        console.log('status', status);
+                        console.log('xhqr', xhqr);
                         console.log('shipping resp', data);
                         self.disableSubmit = false;
                         //self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
