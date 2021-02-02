@@ -528,19 +528,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 CustomOrderNumber = string.Empty
             };
 
-            if (details.BillingAddress != null)
+
+            if (details.BillingAddress is null)
             {
-
-                if (details.BillingAddress is null)
-                    throw new NopException("Billing address is not provided");
-
-                _addressService.InsertAddress(details.BillingAddress);
-                order.BillingAddressId = details.BillingAddress.Id;
+                if (details.PickupAddress != null)
+                {
+                    _addressService.InsertAddress(details.PickupAddress);
+                    order.BillingAddressId = details.PickupAddress.Id;
+                }
+                else if (details.ShippingAddress != null)
+                {
+                    _addressService.InsertAddress(details.ShippingAddress);
+                    order.BillingAddressId = details.ShippingAddress.Id;
+                }
             }
             else
             {
-                _addressService.InsertAddress(details.PickupAddress);
-                order.BillingAddressId = details.PickupAddress.Id;
+                _addressService.InsertAddress(details.BillingAddress);
+                order.BillingAddressId = details.BillingAddress.Id;
             }
 
             if (details.PickupAddress != null)
