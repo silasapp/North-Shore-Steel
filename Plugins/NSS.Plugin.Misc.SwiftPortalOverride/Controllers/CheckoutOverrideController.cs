@@ -922,7 +922,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"build order request to call nss api time - {sw1.ElapsedMilliseconds} ms");
 
             var sw2 = new Stopwatch();
-            sw1.Start();
+            sw2.Start();
             // api call
             var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
             sw2.Stop();
