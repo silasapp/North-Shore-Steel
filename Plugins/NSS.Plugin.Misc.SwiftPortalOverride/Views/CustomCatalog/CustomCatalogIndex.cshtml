@@ -576,7 +576,10 @@
                         }
                         self.hideLoading();
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         $('#partialview').html('an error has occured here');
                         self.hideLoading();
                     }
@@ -719,7 +722,10 @@
                             AjaxCart.success_process(data);
                         }
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         shopVm.hideLoading();
                     }
                 });
