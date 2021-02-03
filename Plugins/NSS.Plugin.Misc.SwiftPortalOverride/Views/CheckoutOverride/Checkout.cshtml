@@ -862,7 +862,7 @@ Content2 =
                         self.orderTotal = data.orderTotal?.replace("$", "");
                         self.taxAmount = data.tax?.replace("$", "");
                         self.shippingAmount = data.shipping?.replace("$", "");
-                        self.deliveryDate = data.shippingCalculatorResponse?.date ? data.shippingCalculatorResponse.date : 'N/A';
+                        self.deliveryDate = data.shippingCalculatorResponse.date ? data.shippingCalculatorResponse.date : 'N/A';
                         if (!data.shippingCalculatorResponse.allowed)
                             self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
 
