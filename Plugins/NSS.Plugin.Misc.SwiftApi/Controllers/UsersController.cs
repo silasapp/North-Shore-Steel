@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
-using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Discounts;
 using Nop.Services.Localization;
@@ -27,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using Customer = Nop.Core.Domain.Customers.Customer;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
@@ -57,17 +55,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _customerApiService = customerApiService;
             _newsLetterSubscriptionService = newsLetterSubscriptionService;
         }
-
-
-        //[HttpGet]
-        //[Route("/api/users")]
-        //[ProducesResponseType(typeof(IList<UserDto>), (int)HttpStatusCode.OK)]
-        //[ProducesResponseType(typeof(ErrorsRootObject), 422)]
-        //[ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
-        //public IActionResult RetriveUserList()
-        //{
-
-        //}
 
         [HttpPost]
         [Route("/api/users")]
@@ -130,7 +117,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     ItemsForNextProject = userDelta.Dto.ItemsForNextProject,
                     PreferredLocationId = userDelta.Dto.PreferredLocationId,
                     Status = UserRegistrationStatus.Approved,
-
                     CreatedOnUtc = DateTime.UtcNow,
                     ModifiedOnUtc = DateTime.UtcNow
                 };
@@ -139,11 +125,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             //generate password
             string password = Common.GenerateRandomPassword();
 
-            customer = _userRegistrationService.CreateCustomer(
-                registration,
-                password,
-                userDelta.Dto.WintrixId
-                );
+            customer = _userRegistrationService.CreateCustomer(registration, password, userDelta.Dto.WintrixId);
 
             if (customer == null)
                 return Error(HttpStatusCode.NotFound, "customer", "not created successfully");

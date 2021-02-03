@@ -65,6 +65,18 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
                 options.MultipartHeadersLengthLimit = int.MaxValue;
             });
 
+            // If using Kestrel:
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
+            // If using IIS:
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
         }
 
         public void Configure(IApplicationBuilder app)

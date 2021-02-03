@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NSS.Plugin.Misc.SwiftApi.DTO.Base;
 using NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
 {
@@ -30,9 +28,6 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
 
         [JsonProperty("phone")]
         public string Phone { get; set; }
-
-        //[JsonProperty("companyName")]
-        //public string CompanyName { get; set; }
 
         [JsonProperty("isExistingCustomer")]
         public bool IsExistingCustomer { get; set; }
