@@ -91,7 +91,7 @@
 
     @if (Model.CountryEnabled)
     {
-        <div class="">
+        <div class="" hidden>
             <label asp-for="CountryId" asp-postfix=":"></label>
             <nop-required />
             <select asp-for="CountryId" asp-items="Model.AvailableCountries" class="form-control custom-input"
@@ -113,7 +113,7 @@
         </div>
     }
 
-    @if (Model.CompanyEnabled)
+    @*@if (Model.CompanyEnabled)
     {
         <div class="">
             <label asp-for="Company" asp-postfix=":"></label>
@@ -121,7 +121,7 @@
             <input asp-for="Company" placeholder="Enter company" class="form-control custom-input" />
             <span asp-validation-for="Company"></span>
         </div>
-    }
+    }*@
 
 
     <div class="" hidden>
@@ -131,7 +131,7 @@
         <span asp-validation-for="Email"></span>
     </div>
 
-    @if (Model.PhoneEnabled)
+    @*@if (Model.PhoneEnabled)
     {
         <div class="">
             <label asp-for="PhoneNumber" asp-postfix=":"></label>
@@ -139,7 +139,7 @@
             <input asp-for="PhoneNumber" id="phone-number" placeholder="Enter phone number" maxlength="14" class="form-control custom-input" />
             <span asp-validation-for="PhoneNumber"></span>
         </div>
-    }
+    }*@
 
     @if (Model.CustomAddressAttributes.Count > 0)
     {

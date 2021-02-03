@@ -1153,6 +1153,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Challenge();
 
             var model = new CustomerAddressEditModel();
+            model.Address.CountryId = 1;
             _addressModelFactory.PrepareAddressModel(model.Address,
                 address: null,
                 excludeProperties: false,

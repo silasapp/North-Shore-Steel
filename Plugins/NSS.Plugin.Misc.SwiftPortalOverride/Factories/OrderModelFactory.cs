@@ -97,11 +97,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 DeliveryTicketFile = $"{order.DeliveryTicketFile}{token}"
             }).ToList();
 
-            var model = new CompanyOrderListModel 
+            var model = new CompanyOrderListModel
             {
                 FilterContext = filter,
-                Orders = orders
-            };
+                Orders = orders?.OrderByDescending(x => x.OrderId)?.ToList()
+        };
 
             return model;
         }

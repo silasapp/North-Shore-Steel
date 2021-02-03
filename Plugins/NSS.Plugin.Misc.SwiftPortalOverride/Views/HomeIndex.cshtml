@@ -171,7 +171,6 @@
                                             </div>
                                         }
                                     </div>
-
                                     <div class="text-nowrap nss-dark text-center mb-2 @(Model.OpenOrders.Count > 5 ? "": "d-none")">* Five most recent only.</div>
                                 </div>
                             </div>
@@ -221,21 +220,21 @@
                                                 <tbody>
                                                     @foreach (var order in Model.ClosedOrders)
                                                     {
-                                                    <tr>
-                                                        <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
-                                                        <td>@order.PoNo</td>
-                                                        <td class="text-center">@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
-                                                        <td class="text-center">@order.DeliveryStatus</td>
-                                                        <td class="text-center"><a v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" scope="row" class="light-blue">View</a></td>
-                                                        <td class="text-center">
-                                                            @if(order.DeliveryTicketCount > 0)
-                                                            {<a href="@order.DeliveryTicketFile" target="_blank" scope="row" class="light-blue">View</a>}
-                                                        </td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
+                                                            <td>@order.PoNo</td>
+                                                            <td class="text-center">@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
+                                                            <td class="text-center">@order.DeliveryStatus</td>
+                                                            <td class="text-center"><a v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" scope="row" class="light-blue">View</a></td>
+                                                            <td class="text-center">
+                                                                @if (order.DeliveryTicketCount > 0)
+                                                                {<a href="@order.DeliveryTicketFile" target="_blank" scope="row" class="light-blue">View</a>}
+                                                            </td>
+                                                        </tr>
                                                     }
                                                 </tbody>
                                             </table>
-                                            <div class="text-nowrap nss-dark text-center mb-1">* All orders display the five most recent result from the past 30 days.</div>
+                                            <div class="text-nowrap nss-dark text-center mb-1 @(Model.ClosedOrders.Count > 5 ? "": "d-none")">* Five most recent only.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -354,7 +353,12 @@
 
     </div>
     <div class="d-md-none">
-        <p class="fs-14" style="font-weight: 500; padding: 0 20px; color: #242424;">*All orders display the five most recent results from the past 30-days</p>
+        <template v-if="openOrders.length > 5">
+            <p v-if="showRecentOrders" class="fs-14" style="font-weight: 500; padding: 0 20px; color: #242424;">* Five most recent only.</p>
+        </template>
+        <template v-if="closedOrders.length > 5">
+            <p v-if="!showRecentOrders" class="fs-14" style="font-weight: 500; padding: 0 20px; color: #242424;">* Five most recent only.</p>
+        </template>
         <ul class="nav nav-pills mb-1 mt-2 mx-4 justify-content-center" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation" style="margin-right: 0.3em" v-on:click="showRecentOrders = true;">
                 <a class="nav-link" v-bind:class="{'active': showRecentOrders}">Open Orders</a>
