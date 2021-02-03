@@ -174,7 +174,10 @@
                             self.hideLoading();
                         }
                     },
-                    error: function (xhr, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         $('#order-grid').html('an error has occured here');
                         self.hideLoading();
                     }

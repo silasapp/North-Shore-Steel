@@ -218,7 +218,10 @@
                         $('#invoice-grid').html(data);
                         self.hideLoading();
                     },
-                    error: function (xhr, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         $('#invoice-grid').html('an error has occured here');
                         self.hideLoading();
                     }

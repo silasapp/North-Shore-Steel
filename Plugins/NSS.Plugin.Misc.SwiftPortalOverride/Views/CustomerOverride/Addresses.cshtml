@@ -151,7 +151,10 @@
                                 success: function (data, textStatus, jqXHR) {
                                     location.href = data.redirect;
                                 },
-                                error: function (jqXHR, textStatus, errorThrown) {
+                                error: function (jqXHR, _, thrownError) {
+                                    if (thrownError == "Unauthorized") {
+                                        location.reload();
+                                    }
                                     alert('Failed to delete');
                                 }
                             });

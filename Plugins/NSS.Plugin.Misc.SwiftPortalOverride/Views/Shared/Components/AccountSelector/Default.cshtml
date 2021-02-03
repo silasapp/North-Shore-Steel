@@ -77,7 +77,10 @@
                 document.location.href = "/";
                 $('#custom-loading').hide();
             },
-            error: function (xhr, thrownError) {
+            error: function (xhr, _, thrownError) {
+                if (thrownError == "Unauthorized") {
+                    location.reload();
+                }
                 document.location.href = "/";
             }
         });

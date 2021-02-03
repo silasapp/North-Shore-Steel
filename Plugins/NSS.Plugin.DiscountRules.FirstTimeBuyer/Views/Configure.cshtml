@@ -30,7 +30,10 @@
                         <text>$("#discountRequirementContainer").trigger('nopnewdiscountruleadded', [data.NewRequirementId]);</text>
                     }
                 },
-                error: function (jqXHR, textStatus, errorThrown) {
+                error: function (jqXHR, _, errorThrown) {
+                    if (errorThrown == "Unauthorized") {
+                        location.reload();
+                    }
                     var $alertInfoEl = $("#savefirsttimebuyerrequirementAlert-info");
                     let response = jqXHR.responseJSON;
                     if (response instanceof Object && response.hasOwnProperty('Errors')) {

@@ -197,7 +197,10 @@
                         self.transformDataForClient(data.model.Notifications);
                         self.hideLoading();
                     },
-                    error: function (xhr, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         self.hideLoading();
                     }
                 });
@@ -220,7 +223,10 @@
                     success: function (data,_,_) {
                         self.hideLoading();
                     },
-                    error: function (xhr, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         self.hideLoading();
                     }
                 });
