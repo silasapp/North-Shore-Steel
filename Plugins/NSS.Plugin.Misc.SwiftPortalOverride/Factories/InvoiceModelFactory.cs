@@ -74,7 +74,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var model = new CompanyInvoiceListModel
             {
                 FilterContext = filter,
-                Invoices = invoices
+                Invoices = invoices?.OrderByDescending(x => x.InvoiceId)?.ToList()
             };
 
             return model;

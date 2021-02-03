@@ -233,8 +233,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
 
             model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
-            model.OpenOrders = openOrders;
-            model.ClosedOrders = closedOrders;
+            model.OpenOrders = openOrders?.OrderByDescending(x => x.OrderId)?.ToList();
+            model.ClosedOrders = closedOrders?.OrderByDescending(x => x.OrderId)?.ToList();
             var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
 
             if (companyStats != null && companyStats.Count > 0)

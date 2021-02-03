@@ -442,7 +442,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 .GetShoppingCartItemWarnings(_workContext.CurrentCustomer, cartType,
                 product, _storeContext.CurrentStore.Id, string.Empty,
                 decimal.Zero, null, null, quantityToValidate, false, shoppingCartItem?.Id ?? 0, true, false, false, false);
-            if (addToCartWarnings.Any())
+            if (cartType == ShoppingCartType.ShoppingCart && addToCartWarnings.Any())
             {
                 //cannot be added to the cart
                 //let's display standard warnings
@@ -460,7 +460,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 storeId: _storeContext.CurrentStore.Id,
                 attributesXml: attXml,
                 quantity: quantity);
-            if (addToCartWarnings.Any())
+            if (cartType == ShoppingCartType.ShoppingCart &&  addToCartWarnings.Any())
             {
                 //cannot be added to the cart
                 //but we do not display attribute and gift card warnings here. let's do it on the product details page
