@@ -772,7 +772,10 @@ Content2 =
                         }
                         self.billingAddressId = address ? address.id : null;
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         console.log('data-xhr', xhr)
                     }
                 });
@@ -810,7 +813,10 @@ Content2 =
                         }
                         self.shippingAddressId = address ? address.id : null;
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         console.log('data-xhr', xhr)
                     }
                 });
@@ -869,7 +875,10 @@ Content2 =
                         if (!disableSpinner)
                             self.hideLoading();
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         self.showNewShippingAddress = false;
                         self.disableSubmit = false;
                         self.errorType = self.shared.constants.ERROR_TYPE_SHIPPING_RATE;
@@ -935,7 +944,10 @@ Content2 =
 
                         orderId = data.orderId;
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         self.errorType = self.shared.constants.ERROR_TYPE_ERROR_TYPE_REGULAR;
                         self.errorMessage = 'An error occured.';
                     }
@@ -990,7 +1002,10 @@ Content2 =
                         }
                         window.location.href = '/Completed';
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         self.hideLoading();
                     }
                 });

@@ -100,7 +100,10 @@
             success: function (data, _, _) {
                 location.href = "@Url.Action("Index")"
             },
-            error: function (xhr, thrownError) {
+            error: function (xhr, _, thrownError) {
+                if (thrownError == "Unauthorized") {
+                    location.reload();
+                }
                 location.href = "@Url.Action("Index")"
             }
         });

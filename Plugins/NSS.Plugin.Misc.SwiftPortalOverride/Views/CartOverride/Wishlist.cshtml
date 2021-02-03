@@ -534,7 +534,10 @@ Content1 =
                             AjaxCart.success_process(data);
                         }
                     },
-                    error: function (xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         AjaxCart.setLoadWaiting(false);
                     }
                 });

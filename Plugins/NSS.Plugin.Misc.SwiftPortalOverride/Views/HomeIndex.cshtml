@@ -651,7 +651,10 @@
                         viewMtrModal.show();
                         self.hideLoading();
                     },
-                    error: function (xhr, thrownError) {
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
                         self.hideLoading();
                     }
                 });
