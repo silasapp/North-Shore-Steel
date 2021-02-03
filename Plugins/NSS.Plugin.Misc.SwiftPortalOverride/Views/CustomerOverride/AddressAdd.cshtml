@@ -48,7 +48,7 @@
                 @await Html.PartialAsync("_CreateOrUpdateAddress", Model.Address, dataDictAddress)
             }
             <div class="buttons" v-bind:class="{'justify-content-center': isMobile,'text-center': isMobile}">
-                <input type="submit" class="cancel-button" style="background-color: transparent !important;" value="Cancel" />
+                <input type="button" class="cancel-button" style="background-color: transparent !important;" onclick="location.href = '/customer/addresses'" value="Cancel" />
                 <input type="submit" onClick="return validatePhoneNumbers();" class="button-1 save-address-button" value="@T("Common.Save")" v-bind:class="{'bg-primary': isMobile,'color-white': isMobile}" />
             </div>
         </div>
