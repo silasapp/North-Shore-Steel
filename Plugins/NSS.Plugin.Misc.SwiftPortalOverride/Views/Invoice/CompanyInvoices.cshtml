@@ -30,7 +30,7 @@
                     </div>
                     <div class="d-flex flex-column mx-3 my-1">
                         <label class="fs12-default mb-2">Total Past Due</label>
-                        <label class="h5-danger mb-0" v-bind:class="{'ml-2': !isMobile}">$@DoFormat(Model.CreditSummary.PastDueAmount)</label>
+                        <label class="mb-0 @(Model.CreditSummary.PastDueAmount == 0 ? "h5-default": "h5-danger")" v-bind:class="{'ml-2': !isMobile}">$@DoFormat(Model.CreditSummary.PastDueAmount)</label>
                     </div>
                     <div class="d-flex flex-column mx-3 my-1">
                         <label class="fs12-default mb-2">Open Credit</label>
