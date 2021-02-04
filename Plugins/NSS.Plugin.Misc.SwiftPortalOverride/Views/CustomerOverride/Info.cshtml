@@ -35,7 +35,6 @@
 
 @{
     var customer = workContext.CurrentCustomer;
-    int ErpId = genericAttributeService.GetAttribute<int>(customer, Constants.ErpKeyAttribute);
     string CellPhone = genericAttributeService.GetAttribute<string>(customer, Constants.CellAttribute);
     int preferredLocationId = genericAttributeService.GetAttribute<int>(customer, Constants.PreferredLocationIdAttribute);
 }
@@ -94,18 +93,10 @@
                         <input asp-for="Email" class="form-control custom-input" style="cursor:unset" readonly />
                     </div>
 
-                    <div class="">
+                    <div class="" hidden>
                         <label asp-for="Company">Company Name</label>
                         <input asp-for="Company" class="form-control custom-input" style="cursor:unset" readonly />
                     </div>
-
-                    @if (!String.IsNullOrEmpty(ErpId.ToString()))
-                    {
-                        <div class="">
-                            <label>Customer Number</label>
-                            <label class="form-control custom-input" style="cursor:unset" readonly>@ErpId</label>
-                        </div>
-                    }
 
                     <div class="" hidden>
                         <label>Preferred Pickup Location</label>

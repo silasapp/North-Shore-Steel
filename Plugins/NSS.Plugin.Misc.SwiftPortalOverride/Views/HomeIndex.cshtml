@@ -261,7 +261,7 @@
                                             </div>
                                             <div class="col-md-12 d-block">
                                                 <label class="float-left h5-default">Total Past Due</label>
-                                                <h5 style="color: red;" class="float-right">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
+                                                <h5 class="float-right @(Model.CreditSummary?.PastDueAmount == 0 ? "nss-dark-blue": "text-danger")">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
                                             </div>
                                             <div class="col-md-12 d-block">
                                                 <label class="float-left h5-default">Open Credit</label>
