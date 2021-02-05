@@ -1,7 +1,6 @@
 @using Nop.Web.Models.ShoppingCart
 @model WishlistModel
 @using Nop.Core
-@using Nop.Core.Domain.Tax
 @using Nop.Web.Framework.Themes
 @using Nop.Services.Catalog
 @using Nop.Services.Common
@@ -18,6 +17,8 @@
 @inject IShapeService shapeService
 @using Syncfusion.EJ2
 @using NSS.Plugin.Misc.SwiftPortalOverride.Models
+@using Newtonsoft.Json.Serialization
+@using Newtonsoft.Json
 @{
     Layout = "_ColumnsOne";
 
@@ -117,11 +118,8 @@ Content1 =
                             <div class="tab-pane fade show active" id=pills-home role=tabpanel aria-labelledby=pills-home-tab>
                                 <table class="table table-striped w3-animate-left nss-table">
                                     <thead class=thead-default>
-
                                         <tr>
-                                            <td scope=col>Item #</td>
                                             <td scope=col class="product">Description</td>
-                                            <td scope=col>Dimensions</td>
                                             <td scope=col class="quantity text-center">Qty.</td>
                                             <td scope=col style="width: 12rem">Actions</td>
                                         </tr>
@@ -139,11 +137,7 @@ Content1 =
                                                 hasSawOption = shape != null ? shape.SawOption : false;
                                             }
                                             var itemId = item.Id;
-                                            var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
-                                            var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                                            var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
-                                            var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
 
                                             var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
 
@@ -153,7 +147,6 @@ Content1 =
                                             var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
                                             var _productAttributes = GetJson(attrs);
                                             var prodAttrs = new List<SawOptionsAttribute>();
-
 
                                             foreach (var it in attrs)
                                             {
@@ -170,36 +163,9 @@ Content1 =
                                             }
 
                                             <tr>
-                                                <td class="align-middle">@iNo</td>
                                                 <td class="product align-middle">
                                                     @item.ProductName
-                                                    @*<a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>*@
-                                                    @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
-                                                        {
-                                                            <div class="attributes">
-                                                                @Html.Raw(item.AttributeInfo)
-                                                            </div>
-                                                        }
-                                                        @if (!string.IsNullOrEmpty(item.RecurringInfo))
-                                                        {
-                                                            <div class="recurring-info">
-                                                                @Html.Raw(item.RecurringInfo)
-                                                            </div>
-                                                        }
-                                                        @if (!string.IsNullOrEmpty(item.RentalInfo))
-                                                        {
-                                                            <div class="rental-info">
-                                                                @Html.Raw(item.RentalInfo)
-                                                            </div>
-                                                        }
-                                                        @if (Model.IsEditable && item.AllowItemEditing)
-                                                        {
-                                                            var editCartItemUrl = Url.RouteUrl("Product", new { SeName = item.ProductSeName }, webHelper.CurrentRequestProtocol);
-                                                            editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid", item.Id.ToString());
-                                                            <div class="edit-item">
-                                                                <a href="@editCartItemUrl">@T("Common.Edit")</a>
-                                                            </div>
-                                                        }*@
+
                                                     @if (item.Warnings.Count > 0)
                                                     {
                                                         <div class="text-danger">
@@ -212,7 +178,6 @@ Content1 =
                                                         </div>
                                                     }
                                                 </td>
-                                                <td class="align-middle">@dimensions</td>
                                                 <td class="quantity text-center">
                                                     @if (Model.IsEditable)
                                                     {
@@ -257,11 +222,6 @@ Content1 =
                                                     </div>
                                                     @if (hasSawOption)
                                                     {
-                                                        @*<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                                <title>Saw Options</title>
-                                                                <path d="M20 15s-1.4 1.3 1.1 2l-2.8 2.8h-2.8s-1.9-.1-.5 2.2h-4l-2-2s-1.3-1.4-2 1.1l-2.8-2.8v-2.8s.1-1.9-2.2-.5v-4l2-2s1.4-1.3-1.2-1.9l2.8-2.9h2.9s1.9.1.5-2.2h4l2 2s1.3 1.4 2-1.2l2.8 2.8v2.9s-.1 1.9 2.2.5v4l-2 2m-6-3a2 2 0 0 0-2-2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2z" />
-                                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                            </svg>*@
                                                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" class="hover-icon mx-1" width="24" height="24"
                                                              v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
                                                             <g transform="translate(-580 -80)">
@@ -279,21 +239,10 @@ Content1 =
                                                                 <path d="M0,0H24V24H0Z" fill="rgba(0, 0, 0, 0)" />
                                                                 <path d="M3.667,3.333v15H17V20H3.667A1.672,1.672,0,0,1,2,18.333v-15H3.667m9.167,2.5h4.583L12.833,1.25V5.833M7,0h6.667l5,5V15A1.661,1.661,0,0,1,17,16.667H7A1.666,1.666,0,0,1,5.333,15V1.667A1.661,1.661,0,0,1,7,0m7.5,13.333V11.667H7v1.667h7.5M17,10V8.333H7V10Z" transform="translate(2 2)" />
                                                             </svg>
-                                                            @*<a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon  mx-1" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                                    <title>View MTRs</title>
-                                                                    <path d="M13 16H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2zm-4-6h2a1 1 0 0 0 0-2H9a1 1 0 0 0 0 2zm12 2h-3V3a1 1 0 0 0-.5-.87a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0A1 1 0 0 0 2 3v16a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-6a1 1 0 0 0-1-1zM5 20a1 1 0 0 1-1-1V4.73l2 1.14a1.08 1.08 0 0 0 1 0l3-1.72l3 1.72a1.08 1.08 0 0 0 1 0l2-1.14V19a3 3 0 0 0 .18 1zm15-1a1 1 0 0 1-2 0v-5h2zm-7-7H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2z" />
-                                                                    <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                                </svg>*@
                                                         </a>
                                                     }
                                                     @if (eRPCompanyIdExist)
                                                     {
-                                                        @*<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" width="24" height="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                                                                <title>Add to cart</title>
-                                                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
-                                                                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                                                            </svg>*@
                                                         <button onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);" style="border: none;background-color: #1899E1;color:#ffffff;display: flex;align-items: center;padding: 5px 10px;margin-left: 5px;">
                                                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" width="24" height="24"
                                                                  preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
@@ -305,19 +254,6 @@ Content1 =
                                                             Add to cart
                                                         </button>
                                                     }
-
-                                                    @*@if (string.IsNullOrEmpty(mtr))
-                                                        {
-                                                            <div class=""></div>
-                                                        }
-                                                        @if (!eRPCompanyIdExist)
-                                                        {
-                                                            <div class=""></div>
-                                                        }
-                                                        @if (!hasSawOption)
-                                                        {
-                                                            <div></div>
-                                                        }*@
                                                 </td>
                                             </tr>
                                         }
@@ -338,11 +274,7 @@ Content1 =
                                     hasSawOption = shape != null ? shape.SawOption : false;
                                 }
                                 var itemId = item.Id;
-                                var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
-                                var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
                                 string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
-                                var iNo = isSerialized.ToLower() == "true" ? itemTagNo : itemNo;
-                                var dimensions = attr.FirstOrDefault(x => x.Key == "dimensions")?.Value;
 
                                 var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
 
@@ -352,7 +284,6 @@ Content1 =
                                 var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
                                 var _productAttributes = GetJson(attrs);
                                 var prodAttrs = new List<SawOptionsAttribute>();
-
 
                                 foreach (var it in attrs)
                                 {
@@ -367,19 +298,11 @@ Content1 =
 
                                     prodAttrs.Add(obj);
                                 }
+
                                 <div class="product-sm d-flex flex-column align-items-start mb-2">
-                                    <label class="fs12-primary mb-1">Item: @iNo</label>
                                     <label class="h2-primary my-2">@item.ProductName</label>
-                                    <div class="d-flex flex-row">
-                                        <label class="fs12-default mr-3 mb-0">Dimension: @dimensions</label>
-                                    </div>
                                     <div class="d-flex flex-row justify-content-between w-100 my-3">
                                         <div class="d-flex flex-row align-items-center">
-                                            @*@if (eRPCompanyIdExist)
-                                                {
-                                                    <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="product-action-sm"
-                                                         v-on:click="handleAddToWishList(data)" title="add to wishlist" width="24" height="24" alt="">
-                                                }*@
                                             <div class="table-action-button">
                                                 <label class="mb-0">
                                                     <span style="cursor:pointer">
@@ -391,16 +314,20 @@ Content1 =
                                                     <input type="checkbox" hidden name="removefromcart" onclick="removeFromFavorites()" value="@(item.Id)">
                                                 </label>
                                             </div>
+
                                             @if (hasSawOption)
                                             {
                                                 <img src="Themes/SwiftPortal/Content/assets/icn-saw.svg" class="product-action-sm" width="24" height="24" alt=""
                                                      v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
                                             }
+
                                             @if (!string.IsNullOrEmpty(mtr))
                                             {
                                                 <a class="table-action-button" style="text-decoration: none" href="@mtr" target="_blank">
                                                     <img class="product-action-sm" src="Themes/SwiftPortal/Content/assets/icn-mt-report.svg" title="mtr report" width="24" height="24" alt="">
-                                                </a>}
+                                                </a>
+                                            }
+
                                         </div>
                                         <div class="d-flex flex-row">
                                             <button type="button" class="btn-sm-step" v-on:click="handleDecrementQuantity(@(item.ProductId))">-</button>
@@ -408,6 +335,7 @@ Content1 =
                                             <button type="button" class="btn-sm-step" v-on:click="handleIncrementQuantity(@(item.ProductId))">+</button>
                                         </div>
                                     </div>
+
                                     @if (eRPCompanyIdExist)
                                     {
                                         <button type="button" class="btn-sm-add-to-cart" onclick="getInputQuantity(@item.ProductId, @shoppingCartTypeId);">
@@ -415,6 +343,7 @@ Content1 =
                                             Add to cart
                                         </button>
                                     }
+
                                 </div>
                             }
                         </div>
@@ -452,9 +381,6 @@ Content1 =
 </div>
 
 @functions{
-    @using Newtonsoft.Json.Serialization;
-    @using Newtonsoft.Json;
-
     string Serialize(object input)
     {
         return JsonConvert.SerializeObject(input, new JsonSerializerSettings
@@ -464,19 +390,20 @@ Content1 =
         });
     }
 }
+
 <script>
     function removeFromFavorites() {
         $('#custom-loading').show();
         $("#updatecart").click();
     }
 </script>
+
 <script>
     var sawOptionModal;
 
     var title = 'TESTING...';
      var items = @Html.Raw(Serialize(Model.Items));
     var pageModel = @Html.Raw(Serialize(Model));
-    @*var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));*@
     var modalVm = new Vue({
         el: '#wishlist',
         data: {
@@ -590,14 +517,12 @@ Content1 =
         sawOptionModal = this;
     }
 </script>
+
 <ejs-scripts></ejs-scripts>
 
 @functions {
     String GetJson(object input)
     {
-        @using Newtonsoft.Json.Serialization;
-        @using Newtonsoft.Json;
-
         var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
         return JsonConvert.SerializeObject(input, new JsonSerializerSettings
         {
