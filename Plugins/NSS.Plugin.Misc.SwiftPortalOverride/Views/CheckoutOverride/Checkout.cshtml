@@ -847,6 +847,7 @@ Content2 =
                     city: address.city,
                     zipPostalCode: address.zipPostalCode,
                     pickupPointId: !this.isDelivery ? this.pickupPointId : null,
+                    existingAddressId: this.shippingAddressId,
                 };
                 const self = this;
                 if (!disableSpinner)

@@ -16,5 +16,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests
         public bool SaveToMyAddress { get; set; }
 
         public string PickupPointId { get; set; }
+        public int? ExistingAddressId { get; set; }
     }
 }

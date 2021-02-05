@@ -533,6 +533,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (!response.Allowed)
                     response.ShippingCost = decimal.Zero;
 
+                var shoppingCart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
                 //if pickup
                 if (address.IsPickup)
                 {
@@ -543,10 +545,36 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
                 else
                 {
-                    var shippingOptions = _genericAttributeService.GetAttribute<List<ShippingOption>>(_workContext.CurrentCustomer,
-                    NopCustomerDefaults.OfferedShippingOptionsAttribute, _storeContext.CurrentStore.Id);
+                    // update shipping address
+                    if (address.ExistingAddressId.HasValue && address.ExistingAddressId.Value > 0)
+                    {
+                        _workContext.CurrentCustomer.ShippingAddressId = address.ExistingAddressId;
+                        _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                    }
 
-                    var shippingOption = shippingOptions.FirstOrDefault(x => x.ShippingRateComputationMethodSystemName == "Shipping.NSS");
+                    //find it
+                    //performance optimization. try cache first
+                    var shippingOptions = _genericAttributeService.GetAttribute<List<ShippingOption>>(_workContext.CurrentCustomer,
+                        NopCustomerDefaults.OfferedShippingOptionsAttribute, _storeContext.CurrentStore.Id);
+
+                    if (shippingOptions == null || !shippingOptions.Any())
+                    {
+                        //not found? let's load them using shipping service
+                        shippingOptions = _shippingService.GetShippingOptions(shoppingCart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer),
+                            _workContext.CurrentCustomer, "Shipping.NSS", _storeContext.CurrentStore.Id).ShippingOptions.ToList();
+                    }
+                    else
+                    {
+                        //loaded cached results. let's filter result by a chosen shipping rate computation method
+                        shippingOptions = shippingOptions.Where(so => so.ShippingRateComputationMethodSystemName.Equals("Shipping.NSS", StringComparison.InvariantCultureIgnoreCase))
+                            .ToList();
+                    }
+
+                    var shippingOption = shippingOptions.FirstOrDefault();
+
+                    //save
+                    _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption, _storeContext.CurrentStore.Id);
+
 
                     if (shippingOption != null)
                         _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption, _storeContext.CurrentStore.Id);
@@ -559,7 +587,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //if (response.Allowed)
                 //    return Json(new { error = 2, message = "We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select \"Pickup\"" });
 
-                var shoppingCart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+
 
                 var orderTotals = _shoppingCartModelFactory.PrepareOrderTotalsModel(shoppingCart, false);
 
