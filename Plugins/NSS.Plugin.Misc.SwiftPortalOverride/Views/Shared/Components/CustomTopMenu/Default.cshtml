@@ -48,15 +48,24 @@
     <div class="d-flex justify-content-center">
         <a href="@Url.RouteUrl("Homepage")" class="dashboard p-3">DASHBOARD</a>
     </div>
-    <div class="d-flex justify-content-center">
-        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog p-3">SHOP</a>
-    </div>
-    <div class="d-flex justify-content-center">
-        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders p-3">ORDERS</a>
-    </div>
-    <div class="d-flex justify-content-center">
-        <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices p-3">INVOICES</a>
-    </div>
+    @if (isBuyer)
+    {
+        <div class="d-flex justify-content-center">
+            <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog p-3">SHOP</a>
+        </div>
+    }
+    @if (isOperations)
+    {
+        <div class="d-flex justify-content-center">
+            <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders p-3">ORDERS</a>
+        </div>
+    }
+    @if (isAP)
+    {
+        <div class="d-flex justify-content-center">
+            <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices p-3">INVOICES</a>
+        </div>
+    }
     <div class="d-flex justify-content-center">
         <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources p-3">RESOURCES</a>
     </div>

@@ -435,11 +435,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //first, try to find existing shopping cart item
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, cartType, _storeContext.CurrentStore.Id);
             var shoppingCartItem = _shoppingCartService.FindShoppingCartItemInTheCart(cart, cartType, product);
+
+
             //if we already have the same product in the cart, then use the total quantity to validate
             var quantityToValidate = shoppingCartItem != null ? shoppingCartItem.Quantity + quantity : quantity;
             product.OrderMaximumQuantity = product.OrderMaximumQuantity > 0 ? product.OrderMaximumQuantity : 0;
-            if (cartType == ShoppingCartType.Wishlist)
-                product.OrderMaximumQuantity = 100001;
 
             var addToCartWarnings = _shoppingCartService
                 .GetShoppingCartItemWarnings(_workContext.CurrentCustomer, cartType,
@@ -457,12 +457,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             //now let's try adding product to the cart (now including product attribute validation, etc)
-            addToCartWarnings = _shoppingCartService.AddToCart(customer: _workContext.CurrentCustomer,
-                product: product,
-                shoppingCartType: cartType,
-                storeId: _storeContext.CurrentStore.Id,
-                attributesXml: attXml,
-                quantity: quantity);
+            // if we already have the same product as a wishlist, then don't add again
+            if (shoppingCartItem == null || (shoppingCartItem != null && cartType != ShoppingCartType.Wishlist)) {
+                addToCartWarnings = _shoppingCartService.AddToCart(customer: _workContext.CurrentCustomer,
+                    product: product,
+                    shoppingCartType: cartType,
+                    storeId: _storeContext.CurrentStore.Id,
+                    attributesXml: attXml,
+                    quantity: quantity);
+            }
             if (cartType == ShoppingCartType.ShoppingCart &&  addToCartWarnings.Any())
             {
                 //cannot be added to the cart

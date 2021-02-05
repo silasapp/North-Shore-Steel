@@ -87,6 +87,7 @@
     .m-b2 {
         margin-bottom: 2rem;
     }
+
     .p-t9 {
         padding-top: 9rem;
     }
@@ -336,11 +337,7 @@
 
                 </div>
 
-
-
-
-
-               @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
+                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
 
             </div>
             <a href="/catalog">
@@ -369,120 +366,125 @@
         </ul>
 
         <div class="mt-2 mx-4">
-            <div v-if="showRecentOrders">
-                <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                    <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
-                        <div class="action">
-                            <a href="/catalog">
-                                <button class="swift-color-btn" style="width: 159px;height: 53px;">
-                                    <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
-                                </button>
-                            </a>
+            @if (isOperations || isBuyer)
+            {
+                <div v-if="showRecentOrders">
+                    <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
+                        <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
+                            <div class="action">
+                                <a href="/catalog">
+                                    <button class="swift-color-btn" style="width: 159px;height: 53px;">
+                                        <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
+                                    </button>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div v-for="order in openOrders" class="d-flex flex-column bg-white-shadow mb-3">
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Order #</label>
+                    <div v-for="order in openOrders" class="d-flex flex-column bg-white-shadow mb-3">
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Order #</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                            </div>
                         </div>
-                        <div class="d-flex p-2">
-                            <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">PO #</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.poNo }}</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">PO #</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.poNo }}</a>
-                        </div>
-                    </div>
 
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0"> Promise Date</label>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0"> Promise Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
+                            </div>
                         </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0"> Scheduled Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.scheduledDate | date }}</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0"> Scheduled Date</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{ order.scheduledDate | date }}</label>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Status</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{ order.orderStatusName }}</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div v-if="!showRecentOrders">
-                <div v-if="closedOrders.length == 0" style="background:#ffffff; padding: 10px;">
-                    <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
-                        <div class="action">
-                            <a href="/catalog">
-                                <button class="swift-color-btn" style="width: 159px;height: 53px;">
-                                    <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
-                                </button>
-                            </a>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Status</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.orderStatusName }}</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div v-for="order in closedOrders" class="d-flex flex-column bg-white-shadow mb-3">
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Order #</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+            }
+            @if (isOperations || isBuyer)
+            {
+                <div v-if="!showRecentOrders">
+                    <div v-if="closedOrders.length == 0" style="background:#ffffff; padding: 10px;">
+                        <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
+                            <div class="action">
+                                <a href="/catalog">
+                                    <button class="swift-color-btn" style="width: 159px;height: 53px;">
+                                        <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
+                                    </button>
+                                </a>
+                            </div>
                         </div>
                     </div>
+                    <div v-for="order in closedOrders" class="d-flex flex-column bg-white-shadow mb-3">
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Order #</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                            </div>
+                        </div>
 
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0"> Order Date</label>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0"> Order Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.orderDate | date }}</label>
+                            </div>
                         </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{ order.orderDate | date }}</label>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0"> Promise Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0"> Promise Date</label>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0"> Delivery Date</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.deliveryDate | date }}</label>
+                            </div>
                         </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0"> Delivery Date</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{ order.deliveryDate | date }}</label>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Status</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{ order.deliveryStatus }}</label>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">Status</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <label class="fs12-default mb-0">{{ order.deliveryStatus }}</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            @if (isAP || isBuyer)
+            }
+            @if (Model.CreditSummary.CanCredit && (isAP || isBuyer))
             {
                 <div class="col-md-5 col-sm-6 col-12 m-b2 p-0 mt-2">
                     <div class="tab-content p-b1" id="pills-tabContent">
