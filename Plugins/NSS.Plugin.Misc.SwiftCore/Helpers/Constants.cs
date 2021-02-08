@@ -68,6 +68,27 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         public static string StoreRegistrationConfirmationUrl => "{0}/userregistration/{1}/confirmregistration";
 
         #endregion
+
+        #region NotificationKeys
+
+        public const string MyOrderConfirmedEmail = "my-order-confirmed-company-email";
+        public const string MyOrderConfirmedSms = "my-order-confirmed-personal-sms";
+        public const string MyOrderScheduleEmail = "my-order-schedule-date-change-company-email";
+        public const string MyOrderScheduleSms = "my-order-schedule-date-change-personal-sms";
+        public const string MyOrderPromiseEmail = "my-order-promise-date-change-company-email";
+        public const string MyOrderPromiseSms = "my-order-promise-date-change-personal-sms";
+        public const string MyOrderReadyEmail = "my-order-ready-company-email";
+        public const string MyOrderReadySms = "my-order-ready-personal-sms";
+        public const string MyOrderLoadingEmail = "my-order-loading-company-email";
+        public const string MyOrderLoadingSms = "my-order-loading-personal-sms";
+        public const string MyOrderShippedEmail = "my-order-shipped-company-email";
+        public const string MyOrderShippedSms = "my-order-shipped-personal-sms";
+        public const string AnyOrderConfirmedEmail = "any-order-confirmed-company-email";
+        public const string AnyOrderConfirmedSms = "any-order-confirmed-personal-sms";
+        public const string AnyOrderShippedEmail = "any-order-shipped-company-email";
+        public const string AnyOrderShippedSms = "any-order-shipped-personal-sms";
+
+        #endregion
         public static string MTRBlobName => "Product-MTR.{0}.pdf";
 
 		public static string ThemeName => "SwiftPortal";

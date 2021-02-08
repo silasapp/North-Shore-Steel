@@ -54,11 +54,13 @@
 <div id="notifications" class="page account-page customer-info-page" v-cloak>
     <div class="page-body">
         <div class="account-page-card" v-bind:class="{'grey-bg':isMobile}">
+            <div class="result text-center" v-bind:class="{'text-danger': notificationError, 'nss-dark': !notificationError}" style="font-size:16px">
+                {{notificationMessage}}
+            </div>
             <div class="title" v-bind:class="{'flex-column': isMobile,'align-items-center': isMobile}">
                 <strong>NOTIFICATIONS</strong>
                 <a v-on:click="enableAllNotifications" class="notification-all">Enable all notifications</a>
             </div>
-
             <div class=notification-group>
                 <div class="notification-top">
                     <p></p>
@@ -131,6 +133,8 @@
         data: {
             preferences: [],
             preferenceArr: [],
+            notificationMessage: null,
+            notificationError: false,
             transformedPreference: [],
             window: {
                 width: 0,
@@ -220,7 +224,10 @@
                     traditional: true,
                     contentType: 'application/json;',
                     data: JSON.stringify(request),
-                    success: function (data,_,_) {
+                    success: function (data, _, _) {
+                        data.model.HasError ? self.disableAllNotifications() : "";
+                        self.notificationError = data.model.HasError;
+                        self.notificationMessage = data.model.HasError ? data.model.Error : "Notifications were updated successfully.";
                         self.hideLoading();
                     },
                     error: function (xhr, _, thrownError) {
@@ -231,7 +238,13 @@
                     }
                 });
             },
-
+            disableAllNotifications: function () {
+                for (var i = 0; i < this.preferenceArr.length; i++) {
+                    this.preferenceArr[i].preferences.map(item => {
+                        item.Value = false;
+                    })
+                }
+            },
             enableAllNotifications: function () {
                 for (var i = 0; i < this.preferenceArr.length; i++) {
                     this.preferenceArr[i].preferences.map(item => {

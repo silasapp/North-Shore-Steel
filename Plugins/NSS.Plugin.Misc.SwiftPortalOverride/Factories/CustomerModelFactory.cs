@@ -17,6 +17,7 @@ using Nop.Web.Factories;
 using Nop.Services.Customers;
 using Nop.Services.Stores;
 using Nop.Services.Directory;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -137,36 +138,36 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 {
                     switch (keyValue.Key)
                     {
-                        case "my-order-confirmed-company-email":
-                        case "my-order-confirmed-personal-sms":
+                        case Constants.MyOrderConfirmedEmail:
+                        case Constants.MyOrderConfirmedSms:
                             AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
                             break;
-                        case "my-order-schedule-date-change-company-email":
-                        case "my-order-schedule-date-change-personal-sms":
+                        case Constants.MyOrderScheduleEmail:
+                        case Constants.MyOrderScheduleSms:
                             AddPreference(keyValue, "When my order has a scheduled date change", ref model);
                             break;
-                        case "my-order-promise-date-change-company-email":
-                        case "my-order-promise-date-change-personal-sms":
+                        case Constants.MyOrderPromiseEmail:
+                        case Constants.MyOrderPromiseSms:
                             AddPreference(keyValue, "When my order has a promise date change", ref model);
                             break;
-                        case "my-order-ready-company-email":
-                        case "my-order-ready-personal-sms":
+                        case Constants.MyOrderReadyEmail:
+                        case Constants.MyOrderReadySms:
                             AddPreference(keyValue, "When my order is ready", ref model);
                             break;
-                        case "my-order-loading-company-email":
-                        case "my-order-loading-personal-sms":
+                        case Constants.MyOrderLoadingEmail:
+                        case Constants.MyOrderLoadingSms:
                             AddPreference(keyValue, "When my order is loading", ref model);
                             break;
-                        case "my-order-shipped-company-email":
-                        case "my-order-shipped-personal-sms":
+                        case Constants.MyOrderShippedEmail:
+                        case Constants.MyOrderShippedSms:
                             AddPreference(keyValue, "When my order has shipped", ref model);
                             break;
-                        case "any-order-confirmed-company-email":
-                        case "any-order-confirmed-personal-sms":
+                        case Constants.AnyOrderConfirmedEmail:
+                        case Constants.AnyOrderConfirmedSms:
                             AddPreference(keyValue, "When any order has been confirmed", ref model);
                             break;
-                        case "any-order-shipped-company-email":
-                        case "any-order-shipped-personal-sms":
+                        case Constants.AnyOrderShippedEmail:
+                        case Constants.AnyOrderShippedSms:
                             AddPreference(keyValue, "When any order has shipped", ref model);
                             break;
                         default:
@@ -174,6 +175,67 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     }
                 }
 
+            }
+            else
+            {
+                IDictionary<string, bool> notifs = new Dictionary<string, bool>();
+                notifs.Add(Constants.MyOrderConfirmedEmail, false);
+                notifs.Add(Constants.MyOrderConfirmedSms, false);
+                notifs.Add(Constants.MyOrderScheduleEmail, false);
+                notifs.Add(Constants.MyOrderScheduleSms, false);
+                notifs.Add(Constants.MyOrderPromiseEmail, false);
+                notifs.Add(Constants.MyOrderPromiseSms, false);
+                notifs.Add(Constants.MyOrderReadyEmail, false);
+                notifs.Add(Constants.MyOrderReadySms, false);
+                notifs.Add(Constants.MyOrderLoadingEmail, false);
+                notifs.Add(Constants.MyOrderLoadingSms, false);
+                notifs.Add(Constants.MyOrderShippedEmail, false);
+                notifs.Add(Constants.MyOrderShippedSms, false);
+                notifs.Add(Constants.AnyOrderConfirmedEmail, false);
+                notifs.Add(Constants.AnyOrderConfirmedSms, false);
+                notifs.Add(Constants.AnyOrderShippedEmail, false);
+                notifs.Add(Constants.AnyOrderShippedSms, false);
+                foreach (var keyValue in notifs)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case Constants.MyOrderConfirmedEmail:
+                        case Constants.MyOrderConfirmedSms:
+                            AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
+                            break;
+                        case Constants.MyOrderScheduleEmail:
+                        case Constants.MyOrderScheduleSms:
+                            AddPreference(keyValue, "When my order has a scheduled date change", ref model);
+                            break;
+                        case Constants.MyOrderPromiseEmail:
+                        case Constants.MyOrderPromiseSms:
+                            AddPreference(keyValue, "When my order has a promise date change", ref model);
+                            break;
+                        case Constants.MyOrderReadyEmail:
+                        case Constants.MyOrderReadySms:
+                            AddPreference(keyValue, "When my order is ready", ref model);
+                            break;
+                        case Constants.MyOrderLoadingEmail:
+                        case Constants.MyOrderLoadingSms:
+                            AddPreference(keyValue, "When my order is loading", ref model);
+                            break;
+                        case Constants.MyOrderShippedEmail:
+                        case Constants.MyOrderShippedSms:
+                            AddPreference(keyValue, "When my order has shipped", ref model);
+                            break;
+                        case Constants.AnyOrderConfirmedEmail:
+                        case Constants.AnyOrderConfirmedSms:
+                            AddPreference(keyValue, "When any order has been confirmed", ref model);
+                            break;
+                        case Constants.AnyOrderShippedEmail:
+                        case Constants.AnyOrderShippedSms:
+                            AddPreference(keyValue, "When any order has shipped", ref model);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                
             }
 
             return model;

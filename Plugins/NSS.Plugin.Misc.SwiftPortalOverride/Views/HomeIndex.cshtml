@@ -128,7 +128,7 @@
                         @if (isOperations || isBuyer)
                         {
                             <div class="col-md-7 col-sm-6 col-12 m-b2">
-                                <div class="tab-content @(Model.OpenOrders.Count > 0 ? "": "open-orders-bg")" id="pills-tabContent" style="height: 22.7rem">
+                                <div class="tab-content @(Model.OpenOrders.Count > 0 ? "" : "open-orders-bg")" id="pills-tabContent" style="height: 22.7rem">
                                     <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="" style="height: 19.4rem">
                                         @if (Model.OpenOrders.Count > 0)
                                         {
@@ -172,7 +172,7 @@
                                             </div>
                                         }
                                     </div>
-                                    <div class="text-nowrap nss-dark text-center mb-2 @(Model.OpenOrders.Count > 5 ? "": "d-none")">* Five most recent only.</div>
+                                    <div class="text-nowrap nss-dark text-center mb-2 @(Model.OpenOrders.Count > 5 ? "" : "d-none")">* Five most recent only.</div>
                                 </div>
                             </div>
                         }
@@ -235,7 +235,7 @@
                                                     }
                                                 </tbody>
                                             </table>
-                                            <div class="text-nowrap nss-dark text-center mb-1 @(Model.ClosedOrders.Count > 5 ? "": "d-none")">* Five most recent only.</div>
+                                            <div class="text-nowrap nss-dark text-center mb-1 @(Model.ClosedOrders.Count > 5 ? "" : "d-none")">* Five most recent only.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -243,7 +243,7 @@
                         }
 
 
-                        @if (Model.CreditSummary.CanCredit && (isAP || isBuyer))
+                        @if (Model.CreditSummary.CanCredit || isAP)
                         {
                             <div class="col-md-5 col-sm-6 col-12 m-b2">
                                 <div class="tab-content" id="pills-tabContent">
@@ -262,7 +262,7 @@
                                             </div>
                                             <div class="col-md-12 d-block">
                                                 <label class="float-left h5-default">Total Past Due</label>
-                                                <h5 class="float-right @(Model.CreditSummary?.PastDueAmount == 0 ? "nss-dark-blue": "text-danger")">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
+                                                <h5 class="float-right @(Model.CreditSummary?.PastDueAmount == 0 ? "nss-dark-blue" : "text-danger")">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
                                             </div>
                                             <div class="col-md-12 d-block">
                                                 <label class="float-left h5-default">Open Credit</label>
@@ -484,7 +484,7 @@
                     </div>
                 </div>
             }
-            @if (Model.CreditSummary.CanCredit && (isAP || isBuyer))
+            @if (Model.CreditSummary.CanCredit || isAP)
             {
                 <div class="col-md-5 col-sm-6 col-12 m-b2 p-0 mt-2">
                     <div class="tab-content p-b1" id="pills-tabContent">

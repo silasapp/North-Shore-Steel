@@ -1075,6 +1075,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     if (response.IsSuccessStatusCode)
                         result = ERPGetNotificationPreferencesResponse.FromJson(respContent);
                     else
+                        error = respContent;
                         throw new NopException($"An error occured when updating user company notification preferences : api status => {response.StatusCode}, message => {respContent}", respContent);
 
                 }
