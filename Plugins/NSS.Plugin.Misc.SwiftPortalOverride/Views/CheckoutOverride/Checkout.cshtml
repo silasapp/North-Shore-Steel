@@ -830,6 +830,8 @@ Content2 =
                 if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) { this.showNewShippingAddress = false; return; }
 
                 this.disableSubmit = true;
+                this.deliveryDate = null;
+
                 let address;
                 if (this.isDelivery) {
                     if (this.showNewShippingAddress) address = this.newShippingAddress;

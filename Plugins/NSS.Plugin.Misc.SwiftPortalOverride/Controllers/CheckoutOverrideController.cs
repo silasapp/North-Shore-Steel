@@ -552,47 +552,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         _customerService.UpdateCustomer(_workContext.CurrentCustomer);
                     }
 
-                    //find it
-                    //performance optimization. try cache first
-                    var shippingOptions = _genericAttributeService.GetAttribute<List<ShippingOption>>(_workContext.CurrentCustomer,
-                        NopCustomerDefaults.OfferedShippingOptionsAttribute, _storeContext.CurrentStore.Id);
-
-                    if (shippingOptions == null || !shippingOptions.Any())
-                    {
-                        //not found? let's load them using shipping service
-                        shippingOptions = _shippingService.GetShippingOptions(shoppingCart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer),
-                            _workContext.CurrentCustomer, "Shipping.NSS", _storeContext.CurrentStore.Id).ShippingOptions.ToList();
-                    }
-                    else
-                    {
-                        //loaded cached results. let's filter result by a chosen shipping rate computation method
-                        shippingOptions = shippingOptions.Where(so => so.ShippingRateComputationMethodSystemName.Equals("Shipping.NSS", StringComparison.InvariantCultureIgnoreCase))
-                            .ToList();
-                    }
+                    //Get shipping
+                    var shippingOptions = _shippingService.GetShippingOptions(shoppingCart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer),
+                        _workContext.CurrentCustomer, "Shipping.NSS", _storeContext.CurrentStore.Id).ShippingOptions.ToList();
 
                     var shippingOption = shippingOptions.FirstOrDefault();
 
                     //save
-                    _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption, _storeContext.CurrentStore.Id);
-
-
                     if (shippingOption != null)
                         _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption, _storeContext.CurrentStore.Id);
 
                     _genericAttributeService.SaveAttribute<PickupPoint>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedPickupPointAttribute, null, _storeContext.CurrentStore.Id);
                 }
 
-                //if shipping
-
-                //if (response.Allowed)
-                //    return Json(new { error = 2, message = "We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select \"Pickup\"" });
-
-
-
                 var orderTotals = _shoppingCartModelFactory.PrepareOrderTotalsModel(shoppingCart, false);
-
-                //var orderTotal = _orderTotalCalculationService.GetShoppingCartTotal(shoppingCart, out var orderDiscountAmount, out var orderAppliedDiscounts, out var appliedGiftCards, out var redeemedRewardPoints, out var redeemedRewardPointsAmount);
-                //orderTotal += response.ShippingCost;
 
                 return Json(new
                 {
@@ -604,7 +577,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
             catch (Exception exc)
             {
-
                 return Json(new { error = 2, message = exc.Message });
             }
 
