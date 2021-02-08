@@ -1898,6 +1898,9 @@ table input {
 .payment-item-card {
     flex-basis: 30%;
 }
+.payment-item-card-2 {
+    flex-basis: 45%;
+}
 
 .checkout-page {
     margin-bottom: 230px;

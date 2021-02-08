@@ -299,8 +299,8 @@ Content2 =
                     <label class="h5 text-primary mb-4" style="font:normal normal 500 26px/20px 'Teko';">PAYMENT METHOD</label>
                     <div class="d-flex flex-column mb-3">
                         <div class="d-flex flex-row flex-wrap justify-content-between" v-if="isPaymentSelection">
-                            <div class="d-flex flex-row payment-item-card align-items-start p-4"
-                                 v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD}"
+                            <div class="d-flex flex-row align-items-start p-4"
+                                 v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD, 'payment-item-card': shared.accountCredit.canCredit, 'payment-item-card-2':!shared.accountCredit.canCredit}"
                                  v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_CREDIT_CARD">
                                 <img src="Themes/@themeName/Content/assets/credit-card.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
@@ -309,7 +309,7 @@ Content2 =
                                 </div>
                             </div>
                             <div class="d-flex flex-row payment-item-card align-items-start p-4"
-                                 v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL}"
+                                 v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL, 'payment-item-card': shared.accountCredit.canCredit, 'payment-item-card-2':!shared.accountCredit.canCredit}"
                                  v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_PAYPAL">
                                 <img src="Themes/@themeName/Content/assets/paypal.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
@@ -716,9 +716,11 @@ Content2 =
                 this.window.height = window.innerHeight;
             },
             showLoading: function () {
+                $('#custom-loading').innerHTML += "<p id='processing' style='position: fixed; top: 55 %; left: 50 %; z - index: 999; margin: 0px - 130px 0px - 130px; font - size: 40px;'>Processing your order</p>";
                 $('#custom-loading').show();
             },
             hideLoading: function () {
+                $('#processing').remove();
                 $('#custom-loading').hide();
             },
             formatMoney: function (input) {
