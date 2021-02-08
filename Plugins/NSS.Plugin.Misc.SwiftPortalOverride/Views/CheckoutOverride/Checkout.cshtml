@@ -694,7 +694,7 @@ Content2 =
         destroyed: function () {
             window.removeEventListener("resize", this.handleResize);
         },
-         mounted: function () {
+        mounted: function () {
 			this.setupCreditCardMethod();
             this.setupPaypalMethod();
             this.getShippingRate(true);
@@ -716,8 +716,16 @@ Content2 =
                 this.window.height = window.innerHeight;
             },
             showLoading: function () {
-                $('#custom-loading').innerHTML += "<p id='processing' style='position: fixed; top: 55 %; left: 50 %; z - index: 999; margin: 0px - 130px 0px - 130px; font - size: 40px;'>Processing your order</p>";
+
                 $('#custom-loading').show();
+            },
+            addProcessingTextToLoader: function() {
+                var newcontent = document.createElement('p');
+                newcontent.innerHTML = "Processing your order";
+                newcontent.setAttribute("id", "processing_loader");
+                newcontent.setAttribute("class", "processing-loader-text");
+                document.getElementById("custom-loading").appendChild(newcontent);
+                console.log('custom-loading', document.getElementById("custom-loading"));
             },
             hideLoading: function () {
                 $('#processing').remove();
@@ -898,13 +906,12 @@ Content2 =
             },
 
             placeOrder: function () {
-
+                this.addProcessingTextToLoader();
                 this.dirty = true;
                 if (this.paymentMethodIndex !== this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
                     || this.errorType === this.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
-
                 this.errorType = this.shared.constants.ERROR_TYPE_NONE;
-                if (!this.validate()) return ;
+                if (!this.validate()) return;
                 this.showLoading();
                 this.finalizeOrder();
             },
@@ -1018,6 +1025,7 @@ Content2 =
                         self.hideLoading();
                     }
                 });
+                $('#processing_loader').remove();
             },
 
             validate: function () {

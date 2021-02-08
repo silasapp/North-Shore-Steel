@@ -1905,7 +1905,19 @@ table input {
 .checkout-page {
     margin-bottom: 230px;
 }
-
+.processing-loader-text {
+    position: fixed;
+    top: 55%;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    margin: auto;
+    font-size: 40px;
+    color: #00a4ff !important;
+    opacity: 1;
+}
 .order-result-page {
     margin-bottom: 365px;
 }
