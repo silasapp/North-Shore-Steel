@@ -1914,8 +1914,9 @@ table input {
     right: 0;
     z-index: 999;
     margin: auto;
+    font: normal normal 700 40px/48px "Exo 2";
     font-size: 40px;
-    color: #00a4ff !important;
+    color: #fff !important;
     opacity: 1;
 }
 .order-result-page {
