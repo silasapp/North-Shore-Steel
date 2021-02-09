@@ -679,7 +679,7 @@ Content2 =
             shippingAmount: orderTotals.shipping?.replace("$", ""),
             discountAmount: orderTotals.subTotalDiscount,
             taxAmount: orderTotals.tax?.replace("$", ""),
-            orderTotal: orderTotals.orderTotal?.replace("$", ""),
+            orderTotal: orderTotals.orderTotal?.replace("$", "")?.replace(/,/g, ''),
             disableSubmit: false,
             window: {
                 width: 0,
@@ -704,7 +704,10 @@ Content2 =
                 return this.window.width <= 767.98;
             },
             lineOfCreditDisabled: function () {
-                return this.shared.accountCredit.creditAmount < Number(this.orderTotal);
+                if (isNaN(parseFloat(this.orderTotal)))
+                    return true;
+
+                return this.shared.accountCredit.creditAmount < parseFloat(this.orderTotal);
             },
             switchToPaymentSelection: function () {
                 isPaymentSelection = true;
@@ -881,7 +884,7 @@ Content2 =
                         console.log('shipping resp', data);
                         self.disableSubmit = false;
                         //self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
-                        self.orderTotal = data.orderTotal?.replace("$", "");
+                        self.orderTotal = data.orderTotal?.replace("$", "")?.replace(/,/g, '');
                         self.taxAmount = data.tax?.replace("$", "");
                         self.shippingAmount = data.shipping?.replace("$", "");
                         self.deliveryDate = data.shippingCalculatorResponse.date;
