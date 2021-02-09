@@ -238,7 +238,7 @@ Content2 =
                 </div>
 
                 <div class="card card-mod">
-                    <label class="h5 text-primary mb-4" style="font:normal normal 500 26px/20px 'Teko';">DELIVERY OR PICKUP</label>
+                    <label class="h5 text-primary mb-4" style="font:normal normal 500 26px/20px 'Teko';">DELIVERY OR WILL CALL</label>
                     <div class="mb-3 d-flex">
                         <div class="mr-4">
                             <label for="customer" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
@@ -251,7 +251,7 @@ Content2 =
                             <label for="pickup" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
                                 <input type="radio" id="pickup" v-bind:checked="!isDelivery" name="ship" value="pickup" v-on:click="isDelivery = false; getShippingRate()">
                                 <span class="checkout-checkmark"></span>
-                                Pickup
+                                Will Call
                             </label>
                         </div>
                     </div>

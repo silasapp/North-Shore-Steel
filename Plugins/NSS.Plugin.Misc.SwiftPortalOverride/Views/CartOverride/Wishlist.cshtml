@@ -139,7 +139,7 @@ Content1 =
                                             var itemId = item.Id;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
-                                            var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
+                                            var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.ProductId);
 
                                             var mappingIds = mappings.Select(x => x.Id).ToArray();
 
@@ -223,7 +223,7 @@ Content1 =
                                                     @if (hasSawOption)
                                                     {
                                                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" class="hover-icon mx-1" width="24" height="24"
-                                                             v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
+                                                             v-on:click="handleSawOption(@item.ProductId, @GetJson(prodAttrs))">
                                                             <g transform="translate(-580 -80)">
                                                                 <title>Saw Options</title>
                                                                 <path d="M0,0H24V24H0Z" transform="translate(580 80)" fill="rgba(0, 0, 0, 0)" />
@@ -318,7 +318,7 @@ Content1 =
                                             @if (hasSawOption)
                                             {
                                                 <img src="Themes/SwiftPortal/Content/assets/icn-saw.svg" class="product-action-sm" width="24" height="24" alt=""
-                                                     v-on:click="handleSawOption(@item.Id, @GetJson(prodAttrs))">
+                                                     v-on:click="handleSawOption(@item.ProductId, @GetJson(prodAttrs))">
                                             }
 
                                             @if (!string.IsNullOrEmpty(mtr))
@@ -450,6 +450,7 @@ Content1 =
                 };
                 sawOptionModal.hide();
                 AjaxCart.setLoadWaiting(true);
+
                 $.ajax({
                     cache: false,
                     url: `/addproducttocart/details/${this.productId}/@Html.Raw((int)ShoppingCartType.ShoppingCart)`,
