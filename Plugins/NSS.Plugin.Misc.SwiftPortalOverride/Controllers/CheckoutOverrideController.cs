@@ -819,7 +819,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                             break;
                     }
 
-                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, amount), 2), Code = discount.CouponCode ?? string.Empty, Description = discount.Name?.Replace("'", "''") ?? string.Empty });
+                    discounts.Add(new Discount { Amount = Math.Round(_discountService.GetDiscountAmount(discount, amount), 2), Code = discount.CouponCode ?? string.Empty, Description = discount.Name ?? string.Empty });
                 }
             }
 
@@ -866,17 +866,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 orderItems.Add(new DTOs.Requests.OrderItem
                 {
-                    Description = genAttrs.FirstOrDefault(x => x.Key == "itemName")?.Value?.Replace("'", "''"),
+                    Description = genAttrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
                     ItemId = (int.TryParse(genAttrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
-                    CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?.Replace("'", "''") ?? string.Empty) : string.Empty,
+                    CustomerPartNo = customerCompany != null ? (_customerCompanyProductService.GetCustomerCompanyProductById(customerCompany.Id, item.ProductId)?.CustomerPartNo ?? string.Empty) : string.Empty,
                     Quantity = item.Quantity,
                     TotalPrice = Math.Round(item.PriceExclTax, 2),
                     UnitPrice = Math.Round(item.UnitPriceExclTax, 2),
                     TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int)Math.Round(weight * item.Quantity) : 0),
                     // product attr
-                    Notes = notes?.Replace("'", "''") ?? string.Empty,
-                    SawOptions = sawoptions?.Replace("'", "''") ?? string.Empty,
-                    SawTolerance = sawTolerance?.Replace("'", "''") ?? string.Empty,
+                    Notes = notes ?? string.Empty,
+                    SawOptions = sawoptions?? string.Empty,
+                    SawTolerance = sawTolerance ?? string.Empty,
                     Uom = uom ?? string.Empty
                 });
             }
@@ -884,16 +884,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var request = new ERPCreateOrderRequest()
             {
                 ContactEmail = _workContext.CurrentCustomer.Email,
-                ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute)?.Replace("'", "''"),
-                ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute)?.Replace("'", "''"),
+                ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute),
+                ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute),
                 ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute),
                 UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
 
-                ShippingAddressLine1 = shippingAddress?.Address1?.Replace("'", "''"),
-                ShippingAddressLine2 = shippingAddress?.Address2?.Replace("'", "''"),
+                ShippingAddressLine1 = shippingAddress?.Address1,
+                ShippingAddressLine2 = shippingAddress?.Address2,
                 ShippingAddressState = _stateProvinceService.GetStateProvinceById(shippingAddress?.StateProvinceId ?? 0)?.Abbreviation,
-                ShippingAddressCity = shippingAddress?.City?.Replace("'", "''"),
-                ShippingAddressPostalCode = shippingAddress?.ZipPostalCode?.Replace("'", "''"),
+                ShippingAddressCity = shippingAddress?.City,
+                ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
                 PickupInStore = order.PickupInStore,
                 PickupLocationId = order.PickupInStore && pickupAddress?.City?.ToLower() == "houston" ? 2 : order.PickupInStore && pickupAddress?.City?.ToLower() == "beaumont" ? 1 : (order.PickupInStore ? 1 : 0),
 
@@ -914,7 +914,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 OrderTotal = Math.Round(order.OrderTotal, 2),
                 PaymentMethodReferenceNo = order.AuthorizationTransactionId,
                 PaymentMethodType = paymentMethod,
-                PoNo = poValues.FirstOrDefault()?.Replace("'", "''")
+                PoNo = poValues.FirstOrDefault()
             };
 
             sw1.Stop();
