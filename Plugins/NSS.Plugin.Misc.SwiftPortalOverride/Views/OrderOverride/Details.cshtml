@@ -339,12 +339,12 @@
                 <tr>
                     <th class="sku">Line #</th>
                     <th class="name">Description</th>
+                    <th class="text-center">Qty.</th>
+                    <th class="total text-right">Weight (lb)</th>
                     <th class="vendor">Customer Part #</th>
                     <th class="price text-right">Unit Price</th>
                     <th class="text-center">UOM</th>
                     <th class="quantity text-right">Total Price</th>
-                    <th class="total text-right">Weight (lb)</th>
-                    <th class="text-center">Qty.</th>
                 </tr>
             </thead>
             <tbody>
@@ -353,12 +353,12 @@
                     <tr>
                         <td class="sku">@item.LineNo</td>
                         <td class="product">@item.Description</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-right">@string.Format("{0:N0}", item.TotalWeight)</td>
                         <td>@item.CustomerPartNo</td>
                         <td class="text-right">$@DoFormat(item.UnitPrice)</td>
                         <td class="text-center">@item.UOM</td>
                         <td class="text-right">$@DoFormat(item.TotalPrice)</td>
-                        <td class="text-right">@string.Format("{0:N0}", item.TotalWeight)</td>
-                        <td class="text-center">@item.Quantity</td>
                     </tr>
                 }
             </tbody>
@@ -375,16 +375,16 @@
                 </div>
                 <label class="h2-primary mt-3 mb-2" v-bind:class="{'text-left': isMobile}">@item.Description</label>
                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                    <label class="h5-default-500">Quantity</label>
+                    <label class="h5-primary-600">@item.Quantity</label>
+                </div>
+                <div class="d-flex flex-row justify-content-between align-items-center my-2">
                     <label class="h5-default-500">Customer Part #</label>
                     <label class="h5-primary-600">@item.CustomerPartNo</label>
                 </div>
                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                     <label class="h5-default-500">Unit Price</label>
                     <label class="h5-primary-600">$@DoFormat(item.UnitPrice)</label>
-                </div>
-                <div class="d-flex flex-row justify-content-between align-items-center my-2">
-                    <label class="h5-default-500">Quantity</label>
-                    <label class="h5-primary-600">@item.Quantity</label>
                 </div>
                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                     <label class="h5-default-500">Total Price</label>
@@ -499,4 +499,5 @@
     }
 
 </script>
+
 <ejs-scripts></ejs-scripts>
