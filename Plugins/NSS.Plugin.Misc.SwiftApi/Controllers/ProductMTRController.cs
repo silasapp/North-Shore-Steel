@@ -90,7 +90,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             byte[] content = Convert.FromBase64String(mtrDelta.MTR);
 
-            var blobUri = _storageService.UploadBlob(accountName, accountKey, containerName, blobName, content);
+            var blobUri = _storageService.UploadBlob(accountName, accountKey, containerName, blobName, content, "application/pdf");
 
             // update customer as NSS Approved
             _genericAttributeService.SaveAttribute(product, Constants.MTRFieldAttribute, blobUri);

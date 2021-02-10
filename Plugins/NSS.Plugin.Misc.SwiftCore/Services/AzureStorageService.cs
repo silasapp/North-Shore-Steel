@@ -1,17 +1,16 @@
 ﻿using Azure.Storage;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
     public class AzureStorageService : IStorageService
     {
-        public string UploadBlob(string accountName, string accountKey, string containerName, string blobName, byte[] content)
+        public string UploadBlob(string accountName, string accountKey, string containerName, string blobName, byte[] content, string contentType = null)
         {
             var credential = new StorageSharedKeyCredential(accountName, accountKey);
 
@@ -27,7 +26,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             // Upload stream file
             using (Stream stream = new MemoryStream(content))
             {
-                blob.Upload(stream, overwrite: true);
+                blob.Upload(stream, new BlobHttpHeaders { ContentType = contentType ?? "application/octet-stream", ContentDisposition = $"inline; filename={blobName}" }, conditions: null);
             }
 
             var blobSasUri = GetBlobSasUri(container, blobName, credential);
