@@ -14,8 +14,9 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
 
     public enum PreferredLocation
     {
+        Beaumont = 1,
         Houston = 2,
-        Beaumont = 1
+        None = 3
     }
 
     public enum HearAboutUs
@@ -23,10 +24,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         Salesperson = 1,
         Website = 2,
         Email = 3,
-        [Display(Name = "Social media")]
+        [Display(Name = "Social Media")]
         SocialMedia = 4,
-        Word_of_mouth = 5,
-        [Display(Name = "Trade publication")]
+        [Display(Name = "Word of Mouth")]
+        WordOfMouth = 5,
+        [Display(Name = "Trade Publication")]
         TradePublication = 6,
         Other = 7
 

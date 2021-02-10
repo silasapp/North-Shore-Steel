@@ -522,7 +522,7 @@ Content2 =
             </div>
             <div class="col-md-3" v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
                 <div class="card card-mod checkout-summary">
-                    <label class="fs-14 text-primary text-center" style="font:normal normal 500 18px/12px 'Teko';">ORDER SUMMARY</label>
+                    <label class="h5 text-primary text-center" style="font:normal normal 500 26px/20px 'Teko';">ORDER SUMMARY</label>
                     <div class="order-summary mt-2">
                         <div class="price-summary">
                             <label class="text-muted">@T("Order.SubTotal"):</label>
@@ -738,10 +738,7 @@ Content2 =
                 if (!input)
                     return input;
 
-                return input.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                return Number(input).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             },
             formatDate: function (date) {
                 if (!date) return 'N/A';

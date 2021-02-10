@@ -22,8 +22,6 @@
     .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
         width: 67rem !important;
         margin: auto;
-        /*position: relative !important;*/
-        /*top: -126rem !important;*/
     }
 
     .ui-dialog {
@@ -79,7 +77,7 @@
     Content2 =
     @<div id="acceptTOSModal">
         <div class="">
-            <p class="pt-4">Please accept the terms of service before the next step.</p>
+            <p class="pt-4">Please accept the Terms and Conditions and Privacy Policy to complete registration.</p>
         </div>
     </div>;
 }
@@ -227,7 +225,6 @@
                                     <label class="nss-input-label"> Let us know how you found us</label>
                                     <input asp-for="Other" placeholder="Enter how you found us" class="textbox form-control custom-input found-us" />
                                     <label id="found-us-text-error" style="display:none" class="text-danger mt-1 mb-0">How you found us is required.</label>
-                                    @*<span asp-validation-for="Other" style="display:flex;"></span>*@
                                 </div>
                             </div>
 
@@ -331,7 +328,7 @@
             @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
         </div>
     </div>
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS AND CONDITIONS and PRIVACY POLICY").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
 </div>
 
 
