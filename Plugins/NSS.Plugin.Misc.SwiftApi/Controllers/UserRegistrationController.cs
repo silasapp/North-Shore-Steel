@@ -28,12 +28,15 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly ICustomerService _customerService;
         private readonly IStoreContext _storeContext;
         private readonly IUserRegistrationService _userRegistrationService;
-        public UserRegistrationController(WorkFlowMessageServiceOverride workFlowMessageService, IUserRegistrationService userRegistrationService, IStoreContext storeContext, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
+        private readonly ILogger _logger;
+
+        public UserRegistrationController(ILogger logger, WorkFlowMessageServiceOverride workFlowMessageService, IUserRegistrationService userRegistrationService, IStoreContext storeContext, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
         {
             _workFlowMessageService = workFlowMessageService;
             _customerService = customerService;
             _storeContext = storeContext;
             _userRegistrationService = userRegistrationService;
+            _logger = logger;
         }
 
         [HttpPut]
@@ -105,6 +108,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 return BadRequest();
             }
+
+            // log request
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - RejectUserRegistration -> regId: {id}");
 
             var userRegistration = _userRegistrationService.GetById(id);
 

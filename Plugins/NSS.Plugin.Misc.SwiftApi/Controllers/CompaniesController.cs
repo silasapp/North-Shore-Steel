@@ -26,11 +26,14 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
     public class CompaniesController : BaseApiController
     {
         private readonly ICompanyService _companyService;
-        public CompaniesController( 
+        private readonly ILogger _logger;
+        public CompaniesController(
+            ILogger logger,
             ICompanyService companyService,
             IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
         {
             _companyService = companyService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -64,6 +67,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - CreateCompany - erpCompId = {companyDelta.Dto.ErpCompanyId}", $"request => {JsonConvert.SerializeObject(companyDelta.Dto)}");
+
             var newCompany = _companyService.GetCompanyEntityByErpEntityId(companyDelta.Dto.ErpCompanyId);
 
             if (newCompany != null)
@@ -94,6 +99,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - UpdateCompany - erpCompId = {companyDelta.Dto.Id}", $"request => {JsonConvert.SerializeObject(companyDelta.Dto)}");
+
             var companyToUpdate = _companyService.GetCompanyEntityByErpEntityId(companyDelta.Dto.Id);
 
             if(companyToUpdate == null)
@@ -102,8 +109,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             }
 
             companyDelta.Dto.Id = companyToUpdate.Id;
-            //companyDelta.Dto.ErpCompanyId = companyToUpdate.ErpCompanyId;
-
 
             companyDelta.Merge(companyToUpdate);
 
@@ -152,6 +157,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 return Error(HttpStatusCode.BadRequest, "id", "invalid id");
             }
+
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - DeleteCompany - erpCompId = {id}");
 
             var company = _companyService.GetCompanyEntityByErpEntityId(id);
 

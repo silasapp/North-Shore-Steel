@@ -89,6 +89,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - CreateProduct - itemId = {erpProductDelta.Dto.itemId}", $"request => {JsonConvert.SerializeObject(erpProductDelta.Dto)}");
+
             var attr = _genericAttributeService.GetAttributeByKeyValue("itemId", erpProductDelta.Dto.itemId.ToString(), nameof(Product));
             if (attr != null)
             {

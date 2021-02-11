@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace NSS.Plugin.Misc.SwiftApi.Controllers
 {
@@ -35,7 +36,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly IProductApiService _productApiService;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
-        public ProductMTRController(IStoreContext storeContext, ISettingService settingService, IProductApiService productApiService, CustomGenericAttributeService genericAttributeService, IStorageService storageService, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : 
+        private readonly ILogger _logger;
+        public ProductMTRController(ILogger logger, IStoreContext storeContext, ISettingService settingService, IProductApiService productApiService, CustomGenericAttributeService genericAttributeService, IStorageService storageService, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : 
             base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
         {
             _genericAttributeService = genericAttributeService;
@@ -43,6 +45,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _productApiService = productApiService;
             _storeContext = storeContext;
             _settingService = settingService;
+            _logger = logger;
         }
 
         [HttpPut]
@@ -51,7 +54,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
-        public IActionResult CreateCustomerCompany(
+        public IActionResult CreateProductMTR(
             int id, ProductMTRDto mtrDelta
             )
         {
@@ -60,7 +63,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
-            CustomerActivityService.InsertActivity("APIService", "Starting Product Update", null);
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - CreateProductMTR - itemId = {id}", $"request => {JsonConvert.SerializeObject(mtrDelta)}");
 
             var product = new Product();
 
@@ -92,7 +95,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             var blobUri = _storageService.UploadBlob(accountName, accountKey, containerName, blobName, content, "application/pdf");
 
-            // update customer as NSS Approved
+            // update product blob url
             _genericAttributeService.SaveAttribute(product, Constants.MTRFieldAttribute, blobUri);
 
             return NoContent();
@@ -104,7 +107,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         [ProducesResponseType(typeof(ErrorsRootObject), 400)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Unauthorized)]
         [GetRequestsErrorInterceptorActionFilter]
-        public IActionResult DeleteCustomerCompany(
+        public IActionResult DeleteProductMTR(
             int id
             )
         {
@@ -143,11 +146,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             _storageService.DeleteBlob(accountName, accountKey, containerName, blobName);
 
-            var attributes = _genericAttributeService.GetAttributesForEntity(product.Id, nameof(Product));
-
-            var mtrAttribute = attributes.FirstOrDefault(x => x.Key == Constants.MTRFieldAttribute);
-            if(mtrAttribute != null)
-                _genericAttributeService.DeleteAttribute(mtrAttribute);
+            // delete attr
+            _genericAttributeService.SaveAttribute<string>(product, Constants.MTRFieldAttribute, null);
 
             return NoContent();
         }

@@ -41,7 +41,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly CustomGenericAttributeService _genericAttributeService;
         private readonly ICustomerApiService _customerApiService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
-        public UsersController(IStoreContext storeContext, WorkFlowMessageServiceOverride workFlowMessageService, ICustomerApiService customerApiService, INewsLetterSubscriptionService newsLetterSubscriptionService,
+        private readonly ILogger _logger;
+        public UsersController(ILogger logger, IStoreContext storeContext, WorkFlowMessageServiceOverride workFlowMessageService, ICustomerApiService customerApiService, INewsLetterSubscriptionService newsLetterSubscriptionService,
             IUserRegistrationService userRegistrationService, ICustomerCompanyService customerCompanyService, ICompanyService companyService, CustomGenericAttributeService genericAttributeService,
             IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
         {
@@ -54,6 +55,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _genericAttributeService = genericAttributeService;
             _customerApiService = customerApiService;
             _newsLetterSubscriptionService = newsLetterSubscriptionService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -68,6 +70,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 return BadRequest();
             }
+
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - CreateUser - regId = {userDelta.Dto.RegistrationId}, wintrixId = {userDelta.Dto.WintrixId}", $"request => {JsonConvert.SerializeObject(userDelta.Dto)}");
 
             UserRegistration registration = null;
 
@@ -212,6 +216,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 return Error();
             }
+
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - UpdateUser - wintrixId = {userDelta.Dto.Id}", $"request => {JsonConvert.SerializeObject(userDelta.Dto)}");
 
             int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, userDelta.Dto.Id.ToString(), nameof(Customer))?.EntityId ?? 0;
 

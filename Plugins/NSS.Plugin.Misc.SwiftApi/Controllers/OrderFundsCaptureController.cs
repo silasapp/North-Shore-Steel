@@ -29,14 +29,16 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
         private readonly SwiftCoreSettings _swiftCoreSettings;
         private readonly IOrderService _orderService;
         private readonly IOrderProcessingService _orderProcessingService;
+        private readonly ILogger _logger;
 
-        public OrderFundsCaptureController(IOrderProcessingService orderProcessingService, IOrderService orderService, SwiftCoreSettings swiftCoreSettings, PayPalProcessor payPalProcessor, CustomGenericAttributeService genericAttributeService, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
+        public OrderFundsCaptureController(ILogger logger, IOrderProcessingService orderProcessingService, IOrderService orderService, SwiftCoreSettings swiftCoreSettings, PayPalProcessor payPalProcessor, CustomGenericAttributeService genericAttributeService, IJsonFieldsSerializer jsonFieldsSerializer, IAclService aclService, ICustomerService customerService, IStoreMappingService storeMappingService, IStoreService storeService, IDiscountService discountService, ICustomerActivityService customerActivityService, ILocalizationService localizationService, IPictureService pictureService) : base(jsonFieldsSerializer, aclService, customerService, storeMappingService, storeService, discountService, customerActivityService, localizationService, pictureService)
         {
             _genericAttributeService = genericAttributeService;
             _payPalProcessor = payPalProcessor;
             _swiftCoreSettings = swiftCoreSettings;
             _orderProcessingService = orderProcessingService;
             _orderService = orderService;
+            _logger = logger;
         }
 
 
@@ -52,6 +54,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             {
                 return BadRequest();
             }
+
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - CaptureOrder - orderId = {orderId}");
 
             // get entity order
             var sysOrderId = _genericAttributeService.GetAttributeByKeyValue(SwiftCore.Helpers.Constants.ErpOrderNoAttribute, orderId.ToString(), nameof(Order))?.EntityId;

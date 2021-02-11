@@ -77,10 +77,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
-            int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, id.ToString(), nameof(Customer))?.EntityId ?? 0;
-
             // log request
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift.ApproveUser -> Customer Id: {customerId}", JsonConvert.SerializeObject(input.Dto));
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - CreateCustomerCompany -> wintrix Id: {id}", $"request => {JsonConvert.SerializeObject(input.Dto)}");
+
+            int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, id.ToString(), nameof(Customer))?.EntityId ?? 0;
 
             Nop.Core.Domain.Customers.Customer customer = _customerApiService.GetCustomerEntityById(customerId);
 
@@ -147,6 +147,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             int companyId
             )
         {
+
+            // log request
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - DeleteCustomerCompany -> wintrixId: {id}, erpCompId: {companyId}");
+
             int customerId = _genericAttributeService.GetAttributeByKeyValue(Constants.ErpKeyAttribute, id.ToString(), nameof(Customer))?.EntityId ?? 0;
 
             Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
