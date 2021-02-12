@@ -276,7 +276,7 @@ Content2 =
 
                         </div>
                         <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required.</label>
-                        <label class="text-black mt-2 font-weight-bolder h5">Promise Date: {{deliveryDate}}</label>
+                        <label class="text-black mt-2 font-weight-bolder">Promise Date: {{deliveryDate}}</label>
                     </div>
                     <div class="d-flex flex-column mb-3" v-if="!isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
@@ -291,7 +291,7 @@ Content2 =
                             </select>
                         </div>
                         <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Pickup Location is required.</label>
-                        <label class="text-black mt-2 font-weight-bolder h5">Promise Date: {{deliveryDate}}</label>
+                        <label class="text-black mt-2 font-weight-bolder">Promise Date: {{deliveryDate}}</label>
                     </div>
 
                 </div>
