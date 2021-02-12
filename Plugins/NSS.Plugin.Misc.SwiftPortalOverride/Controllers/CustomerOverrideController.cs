@@ -1269,14 +1269,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
+            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+
+            if (!isOperations && !isBuyer)
                 return AccessDeniedView();
 
             // call api
             var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
             var (result, error) = _nSSApiProvider.GetCompanyNotificationPreferences(custNo, eRPCompanyId);
 
-            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(error, result);
+            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(eRPCompanyId, error, result);
 
             return Json(new { model });
         }
@@ -1292,8 +1296,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
+            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!isOperations && !isBuyer)
                 return AccessDeniedView();
 
             // call api
@@ -1310,7 +1317,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var (result, error) = _nSSApiProvider.UpdateCompanyNotificationPreferences(custNo, eRPCompanyId, preferences);
 
-            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(error, result);
+            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(eRPCompanyId, error, result);
 
             //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Notifications.cshtml", model);
 

@@ -76,7 +76,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// </summary>
         /// <param name="selectedTabId">Identifier of the selected tab</param>
         /// <returns>Customer navigation model</returns>
-        public virtual CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, int selectedTabId = 0)
+        public virtual CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, bool isOperations = false, int selectedTabId = 0)
         {
             var model = new CustomerNavigationModel();
             var themeName = _themeContext.WorkingThemeName;
@@ -107,7 +107,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 ItemClass = "change-password",
                 ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-key.svg"
             });
-            if (isABuyer)
+            if (isABuyer || isOperations)
             {
                 model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
                 {
@@ -125,8 +125,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-        public NotificationsModel PrepareNotificationsModel(string error, IDictionary<string, bool> notifications)
+        public NotificationsModel PrepareNotificationsModel(int ERPCompanyId, string error, IDictionary<string, bool> notifications)
         {
+            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, ERPCompanyId, ERPRole.Operations);
+            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, ERPCompanyId, ERPRole.Buyer);
+
             var model = new NotificationsModel
             {
                 Error = error
@@ -136,106 +139,91 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             {
                 foreach (var keyValue in notifications)
                 {
-                    switch (keyValue.Key)
-                    {
-                        case Constants.MyOrderConfirmedEmail:
-                        case Constants.MyOrderConfirmedSms:
-                            AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
-                            break;
-                        case Constants.MyOrderScheduleEmail:
-                        case Constants.MyOrderScheduleSms:
-                            AddPreference(keyValue, "When my order has a scheduled date change", ref model);
-                            break;
-                        case Constants.MyOrderPromiseEmail:
-                        case Constants.MyOrderPromiseSms:
-                            AddPreference(keyValue, "When my order has a promise date change", ref model);
-                            break;
-                        case Constants.MyOrderReadyEmail:
-                        case Constants.MyOrderReadySms:
-                            AddPreference(keyValue, "When my order is ready", ref model);
-                            break;
-                        case Constants.MyOrderLoadingEmail:
-                        case Constants.MyOrderLoadingSms:
-                            AddPreference(keyValue, "When my order is loading", ref model);
-                            break;
-                        case Constants.MyOrderShippedEmail:
-                        case Constants.MyOrderShippedSms:
-                            AddPreference(keyValue, "When my order has shipped", ref model);
-                            break;
-                        case Constants.AnyOrderConfirmedEmail:
-                        case Constants.AnyOrderConfirmedSms:
-                            AddPreference(keyValue, "When any order has been confirmed", ref model);
-                            break;
-                        case Constants.AnyOrderShippedEmail:
-                        case Constants.AnyOrderShippedSms:
-                            AddPreference(keyValue, "When any order has shipped", ref model);
-                            break;
-                        default:
-                            break;
-                    }
+                    model = populateNotificationPreferenceModel(isOperations, isBuyer, model, keyValue);
                 }
 
             }
             else
             {
                 IDictionary<string, bool> notifs = new Dictionary<string, bool>();
-                notifs.Add(Constants.MyOrderConfirmedEmail, false);
-                notifs.Add(Constants.MyOrderConfirmedSms, false);
-                notifs.Add(Constants.MyOrderScheduleEmail, false);
-                notifs.Add(Constants.MyOrderScheduleSms, false);
-                notifs.Add(Constants.MyOrderPromiseEmail, false);
-                notifs.Add(Constants.MyOrderPromiseSms, false);
-                notifs.Add(Constants.MyOrderReadyEmail, false);
-                notifs.Add(Constants.MyOrderReadySms, false);
-                notifs.Add(Constants.MyOrderLoadingEmail, false);
-                notifs.Add(Constants.MyOrderLoadingSms, false);
-                notifs.Add(Constants.MyOrderShippedEmail, false);
-                notifs.Add(Constants.MyOrderShippedSms, false);
-                notifs.Add(Constants.AnyOrderConfirmedEmail, false);
-                notifs.Add(Constants.AnyOrderConfirmedSms, false);
-                notifs.Add(Constants.AnyOrderShippedEmail, false);
-                notifs.Add(Constants.AnyOrderShippedSms, false);
+                if (isBuyer)
+                {
+                    notifs.Add(Constants.MyOrderConfirmedEmail, false);
+                    notifs.Add(Constants.MyOrderConfirmedSms, false);
+                    notifs.Add(Constants.MyOrderScheduleEmail, false);
+                    notifs.Add(Constants.MyOrderScheduleSms, false);
+                    notifs.Add(Constants.MyOrderPromiseEmail, false);
+                    notifs.Add(Constants.MyOrderPromiseSms, false);
+                    notifs.Add(Constants.MyOrderReadyEmail, false);
+                    notifs.Add(Constants.MyOrderReadySms, false);
+                    notifs.Add(Constants.MyOrderLoadingEmail, false);
+                    notifs.Add(Constants.MyOrderLoadingSms, false);
+                    notifs.Add(Constants.MyOrderShippedEmail, false);
+                    notifs.Add(Constants.MyOrderShippedSms, false);
+                    notifs.Add(Constants.AnyOrderConfirmedEmail, false);
+                    notifs.Add(Constants.AnyOrderConfirmedSms, false);
+                }
+                if (isBuyer || isOperations)
+                {
+                    notifs.Add(Constants.AnyOrderShippedEmail, false);
+                    notifs.Add(Constants.AnyOrderShippedSms, false);
+                }
                 foreach (var keyValue in notifs)
                 {
-                    switch (keyValue.Key)
-                    {
-                        case Constants.MyOrderConfirmedEmail:
-                        case Constants.MyOrderConfirmedSms:
-                            AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
-                            break;
-                        case Constants.MyOrderScheduleEmail:
-                        case Constants.MyOrderScheduleSms:
-                            AddPreference(keyValue, "When my order has a scheduled date change", ref model);
-                            break;
-                        case Constants.MyOrderPromiseEmail:
-                        case Constants.MyOrderPromiseSms:
-                            AddPreference(keyValue, "When my order has a promise date change", ref model);
-                            break;
-                        case Constants.MyOrderReadyEmail:
-                        case Constants.MyOrderReadySms:
-                            AddPreference(keyValue, "When my order is ready", ref model);
-                            break;
-                        case Constants.MyOrderLoadingEmail:
-                        case Constants.MyOrderLoadingSms:
-                            AddPreference(keyValue, "When my order is loading", ref model);
-                            break;
-                        case Constants.MyOrderShippedEmail:
-                        case Constants.MyOrderShippedSms:
-                            AddPreference(keyValue, "When my order has shipped", ref model);
-                            break;
-                        case Constants.AnyOrderConfirmedEmail:
-                        case Constants.AnyOrderConfirmedSms:
-                            AddPreference(keyValue, "When any order has been confirmed", ref model);
-                            break;
-                        case Constants.AnyOrderShippedEmail:
-                        case Constants.AnyOrderShippedSms:
-                            AddPreference(keyValue, "When any order has shipped", ref model);
-                            break;
-                        default:
-                            break;
-                    }
+                    model = populateNotificationPreferenceModel(isOperations, isBuyer, model, keyValue);
                 }
-                
+
+            }
+
+            return model;
+        }
+
+        private static NotificationsModel populateNotificationPreferenceModel(bool isOperations, bool isBuyer, NotificationsModel model, KeyValuePair<string, bool> keyValue)
+        {
+            switch (keyValue.Key)
+            {
+                case Constants.MyOrderConfirmedEmail:
+                case Constants.MyOrderConfirmedSms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
+                    break;
+                case Constants.MyOrderScheduleEmail:
+                case Constants.MyOrderScheduleSms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order has a scheduled date change", ref model);
+                    break;
+                case Constants.MyOrderPromiseEmail:
+                case Constants.MyOrderPromiseSms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order has a promise date change", ref model);
+                    break;
+                case Constants.MyOrderReadyEmail:
+                case Constants.MyOrderReadySms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order is ready", ref model);
+                    break;
+                case Constants.MyOrderLoadingEmail:
+                case Constants.MyOrderLoadingSms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order is loading", ref model);
+                    break;
+                case Constants.MyOrderShippedEmail:
+                case Constants.MyOrderShippedSms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order has shipped", ref model);
+                    break;
+                case Constants.AnyOrderConfirmedEmail:
+                case Constants.AnyOrderConfirmedSms:
+                    if (isBuyer || isOperations)
+                        AddPreference(keyValue, "When any order has been confirmed", ref model);
+                    break;
+                case Constants.AnyOrderShippedEmail:
+                case Constants.AnyOrderShippedSms:
+                    if (isBuyer || isOperations)
+                        AddPreference(keyValue, "When any order has shipped", ref model);
+                    break;
+                default:
+                    break;
             }
 
             return model;
@@ -244,23 +232,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         private static void AddPreference(KeyValuePair<string, bool> keyValue, string title, ref NotificationsModel model)
         {
             if (model.Notifications.Any(x => x.Title == title))
-                model.Notifications.FirstOrDefault(x => x.Title == title).Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
-            else
-            {
-                var itemModel = new NotificationsModel.NotificationItemModel();
-                itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? title : itemModel.Title;
-                itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                    model.Notifications.FirstOrDefault(x => x.Title == title).Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                else
+                {
+                    var itemModel = new NotificationsModel.NotificationItemModel();
+                    itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? title : itemModel.Title;
+                    itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
 
-                model.Notifications.Add(itemModel);
-            }
+                    model.Notifications.Add(itemModel);
+                }
         }
 
 
         public TransactionModel PrepareCustomerHomeModel(string companyId)
         {
             var token = string.Empty;
+            var companyInfo = new Company();
             var openOrdersResponse = new List<ERPSearchOrdersResponse>();
             var closedOrdersResponse = new List<ERPSearchOrdersResponse>();
+            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Int32.Parse(companyId), ERPRole.AP);
             var request = new ERPSearchOrdersRequest()
             {
                 FromDate = DateTimeOffset.UtcNow.AddYears(-1).ToString("yyyy-MM-dd"),
@@ -293,8 +283,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 DeliveryTicketCount = order.DeliveryTicketCount
             }).Take(5).ToList();
 
-
-            model.CompanyInfo = _nSSApiProvider.GetCompanyInfo(companyId);
+            companyInfo = _companyService.GetCompanyEntityByErpEntityId(Int32.Parse(companyId));
+            model.CompanySalesContact = companyInfo;
             model.OpenOrders = openOrders?.OrderByDescending(x => x.OrderId)?.ToList();
             model.ClosedOrders = closedOrders?.OrderByDescending(x => x.OrderId)?.ToList();
             var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
@@ -321,7 +311,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 CanCredit = customerCompany?.CanCredit ?? false
             };
 
-            if (creditSummary.CanCredit)
+            if (creditSummary.CanCredit || isAp)
             {
                 var creditResponse = _eRPApiProvider.GetCompanyCreditBalance(Convert.ToInt32(companyId));
 

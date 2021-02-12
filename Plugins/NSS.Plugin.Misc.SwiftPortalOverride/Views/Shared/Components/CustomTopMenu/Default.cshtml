@@ -33,11 +33,11 @@
         {
             <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog px-3">SHOP</a></li>
         }
-        @if (isOperations)
+        @if (isOperations|| isBuyer)
         {
             <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders px-3">ORDERS</a></li>
         }
-        @if (isAP)
+        @if (isAP || isBuyer)
         {
             <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices px-3">INVOICES</a></li>
         }
@@ -54,13 +54,13 @@
             <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog p-3">SHOP</a>
         </div>
     }
-    @if (isOperations)
+    @if (isOperations || isBuyer)
     {
         <div class="d-flex justify-content-center">
             <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders p-3">ORDERS</a>
         </div>
     }
-    @if (isAP)
+    @if (isAP || isBuyer)
     {
         <div class="d-flex justify-content-center">
             <a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices p-3">INVOICES</a>
@@ -73,62 +73,7 @@
         <a href="@Url.RouteUrl("Logout")" class="text-danger p-3">LOG OUT</a>
     </div>
 </div>
-@*@{
-        var rootCategoriesResponsive = Model.Categories.ToList();
-        //name it "Categories" if we have only categories. Otherwise, "Menu"
-        var responsiveMenuTitle = Model.HasOnlyCategories ? T("Categories") : T("Menu");
-        <div class="menu-toggle"></div>
-        <ul class="top-menu mobile">
-            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore })
-            <li><a href="@Url.RouteUrl("Homepage")" class="dashboard">DASHBOARD</a></li>
-            @if (isBuyer)
-            {
-                <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Catalog")" class="catalog">SHOP</a></li>
-            }
-            @if (isOperations)
-            {
-                <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Orders")" class="orders">ORDERS</a></li>
-            }
-            @if (isAP)
-            {
-                <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Invoices")" class="invoices">INVOICES</a></li>
-            }
-            <li><a href="@Url.RouteUrl("Plugin.Misc.SwiftPortalOverride.Resources")" class="resources">RESOURCES</a></li>
-        </ul>
 
-        @if (Model.UseAjaxMenu)
-        {
-            <script asp-location="Footer">
-            $(document).ready(function () {
-                $('.menu-toggle').on('click', function () {
-                    $(this).siblings('.top-menu.mobile').slideToggle('slow');
-                });
-                var localized_data = {
-                    AjaxFailure: "@T("MainMenu.AjaxFailure")"
-                };
-                mainMenu.init('@Url.RouteUrl("GetCatalogRoot")', '@Url.RouteUrl("GetCatalogSubCategories")', 'ul.top-menu.notmobile', 'ul.top-menu.mobile', localized_data);
-            });
-            </script>
-
-            Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.menu.js");
-
-        }
-        else
-        {
-            <script asp-location="Footer">
-                $(document).ready(function () {
-                    $('.menu-toggle').on('click', function () {
-                        $(this).siblings('.top-menu.mobile').slideToggle('slow');
-                    });
-                    $('.top-menu.mobile .sublist-toggle').on('click', function () {
-                        $(this).siblings('.sublist').slideToggle('slow');
-                    });
-                });
-            </script>
-
-        }
-
-    }*@
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -144,6 +89,9 @@
                 break;
             case '/invoices':
                 $('.invoices').addClass('active-tab');
+                break;
+            case '/resources':
+                $('.resources').addClass('active-tab');
                 break;
             default:
             // code block

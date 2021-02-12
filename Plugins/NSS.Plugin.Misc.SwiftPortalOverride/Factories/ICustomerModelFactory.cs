@@ -18,7 +18,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// </summary>
         /// <param name="selectedTabId">Identifier of the selected tab</param>
         /// <returns>Customer navigation model</returns>
-        CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, int selectedTabId = 0);
+        CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, bool isOperations, int selectedTabId = 0);
 
         TransactionModel PrepareCustomerHomeModel(string CompanyId);
         /// <summary>
@@ -32,7 +32,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         RegisterModel PrepareRegisterModel(RegisterModel model, bool excludeProperties,
             string overrideCustomCustomerAttributesXml = "", bool setDefaultValues = false);
 
-        NotificationsModel PrepareNotificationsModel(string error, IDictionary<string, bool> notifications);
+        NotificationsModel PrepareNotificationsModel(int eRPCompanyId, string error, IDictionary<string, bool> notifications);
 
         Nop.Web.Models.Customer.CustomerAddressListModel PrepareCustomerAddressListModel();
     }

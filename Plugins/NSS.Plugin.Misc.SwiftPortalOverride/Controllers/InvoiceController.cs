@@ -50,8 +50,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
+            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP))
+            if (!isAp && !isBuyer)
                 return AccessDeniedView();
 
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
@@ -65,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 CanCredit = customerCompany?.CanCredit ?? false
             };
 
-            if (creditSummary.CanCredit)
+            if (creditSummary.CanCredit || isAp)
             {
                 var creditResposne = _eRPApiProvider.GetCompanyCreditBalance(eRPCompanyId);
 
@@ -74,10 +77,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 creditSummary.OpenInvoiceAmount = creditResposne?.OpenInvoiceAmount ?? decimal.Zero;
                 creditSummary.PastDueAmount = creditResposne?.PastDueAmount ?? decimal.Zero;
             }
+            var customerRoles = new CompanyInvoiceListModel.CustomerRolesModel
+            {
+                IsAP = isAp,
+                IsBuyer = isBuyer
+            };
 
             var model = new CompanyInvoiceListModel
             {
-                CreditSummary = creditSummary
+                CreditSummary = creditSummary,
+                CustomerRoles = customerRoles
+                
             };
 
             return View(model);
@@ -90,7 +100,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP))
+            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP) && !_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
                 return (PartialViewResult)AccessDeniedView();
 
             var model = new CompanyInvoiceListModel();

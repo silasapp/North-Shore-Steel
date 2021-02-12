@@ -12,11 +12,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             Invoices = new List<InvoiceDetailsModel>();
             FilterContext = new SearchFilter();
             CreditSummary = new CreditSummaryModel();
+            CustomerRoles = new CustomerRolesModel();
         }
 
         public IList<InvoiceDetailsModel> Invoices { get; set; }
 
         public CreditSummaryModel CreditSummary { get; set; }
+
+        public CustomerRolesModel CustomerRoles { get; set; }
 
         public SearchFilter FilterContext { get; set; }
 
@@ -35,6 +38,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public decimal PastDueAmount { get; set; }
         }
 
+        public partial class CustomerRolesModel
+        {
+            public bool IsAP { get; set; }
+            public bool IsBuyer { get; set; }
+            public bool IsOperations { get; set; }
+        }
         public partial class InvoiceDetailsModel : BaseNopEntityModel
         {
             public int InvoiceId { get; set; }

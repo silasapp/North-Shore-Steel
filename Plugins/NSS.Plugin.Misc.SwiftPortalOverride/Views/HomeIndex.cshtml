@@ -177,7 +177,7 @@
                             </div>
                         }
 
-                        @if (isOperations)
+                        @if (isOperations || isBuyer)
                         {
 
                             <div class="col-md-5 col-sm-6 col-12 m-b2">
@@ -322,13 +322,13 @@
                                 </div>
                             </div>
                             <div class="contact-container">
-                                <a href=tel:@Model.CompanyInfo.SalesContact?.Phone class="btn contact-btn">
+                                <a href=tel:@Model.CompanySalesContact?.SalesContactPhone class="btn contact-btn">
                                     <img src="~/Themes/@(themeName)/Content/assets/phone.svg" alt="">
-                                    <label class="fs12-default mb-0 ml-1">@Model.CompanyInfo.SalesContact?.Phone</label>
+                                    <label class="fs12-default mb-0 ml-1">@Model.CompanySalesContact?.SalesContactPhone</label>
                                 </a>
-                                <a href=mailto:@Model.CompanyInfo.SalesContact?.Email class="btn contact-btn">
+                                <a href=mailto:@Model.CompanySalesContact?.SalesContactEmail class="btn contact-btn">
                                     <img src="~/Themes/@(themeName)/Content/assets/mail.svg" alt="">
-                                    <label class="fs12-default mb-0 ml-1">@Model.CompanyInfo.SalesContact?.Email</label>
+                                    <label class="fs12-default mb-0 ml-1">@Model.CompanySalesContact?.SalesContactEmail</label>
                                 </a>
                             </div>
 
@@ -516,7 +516,7 @@
                 </div>
             }
 
-            @if (isOperations)
+            @if (isOperations || isBuyer)
             {
 
                 <div class="col-md-7 col-sm-6 col-12 m-b2 p-0">
@@ -586,11 +586,11 @@
                     <label class="h5-default mb-3 mx-5">exceptional customer service.</label>
 
                     <div class="d-flex flex-row justify-content-center align-items-center mb-3">
-                        <a href=tel:@Model.CompanyInfo.SalesContact?.Phone class="d-flex flex-row align-items-end">
+                        <a href=tel:@Model.CompanySalesContact?.SalesContactPhone class="d-flex flex-row align-items-end">
                             <img src="~/Themes/@(themeName)/Content/assets/phone.svg" alt="" height="25">
                             <label class="h4-primary ml-2 mr-4 mb-0">Call Us</label>
                         </a>
-                        <a href=mailto:@Model.CompanyInfo.SalesContact?.Email class="d-flex flex-row align-items-end">
+                        <a href=mailto:@Model.CompanySalesContact?.SalesContactEmail class="d-flex flex-row align-items-end">
                             <img src="~/Themes/@(themeName)/Content/assets/mail.svg" alt="" height="25">
                             <label class="h4-primary ml-2 mb-0">Email Us</label>
                         </a>

@@ -1,4 +1,5 @@
 ﻿using Nop.Web.Framework.Models;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         //public List<Invoice> RecentInvoices { get; set; }
         public CreditSummaryModel CreditSummary { get; set; }
         public CompanyInfo CompanyInfo { get; set; }
+
+        public Company CompanySalesContact { get; set; }
     }
 
     public class CompanyStats

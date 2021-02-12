@@ -391,7 +391,7 @@ button, button:focus {
     }
 
 td {
-    color: rgb(7, 7, 107);
+    font-weight: 500;
 }
 
 .table-action-button, .table-action-button:focus {
