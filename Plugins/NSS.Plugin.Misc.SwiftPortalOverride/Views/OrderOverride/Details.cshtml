@@ -14,6 +14,7 @@
 }
 @{
     var themeName = themeContext.WorkingThemeName;
+    string CLOSED_ORDER_STATUS_NAME = "Invoiced";
 }
 
 @{
@@ -52,15 +53,18 @@
         }
     </div>;
 }
+
 <style>
     .cart-total-left, .cart-total-right {
         display: table-cell !important;
     }
 </style>
+
 <div id="order-detail" class="page order-details-page">
     <div class="d-flex flex-md-row justify-content-between align-items-md-start bg-white-shadow px-5 py-2" v-bind:style="{'background': isMobile ? '#f6f6f6' : '#ffffff'}">
         <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2"></div>
         <label v-if="!isMobile" class="h3-primary-sans my-3">ORDER NUMBER: @Model.OrderId</label>
+
         @if (Model.SysOrderId != null)
         {
             @if (Model.CanBuy)
@@ -97,7 +101,10 @@
             </div>
 
         </div>
-        <div class="col-md-3 col-sm-6 text-left" v-bind:style="{'width': isMobile ? '50%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" v-bind:class="{'px-4': isMobile, 'pt-4': isMobile, 'pb-0': isMobile}">
+        <div class="col-md-3 col-sm-6 text-left" 
+             v-bind:style="{'width': isMobile ? '50%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" 
+             v-bind:class="{'px-4': isMobile, 'pt-4': isMobile, 'pb-0': isMobile}"
+        >
             <div class="row">
                 <div class="col-md-12 pb-3">
                     <label class="h4-primary-500-teko text-uppercase mb-0">PROMISE DATE</label>
@@ -105,6 +112,17 @@
                         <li class="name">@Model.PromiseDate?.ToString("MM/dd/yyyy")</li>
                     </ul>
                 </div>
+
+                @if (Model?.OrderStatusName.ToLower() != CLOSED_ORDER_STATUS_NAME.ToLower())
+                {
+                    <div class="col-md-12 pb-3">
+                        <label class="h4-primary-500-teko text-uppercase mb-0">SCHEDULED DATE</label>
+                        <ul class="h5-default">
+                            <li class="name">@Model.ScheduledDate?.ToString("MM/dd/yyyy")</li>
+                        </ul>
+                    </div>
+                }
+
                 <div class="col-md-12 pb-3">
                     <label class="h4-primary-500-teko text-uppercase mb-0">SHIP VIA</label>
                     <ul class="h5-default">
@@ -114,10 +132,14 @@
             </div>
         </div>
 
-        @if (Model.DeliveryMethodName != "WILL CALL" && Model.DeliveryMethodName != "NOT APPLICABLE")
-        {
-            <div class="col-md-4 col-sm-6 text-left" v-bind:style="{'width': isMobile ? '100%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" v-bind:class="{'px-4': isMobile, 'pt-0': isMobile, 'pb-4': isMobile, 'mb-4': isMobile}">
-                <div class="shipping-info-wrap">
+        <div class="col-md-4 col-sm-6 text-left" 
+             v-bind:style="{'width': isMobile ? '100%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" 
+             v-bind:class="{'px-4': isMobile, 'pt-0': isMobile, 'pb-4': isMobile, 'mb-4': isMobile}"
+        >
+            @if (Model.DeliveryMethodName != "WILL CALL" && Model.DeliveryMethodName != "NOT APPLICABLE")
+            {
+            
+                <div class="shipping-info-wrap pb-3">
                     <div class="shipping-info">
                         <label class="h4-primary-500-teko text-uppercase mb-0">@(Model.IsPickup ? T("Order.PickupAddress") : T("Order.ShippingAddress"))</label>
                         <ul class="h5-default lh-md">
@@ -267,10 +289,20 @@
                         </ul>
                     </div>
                 </div>
-            </div>
-        }
+            }
 
-        <div class="col-md-2 col-sm-6 d-flex flex-column align-items-center align-items-md-start text-left" v-bind:style="{'background': isMobile ? '#f6f6f6' : 'transparent'}" v-bind:class="{'px-4': isMobile, 'py-4': isMobile}">
+            <div class="col-md-12 pb-3 pl-0 pr-0">
+                <label class="h4-primary-500-teko text-uppercase mb-0">STATUS</label>
+                <ul class="h5-default">
+                    <li class="name">@Model.OrderStatusName</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-sm-6 d-flex flex-column align-items-center align-items-md-start text-left" 
+             v-bind:style="{'background': isMobile ? '#f6f6f6' : 'transparent'}" 
+             v-bind:class="{'px-4': isMobile, 'py-4': isMobile}"
+        >
             @if (Model.OrderFile != null)
             {
                 <a href="@Model.OrderFile" target="_blank" class="text-decoration-none">
