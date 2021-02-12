@@ -292,17 +292,6 @@
     }
 }
 
-@{
-
-    Func<object, object>
-    Content1 =
-    @<div id="openMTRModal">
-        <div class="">
-            <ejs-pdfviewer id="pdfviewer" enableTextSearch="false" enablePrint="false" enableAnnotation="false" enableTextSelection="false" enableThumbnail="false" enableBookmark="false"></ejs-pdfviewer>
-        </div>
-    </div>;
-
-}
 
 
 <div id="gridView">
@@ -357,7 +346,6 @@
             </div>
         </div>
     </div>
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("MILL TEST REPORT PDF").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Height("45rem").Width("97rem").Target("body").Render()
 
 </div>
 
@@ -379,19 +367,6 @@
     string buildColumnScript(string columnName) => $@"<script id='{columnName.ToLower()}Template' type='text/x-template'><label>${{{ columnName.ToLower() }}}</label></script>";
 }
 
-<script type="text/javascript">
-    function onDialogCreated() {
-        openMTRModal = this;
-    }
-
-
-    function openMTR(mtrFile) {
-        var pdfViewer = document.getElementById('pdfviewer').ej2_instances[0];
-        pdfViewer.serviceUrl = window.location.origin + '/api/PdfViewer';
-        pdfViewer.load(mtrFile, null);
-        openMTRModal.show();
-    }
-</script>
 
 <script>
     gridData = @Html.Raw(Serialize(ObjectData));
@@ -547,13 +522,6 @@
         </svg>
 
         ${if(_sawOption)}
-        @*<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" width="24" height="24"
-                 onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
-                 style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                <title>Saw Options</title>
-                <path d="M20 15s-1.4 1.3 1.1 2l-2.8 2.8h-2.8s-1.9-.1-.5 2.2h-4l-2-2s-1.3-1.4-2 1.1l-2.8-2.8v-2.8s.1-1.9-2.2-.5v-4l2-2s1.4-1.3-1.2-1.9l2.8-2.9h2.9s1.9.1.5-2.2h4l2 2s1.3 1.4 2-1.2l2.8 2.8v2.9s-.1 1.9 2.2.5v4l-2 2m-6-3a2 2 0 0 0-2-2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2z" />
-                <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-            </svg>*@
         <svg xmlns="http://www.w3.org/2000/svg" class="hover-icon mx-1" onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" width="24" height="24" viewBox="0 0 24 24">
             <defs>
                 <style>
@@ -572,16 +540,7 @@
         ${/if}
 
         ${if(_mtr)}
-        @*<a class="table-action-button mx-1" style="text-decoration:none" onclick="openMTR(`${_mtr}`)">
-                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" width="24" height="24"
-                     preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
-                     style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                    <title>View MTRs</title>
-                    <path d="M13 16H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2zm-4-6h2a1 1 0 0 0 0-2H9a1 1 0 0 0 0 2zm12 2h-3V3a1 1 0 0 0-.5-.87a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0l-3 1.72l-3-1.72a1 1 0 0 0-1 0A1 1 0 0 0 2 3v16a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-6a1 1 0 0 0-1-1zM5 20a1 1 0 0 1-1-1V4.73l2 1.14a1.08 1.08 0 0 0 1 0l3-1.72l3 1.72a1.08 1.08 0 0 0 1 0l2-1.14V19a3 3 0 0 0 .18 1zm15-1a1 1 0 0 1-2 0v-5h2zm-7-7H7a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2z" />
-                    <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
-                </svg>
-            </a>*@
-        <a class="table-action-button mx-1" style="text-decoration:none" onclick="openMTR(`${_mtr}`)">
+        <a class="table-action-button mx-1" style="text-decoration:none" href="${_mtr}" target="_blank">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" width="24" height="24"
                  preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
                 <title>View MTRs</title>

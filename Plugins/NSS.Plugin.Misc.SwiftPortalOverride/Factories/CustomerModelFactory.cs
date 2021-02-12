@@ -271,7 +271,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 PromiseDate = order.PromiseDate,
                 ScheduledDate = order.ScheduledDate,
                 OrderStatusName = order.OrderStatusName
-            }).Take(5).ToList();
+            }).ToList();
 
             var closedOrders = closedOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
@@ -281,12 +281,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 DeliveryStatus = order.DeliveryStatus,
                 DeliveryTicketFile = $"{order.DeliveryTicketFile}{token}",
                 DeliveryTicketCount = order.DeliveryTicketCount
-            }).Take(5).ToList();
+            }).ToList();
 
             companyInfo = _companyService.GetCompanyEntityByErpEntityId(Int32.Parse(companyId));
             model.CompanySalesContact = companyInfo;
-            model.OpenOrders = openOrders?.OrderByDescending(x => x.OrderId)?.ToList();
-            model.ClosedOrders = closedOrders?.OrderByDescending(x => x.OrderId)?.ToList();
+            model.OpenOrders = openOrders?.OrderByDescending(x => x.OrderId)?.Take(5)?.ToList();
+            model.ClosedOrders = closedOrders?.OrderByDescending(x => x.OrderId)?.Take(5)?.ToList();
             var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
 
             if (companyStats != null && companyStats.Count > 0)
