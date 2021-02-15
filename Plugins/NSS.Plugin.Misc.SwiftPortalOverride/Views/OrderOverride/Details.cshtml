@@ -101,10 +101,9 @@
             </div>
 
         </div>
-        <div class="col-md-3 col-sm-6 text-left" 
-             v-bind:style="{'width': isMobile ? '50%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" 
-             v-bind:class="{'px-4': isMobile, 'pt-4': isMobile, 'pb-0': isMobile}"
-        >
+        <div class="col-md-3 col-sm-6 text-left"
+             v-bind:style="{'width': isMobile ? '50%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}"
+             v-bind:class="{'px-4': isMobile, 'pt-4': isMobile, 'pb-0': isMobile}">
             <div class="row">
                 <div class="col-md-12 pb-3">
                     <label class="h4-primary-500-teko text-uppercase mb-0">PROMISE DATE</label>
@@ -132,13 +131,12 @@
             </div>
         </div>
 
-        <div class="col-md-4 col-sm-6 text-left" 
-             v-bind:style="{'width': isMobile ? '100%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}" 
-             v-bind:class="{'px-4': isMobile, 'pt-0': isMobile, 'pb-4': isMobile, 'mb-4': isMobile}"
-        >
+        <div class="col-md-4 col-sm-6 text-left"
+             v-bind:style="{'width': isMobile ? '100%' : 'auto','background': isMobile ? '#f6f6f6' : 'transparent'}"
+             v-bind:class="{'px-4': isMobile, 'pt-0': isMobile, 'pb-4': isMobile, 'mb-4': isMobile}">
             @if (Model.DeliveryMethodName != "WILL CALL" && Model.DeliveryMethodName != "NOT APPLICABLE")
             {
-            
+
                 <div class="shipping-info-wrap pb-3">
                     <div class="shipping-info">
                         <label class="h4-primary-500-teko text-uppercase mb-0">@(Model.IsPickup ? T("Order.PickupAddress") : T("Order.ShippingAddress"))</label>
@@ -174,17 +172,17 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                            !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                            !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                            !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                           !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                           !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                           !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                                    !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                    !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                   !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                                   !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -194,7 +192,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                        !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                       !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -249,8 +247,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                                    !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                    !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                   !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                                   !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -259,7 +257,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                    !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                   !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -299,10 +297,9 @@
             </div>
         </div>
 
-        <div class="col-md-2 col-sm-6 d-flex flex-column align-items-center align-items-md-start text-left" 
-             v-bind:style="{'background': isMobile ? '#f6f6f6' : 'transparent'}" 
-             v-bind:class="{'px-4': isMobile, 'py-4': isMobile}"
-        >
+        <div class="col-md-2 col-sm-6 d-flex flex-column align-items-center align-items-md-start text-left"
+             v-bind:style="{'background': isMobile ? '#f6f6f6' : 'transparent'}"
+             v-bind:class="{'px-4': isMobile, 'py-4': isMobile}">
             @if (Model.OrderFile != null)
             {
                 <a href="@Model.OrderFile" target="_blank" class="text-decoration-none">
@@ -426,7 +423,7 @@
         }
     </div>
 
-    <div class="col-md-4 offset-md-8 bg-white-shadow p-4 mt-4" v-bind:style="{'background': isMobile ? '#f6f6f6' : '#ffffff'}">
+    <div class="col-md-4 offset-md-8 bg-white-shadow p-4 mt-4" v-bind:style="{'background': isMobile ? '#f6f6f6' : '#ffffff','margin-bottom': isMobile ? '70px' : '0'}">
         <table class="cart-total">
             <tbody>
                 <tr>
