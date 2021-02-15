@@ -513,7 +513,7 @@
     ${/if}
 </script>
 <script id="optionsTemplate" type="text/x-template">
-    <div class="d-flex align-items-center w-100" style="justify-content: space-evenly;">
+    <div class="d-flex align-items-center w-100" style="justify-content: flex-end;">
         <svg id="add-to-wishlist" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mr-1" aria-hidden="true" focusable="false" width="24" height="24"
              style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
              preserveAspectRatio="xMidYMid meet" viewBox="0 0 1024 1024" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`, true);return false;">
@@ -522,7 +522,7 @@
         </svg>
 
         ${if(_sawOption)}
-        <svg xmlns="http://www.w3.org/2000/svg" class="hover-icon mx-1" onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" width="24" height="24" viewBox="0 0 24 24">
+        <svg xmlns="http://www.w3.org/2000/svg" class="hover-icon mr-1" onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" width="24" height="24" viewBox="0 0 24 24">
             <defs>
                 <style>
                     .a {
@@ -540,7 +540,7 @@
         ${/if}
 
         ${if(_mtr)}
-        <a class="table-action-button mx-1" style="text-decoration:none" href="${_mtr}" target="_blank">
+        <a class="table-action-button mr-1" style="text-decoration:none" href="${_mtr}" target="_blank">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon" width="24" height="24"
                  preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
                 <title>View MTRs</title>
