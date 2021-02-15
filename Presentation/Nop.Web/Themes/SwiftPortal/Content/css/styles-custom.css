@@ -1253,10 +1253,6 @@ table input {
     display: initial;
 }
 
-.e-grid td.e-active {
-    background: transparent !important;
-}
-
 .chipsStyle {
     display: flex !important;
 }
@@ -1915,9 +1911,10 @@ table input {
     z-index: 999;
     margin: auto;
     font: normal normal 700 40px/48px "Exo 2";
-    font-size: 40px;
+    font-size: 36px;
     color: #fff !important;
     opacity: 1;
+    text-align: center;
 }
 .order-result-page {
     margin-bottom: 365px;

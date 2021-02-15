@@ -708,12 +708,12 @@ Content2 =
 
                 $('#custom-loading').show();
             },
-            addProcessingTextToLoader: function() {
-                var newcontent = document.createElement('p');
-                newcontent.innerHTML = "Processing your order";
-                newcontent.setAttribute("id", "processing_loader");
-                newcontent.setAttribute("class", "processing-loader-text");
-                document.getElementById("custom-loading").appendChild(newcontent);
+            addProcessingTextToLoader: function(text) {
+                var processingText = document.createElement('p');
+                processingText.innerHTML = text; //"Processing your order";
+                processingText.setAttribute("id", "processing_loader");
+                processingText.setAttribute("class", "processing-loader-text");
+                document.getElementById("custom-loading").appendChild(processingText);
                 console.log('custom-loading', document.getElementById("custom-loading"));
             },
             hideLoading: function () {
@@ -892,14 +892,16 @@ Content2 =
             },
 
             placeOrder: function () {
-                this.addProcessingTextToLoader();
                 this.dirty = true;
                 if (this.paymentMethodIndex !== this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
                     || this.errorType === this.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
                 this.errorType = this.shared.constants.ERROR_TYPE_NONE;
                 if (!this.validate()) return;
+                console.log('line credit card');
+                this.addProcessingTextToLoader('Processing your order');
                 this.showLoading();
                 this.finalizeOrder();
+                $('#processing_loader').remove();
             },
             initializeOrder: async function () {
                 const self = this;
@@ -957,6 +959,9 @@ Content2 =
                 return orderId;
             },
             finalizeOrder: function () {
+                console.log('finalizing');
+                $('#processing_loader').remove();
+                this.addProcessingTextToLoader('Processing your order');
                 this.showLoading();
                 const shippingAddressId = this.shippingAddressId ? this.shippingAddressId : 0;
                 let shippingNewAddress = {...this.newShippingAddress};
@@ -1009,9 +1014,10 @@ Content2 =
                             location.reload();
                         }
                         self.hideLoading();
+                        $('#processing_loader').remove();
                     }
                 });
-                $('#processing_loader').remove();
+
             },
 
             validate: function () {
@@ -1073,15 +1079,18 @@ Content2 =
                                 self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
 
                             self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+                            console.log('credit card');
+                            self.addProcessingTextToLoader('Processing your credit card');
                             self.showLoading();
 
                             hf.submit({
                                 cardholderName: self.paymentCard.cardHolderName,
                             }).then(function (data) {
-                                    self.finalizeOrder();
+                                self.finalizeOrder();
                                 })
                                 .catch(function (err) {
                                     self.hideLoading();
+                                    $('#processing_loader').remove();
                                     self.errorMessage = err.message;
                                     self.errorMessages = err.details.map(x => x.description);
                                     self.errorType = self.shared.constants.ERROR_TYPE_CREDIT_CARD;
