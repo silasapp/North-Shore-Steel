@@ -419,7 +419,7 @@
                         };
                     else
                         column = {
-                            field: col.code.toLowerCase(), headerText: col.displayName,
+                            field: col.displayName.includes("Weight") ? "sortweight" : col.code.toLowerCase(), headerText: col.displayName,
                             template: `#${col.code.toLowerCase()}Template`,
                             width: col.displayName.includes("Description") ? 230 : col.displayName.includes("Item #") ? 170 : col.displayName.includes("Weight Per Foot") ? 170 : 150,
                             textAlign: col.displayName.includes("Weight") ? "Right" : col.displayName.includes("Amount") ? "Right" : "Left",
@@ -452,7 +452,10 @@
                 this.grid.appendTo('#Grid');
             },
             formatText: function () {
-                gridData.map(g => g.weight = Number(g.weight)?.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                gridData.map(g => {
+                    g.sortweight = Number(g.weight);
+                    g.weight = Math.round(g.weight)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                });
                 gridData.map(g => g.millname = g.millname == null ? '' : g.millname);
                 gridData.map(g => g.countryoforigin = g.countryoforigin == null ? '' : g.countryoforigin);
             },
@@ -465,11 +468,9 @@
             },
 
             handleIncrementQuantity: function (itemId) {
-                console.log('itemId', itemId);
                 const quantityEl = $('#qty' + itemId);
                 const quantity = Number(quantityEl.val());
                 $('#qty' + itemId).val(quantity ? quantity + 1 : 1);
-                console.log('itemId', '#qty' + itemId, (quantity ? quantity + 1 : 1));
             },
 
             handleAddToWishList: function(data) {
