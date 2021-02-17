@@ -180,7 +180,7 @@ a:not([href]):not([class]) {
         height: 26px;
     }
 
-    .nav-bar-search {
+    .nav-bar-search, .account-select {
         width: 20rem;
         position: relative;
     }
@@ -213,10 +213,10 @@ a:not([href]):not([class]) {
             padding: 1rem 1rem !important;
         }
 
-        #top-menu-drawer select {
+       /* #top-menu-drawer select {
             width: 14rem;
             padding: 0px;
-        }
+        }*/
 
         #top-menu-drawer ul {
             margin-right: 19.5rem;
@@ -229,7 +229,7 @@ a:not([href]):not([class]) {
         width: 16rem;
     }
 
-    .nav-bar-search {
+    .nav-bar-search, .account-select {
         width: 20rem;
         position: relative;
     }
@@ -243,10 +243,10 @@ a:not([href]):not([class]) {
         padding: 1rem 6rem !important;
     }
 
-    #top-menu-drawer select {
+  /*  #top-menu-drawer select {
         width: 16rem;
         padding: 0px;
-    }
+    }*/
 
     #top-menu-drawer ul {
         margin-right: 15.5rem;
@@ -1923,9 +1923,9 @@ a:not([href]):not([class]) {
         flex-basis: 45%;
     }
 
-    .checkout-page {
-        margin-bottom: 230px;
-    }
+.checkout-page {
+    margin-bottom: 230px;
+}
 
     .processing-loader-text {
         position: fixed;

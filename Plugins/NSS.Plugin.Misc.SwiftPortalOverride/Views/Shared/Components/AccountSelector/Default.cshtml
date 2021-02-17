@@ -34,6 +34,11 @@
             <label class="h2-white-500 text-center ml-3 mb-0 pt-1 flex-fill">MENU</label>
             <img src="~/Themes/SwiftPortal/Content/assets/close-white.svg" alt="Close menu" v-on:click="closeMenuDrawer" width="24">
         </div>
+        @if (selectAccountModel.Count < 2)
+        {
+            <div class="account-select"></div>
+        }
+
         @if (selectAccountModel.Count > 1)
         {
             <select id="accountSelect" name="options" class="account-select" data-role="accountSelect" onchange="SelectCompany(this)">
