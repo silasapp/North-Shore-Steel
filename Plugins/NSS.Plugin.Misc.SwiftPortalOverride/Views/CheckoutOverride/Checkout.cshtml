@@ -215,7 +215,7 @@ Content2 =
                 <div v-show="errorType === shared.constants.ERROR_TYPE_SHIPPING_RATE">
                     <div class="d-flex flex-row align-items-center mb-3 nss-alert-danger">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
-                        <span class="ml-2">We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select “Pickup”.</span>
+                        <span class="ml-2">We are unable to ship to locations greater than 200 miles from our warehouse. Please use a different address or select “Will Call”.</span>
                     </div>
                 </div>
                 <div v-show="errorType === shared.constants.ERROR_TYPE_REGULAR">
@@ -358,7 +358,7 @@ Content2 =
                                     <div id="expiration-date" class="nss-form-control" style="height: 40px;"></div>
                                 </div>
                                 <div class="col-md-2 d-flex flex-column">
-                                    <label for="cvv" class="fs-14 text-black mb-1">CVV</label>
+                                    <label for="cvv" class="fs-14 text-black mb-1">{{cvvText}}</label>
                                     <div id="cvv" class="nss-form-control" style="height: 40px;"></div>
                                 </div>
                             </div>
@@ -398,7 +398,7 @@ Content2 =
 
                     <div v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_PAYPAL">
                         <label class="text-primary">
-                            You will be redirected to a paypal page where you'll be able to make payment when you click "PLACE ORDER".
+                            You will be redirected to a paypal page where you'll be able to make payment when you click "PayPal".
                         </label>
                     </div>
                     <div v-show="paymentMethodIndex === shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT">
@@ -672,6 +672,7 @@ Content2 =
                 height: 0,
             },
             isPaymentSelection: false,
+            cvvText: 'CVV',
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
@@ -714,7 +715,6 @@ Content2 =
                 processingText.setAttribute("id", "processing_loader");
                 processingText.setAttribute("class", "processing-loader-text");
                 document.getElementById("custom-loading").appendChild(processingText);
-                console.log('custom-loading', document.getElementById("custom-loading"));
             },
             hideLoading: function () {
                 $('#processing').remove();
@@ -775,7 +775,6 @@ Content2 =
                         if (thrownError == "Unauthorized") {
                             location.reload();
                         }
-                        console.log('data-xhr', xhr)
                     }
                 });
 
@@ -816,7 +815,6 @@ Content2 =
                         if (thrownError == "Unauthorized") {
                             location.reload();
                         }
-                        console.log('data-xhr', xhr)
                     }
                 });
 
@@ -862,11 +860,8 @@ Content2 =
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(request),
                     success: function (data, status, xhqr) {
-                        console.log('status', status);
-                        console.log('xhqr', xhqr);
                         console.log('shipping resp', data);
                         self.disableSubmit = false;
-                        //self.shippingAmount = data.shippingCalculatorResponse.shippingCost;
                         self.orderTotal = data.orderTotal?.replace("$", "")?.replace(/,/g, '');
                         self.taxAmount = data.tax?.replace("$", "");
                         self.shippingAmount = data.shipping?.replace("$", "");
@@ -897,7 +892,6 @@ Content2 =
                     || this.errorType === this.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
                 this.errorType = this.shared.constants.ERROR_TYPE_NONE;
                 if (!this.validate()) return;
-                console.log('line credit card');
                 this.addProcessingTextToLoader('Processing your order');
                 this.showLoading();
                 this.finalizeOrder();
@@ -959,7 +953,6 @@ Content2 =
                 return orderId;
             },
             finalizeOrder: function () {
-                console.log('finalizing');
                 $('#processing_loader').remove();
                 this.addProcessingTextToLoader('Processing your order');
                 this.showLoading();
@@ -1048,15 +1041,11 @@ Content2 =
                     paypal.HostedFields.render({
                         createOrder: async function () {
                             return await self.initializeOrder();
-                        }, // replace order-ID with the order ID
+                        },
                         styles: {
-                            'input': {
-                              'color': '#3A3A3A',
-                              'transition': 'color 160ms linear',
-                              '-webkit-transition': 'color 160ms linear'
-                            },
                             ':focus': {
                                 color: 'black',
+                                background: 'white',
                             },
                             '::placeholder': {
                                 'font- style': 'italic',
@@ -1081,28 +1070,55 @@ Content2 =
                             },
                         },
                     }).then(function (hf) {
+                        hf.on('cardTypeChange', function (event) {
+                           // This event triggers when a change in card type is detected.
+                           // It triggers only from the number field.
+                           var cvvText;
+
+                           if (event.cards.length === 1) {
+                             cvvText = event.cards[0].code.name;
+                           } else {
+                             cvvText = 'CVV';
+                           }
+
+                            self.cvvText = cvvText;
+                        });
+
                         $('#place-order').click(function (event) {
                             event.preventDefault();
                             if (self.paymentMethodIndex !== self.shared.constants.PAYMENT_METHOD_CREDIT_CARD || !self.validate() ||
                                 self.errorType === self.shared.constants.ERROR_TYPE_SHIPPING_RATE) return;
 
-                            self.errorType = self.shared.constants.ERROR_TYPE_NONE;
-                            console.log('credit card');
-                            self.addProcessingTextToLoader('Processing your credit card');
-                            self.showLoading();
+                            // check if card is valid
+                            var state = hf.getState();
+                            var formValid = Object.keys(state.fields).every(function (key) {
+                              return state.fields[key].isValid;
+                            });
 
-                            hf.submit({
+                            if (formValid) {
+                                self.errorType = self.shared.constants.ERROR_TYPE_NONE;
+                                self.addProcessingTextToLoader('Processing your credit card');
+                                self.showLoading();
+
+                                // Submit Hosted Fields card data
+                                hf.submit({
                                 cardholderName: self.paymentCard.cardHolderName,
-                            }).then(function (data) {
-                                self.finalizeOrder();
+                                })
+                                .then(function (data) {
+                                    self.finalizeOrder();
                                 })
                                 .catch(function (err) {
                                     self.hideLoading();
                                     $('#processing_loader').remove();
-                                    self.errorMessage = err.message;
+                                    //self.errorMessage = err.message;
                                     self.errorMessages = err.details.map(x => x.description);
                                     self.errorType = self.shared.constants.ERROR_TYPE_CREDIT_CARD;
                                 });
+                            } else {
+                                // Let the customer know their fields are invalid
+                                self.errorMessage = 'Enter a valid credit card detail.';
+                                self.errorType = self.shared.constants.ERROR_TYPE_CREDIT_CARD;
+                            }
                         });
                     });
                 } else {
@@ -1119,7 +1135,6 @@ Content2 =
                             layout: 'vertical',
                             color: 'blue',
                             shape: 'rect',
-                            tagline: 'false',
                         },
                         onClick: function (e, actions) {
                             self.dirty = true;
@@ -1134,6 +1149,7 @@ Content2 =
                         },
                         onCancel: function (data) {
                             // Show a cancel page, or return to cart
+                            setLocation('@Url.Action("Cart", "CartOverride")');
                         },
                         onApprove: function (data, actions) {
                             // This function captures the funds from the transaction
