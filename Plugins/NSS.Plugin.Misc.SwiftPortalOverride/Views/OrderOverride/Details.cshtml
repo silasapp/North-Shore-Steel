@@ -122,6 +122,16 @@
                     </div>
                 }
 
+                @*@if (Model?.OrderStatusName.ToLower() != CLOSED_ORDER_STATUS_NAME.ToLower())
+                {
+                    <div class="col-md-12 pb-3">
+                        <label class="h4-primary-500-teko text-uppercase mb-0">DELIVERED DATE</label>
+                        <ul class="h5-default">
+                            <li class="name">@Model.DeliveryDate?.ToString("MM/dd/yyyy")</li>
+                        </ul>
+                    </div>
+                }*@
+
                 <div class="col-md-12 pb-3">
                     <label class="h4-primary-500-teko text-uppercase mb-0">SHIP VIA</label>
                     <ul class="h5-default">
@@ -172,17 +182,17 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                           !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                           !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                           !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                          !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                          !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                          !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                                   !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                   !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                  !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                                  !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -192,7 +202,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                       !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                      !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -247,8 +257,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                                   !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                   !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                  !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                                  !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -257,7 +267,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                   !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                  !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
