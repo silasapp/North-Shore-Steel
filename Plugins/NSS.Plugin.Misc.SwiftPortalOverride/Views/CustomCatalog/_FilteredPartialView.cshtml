@@ -282,11 +282,11 @@
         productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
         productRowData.Add("_sawOption", sawOption);
         productRowData.Add("_cartId", shoppingCartTypeId.ToString());
-        //productRowData.Add("_eRPCompanyIdExist", ERPCompanyIdExist.ToString().ToLower());
         productRowData.Add("_wishListId", wishListShoppingCartId.ToString());
         productRowData.Add("_isSerialized", _isSerialized.ToString().ToLower());
         productRowData.Add("_productAttributes", Serialize(prodAttrs));
         productRowData.Add("_productName", item.Name);
+        productRowData.Add("_isWishlistItem", item.IsFavoriteItem);
 
         ObjectData.Add(productRowData);
     }
@@ -301,7 +301,6 @@
         </div>
         <div v-if="isMobile">
             <div class="product-sm d-flex flex-column align-items-start mb-2" v-for="data in gridData">
-                @*<label class="fs12-primary mb-1"> {{ data.itemno ? 'Item #: ' + data.itemno : 'Tage #: ' + data.itemtagno }}</label>*@
                 <label class="h2-primary my-2">{{ data.itemname }}</label>
                 <div class="d-flex flex-row flex-wrap">
                     <label v-if="data.height" class="fs12-default mr-3 mb-1">Height(in): {{ data.height }}</label>
@@ -322,7 +321,16 @@
                 </div>
                 <div class="d-flex flex-row justify-content-between w-100 my-3">
                     <div class="d-flex flex-row align-items-center">
-                        <img src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="product-action-sm"
+                        <img :id=`mh-remove-from-wishlist-${data._itemId}` src="Themes/SwiftPortal/Content/assets/icn-remove-favorite-dark.svg" style="display:none;" class="product-action-sm"
+                             v-on:click="handleRemoveFromWishList(data._itemId)" title="add to wishlist" width="24" height="24" alt="">
+                        <img :id=`mh-add-to-wishlist-${data._itemId}` src="Themes/SwiftPortal/Content/assets/c-heart.svg" style="display:none;" class="product-action-sm"
+                             v-on:click="handleAddToWishList(data)" title="add to wishlist" width="24" height="24" alt="">
+
+                        <img v-if="data._isWishlistItem" :id=`m-remove-from-wishlist-${data._itemId}` src="Themes/SwiftPortal/Content/assets/icn-remove-favorite-dark.svg" class="product-action-sm"
+                             v-on:click="handleRemoveFromWishList(data._itemId)" title="add to wishlist" width="24" height="24" alt="">
+
+
+                        <img v-if="!data._isWishlistItem" :id=`m-add-to-wishlist-${data._itemId}` src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="product-action-sm"
                              v-on:click="handleAddToWishList(data)" title="add to wishlist" width="24" height="24" alt="">
 
                         <img v-if="data._sawOption" src="Themes/SwiftPortal/Content/assets/icn-saw.svg" class="product-action-sm" width="24" height="24" alt=""
@@ -372,7 +380,6 @@
     gridData = @Html.Raw(Serialize(ObjectData));
     gridColumns = @Html.Raw(Serialize(headerColumns));
     shopVm.buildSortOptions(gridColumns);
-
 
     var gridVm = new Vue({
         el: '#gridView',
@@ -466,15 +473,16 @@
                 const quantity = Number(quantityEl.val());
                 quantityEl.val(quantity && quantity - 1 > 1 ? quantity - 1 : 1);
             },
-
             handleIncrementQuantity: function (itemId) {
                 const quantityEl = $('#qty' + itemId);
                 const quantity = Number(quantityEl.val());
                 $('#qty' + itemId).val(quantity ? quantity + 1 : 1);
             },
-
+            handleRemoveFromWishList: function (itemId) {
+                removeFromFavorites(itemId, true);
+            },
             handleAddToWishList: function(data) {
-                getInputQuantity(data._itemId, data._wishListId, true);
+                getInputQuantity(data._itemId, data._wishListId, true, true);
             },
             handleAddToCart: function (data) {
                 getInputQuantity(data._itemId, data._cartId);
@@ -491,17 +499,65 @@
 </script>
 
 <script>
-    function getInputQuantity(itemId, cartId, isFaves) {
+    function getInputQuantity(itemId, cartId, addToFavorite, isMobile) {
         let qty = $('#qty' + itemId).val();
-        if (!qty || isFaves)
+        if (!qty || addToFavorite)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
         $('#qty' + itemId).val("");
         AjaxCart.addproducttocart_catalog(link);
+        if (addToFavorite && isMobile) {
+            $('#mh-add-to-wishlist-' + itemId).hide();
+            $('#m-add-to-wishlist-' + itemId).hide();
+            $('#m-remove-from-wishlist-' + itemId).hide();
+            $('#mh-remove-from-wishlist-' + itemId).show();
+        }
+        if (addToFavorite && !isMobile) {
+            $('#wh-add-to-wishlist-' + itemId).hide();
+            $('#w-add-to-wishlist-' + itemId).hide();
+            $('#w-remove-from-wishlist-' + itemId).hide();
+            $('#wh-remove-from-wishlist-' + itemId).show();
+        }
     }
 
     function handleSawOption(productId, attributes, product) {
         modalVm.handleSawOption(productId, attributes, product);
+    }
+
+    function removeFromFavorites(itemId, isMobile) {
+        $('#custom-loading').show();
+        $.ajax({
+            url: "@Url.Action("RemoveFromFavorites", "CatalogOverride")",
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(itemId),
+            success: function (data, _, _) {
+                if (isMobile) {
+                    $('#m-remove-from-wishlist-' + itemId).hide();
+                    $('#mh-remove-from-wishlist-' + itemId).hide();
+                    $('#m-add-to-wishlist-' + itemId).hide();
+                    $('#mh-add-to-wishlist-' + itemId).show();
+                } else {
+                    $('#w-remove-from-wishlist-' + itemId).hide();
+                    $('#wh-remove-from-wishlist-' + itemId).hide();
+                    $('#w-add-to-wishlist-' + itemId).hide();
+                    $('#wh-add-to-wishlist-' + itemId).show();
+                }
+                $('#custom-loading').hide();
+                if (data.updatetopwishlistsectionhtml) {
+                    $(AjaxCart.topwishlistselector).html(data.updatetopwishlistsectionhtml);
+                }
+                displayBarNotification(data.message, 'success', 3500);
+            },
+            error: function (xhr, _, thrownError) {
+                if (thrownError == "Unauthorized") {
+                    location.reload();
+                }
+                console.log('data-xhr', xhr)
+                $('#custom-loading').hide();
+                displayBarNotification(xhr.message, 'error', 0);
+            }
+        });
     }
 </script>
 
@@ -515,12 +571,33 @@
 </script>
 <script id="optionsTemplate" type="text/x-template">
     <div class="d-flex align-items-center w-100" style="justify-content: flex-end;">
-        <svg id="add-to-wishlist" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mr-1" aria-hidden="true" focusable="false" width="24" height="24"
-             style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
-             preserveAspectRatio="xMidYMid meet" viewBox="0 0 1024 1024" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`, true);return false;">
+        <svg id="wh-add-to-wishlist-${_itemId}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mr-1" aria-hidden="true" focusable="false" width="24" height="24"
+             style="display:none;-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+             preserveAspectRatio="xMidYMid meet" viewBox="0 0 1024 1024" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`, true, false);return false;">
             <title>Add to favorite</title>
             <path d="M923 283.6a260.04 260.04 0 0 0-56.9-82.8a264.4 264.4 0 0 0-84-55.5A265.34 265.34 0 0 0 679.7 125c-49.3 0-97.4 13.5-139.2 39c-10 6.1-19.5 12.8-28.5 20.1c-9-7.3-18.5-14-28.5-20.1c-41.8-25.5-89.9-39-139.2-39c-35.5 0-69.9 6.8-102.4 20.3c-31.4 13-59.7 31.7-84 55.5a258.44 258.44 0 0 0-56.9 82.8c-13.9 32.3-21 66.6-21 101.9c0 33.3 6.8 68 20.3 103.3c11.3 29.5 27.5 60.1 48.2 91c32.8 48.9 77.9 99.9 133.9 151.6c92.8 85.7 184.7 144.9 188.6 147.3l23.7 15.2c10.5 6.7 24 6.7 34.5 0l23.7-15.2c3.9-2.5 95.7-61.6 188.6-147.3c56-51.7 101.1-102.7 133.9-151.6c20.7-30.9 37-61.5 48.2-91c13.5-35.3 20.3-70 20.3-103.3c.1-35.3-7-69.6-20.9-101.9z" />
         </svg>
+        <svg id="wh-remove-from-wishlist-${_itemId}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="remove-favorite-icon mx-1" aria-hidden="true" focusable="false" width="24" height="24"
+             style="display:none;-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+             preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" onclick="removeFromFavorites(`${_itemId}`, false)">
+            <title>Remove favorite</title>
+            <path d="M2.808 1.393l18.384 18.385l-1.414 1.414l-3.747-3.747L12 21.485l-8.48-8.492a6 6 0 0 1 .034-8.023L1.393 2.808l1.415-1.415zm17.435 3.364a6 6 0 0 1 .236 8.236l-1.635 1.636L7.26 3.046a5.986 5.986 0 0 1 4.741 1.483a5.998 5.998 0 0 1 8.242.228z" />
+        </svg>
+        ${if(_isWishlistItem)}
+        <svg id="w-remove-from-wishlist-${_itemId}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="remove-favorite-icon mx-1" aria-hidden="true" focusable="false" width="24" height="24"
+             style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+             preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" onclick="removeFromFavorites(`${_itemId}`, false)">
+            <title>Remove favorite</title>
+            <path d="M2.808 1.393l18.384 18.385l-1.414 1.414l-3.747-3.747L12 21.485l-8.48-8.492a6 6 0 0 1 .034-8.023L1.393 2.808l1.415-1.415zm17.435 3.364a6 6 0 0 1 .236 8.236l-1.635 1.636L7.26 3.046a5.986 5.986 0 0 1 4.741 1.483a5.998 5.998 0 0 1 8.242.228z" />
+        </svg>
+        ${else}
+        <svg id="w-add-to-wishlist-${_itemId}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mr-1" aria-hidden="true" focusable="false" width="24" height="24"
+             style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+             preserveAspectRatio="xMidYMid meet" viewBox="0 0 1024 1024" onclick="getInputQuantity(`${_itemId}`, `${_wishListId}`, true, false);return false;">
+            <title>Add to favorite</title>
+            <path d="M923 283.6a260.04 260.04 0 0 0-56.9-82.8a264.4 264.4 0 0 0-84-55.5A265.34 265.34 0 0 0 679.7 125c-49.3 0-97.4 13.5-139.2 39c-10 6.1-19.5 12.8-28.5 20.1c-9-7.3-18.5-14-28.5-20.1c-41.8-25.5-89.9-39-139.2-39c-35.5 0-69.9 6.8-102.4 20.3c-31.4 13-59.7 31.7-84 55.5a258.44 258.44 0 0 0-56.9 82.8c-13.9 32.3-21 66.6-21 101.9c0 33.3 6.8 68 20.3 103.3c11.3 29.5 27.5 60.1 48.2 91c32.8 48.9 77.9 99.9 133.9 151.6c92.8 85.7 184.7 144.9 188.6 147.3l23.7 15.2c10.5 6.7 24 6.7 34.5 0l23.7-15.2c3.9-2.5 95.7-61.6 188.6-147.3c56-51.7 101.1-102.7 133.9-151.6c20.7-30.9 37-61.5 48.2-91c13.5-35.3 20.3-70 20.3-103.3c.1-35.3-7-69.6-20.9-101.9z" />
+        </svg>
+        ${/if}
 
         ${if(_sawOption)}
         <svg xmlns="http://www.w3.org/2000/svg" class="hover-icon mr-1" onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" width="24" height="24" viewBox="0 0 24 24">

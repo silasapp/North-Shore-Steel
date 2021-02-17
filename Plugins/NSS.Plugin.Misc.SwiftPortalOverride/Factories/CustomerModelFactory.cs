@@ -185,42 +185,42 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 case Constants.MyOrderConfirmedEmail:
                 case Constants.MyOrderConfirmedSms:
                     if (isBuyer)
-                        AddPreference(keyValue, "When my order has been confirmed (offline orders only)", ref model);
+                        AddPreference(keyValue, "When my order has been confirmed (offline orders only).", ref model);
                     break;
                 case Constants.MyOrderScheduleEmail:
                 case Constants.MyOrderScheduleSms:
                     if (isBuyer)
-                        AddPreference(keyValue, "When my order has a scheduled date change", ref model);
+                        AddPreference(keyValue, "When my order has a scheduled date change.", ref model);
                     break;
                 case Constants.MyOrderPromiseEmail:
                 case Constants.MyOrderPromiseSms:
                     if (isBuyer)
-                        AddPreference(keyValue, "When my order has a promise date change", ref model);
+                        AddPreference(keyValue, "When my order has a promise date change.", ref model);
                     break;
                 case Constants.MyOrderReadyEmail:
                 case Constants.MyOrderReadySms:
                     if (isBuyer)
-                        AddPreference(keyValue, "When my order is ready", ref model);
+                        AddPreference(keyValue, "When my order is ready.", ref model);
                     break;
                 case Constants.MyOrderLoadingEmail:
                 case Constants.MyOrderLoadingSms:
                     if (isBuyer)
-                        AddPreference(keyValue, "When my order is loading", ref model);
+                        AddPreference(keyValue, "When my order is loading.", ref model);
                     break;
                 case Constants.MyOrderShippedEmail:
                 case Constants.MyOrderShippedSms:
                     if (isBuyer)
-                        AddPreference(keyValue, "When my order has shipped", ref model);
+                        AddPreference(keyValue, "When my order has shipped.", ref model);
                     break;
                 case Constants.AnyOrderConfirmedEmail:
                 case Constants.AnyOrderConfirmedSms:
                     if (isBuyer || isOperations)
-                        AddPreference(keyValue, "When any order has been confirmed", ref model);
+                        AddPreference(keyValue, "When any order has been confirmed.", ref model);
                     break;
                 case Constants.AnyOrderShippedEmail:
                 case Constants.AnyOrderShippedSms:
                     if (isBuyer || isOperations)
-                        AddPreference(keyValue, "When any order has shipped", ref model);
+                        AddPreference(keyValue, "When any order has shipped.", ref model);
                     break;
                 default:
                     break;

@@ -16,7 +16,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
     {
         Beaumont = 1,
         Houston = 2,
-        None = 3
+        None = 0
     }
 
     public enum HearAboutUs

@@ -1,7 +1,9 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using Nop.Core;
+using Nop.Core.Domain.Catalog;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Localization;
+using Nop.Services.Orders;
 using Nop.Services.Seo;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
@@ -10,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Nop.Core.Domain.Orders;
 using static NSS.Plugin.Misc.SwiftPortalOverride.Models.ProductOverviewModel;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
@@ -21,13 +24,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly IShapeService _shapeService;
         private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IWorkContext _workContext;
+        private readonly IStoreContext _storeContext;
 
         public ProductModelFactory(
             ILocalizationService localizationService,
             ISpecificationAttributeService specificationAttributeService,
             IShapeService shapeService,
             IGenericAttributeService genericAttributeService,
-            IUrlRecordService urlRecordService
+            IUrlRecordService urlRecordService,
+            IShoppingCartService shoppingCartService,
+            IWorkContext workContext,
+            IStoreContext storeContext
             )
         {
             _localizationService = localizationService;
@@ -35,6 +44,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             _shapeService = shapeService;
             _genericAttributeService = genericAttributeService;
             _urlRecordService = urlRecordService;
+            _shoppingCartService = shoppingCartService;
+            _workContext = workContext;
+            _storeContext = storeContext;
         }
 
         public IEnumerable<ProductOverviewModel> PrepareSwiftProductOverviewmodel(IEnumerable<Product> products)
@@ -43,11 +55,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 throw new ArgumentNullException(nameof(products));
 
             var models = new List<ProductOverviewModel>();
+            var wishlistItems = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+
             foreach (var product in products)
             {
                 var model = new ProductOverviewModel
                 {
                     Id = product.Id,
+                    IsFavoriteItem = wishlistItems.Any(x => x.ProductId == product.Id),
                     Name = _localizationService.GetLocalized(product, x => x.Name),
                     ShortDescription = _localizationService.GetLocalized(product, x => x.ShortDescription),
                     FullDescription = _localizationService.GetLocalized(product, x => x.FullDescription),
@@ -59,29 +74,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         (!product.MarkAsNewEndDateTimeUtc.HasValue || product.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
                 };
 
-                //price
-                //if (preparePriceModel)
-                //{
-                //    model.ProductPrice = PrepareProductOverviewPriceModel(product, forceRedirectionAfterAddingToCart);
-                //}
-
-                //picture
-                //if (preparePictureModel)
-                //{
-                //    model.DefaultPictureModel = PrepareProductOverviewPictureModel(product, productThumbPictureSize);
-                //}
-
-                //specs
-
-                //model.SpecificationAttributeModels = PrepareProductSpecificationModel(product);
-
-                //reviews
-                //model.ReviewOverviewModel = PrepareProductReviewOverviewModel(product);
-
+               
                 // erp
                 var attr = _genericAttributeService.GetAttributesForEntity(model.Id, nameof(Product));
-                //if(int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
-                //    model.Shape = _shapeService.GetShapeById(shapeId);
 
                 model.ProductCustomAttributes = attr;
 

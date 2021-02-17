@@ -29,6 +29,9 @@ using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CatalogModel;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using System.Diagnostics;
+using Nop.Services.Orders;
+using Nop.Core.Domain.Orders;
+using System.Text.RegularExpressions;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -41,9 +44,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IStoreContext _storeContext;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly IShapeService _shapeService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly ILocalizationService _localizationService;
 
         #region Constructor
-        public CatalogOverrideController(IShapeService shapeService, ICustomerCompanyService customerCompanyService, ICatalogModelFactory catalogModelFactory, IGenericAttributeService genericAttributeService, IWorkContext workContext, IWebHelper webHelper, IStoreContext storeContext)
+        public CatalogOverrideController(IShoppingCartService shoppingCartService, ILocalizationService localizationService, IShapeService shapeService, ICustomerCompanyService customerCompanyService, ICatalogModelFactory catalogModelFactory, IGenericAttributeService genericAttributeService, IWorkContext workContext, IWebHelper webHelper, IStoreContext storeContext)
         {
             _catalogModelFactory = catalogModelFactory;
             _genericAttributeService = genericAttributeService;
@@ -52,6 +57,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _storeContext = storeContext;
             _customerCompanyService = customerCompanyService;
             _shapeService = shapeService;
+            _shoppingCartService = shoppingCartService;
+            _localizationService = localizationService;
         }
         #endregion
 
@@ -72,7 +79,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(new List<int>(), new List<int>(), isPageLoad: true);
 
-            //ViewBag.dataSource = JavaScriptConvert.ToString(shapeData);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
         }
 
@@ -111,6 +117,41 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             );
         }
 
+        [IgnoreAntiforgeryToken]
+        public JsonResult RemoveFromFavorites([FromBody] int itemId)
+        {
+
+            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+
+            var innerWarnings = new Dictionary<int, IList<string>>();
+            foreach (var sci in cart)
+            {
+                var remove = itemId == sci.ProductId;
+                if (remove)
+                {
+                    _shoppingCartService.DeleteShoppingCartItem(sci);
+                    var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+
+                    var updatetopwishlistsectionhtml = string.Format(_localizationService.GetResource("Wishlist.HeaderQuantity"),
+                          shoppingCarts.Count);
+                    updatetopwishlistsectionhtml = Regex.Replace(updatetopwishlistsectionhtml, @"[()]+", "");
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "The product has been removed from your favorites.",
+                        updatetopwishlistsectionhtml
+                    });
+                }
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = ""
+            });
+        }
+
         public class PartialViewWithData
         {
             public PartialViewResult PartialViewData { get; set; }
@@ -131,24 +172,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
     public static class JavaScriptConvert
     {
-        //public static IHtmlString SerializeObject(object value)
-        //{
-        //    using (var stringWriter = new StringWriter())
-        //    using (var jsonWriter = new JsonTextWriter(stringWriter))
-        //    {
-        //        var serializer = new JsonSerializer
-        //        {
-        //            // Let's use camelCasing as is common practice in JavaScript
-        //            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        //        };
-
-        //        // We don't want quotes around object names
-        //        jsonWriter.QuoteName = false;
-        //        serializer.Serialize(jsonWriter, value);
-
-        //        return new HtmlString(stringWriter.ToString());
-        //    }
-        //}
 
         public static string ToString(object data)
         {

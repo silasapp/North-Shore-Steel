@@ -29,6 +29,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string FullDescription { get; set; }
         public string SeName { get; set; }
 
+        public bool IsFavoriteItem { get; set; }
+
         public string Sku { get; set; }
 
         public ProductType ProductType { get; set; }

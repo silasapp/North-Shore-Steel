@@ -1245,9 +1245,18 @@ a:not([href]):not([class]) {
         cursor: pointer;
     }
 
-        .hover-icon:hover {
-            fill: #0076B4 !important;
-        }
+.remove-favorite-icon {
+    fill: #1899E1;
+    cursor: pointer;
+}
+
+.remove-favorite-icon:hover {
+    fill: gray !important;
+}
+
+.hover-icon:hover {
+    fill: #1899E1 !important;
+}
 
     table a {
         color: #0076b4;
