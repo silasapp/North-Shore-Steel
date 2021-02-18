@@ -122,17 +122,19 @@
                     </div>
                 }
 
-                @*@if (Model?.OrderStatusName.ToLower() != CLOSED_ORDER_STATUS_NAME.ToLower())
+                @if (Model?.OrderStatusName.ToLower() == CLOSED_ORDER_STATUS_NAME.ToLower())
                 {
+
                     <div class="col-md-12 pb-3">
                         <label class="h4-primary-500-teko text-uppercase mb-0">DELIVERED DATE</label>
                         <ul class="h5-default">
                             <li class="name">@Model.DeliveryDate?.ToString("MM/dd/yyyy")</li>
                         </ul>
                     </div>
-                }*@
+                }
 
                 <div class="col-md-12 pb-3">
+
                     <label class="h4-primary-500-teko text-uppercase mb-0">SHIP VIA</label>
                     <ul class="h5-default">
                         <li class="name">@Model.DeliveryMethodName</li>

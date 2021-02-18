@@ -228,7 +228,7 @@ Content1 =
                                         <td class="text-center">
                                             <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
                                                v-on:click="handleNotesModal(item)" data-target="#noteModal">
-                                                <svg v-if="!item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                <svg :id=`removedNote-${item.controlId}` v-show="!item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                                      class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
                                                      viewBox="0 0 24 24"
                                                      style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #2F2F2F; opacity: 0.5;">
@@ -236,7 +236,7 @@ Content1 =
                                                     <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
                                                     <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                 </svg>
-                                                <svg v-if="item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                <svg :id=`addedNote-${item.controlId}` v-show="item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                                      class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
                                                      viewBox="0 0 24 24"
                                                      style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #1899E1; opacity: 0.5;">
@@ -714,7 +714,17 @@ Content1 =
     }
 
     $('#saveNote').on('click', function () {
-        $(`#${itemNoteId}`).val($("#productNote").val());
+        var productNoteValue = $("#productNote").val();
+        if ($("#productNote").val().length == 0) {
+            productNoteValue = " ";
+            $('#removedNote-' + itemNoteId).show();
+            $('#addedNote-' + itemNoteId).hide();
+        }
+        else {
+            $('#addedNote-' + itemNoteId).show();
+            $('#removedNote-' + itemNoteId).hide();
+        }
+        $(`#${itemNoteId}`).val(productNoteValue);
         $(this).find("textarea").val('').end();
         viewNotesModal.hide();
     });
