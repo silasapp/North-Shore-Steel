@@ -63,8 +63,6 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 return Error();
             }
 
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Swift API - CreateProductMTR - itemId = {id}", $"request => {JsonConvert.SerializeObject(mtrDelta)}");
-
             var product = new Product();
 
             var attr = _genericAttributeService.GetAttributeByKeyValue(Constants.ItemIdFieldAttribute, id.ToString(), nameof(Product));

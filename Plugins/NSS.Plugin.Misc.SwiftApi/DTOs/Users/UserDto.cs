@@ -14,13 +14,13 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
         [JsonProperty("wintrixId")]
         public int WintrixId { get; set; }
 
-        [JsonProperty("firstName", Required = Required.DisallowNull)]
+        [JsonProperty("firstName")]
         public string FirstName { get; set; }
 
-        [JsonProperty("lastName", Required = Required.DisallowNull)]
+        [JsonProperty("lastName")]
         public string LastName { get; set; }
 
-        [JsonProperty("workEmail", Required = Required.DisallowNull)]
+        [JsonProperty("workEmail")]
         public string WorkEmail { get; set; }
 
         [JsonProperty("cell")]
@@ -47,7 +47,7 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Users
         [JsonProperty("active")]
         public bool? Active { get; set; }
 
-        [JsonProperty("companies", Required = Required.DisallowNull)]
+        [JsonProperty("companies")]
         public IList<CustomerCompaniesDto> UserCompanies { get; set; }
     }
 }
