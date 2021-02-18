@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Teko:wght@300;400;500;600;700&family=Open+Sans:wght@400;600;700;800&display=swap");
+@import url("font.css");
 /* CUSTOM STYLE */
 
 html,
@@ -129,8 +129,16 @@ a:not([href]):not([class]) {
     .nav-bar-search .search-box-button:focus {
         outline: none;
     }
-
-.nav-bar-search input:focus {
+.bar-notification-container {
+    width: fit-content !important;
+    bottom: 40px !important;
+    left: 20px !important;
+    top: unset !important;
+}
+.bar-notification.success, .bar-notification.error {
+    padding: 20px 40px 20px 20px !important; 
+}
+    .nav-bar-search input:focus {
     border-color: none;
     color: #ffffff;
 }
@@ -355,6 +363,7 @@ a:not([href]):not([class]) {
         #custom-search-box-container {
             width: 100%;
         }
+
     }
 
     /*// Medium devices (tablets, less than 992px)*/
@@ -3936,6 +3945,17 @@ and also iPads specifically.
     }
     /*// Small devices (landscape phones, less than 768px)*/
     @media (max-width: 767.98px) {
+        .bar-notification-container {
+            width: 80% !important;
+            bottom: 40px !important;
+            left: 20px !important;
+            top: unset !important;
+        }
+
+        .bar-notification.success, .bar-notification.error {
+            padding: 20px 40px 20px 20px !important;
+            white-space:pre-wrap;
+        }
         .check-out-card {
             padding: 0 !important;
         }

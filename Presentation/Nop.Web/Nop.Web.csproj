@@ -234,6 +234,7 @@
     <Content Remove="Themes\SwiftPortal\Content\assets\truck.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\twitter.svg" />
     <Content Remove="Themes\SwiftPortal\Content\assets\youtube.svg" />
+    <Content Remove="Themes\SwiftPortal\Content\css\font.css" />
     <Content Remove="Themes\SwiftPortal\Content\css\styles-custom.css" />
     <Content Remove="Themes\SwiftPortal\Content\images\call-avatar.png" />
     <Content Remove="Themes\SwiftPortal\Content\js\filters.js" />
