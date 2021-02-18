@@ -67,10 +67,10 @@
                     <tbody>
                         <template v-for="p in orderMTRs">
                             <tr>
-                                <td><a v-bind:href="p.MtrFile" target="_blank" scope="row">{{p.MtrId}}</a></td>
-                                <td>{{p.HeatNo}}</td>
-                                <td class="text-center">{{p.LineNo}}</td>
-                                <td>{{p.Description}}</td>
+                                <td><a v-bind:href="p.MtrFile" target="_blank" scope="row" v-cloak>{{p.MtrId}}</a></td>
+                                <td v-cloak>{{p.HeatNo}}</td>
+                                <td class="text-center" v-cloak>{{p.LineNo}}</td>
+                                <td v-cloak>{{p.Description}}</td>
                             </tr>
                         </template>
                         <template v-if="orderMTRs.length == 0">
@@ -188,8 +188,8 @@
                                         </div>
                                         <div class="row" v-for="stats in companyStats">
                                             <div class="col-md-12 d-block my-1">
-                                                <label class="float-left h5-default">{{stats.statName}}</label>
-                                                <h5 class="float-right nss-dark-blue">{{stats.statValue}}</h5>
+                                                <label class="float-left h5-default" v-cloak>{{stats.statName}}</label>
+                                                <h5 class="float-right nss-dark-blue" v-cloak>{{stats.statValue}}</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -386,7 +386,7 @@
                                 <label class="fs12-white mb-0">Order #</label>
                             </div>
                             <div class="d-flex p-2">
-                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link" v-cloak>{{ order.orderId }}</a>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -394,7 +394,7 @@
                                 <label class="fs12-white mb-0">PO #</label>
                             </div>
                             <div class="d-flex p-2">
-                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.poNo }}</a>
+                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link" v-cloak>{{ order.poNo }}</a>
                             </div>
                         </div>
 
@@ -403,7 +403,7 @@
                                 <label class="fs12-white mb-0"> Promise Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.promiseDate | date }}</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -411,7 +411,7 @@
                                 <label class="fs12-white mb-0"> Scheduled Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.scheduledDate | date }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.scheduledDate | date }}</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -419,7 +419,7 @@
                                 <label class="fs12-white mb-0">Status</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.orderStatusName }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.orderStatusName }}</label>
                             </div>
                         </div>
                     </div>
@@ -445,7 +445,7 @@
                                 <label class="fs12-white mb-0">Order #</label>
                             </div>
                             <div class="d-flex p-2">
-                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link">{{ order.orderId }}</a>
+                                <a v-bind:href="'/orders/' + order.orderId" class="fs12-link" v-cloak>{{ order.orderId }}</a>
                             </div>
                         </div>
 
@@ -454,7 +454,7 @@
                                 <label class="fs12-white mb-0"> Order Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.orderDate | date }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.orderDate | date }}</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -462,7 +462,7 @@
                                 <label class="fs12-white mb-0"> Promise Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.promiseDate | date }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.promiseDate | date }}</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -470,7 +470,7 @@
                                 <label class="fs12-white mb-0"> Delivery Date</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.deliveryDate | date }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.deliveryDate | date }}</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -478,7 +478,7 @@
                                 <label class="fs12-white mb-0">Status</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0">{{ order.deliveryStatus }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.deliveryStatus }}</label>
                             </div>
                         </div>
                     </div>
@@ -527,8 +527,8 @@
                             </div>
                             <div class="row" v-for="stats in companyStats">
                                 <div class="col-md-12 d-block">
-                                    <label class="float-left h5-default">{{stats.statName}}</label>
-                                    <h5 class="float-right nss-dark-blue">{{stats.statValue}}</h5>
+                                    <label class="float-left h5-default" v-cloak>{{stats.statName}}</label>
+                                    <h5 class="float-right nss-dark-blue" v-cloak>{{stats.statValue}}</h5>
                                 </div>
                             </div>
                         </div>

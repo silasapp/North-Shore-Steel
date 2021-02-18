@@ -131,7 +131,7 @@ Content1 =
                         <label class="fs-14 text-black mb-1 shipping-input">State</label>
                         <select type="text" class="nss-form-control" name="state" v-model="newShippingAddress.stateProvinceId">
                             <option v-bind:value="null">-Select-</option>
-                            <option v-bind:value="option.id" v-for="option in shared.states">
+                            <option v-bind:value="option.id" v-for="option in shared.states" v-cloak>
                                 {{ option.name }}
                             </option>
                         </select>
@@ -178,7 +178,7 @@ Content2 =
                     <label class="fs-14 text-black mb-1">State</label>
                     <select type="text" class="nss-form-control" v-model="newBillingAddress.stateProvinceId">
                         <option v-bind:value="null">-Select-</option>
-                        <option v-bind:value="option.id" v-for="option in shared.states">
+                        <option v-bind:value="option.id" v-for="option in shared.states" v-cloak>
                             {{ option.name }}
                         </option>
                     </select>
@@ -221,7 +221,7 @@ Content2 =
                 <div v-show="errorType === shared.constants.ERROR_TYPE_REGULAR">
                     <div class="d-flex flex-row mb-3 nss-alert-danger">
                         <img src="~/Themes/@(themeName)/Content/assets/icn-error-red.svg" alt="">
-                        <span class="ml-2">{{ errorMessage }}</span>
+                        <span class="ml-2" v-cloak>{{ errorMessage }}</span>
                     </div>
                 </div>
                 <div v-show="errorType === shared.constants.ERROR_TYPE_CREDIT_CARD">
@@ -230,9 +230,9 @@ Content2 =
                         <div class="ml-2">
                             <span>The following error(s) occured:</span>
                             <ul class="ml-3">
-                                <li v-for="error in errorMessages" style="list-style: disc">{{ error }}</li>
+                                <li v-for="error in errorMessages" style="list-style: disc" v-cloak>{{ error }}</li>
                             </ul>
-                            <span class="ml-2">{{ errorMessage }}</span>
+                            <span class="ml-2" v-cloak>{{ errorMessage }}</span>
                         </div>
                     </div>
                 </div>
@@ -263,7 +263,7 @@ Content2 =
                                     v-on:change="showNewShippingAddress = false; $event.target.value ? getShippingRate(false) : null;"
                                     v-model="shippingAddressId">
                                 <option v-bind:value="null">-Select Address-</option>
-                                <option v-bind:value="address.id" v-for="address in shared.shippingAddresses">
+                                <option v-bind:value="address.id" v-for="address in shared.shippingAddresses" v-cloak>
                                     {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
                                     {{ address.city }}{{ address.city ? ', ' : '' }}
                                     {{ address.stateProvinceName }} {{ address.zipPostalCode }}
@@ -276,7 +276,7 @@ Content2 =
 
                         </div>
                         <label class="text-danger mt-1 mb-0" v-if="!shippingAddressId && !showNewShippingAddress && isDelivery && dirty">Shipping Address is required.</label>
-                        <label class="text-black mt-2 font-weight-bolder">Promise Date: {{deliveryDate}}</label>
+                        <label class="text-black mt-2 font-weight-bolder" v-cloak>Promise Date: {{deliveryDate}}</label>
                     </div>
                     <div class="d-flex flex-column mb-3" v-if="!isDelivery">
                         <label for="shippingAddress" class="fs-14 text-black mb-1">North Shore Steel Pickup Location</label>
@@ -285,13 +285,13 @@ Content2 =
                                     name="shipping-address" id="shippingAddress"
                                     v-on:change="$event.target.value ? getShippingRate() : null;" v-model="pickupPointId">
                                 <option v-bind:value="null">-Select Address-</option>
-                                <option v-bind:value="address.id" v-for="address in shared.pickupPoints">
+                                <option v-bind:value="address.id" v-for="address in shared.pickupPoints" v-cloak>
                                     {{ address.name }}, {{ address.address }}, {{ address.city }}, {{ address.stateProvinceName }} {{ address.zipPostalCode }}
                                 </option>
                             </select>
                         </div>
                         <label class="text-danger mt-1 mb-0" v-if="!pickupPointId && !isDelivery && dirty">Pickup Location is required.</label>
-                        <label class="text-black mt-2 font-weight-bolder">Promise Date: {{deliveryDate}}</label>
+                        <label class="text-black mt-2 font-weight-bolder" v-cloak>Promise Date: {{deliveryDate}}</label>
                     </div>
 
                 </div>
@@ -327,7 +327,7 @@ Content2 =
                                 <img src="Themes/@themeName/Content/assets/dollar.svg" alt="" width="24">
                                 <div class="d-flex flex-column ml-2">
                                     <label class="fs-18 font-weight-bold mb-1">Line of Credit</label>
-                                    <label class="fs-12 mb-0">Balance: ${{ formatMoney(shared.accountCredit.creditAmount) }}</label>
+                                    <label class="fs-12 mb-0" v-cloak>Balance: ${{ formatMoney(shared.accountCredit.creditAmount) }}</label>
                                 </div>
                             </div>
                         </div>
@@ -358,7 +358,7 @@ Content2 =
                                     <div id="expiration-date" class="nss-form-control" style="height: 40px;"></div>
                                 </div>
                                 <div class="col-md-2 d-flex flex-column">
-                                    <label for="cvv" class="fs-14 text-black mb-1">{{cvvText}}</label>
+                                    <label for="cvv" class="fs-14 text-black mb-1" v-cloak>{{cvvText}}</label>
                                     <div id="cvv" class="nss-form-control" style="height: 40px;"></div>
                                 </div>
                             </div>
@@ -369,7 +369,7 @@ Content2 =
                                     <select type="text" class="bg-accent text-black px-2 py-2 w-75"
                                             id="shippingAddress" v-on:change="showNewBillingAddress = false;" v-model="billingAddressId">
                                         <option v-bind:value="null">-Select Address-</option>
-                                        <option v-bind:value="address.id" v-for="address in shared.billingAddresses">
+                                        <option v-bind:value="address.id" v-for="address in shared.billingAddresses" v-cloak>
                                             {{ address.address1 }}{{ address.address1 ? ', ' : '' }}
                                             {{ address.city }}{{ address.city ? ', ' : '' }}
                                             {{ address.stateProvinceName }} {{ address.zipPostalCode }}
@@ -516,21 +516,21 @@ Content2 =
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Shipping:</label>
-                            <label class="text-black">${{ formatMoney(shippingAmount) }}</label>
+                            <label class="text-black" v-cloak>${{ formatMoney(shippingAmount) }}</label>
                         </div>
                         <div class="price-summary" v-if="discountAmount">
                             <label class="text-muted">Discount:</label>
-                            <label class="text-black">{{ discountAmount }}</label>
+                            <label class="text-black" v-cloak>{{ discountAmount }}</label>
                         </div>
                         <div class="price-summary">
                             <label class="text-muted">Tax:</label>
-                            <label class="text-black">
+                            <label class="text-black" v-cloak>
                                 ${{ taxAmount }}
                             </label>
                         </div>
                         <div class="price-summary">
                             <label class="h5 text-black" style="font:normal normal 500 30px/20px 'Teko';">TOTAL</label>
-                            <label class="h5 text-black" style="font:normal normal 500 30px/20px 'Teko';">${{ formatMoney(orderTotal) }}</label>
+                            <label class="h5 text-black" style="font:normal normal 500 30px/20px 'Teko';" v-cloak>${{ formatMoney(orderTotal) }}</label>
                         </div>
                     </div>
 

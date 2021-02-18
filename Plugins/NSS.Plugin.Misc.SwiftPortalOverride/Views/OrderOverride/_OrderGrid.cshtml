@@ -75,14 +75,14 @@
                         <label class="fs12-white mb-0">Order #</label>
                     </div>
                     <div class="d-flex p-2">
-                        <a class="fs12-link" v-bind:href="'/orders/'+order.orderId">{{order.orderId}}</a>
+                        <a class="fs12-link" v-bind:href="'/orders/'+order.orderId" v-cloak>{{order.orderId}}</a>
                     </div>
                 </div><div class="d-flex flex-row">
                     <div class="d-flex bg-primary p-2 home-table-sm-header">
                         <label class="fs12-white mb-0">Purchase Order #</label>
                     </div>
                     <div class="d-flex p-2">
-                        <a class="fs12-link">{{order.poNo}}</a>
+                        <a class="fs12-link" v-cloak>{{order.poNo}}</a>
                     </div>
                 </div>
                 <div class="d-flex flex-row">
@@ -90,7 +90,7 @@
                         <label class="fs12-white mb-0">Tot. Weight (lbs)</label>
                     </div>
                     <div class="d-flex p-2">
-                        <label class="fs12-default mb-0">{{order.weight}}</label>
+                        <label class="fs12-default mb-0" v-cloak>{{order.weight}}</label>
                     </div>
                 </div>
 
@@ -99,7 +99,7 @@
                         <label class="fs12-white mb-0">Order Amount</label>
                     </div>
                     <div class="d-flex p-2">
-                        <label class="fs12-default mb-0">{{order.orderTotal}}</label>
+                        <label class="fs12-default mb-0" v-cloak>{{order.orderTotal}}</label>
                     </div>
                 </div>
                 <div class="d-flex flex-row">
@@ -107,7 +107,7 @@
                         <label class="fs12-white mb-0">Order Date</label>
                     </div>
                     <div class="d-flex p-2">
-                        <label class="fs12-default mb-0">
+                        <label class="fs12-default mb-0" v-cloak>
                             {{order.orderDate|date}}
                         </label>
                     </div>
@@ -117,7 +117,7 @@
                         <label class="fs12-white mb-0">Promise Date</label>
                     </div>
                     <div class="d-flex p-2">
-                        <label class="fs12-default mb-0">
+                        <label class="fs12-default mb-0" v-cloak>
                             {{order.promiseDate|date}}
                         </label>
                     </div>
@@ -129,7 +129,7 @@
                             <label class="fs12-white mb-0">Delivery Date</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{order.deliveryDate|date}}</label>
+                            <label class="fs12-default mb-0" v-cloak>{{order.deliveryDate|date}}</label>
                         </div>
                     </div>
                     <div class="d-flex flex-row">
@@ -148,14 +148,14 @@
                             <label class="fs12-white mb-0">Scheduled Date</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0" style="color: #DB0606 !important;">{{order.scheduledDate|date}}</label>
+                            <label class="fs12-default mb-0" style="color: #DB0606 !important;" v-cloak>{{order.scheduledDate|date}}</label>
                         </div>
                     </div><div class="d-flex flex-row">
                         <div class="d-flex bg-primary p-2 home-table-sm-header">
                             <label class="fs12-white mb-0">Status</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{order.orderStatusName}}</label>
+                            <label class="fs12-default mb-0" v-cloak>{{order.orderStatusName}}</label>
                         </div>
                     </div>
                 }

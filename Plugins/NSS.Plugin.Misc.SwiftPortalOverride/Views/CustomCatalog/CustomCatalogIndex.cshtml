@@ -45,7 +45,7 @@
                 <div class="d-flex flex-column align-items-center" style="width: 112px;" v-for="shape in topShapes" v-on:click="handleCategoryClicked(shape)">
                     <img v-if="shape.icon" class="shape-icon-img" v-bind:src="'Themes/SwiftPortal/Content/assets/' + shape.icon" alt="" width="112" height="112" />
                     <div v-if="!shape.icon" class="icon-shape"></div>
-                    <label class="h4-default-500 mt-2 font-weight-bolder">{{ shape.upperCaseName}}</label>
+                    <label class="h4-default-500 mt-2 font-weight-bolder" v-cloak>{{ shape.upperCaseName}}</label>
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@
                     <div class="d-flex flex-row mx-3 mx-md-0 mb-3 mt-3 mt-md-0 align-items-center flex-wrap">
                         <label class="h5-default-normal mb-2 mr-3">Applied Filters:</label>
                         <div v-for="(tag, i) in filterTags" class="d-flex flex-row mb-2" v-bind:class="{'mr-1': i == (filterTags.length - 1) }">
-                            <span class="filter-tag">
+                            <span class="filter-tag" v-cloak>
                                 {{ tag.type === 'query' ? `"${tag.text}"` : tag.text }}
                                 <button v-on:click='removeFilter(tag)'>
                                     <img alt="close icon" src="Themes/SwiftPortal/Content/assets/close-filled.svg" width="15" height="15" />
@@ -97,11 +97,11 @@
                             <div class="card" style="display: flex" v-for="(specs, index) in defaultSpecs">
                                 <a :id="'default-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#default-spec-collapse-' + index"
                                    v-on:click="toggleHeader('default-spec-header-' + index)">
-                                    <div class="card-header">{{ specs[0].name }}</div>
+                                    <div class="card-header" v-cloak>{{ specs[0].name }}</div>
                                 </a>
                                 <div :id="'default-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
                                     <div class="card-body">
-                                        <label class="pure-material-checkbox">
+                                        <label class="pure-material-checkbox" v-cloak>
                                             <input :id="'checkbox-' + spec.specificationAttributeOptionId"
                                                    type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
                                             <span class="checkmark"></span>{{ spec.displayName }} ({{ spec.count }})
@@ -112,11 +112,11 @@
                             <div class="card" style="display: flex" v-if="showOtherSpecs" v-for="(specs, index) in otherSpecs">
                                 <a :id="'other-spec-header-' + index" class="card-link" data-toggle="collapse" :href="'#other-spec-collapse-' + index"
                                    v-on:click="toggleHeader('other-spec-header-' + index)">
-                                    <div class="card-header">{{ specs[0].name }}</div>
+                                    <div class="card-header" v-cloak>{{ specs[0].name }}</div>
                                 </a>
                                 <div :id="'other-spec-collapse-' + index" class="collapse show" v-for="spec in specs">
                                     <div class="card-body">
-                                        <label class="pure-material-checkbox">
+                                        <label class="pure-material-checkbox" v-cloak>
                                             <input :id="'checkbox-' + spec.specificationAttributeOptionId"
                                                    type="checkbox" v-bind:checked="spec.checked" v-on:change="toggleSpec(spec)">
                                             <span class="checkmark"></span>{{ spec.displayName }} ({{ spec.count }})

@@ -143,7 +143,9 @@ a:not([href]):not([class]) {
     letter-spacing: 0px;
     color: #242424;
 }
-
+[v-cloak] {
+    display: none;
+}
 .header-links li a span:nth-of-type(2) {
     position: absolute;
     border: 2px solid #0076b4;

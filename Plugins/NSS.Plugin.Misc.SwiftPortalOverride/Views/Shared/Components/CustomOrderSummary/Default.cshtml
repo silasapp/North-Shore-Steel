@@ -162,7 +162,7 @@ Content1 =
                         <div class="d-flex flex-column flex-md-row justify-content-md-between">
                             <div v-if="isEditable" class="d-flex flex-row bg-accent bg-md-white justify-content-between mb-3 p-3 p-md-0 order-0 order-md-1 w-100">
                                 <button type="submit" class="nss-btn-white mr-md-4" name="continueshopping">
-                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="">
+                                    <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="" v-cloak>
                                     {{ isMobile ? 'Keep Shopping' : 'Continue Shopping' }}
                                 </button>
                                 <button type="submit" class="nss-btn-white" name="updatecart">
@@ -191,10 +191,10 @@ Content1 =
                                 <tbody>
                                     <tr v-for="item in items">
                                         <td class="align-middle">
-                                            <label class="mv-value" style="margin:0;">{{ item.productName }}</label>
+                                            <label class="mv-value" style="margin:0;" v-cloak>{{ item.productName }}</label>
                                             <div class="message-error" v-if="item.warnings?.length > 0">
                                                 <ul>
-                                                    <li v-for="warning in item.warnings">{{ warning }}</li>
+                                                    <li v-for="warning in item.warnings" v-cloak>{{ warning }}</li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -205,7 +205,7 @@ Content1 =
                                                    aria-label="@T("ShoppingCart.Quantity")"
                                                    min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
                                         </td>
-                                        <td class="pt-3 text-right"><label v-bind:id="'itemweight' + item.id" style="margin:0;">{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
+                                        <td class="pt-3 text-right"><label v-bind:id="'itemweight' + item.id" style="margin:0;" v-cloak>{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
                                         <td class="">
                                             <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
                                                    v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
@@ -216,14 +216,14 @@ Content1 =
                                                         v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                                     <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
                                                             v-for="attribute in item.purchaseUnitAttr.values"
-                                                            v-bind:value="attribute.id">
+                                                            v-bind:value="attribute.id" v-cloak>
                                                         {{ attribute.name }}
                                                     </option>
                                                 </select>
-                                                <label class="float-left" style="margin:4px 8px 0px 0px;" v-bind:id="'itemunitprice' + item.id">${{ item.unitPrice }} /</label>
+                                                <label class="float-left" style="margin:4px 8px 0px 0px;" v-bind:id="'itemunitprice' + item.id" v-cloak>${{ item.unitPrice }} /</label>
                                             </div>
                                         </td>
-                                        <td class="pt-3 text-right" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;">{{ item.subTotal }}</label></td>
+                                        <td class="pt-3 text-right" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;" v-cloak>{{ item.subTotal }}</label></td>
 
                                         <td class="text-center">
                                             <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
@@ -272,13 +272,13 @@ Content1 =
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>
-                                <label class="h2-primary mt-3 mb-2">{{ item.productName }}</label>
+                                <label class="h2-primary mt-3 mb-2" v-cloak>{{ item.productName }}</label>
                                 <div style="color: #e4434b; font-size:12px" v-if="item.warnings?.length > 0">
                                     <ul>
-                                        <li v-for="warning in item.warnings">{{ warning }}</li>
+                                        <li v-for="warning in item.warnings" v-cloak>{{ warning }}</li>
                                     </ul>
                                 </div>
-                                <label class="h5-default-500">Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
+                                <label class="h5-default-500" v-cloak>Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
                                 <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
 
@@ -292,12 +292,12 @@ Content1 =
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Unit Price</label>
                                     <div class="d-flex flex-row align-items-center">
-                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white">${{ item.unitPrice }} / </label>
+                                        <label v-bind:id="'itemunitprice' + item.id" class="h5-default-500 px-2 py-1 bg-white" v-cloak>${{ item.unitPrice }} / </label>
                                         <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                 v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                             <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT ||
                                                 attribute.name === 'FT' && item.pricePerFt"
-                                                    v-for="attribute in item.purchaseUnitAttr.values" v-bind:value="attribute.id">
+                                                    v-for="attribute in item.purchaseUnitAttr.values" v-bind:value="attribute.id" v-cloak>
                                                 {{ attribute.name }}
                                             </option>
                                         </select>
@@ -305,7 +305,7 @@ Content1 =
                                 </div>
                                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                                     <label class="h5-default-500">Total Price</label>
-                                    <label class="h2-primary" v-bind:id="'itemsubtotal' + item.id">{{ item.subTotal }}</label>
+                                    <label class="h2-primary" v-bind:id="'itemsubtotal' + item.id" v-cloak>{{ item.subTotal }}</label>
                                 </div>
                             </div>
                         </div>
