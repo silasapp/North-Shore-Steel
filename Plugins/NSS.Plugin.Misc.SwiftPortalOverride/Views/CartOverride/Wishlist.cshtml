@@ -42,11 +42,6 @@
     .hover-icon {
         margin-right: 0.5rem;
     }
-
-    .m-r4 {
-        position:relative;
-        right:0.4rem;
-    }
 </style>
 @{
     Func<object, object>
@@ -126,7 +121,7 @@ Content1 =
                                         <tr>
                                             <td scope=col class="product">Description</td>
                                             <td scope=col class="quantity text-center">Qty.</td>
-                                            <td scope=col style="width: 12rem">Actions</td>
+                                            <td scope=col class="text-center" style="width: 12rem">Actions</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -213,7 +208,7 @@ Content1 =
                                                         <span class="product-quantity">@item.Quantity</span>
                                                     }
                                                 </td>
-                                                <td style="text-align:left" class="d-flex flex-row align-items-center m-r4">
+                                                <td style="justify-content: flex-end;" class="d-flex align-items-center w-100">
                                                     <div class="table-action-button">
                                                         <label class="mb-0">
                                                             <span style="cursor:pointer">
