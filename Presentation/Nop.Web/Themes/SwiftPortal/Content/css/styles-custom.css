@@ -180,6 +180,9 @@ a:not([href]):not([class]) {
 
 /*// Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
+    .header-logo-lg > a > img {
+        width: 16rem !important;
+    }
     .header-logo > a > img {
         width: 14rem;
     }
@@ -202,6 +205,9 @@ a:not([href]):not([class]) {
 
 /*// Large devices (desktops, 992px and up)*/
 @media (min-width: 992px) {
+    .header-logo-lg > a > img {
+        width: 16rem !important;
+    }
     .header-logo > a > img {
         width: 14rem;
     }
@@ -235,6 +241,9 @@ a:not([href]):not([class]) {
 
 /*// Extra large devices (large desktops, 1200px and up)*/
 @media (min-width: 1200px) {
+    .header-logo-lg > a > img {
+        width: 17rem !important;
+    }
     .header-logo > a > img {
         width: 16rem;
     }
@@ -309,6 +318,9 @@ a:not([href]):not([class]) {
 
     /*// Small devices (landscape phones, less than 768px)*/
     @media (max-width: 767.98px) {
+        .header-logo-lg > a > img {
+            width: 12rem;
+        }
         .header-logo > a > img {
             width: 10rem;
         }
