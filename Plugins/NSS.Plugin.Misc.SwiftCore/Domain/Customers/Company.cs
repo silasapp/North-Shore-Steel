@@ -17,10 +17,10 @@ namespace NSS.Plugin.Misc.SwiftCore.Domain.Customers
         /// </summary>
         public int ErpCompanyId { get; set; }
 
-        ///// <summary>
-        ///// Gets or sets a sales contact live chat id
-        ///// </summary>
-        //public string SalesContactLiveChatId { get; set; }
+        /// <summary>
+        /// Gets or sets the credit terms
+        /// </summary>
+        public bool HasCreditTerms { get; set; }
 
         /// <summary>
         /// Gets or sets a sales contact name

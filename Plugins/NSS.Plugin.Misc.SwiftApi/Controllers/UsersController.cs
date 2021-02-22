@@ -144,6 +144,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     {
                         ErpCompanyId = userCompany.CompanyId,
                         Name = userCompany.CompanyName,
+                        HasCreditTerms = userCompany.HasCreditTerms,
                         SalesContactName = userCompany.SalesContactName,
                         SalesContactEmail = userCompany.SalesContactEmail,
                         SalesContactPhone = userCompany.SalesContactPhone,
@@ -312,6 +313,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 {
                     CompanyId = customerCompany.Company.ErpCompanyId,
                     CompanyName = customerCompany.Company.Name,
+                    HasCreditTerms = customerCompany.Company.HasCreditTerms,
                     AP = customerCompany.AP,
                     Buyer = customerCompany.Buyer,
                     CanCredit = customerCompany.CanCredit,

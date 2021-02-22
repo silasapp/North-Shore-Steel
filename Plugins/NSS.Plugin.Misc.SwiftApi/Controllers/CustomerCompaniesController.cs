@@ -98,7 +98,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                     ErpCompanyId = input.Dto.CompanyId,
                     Name = input.Dto.CompanyName,
                     SalesContactEmail = input.Dto.SalesContactEmail,
-                    //SalesContactLiveChatId = input.Dto.SalesContact.LiveChatId,
+                    HasCreditTerms = input.Dto.HasCreditTerms,
                     SalesContactName = input.Dto.SalesContactName,
                     SalesContactPhone = input.Dto.SalesContactPhone,
                     SalesContactImageUrl = input.Dto.SalesContactImageUrl,
