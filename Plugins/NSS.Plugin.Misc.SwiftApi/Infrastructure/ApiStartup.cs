@@ -69,6 +69,9 @@ namespace NSS.Plugin.Misc.SwiftApi.Infrastructure
             services.Configure<KestrelServerOptions>(options =>
             {
                 options.AllowSynchronousIO = true;
+
+                // increase req body siz
+                options.Limits.MaxRequestBodySize = 100000000; //100MB
             });
 
             // If using IIS:

@@ -48,6 +48,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             _logger = logger;
         }
 
+        [RequestSizeLimit(100_000_000)]
         [HttpPut]
         [Route("/api/products/{id}/mtr")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
