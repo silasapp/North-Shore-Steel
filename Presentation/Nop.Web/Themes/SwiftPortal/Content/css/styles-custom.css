@@ -1,10 +1,21 @@
-@import url("font.css");
+/*@import url("font.css");*/
 /* CUSTOM STYLE */
 
 html,
 body {
     font-family: "Exo 2" !important;
 }
+.e-grid ::-webkit-scrollbar {
+    width: 5px !important;
+    height: 5px !important;
+}
+.e-grid ::-webkit-scrollbar-thumb {
+    background: #1899E1 !important;
+}
+
+    .e-grid ::-webkit-scrollbar-thumb:window-inactive {
+        background: #1899E1 !important;
+    }
 
 a:not([href]):not([class]) {
     text-decoration: underline;
@@ -132,9 +143,10 @@ a:not([href]):not([class]) {
 
 .bar-notification-container {
     width: fit-content !important;
-    bottom: 40px !important;
-    left: 20px !important;
-    top: unset !important;
+    bottom: unset !important;
+    right: 20px !important;
+    left: unset !important;
+    top: 220px !important;
 }
 
 .bar-notification.success, .bar-notification.error {
@@ -3971,9 +3983,10 @@ and also iPads specifically.
 @media (max-width: 767.98px) {
     .bar-notification-container {
         width: 80% !important;
-        bottom: 40px !important;
+        bottom: unset !important;
         left: 20px !important;
-        top: unset !important;
+        left: unset !important;
+        top: 170px !important;
     }
 
     .bar-notification.success, .bar-notification.error {

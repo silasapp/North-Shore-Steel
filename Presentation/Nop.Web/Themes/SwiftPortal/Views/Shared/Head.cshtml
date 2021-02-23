@@ -30,6 +30,7 @@
     }
     else
     {
+        Html.AppendCssFileParts($"~/Themes/{themeName}/Content/css/font.css");
         Html.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles-custom.css");
         Html.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles.css");
     }
