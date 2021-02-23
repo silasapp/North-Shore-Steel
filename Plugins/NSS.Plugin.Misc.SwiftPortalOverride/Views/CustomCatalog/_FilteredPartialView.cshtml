@@ -188,8 +188,7 @@
         padding-bottom: 5px;
         padding-top: 5px;
     }
-
-    .e-headercelldiv {
+    thead > tr > :last-child > div, thead > tr > :nth-last-child(2) > div {
         padding: 0 1.8em 0 1.8em !important;
     }
 </style>
@@ -223,6 +222,7 @@
     {
         headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>()
 {
+            
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "itemName",
@@ -439,7 +439,7 @@
                             field: col.displayName.includes("Weight") ? "sortweight" : col.code.toLowerCase(), headerText: col.displayName,
                             template: `#${col.code.toLowerCase()}Template`,
                             width: col.displayName.includes("Description") ? 230 : col.displayName.includes("Item #") ? 170 : col.displayName.includes("Weight Per Foot") ? 170 : 150,
-                            textAlign: "Center",
+                            textAlign: col.displayName.includes("Weight") ? "Right" : col.displayName.includes("Amount") ? "Right" : "Left",
                         };
 
                     retVal = [...retVal, column];
