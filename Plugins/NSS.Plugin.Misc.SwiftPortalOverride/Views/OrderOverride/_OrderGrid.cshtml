@@ -6,6 +6,11 @@
 @using Nop.Services.Common
 
 <style>
+
+    .e-headercelldiv {
+        padding: 0 1.8em 0 1.8em !important;
+    }
+
     .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
         padding-left: 0.6rem
     }
@@ -29,6 +34,10 @@
         background-color: #1899E1 !important;
         color: #ffffff;
     }
+
+    thead > tr > :nth-child(3) > div, thead > tr > :nth-child(4) > div {
+        text-align: center !important;
+    }
 </style>
 <div id="ordersGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
@@ -37,21 +46,21 @@
             <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
             <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
             <e-grid-columns>
-                <e-grid-column headerText="Order #" template="#orderNo" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="PoNo" headerText="PO #" minWidth="60" width="70" maxWidth="80" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="Weight" textAlign="Right" headerText="Weight (lb)" minWidth="120" format="N0" width="130" maxWidth="140" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="OrderTotal" textAlign="Right" headerText="Order Amount" minWidth="110" width="120" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="OrderDate" headerText="Order Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="PromiseDate" headerText="Promise Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" headerText="Order #" template="#orderNo" width="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="PoNo" headerText="PO #" width="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" width="130" format="N0" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Right" field="OrderTotal" headerText="Order Amount" width="130" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="OrderDate" headerText="Order Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="PromiseDate" headerText="Promise Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
-                    <e-grid-column field="DeliveryDate" headerText="Delivery Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column template="#viewTicket" headerText="POD" minWidth="110" width="120" maxWidth="130" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="DeliveryDate" headerText="Delivery Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" template="#viewTicket" headerText="POD" width="130" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
-                    <e-grid-column field="ScheduledDate" headerText="Scheduled Date" minWidth="120" width="130" maxWidth="140" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="110" width="120" maxWidth="130"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="ScheduledDate" headerText="Scheduled Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" width="130"></e-grid-column>
                 }
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>

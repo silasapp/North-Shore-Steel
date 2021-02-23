@@ -4,6 +4,10 @@
 @using Syncfusion.EJ2
 
 <style>
+    .e-headercelldiv {
+        padding: 0 1.8em 0 1.8em !important;
+    }
+
     .e-headercell.e-lastcell, .e-rowcell.e-gridchkbox {
         padding-left: 0.6rem
     }
@@ -15,7 +19,6 @@
     .home-table-sm-header {
         width: 110px !important;
         background-color: #1899E1 !important;
-        /* border-bottom: 0.1px solid white; */
     }
 
     .invisible-grid {
@@ -27,6 +30,10 @@
         background-color: #1899E1 !important;
         color: #ffffff;
     }
+
+    thead > tr > :nth-child(4) > div, thead > tr > :nth-child(5) > div {
+        text-align: center !important;
+    }
 </style>
 <div id="invoicesGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
@@ -36,23 +43,23 @@
             <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
             <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
             <e-grid-columns>
-                <e-grid-column template="#invoiceNo" headerText="Invoice #" minWidth="80" width="100" maxWidth="120" allowFiltering="false"></e-grid-column>
-                <e-grid-column template="#orderNo" headerText="Order #" minWidth="80" width="90" maxWidth="100" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="PoNo" headerText="Purchase Order #" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="InvoiceAmount" textAlign="Right" headerText="Invoice Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#invoiceNo" headerText="Invoice #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column template="#orderNo" headerText="Order #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PoNo" headerText="Purchase Order #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" textAlign="Right" width="130" allowFiltering="false"></e-grid-column>
                 @if (!Model.IsClosed)
                 {
-                    <e-grid-column field="BalanceAmount" textAlign="Right" headerText="Balance Amount" format="C2" minWidth="130" width="140" maxWidth="150" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="BalanceAmount" textAlign="Right" width="130" headerText="Balance Amount" format="C2" allowFiltering="false"></e-grid-column>
                 }
-                <e-grid-column field="InvoiceDate" headerText="Invoice Date" minWidth="110" width="120" maxWidth="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="InvoiceDate" headerText="Invoice Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
-                    <e-grid-column field="InvoicePaidDate" headerText="Paid Date" minWidth="80" width="100" maxWidth="120" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="InvoicePaidDate" headerText="Paid Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
-                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" minWidth="80" width="100" maxWidth="120" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" minWidth="80" width="100" maxWidth="120"></e-grid-column>
+                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" textAlign="Center" width="130"></e-grid-column>
                 }
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>

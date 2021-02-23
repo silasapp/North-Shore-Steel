@@ -1289,7 +1289,7 @@ input:focus {
 }
 
 .remove-favorite-icon {
-    fill: #1899E1;
+    fill: #DB0606;
     cursor: pointer;
 }
 
@@ -1298,7 +1298,7 @@ input:focus {
     }
 
 .hover-icon:hover {
-    fill: #1899E1 !important;
+    fill: gray !important;
 }
 
 table a {

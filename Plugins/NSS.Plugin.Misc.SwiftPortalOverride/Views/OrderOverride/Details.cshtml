@@ -26,7 +26,7 @@
         {
             <div class="d-flex flex-column">
                 <div class="d-flex flex-column mt-4 mb-2">
-                    <table class="table table-striped w3-animate-left nss-table">
+                    <table class="table table-striped nss-table">
                         <thead class="thead-default">
                             <tr>
                                 <td scope="col">MTR #</td>
@@ -184,17 +184,17 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                          !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                          !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                          !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                         !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                         !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                         !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                                  !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                  !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                 !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                                 !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -204,7 +204,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                      !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                     !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -259,8 +259,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                                  !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                  !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                 !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                                 !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -269,7 +269,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                  !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                 !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -365,7 +365,7 @@
         </div>
     </div>
     <div v-if="!isMobile" class="mt-4 bg-white-shadow">
-        <table class="table table-striped w3-animate-left nss-table">
+        <table class="table table-striped nss-table">
             <colgroup>
                 <col width="10%" />
                 <col />

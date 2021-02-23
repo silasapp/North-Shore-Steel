@@ -417,10 +417,10 @@ Content2 =
                                 <tr>
                                     <th scope="col">Description</th>
                                     <th scope="col" class="text-center">Qty.</th>
-                                    <th scope="col">Weight (lb)</th>
+                                    <th scope="col" class="text-center">Weight (lb)</th>
                                     <th scope="col">Customer Part #</th>
                                     <th scope="col">Unit Price</th>
-                                    <th scope="col">Total Price</th>
+                                    <th scope="col" class="text-center">Total Price</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -450,18 +450,12 @@ Content2 =
                                     <tr>
                                         <td>
                                             @item.ProductName
-                                            @*@if (!string.IsNullOrEmpty(item.AttributeInfo))
-                                                {
-                                                    <div class="attributes">
-                                                        @Html.Raw(item.AttributeInfo)
-                                                    </div>
-                                                }*@
                                         </td>
-                                        <td class="text-center">@item.Quantity</td>
-                                        <td>@DoFormat(totalWeight)</td>
+                                        <td class="text-right">@item.Quantity</td>
+                                        <td class="text-right">@DoFormat(totalWeight)</td>
                                         <td>@customerPathNo</td>
                                         <td>@item.UnitPrice / @uom</td>
-                                        <td>@item.SubTotal</td>
+                                        <td class="text-right">@item.SubTotal</td>
                                     </tr>
                                 }
 
