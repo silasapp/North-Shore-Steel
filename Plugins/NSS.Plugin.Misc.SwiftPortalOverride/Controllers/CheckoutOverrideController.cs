@@ -275,7 +275,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var creditModel = new AccountCreditModel();
             var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
 
-            if (customerCompany != null && customerCompany.CanCredit)
+            if (customerCompany != null && customerCompany.Company != null && customerCompany.Company.HasCreditTerms && customerCompany.CanCredit)
             {
                 var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
                 creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero };
@@ -322,12 +322,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return RedirectToRoute("Homepage");
             }
 
-            //disable "order completed" page?
-            //if (_orderSettings.DisableOrderCompletedPage)
-            //{
-            //    return RedirectToRoute("OrderDetails", new { orderId = order.Id });
-            //}
-
             var model = _checkoutModelFactory.PrepareCheckoutCompletedModel(order);
             //add erp order no
             model.CustomProperties.TryAdd(SwiftCore.Helpers.Constants.ErpOrderNoAttribute, _genericAttributeService.GetAttribute<long?>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute));
@@ -355,19 +349,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var sw1 = new Stopwatch();
                 sw1.Start();
 
-
                 var result = Json(new { });
                 //prepare order GUID
                 var paymentRequest = new ProcessPaymentRequest();
                 _paymentService.GenerateOrderGuid(paymentRequest);
-
-                //// get shipping cost
-                //// shipping
-                //ERPCalculateShippingRequest request = BuildShippingCostRequest(model);
-
-                //var shipObj = GetShippingCost(requestOverride: request);
-                //if (!shipObj.Allowed)
-                //    shipObj.ShippingCost = decimal.Zero;
 
                 //try to create an order
                 var (order, errorMessage) = _payPalServiceManager.CreateOrder(_settings, paymentRequest.OrderGuid, model);
@@ -935,12 +920,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private (int companyId, CustomerCompany customerCompany) GetCustomerCompanyDetails()
         {
+            CustomerCompany customerCompany = null;
+
             string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int ERPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, erpCompIdCookieKey));
 
-            var customerCompany = new CustomerCompany();
-
-            if (ERPCompanyId > 0)
+            if (ERPCompanyId > 0) 
                 customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, ERPCompanyId);
 
             return (ERPCompanyId, customerCompany);

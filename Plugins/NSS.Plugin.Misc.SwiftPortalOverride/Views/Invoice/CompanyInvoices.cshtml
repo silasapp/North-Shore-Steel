@@ -14,7 +14,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" />
 <div id="invoices" class="page orders-page">
     <div class=page-body>
-        @if (Model.CreditSummary.CanCredit || Model.CustomerRoles.IsAP)
+
+        @if (Model.CustomerRoles.IsBuyer && !Model.CreditSummary.CompanyHasCreditTerms)
+        {
+            <div class="mb-2 p-2 text-right nss-input-label nss-dark">
+                <a href="@Model.CreditSummary.ApplyForCreditUrl" target="_blank"><img src="~/Themes/@(themeName)/Content/assets/icn-chevrons.svg" alt="" style="height:1rem;" class="pr-2">Apply For Credit</a>
+            </div>
+        }
+        else if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || Model.CustomerRoles.IsAP))
         {
             <div class="bg-white-shadow d-flex flex-row flex-wrap align-items-center mb-3 p-4" v-bind:style="{'background': isMobile ? '#f6f6f6': '#ffffff'}">
                 <label class="h2-primary my-4 text-center" v-bind:style="{'width':isMobile ? '100%':'auto'}">CREDIT SUMMARY</label>
@@ -38,12 +45,6 @@
                     </div>
                 </div>
 
-            </div>
-        }
-        else if (Model.CustomerRoles.IsBuyer && !Model.CreditSummary.CanCredit)
-        {
-            <div class="mb-2 p-2 text-right nss-input-label nss-dark">
-                <a href="@Model.CreditSummary.ApplyForCreditUrl" target="_blank"><img src="~/Themes/@(themeName)/Content/assets/icn-chevrons.svg" alt="" style="height:1rem;" class="pr-2">Apply For Credit</a>
             </div>
         }
 
@@ -95,17 +96,17 @@
             </div>
         </div>
         @*<div v-if="isMobile && !isExportMode" class="mobile-export">
-                <button class=" ml-lg-5 text-center" v-on:click="switchToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+            <button class=" ml-lg-5 text-center" v-on:click="switchToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+        </div>
+        <div v-if="isMobile && isExportMode" class="mobile-export">
+            <button class=" ml-lg-5 text-center mr-2" v-on:click="cancelExportMode()"><img src="~/Themes/@(themeName)/Content/assets/close.svg" alt="" width="25">Cancel</button>
+            <div class="ml-2">
+                <label v-if="isExportMode" class="pure-material-checkbox" style="position: relative;">
+                    <input type="checkbox" class=" mr-2" onclick="selectAll(this)" id="select-all-invoices">
+                    <span class="checkmark"></span>Select All
+                </label>
             </div>
-            <div v-if="isMobile && isExportMode" class="mobile-export">
-                <button class=" ml-lg-5 text-center mr-2" v-on:click="cancelExportMode()"><img src="~/Themes/@(themeName)/Content/assets/close.svg" alt="" width="25">Cancel</button>
-                <div class="ml-2">
-                    <label v-if="isExportMode" class="pure-material-checkbox" style="position: relative;">
-                        <input type="checkbox" class=" mr-2" onclick="selectAll(this)" id="select-all-invoices">
-                        <span class="checkmark"></span>Select All
-                    </label>
-                </div>
-            </div>*@
+        </div>*@
         <div class="d-flex flex-row justify-content-between">
             <div v-bind:style="{'padding-left': isMobile ? '20px':'0'}">
                 <ul class="nav nav-pills mb-1" id=pills-tab role="tablist">

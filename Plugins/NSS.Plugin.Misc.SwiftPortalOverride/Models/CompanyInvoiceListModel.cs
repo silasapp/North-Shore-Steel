@@ -31,6 +31,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public partial class CreditSummaryModel
         {
             public bool CanCredit { get; set; }
+            public bool CompanyHasCreditTerms { get; set; }
             public string ApplyForCreditUrl { get; set; }
             public decimal CreditAmount { get; set; }
             public decimal CreditLimit { get; set; }

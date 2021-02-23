@@ -65,10 +65,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
             {
                 ApplyForCreditUrl = string.IsNullOrEmpty(_swiftCoreSettings.ApplyForCreditUrl) ? "https://www.nssco.com/assets/files/newaccountform.pdf" : _swiftCoreSettings.ApplyForCreditUrl,
-                CanCredit = customerCompany?.CanCredit ?? false
+                CanCredit = customerCompany?.CanCredit ?? false,
+                CompanyHasCreditTerms = customerCompany?.Company?.HasCreditTerms ?? false
             };
 
-            if (creditSummary.CanCredit || isAp)
+            if ( creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))
             {
                 var creditResposne = _eRPApiProvider.GetCompanyCreditBalance(eRPCompanyId);
 

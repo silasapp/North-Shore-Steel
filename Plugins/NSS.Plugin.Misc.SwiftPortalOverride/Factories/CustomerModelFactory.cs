@@ -305,13 +305,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             }
 
             // get credit summary
+            var company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(companyId));
             var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, Convert.ToInt32(companyId));
+
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
             {
                 CanCredit = customerCompany?.CanCredit ?? false
             };
 
-            if (creditSummary.CanCredit || isAp)
+            if ((company?.HasCreditTerms ?? false) && (creditSummary.CanCredit || isAp))
             {
                 var creditResponse = _eRPApiProvider.GetCompanyCreditBalance(Convert.ToInt32(companyId));
 
@@ -324,9 +326,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.CreditSummary = creditSummary;
 
             // save selected company name to generic attributes
-            // display in customer info screen
-            Company company = _companyService.GetCompanyEntityByErpEntityId(Convert.ToInt32(companyId));
-            _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company.Name);
+            // displayed in customer info screen
+            _genericAttributeService.SaveAttribute(currentCustomer, NopCustomerDefaults.CompanyAttribute, company?.Name);
 
             return model;
         }
