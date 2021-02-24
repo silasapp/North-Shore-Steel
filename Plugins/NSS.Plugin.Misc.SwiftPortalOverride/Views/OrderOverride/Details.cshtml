@@ -58,6 +58,7 @@
     .cart-total-left, .cart-total-right {
         display: table-cell !important;
     }
+
     .eqaul-width {
         flex-basis: 0;
         flex-grow: 1;
@@ -67,17 +68,19 @@
 <div id="order-detail" class="page order-details-page">
     <div class="d-flex flex-md-row justify-content-between align-items-md-start bg-white-shadow px-5 py-2" v-bind:style="{'background': isMobile ? '#f6f6f6' : '#ffffff'}">
         <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" v-bind:class="{'eqaul-width': !isMobile}"></div>
+
         <label v-if="!isMobile" class="h3-primary-sans my-3" v-bind:class="{'eqaul-width': !isMobile,'d-flex': !isMobile}" v-bind:style="{'justify-content': !isMobile? 'center' : 'unset'}">ORDER NUMBER: @Model.OrderId</label>
 
-        @if (Model.SysOrderId != null)
+        @if (Model.SysOrderId != null && Model.CanBuy)
         {
-            @if (Model.CanBuy)
-            {
-                <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')" v-bind:class="{'eqaul-width': !isMobile}" v-bind:style="{'height': isMobile ? '40px' : 'auto','background': isMobile ? '#ffffff' : 'transparent', 'justify-content': !isMobile? 'flex-end' : 'unset'}">
-                    <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
-                    Order Again
-                </div>
-            }
+            <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" onclick="setLocation('@Url.RouteUrl("ReOrder", new { orderId = Model.SysOrderId })')" v-bind:class="{'eqaul-width': !isMobile}" v-bind:style="{'height': isMobile ? '40px' : 'auto','background': isMobile ? '#ffffff' : 'transparent', 'justify-content': !isMobile? 'flex-end' : 'unset'}">
+                <img src="~/Themes/@themeName/Content/assets/reload.svg" alt="" width="20" class="mr-2">
+                Order Again
+            </div>
+        }
+        else
+        {
+            <div class="h4-primary d-flex flex-row my-3 cursor-pointer p-2" v-bind:class="{'eqaul-width': !isMobile}"></div>
         }
 
     </div>
@@ -188,17 +191,17 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                        !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                        !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                        !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                       !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                       !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                       !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                                !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                               !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                               !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -208,7 +211,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                    !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                   !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -263,8 +266,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                                !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                               !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                               !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -273,7 +276,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                               !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
