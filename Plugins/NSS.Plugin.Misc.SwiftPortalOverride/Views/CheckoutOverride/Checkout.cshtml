@@ -415,11 +415,11 @@ Content2 =
                         <table class="table table-striped nss-table checkout-table" id="catalogTable" onload="sortTable(0)">
                             <thead>
                                 <tr>
-                                    <th scope="col">Description</th>
+                                    <th scope="col" class="text-center">Description</th>
+                                    <th scope="col" class="text-center">Customer Part #</th>
                                     <th scope="col" class="text-center">Qty.</th>
                                     <th scope="col" class="text-center">Weight (lb)</th>
-                                    <th scope="col">Customer Part #</th>
-                                    <th scope="col">Unit Price</th>
+                                    <th scope="col" class="text-center">Unit Price</th>
                                     <th scope="col" class="text-center">Total Price</th>
                                 </tr>
                             </thead>
@@ -451,10 +451,10 @@ Content2 =
                                         <td>
                                             @item.ProductName
                                         </td>
+                                        <td>@customerPathNo</td>
                                         <td class="text-right">@item.Quantity</td>
                                         <td class="text-right">@DoFormat(totalWeight)</td>
-                                        <td>@customerPathNo</td>
-                                        <td>@item.UnitPrice / @uom</td>
+                                        <td class="text-center">@item.UnitPrice / @uom</td>
                                         <td class="text-right">@item.SubTotal</td>
                                     </tr>
                                 }
@@ -489,9 +489,9 @@ Content2 =
                             var totalWeight = (int)Math.Round(product.Weight * item.Quantity);
                             <div class="cart-item d-flex flex-column bg-accent p-3 mb-3">
                                 <label class="h2-primary mt-3 mb-2 text-left">@item.ProductName</label>
+                                <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
                                 <label class="h5-default-500 text-left">Quantity: @item.Quantity </label>
                                 <label class="h5-default-500 text-left">Weight: @DoFormat(totalWeight) </label>
-                                <label class="h5-default-500 text-left">Customer Part #: @customerPathNo </label>
                                 <label class="h5-default-500 text-left">Unit Price: @item.UnitPrice / @uom </label>
                                 <label class="h5-default-500 text-left">Total Price: @item.SubTotal </label>
 

@@ -184,17 +184,17 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                         !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                         !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                         !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                        !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                        !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                        !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                                 !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                 !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                                !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -204,7 +204,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                     !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                    !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -259,8 +259,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                                 !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                 !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                                !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -269,7 +269,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                                 !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                                !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -366,23 +366,13 @@
     </div>
     <div v-if="!isMobile" class="mt-4 bg-white-shadow">
         <table class="table table-striped nss-table">
-            <colgroup>
-                <col width="10%" />
-                <col />
-                <col width="8%" />
-                <col width="8%" />
-                <col width="8%" />
-                <col width="8%" />
-                <col width="8%" />
-                <col width="8%" />
-            </colgroup>
             <thead>
                 <tr>
                     <th class="sku">Line #</th>
                     <th class="name">Description</th>
+                    <th class="vendor">Customer Part #</th>
                     <th class="text-center">Qty.</th>
                     <th class="total text-right">Weight (lb)</th>
-                    <th class="vendor">Customer Part #</th>
                     <th class="price text-right">Unit Price</th>
                     <th class="text-center">UOM</th>
                     <th class="quantity text-right">Total Price</th>
@@ -394,9 +384,9 @@
                     <tr>
                         <td class="sku">@item.LineNo</td>
                         <td class="product">@item.Description</td>
+                        <td>@item.CustomerPartNo</td>
                         <td class="text-center">@item.Quantity</td>
                         <td class="text-right">@string.Format("{0:N0}", item.TotalWeight)</td>
-                        <td>@item.CustomerPartNo</td>
                         <td class="text-right">$@DoFormat(item.UnitPrice)</td>
                         <td class="text-center">@item.UOM</td>
                         <td class="text-right">$@DoFormat(item.TotalPrice)</td>
@@ -416,12 +406,12 @@
                 </div>
                 <label class="h2-primary mt-3 mb-2" v-bind:class="{'text-left': isMobile}">@item.Description</label>
                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
-                    <label class="h5-default-500">Quantity</label>
-                    <label class="h5-primary-600">@item.Quantity</label>
-                </div>
-                <div class="d-flex flex-row justify-content-between align-items-center my-2">
                     <label class="h5-default-500">Customer Part #</label>
                     <label class="h5-primary-600">@item.CustomerPartNo</label>
+                </div>
+                <div class="d-flex flex-row justify-content-between align-items-center my-2">
+                    <label class="h5-default-500">Quantity</label>
+                    <label class="h5-primary-600">@item.Quantity</label>
                 </div>
                 <div class="d-flex flex-row justify-content-between align-items-center my-2">
                     <label class="h5-default-500">Unit Price</label>

@@ -188,6 +188,7 @@
         padding-bottom: 5px;
         padding-top: 5px;
     }
+
     thead > tr > :last-child > div, thead > tr > :nth-last-child(2) > div {
         padding: 0 1.8em 0 1.8em !important;
     }
@@ -222,7 +223,7 @@
     {
         headerColumns = new List<NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute>()
 {
-            
+
             new NSS.Plugin.Misc.SwiftCore.Domain.Shapes.ShapeAttribute
             {
                 Code = "itemName",
@@ -510,8 +511,9 @@
 
 <script>
     function getInputQuantity(itemId, cartId, addToFavorite, isMobile) {
-        let qty = $('#qty' + itemId).val();
-        if (!qty && !addToFavorite) { displayBarNotification("Please enter quantity", 'error', 0);return;}
+        var qty = $('#qty' + itemId).val();
+        var seQty = $('#qty' + itemId).text();
+        if (seQty === "" && !qty && !addToFavorite) { displayBarNotification("Please enter quantity", 'error', 0);return;}
         if (!qty || addToFavorite)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
@@ -574,7 +576,7 @@
 
 <script id="quantityTemplate" type="text/x-template">
     ${if(_isSerialized == "true")}
-    <label style="width: 40px" for="" class="text-center">1</label>
+    <label style="width: 40px" for="" value="1" id="qty${_itemId}" class="text-center">1</label>
     ${else}
     <input min="1" name="quantity" style="width: 40px" class="text-center" id="qty${_itemId}"
            oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null">

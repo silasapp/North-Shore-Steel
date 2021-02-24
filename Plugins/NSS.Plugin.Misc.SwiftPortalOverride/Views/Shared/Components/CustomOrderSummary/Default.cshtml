@@ -179,13 +179,13 @@ Content1 =
                                 <thead>
                                     <tr>
                                         <th scope="col">Description</th>
-                                        <th scope="col" width="8%" class="text-center">Qty.</th>
-                                        <th scope="col" width="9%" class="text-center">Weight (lb)</th>
-                                        <th scope="col" width="10%">Customer Part #</th>
-                                        <th scope="col" width="12%" class="text-center">Unit Price</th>
-                                        <th scope="col" width="9%" class="text-center">Total Price</th>
-                                        <th scope="col" width="5%" class="text-center">Notes</th>
-                                        <th scope="col" width="5%" class="text-center">Remove</th>
+                                        <th scope="col">Customer Part #</th>
+                                        <th scope="col" class="text-center">Qty.</th>
+                                        <th scope="col" class="text-center">Weight (lb)</th>
+                                        <th scope="col" class="text-center">Unit Price</th>
+                                        <th scope="col" class="text-center">Total Price</th>
+                                        <th scope="col" class="text-center">Notes</th>
+                                        <th scope="col" class="text-center">Remove</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -198,6 +198,10 @@ Content1 =
                                                 </ul>
                                             </div>
                                         </td>
+                                        <td class="">
+                                            <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
+                                                   v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
+                                        </td>
                                         <td class="text-center">
                                             <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
                                                    style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
@@ -206,10 +210,7 @@ Content1 =
                                                    min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
                                         </td>
                                         <td class="pt-3 text-right"><label v-bind:id="'itemweight' + item.id" style="margin:0;" v-cloak>{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
-                                        <td class="">
-                                            <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
-                                                   v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
-                                        </td>
+
                                         <td>
                                             <div class="text-right">
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
