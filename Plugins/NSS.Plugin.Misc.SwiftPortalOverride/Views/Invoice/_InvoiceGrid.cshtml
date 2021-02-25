@@ -45,7 +45,7 @@
             <e-grid-columns>
                 <e-grid-column template="#invoiceNo" headerText="Invoice #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
                 <e-grid-column template="#orderNo" headerText="Order #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="PoNo" headerText="Purchase Order #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="PoNo" headerText="PO #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
                 <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" textAlign="Right" width="130" allowFiltering="false"></e-grid-column>
                 @if (!Model.IsClosed)
                 {
@@ -96,7 +96,7 @@
                 </div>
                 <div class="d-flex flex-row">
                     <div class="d-flex bg-primary p-2 home-table-sm-header">
-                        <label class="fs12-white mb-0">Purchase Order #</label>
+                        <label class="fs12-white mb-0">PO #</label>
                     </div>
                     <div class="d-flex p-2">
                         <a class="fs12-default" v-cloak>{{invoice.poNo}}</a>
