@@ -274,8 +274,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             // account credit
             var creditModel = new AccountCreditModel();
             var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+            var companyInfo = _nSSApiProvider.GetCompanyInfo(eRPCompanyId);
 
-            if (customerCompany != null && customerCompany.Company != null && customerCompany.Company.HasCreditTerms && customerCompany.CanCredit)
+            if (customerCompany != null && companyInfo != null && companyInfo.HasCredit && customerCompany.CanCredit)
             {
                 var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
                 creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero };

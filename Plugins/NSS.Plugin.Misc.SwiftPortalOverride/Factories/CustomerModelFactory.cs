@@ -247,7 +247,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         public TransactionModel PrepareCustomerHomeModel(string companyId)
         {
             var token = string.Empty;
-            var companyInfo = new Company();
             var openOrdersResponse = new List<ERPSearchOrdersResponse>();
             var closedOrdersResponse = new List<ERPSearchOrdersResponse>();
             bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Int32.Parse(companyId), ERPRole.AP);
@@ -283,8 +282,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 DeliveryTicketCount = order.DeliveryTicketCount
             }).ToList();
 
-            companyInfo = _companyService.GetCompanyEntityByErpEntityId(Int32.Parse(companyId));
-            model.CompanySalesContact = companyInfo;
+            var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, Convert.ToInt32(companyId));
+            model.CompanySalesContact = customerCompany?.Company ?? new Company();
             model.OpenOrders = openOrders?.OrderByDescending(x => x.OrderId)?.Take(5)?.ToList();
             model.ClosedOrders = closedOrders?.OrderByDescending(x => x.OrderId)?.Take(5)?.ToList();
             var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
@@ -304,13 +303,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 }
             }
 
-            // get credit summary
-            var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, Convert.ToInt32(companyId));
+            // build credit summary
+            var companyInfo = _nSSApiProvider.GetCompanyInfo(Convert.ToInt32(companyId));
 
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
             {
                 CanCredit = customerCompany?.CanCredit ?? false,
-                CompanyHasCreditTerms = customerCompany?.Company?.HasCreditTerms ?? false
+                CompanyHasCreditTerms = companyInfo?.HasCredit ?? false
             };
 
             if ( creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))

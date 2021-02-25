@@ -43,6 +43,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public int CompanyId { get; set; }
         public string CompanyName { get; set; }
         public SalesContact SalesContact { get; set; }
+        public bool HasCredit { get; set; }
     }
 
     public class SalesContact

@@ -60,13 +60,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
 
-            // get credit summary
+            // get company info
             var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
+            var company = _eRPApiProvider.GetCompanyInfo(eRPCompanyId);
+
+            // build credit summary
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
             {
                 ApplyForCreditUrl = string.IsNullOrEmpty(_swiftCoreSettings.ApplyForCreditUrl) ? "https://www.nssco.com/assets/files/newaccountform.pdf" : _swiftCoreSettings.ApplyForCreditUrl,
                 CanCredit = customerCompany?.CanCredit ?? false,
-                CompanyHasCreditTerms = customerCompany?.Company?.HasCreditTerms ?? false
+                CompanyHasCreditTerms = company?.HasCredit ?? false
             };
 
             if ( creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))

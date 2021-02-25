@@ -20,12 +20,6 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.CustomerCompanies
         /// <summary>
         /// Gets or sets the Company name
         /// </summary>
-        [JsonProperty("hasCreditTerms", Required = Required.Always)]
-        public bool HasCreditTerms { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Company name
-        /// </summary>
         [JsonProperty("buyer", Required = Required.Always)]
         public bool Buyer { get; set; }
 

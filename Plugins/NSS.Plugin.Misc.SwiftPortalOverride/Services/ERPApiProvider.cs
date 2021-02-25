@@ -850,7 +850,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 
         #region Companies API
 
-        public CompanyInfo GetCompanyInfo(string erpCompanyId)
+        public CompanyInfo GetCompanyInfo(int erpCompanyId)
         {
             var retVal = new CompanyInfo();
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))

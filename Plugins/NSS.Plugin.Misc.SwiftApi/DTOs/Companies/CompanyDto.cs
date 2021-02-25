@@ -15,9 +15,6 @@ namespace NSS.Plugin.Misc.SwiftApi.DTOs.Companies
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("hasCreditTerms")]
-        public bool HasCreditTerms { get; set; }
-
         [JsonProperty("salesContactName")]
         public string SalesContactName { get; set; }   
         
