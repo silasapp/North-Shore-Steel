@@ -455,10 +455,11 @@
                     allowSorting: true,
                     allowFiltering: true,
                     filterSettings: { type: 'CheckBox' },
-                    enableHover: false,
+                    enableHover: true,
                     rowHeight: 38,
                     enableResponsiveRow: true,
                     isResponsive: true,
+                    allowSelection: true,
                     columns: [
                         ...gridColumns,
                         { headerText: 'Qty.', width: 100, textAlign: 'Center', template: '#quantityTemplate' },
