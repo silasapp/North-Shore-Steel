@@ -518,9 +518,11 @@
         if (!qty || addToFavorite)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`;
+
+        AjaxCart.addproducttocart_catalog(link);
         // don't clear qty
         //$('#qty' + itemId).val("");
-        AjaxCart.addproducttocart_catalog(link);
+
         if (addToFavorite && isMobile) {
             $('#mh-add-to-wishlist-' + itemId).hide();
             $('#m-add-to-wishlist-' + itemId).hide();
