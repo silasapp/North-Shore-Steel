@@ -244,15 +244,15 @@ Content2 =
                             <label for="customer" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
                                 <input type="radio" id="customer" v-bind:checked="isDelivery" name="ship" value="customer" v-on:click="isDelivery = true; getShippingRate();">
                                 <span class="checkout-checkmark"></span>
-								Delivery: <label v-if="isDelivery && deliveryDate !== 'N/A' && deliveryDate !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be <span class="font-weight-bolder">DELIVERED</span> By <span class="font-weight-bolder">{{deliveryDate}}</span></label>
-                                <label v-if="isDelivery && (deliveryDate === 'N/A' || deliveryDate == null)" class="text-black mt-2 ml-2" v-cloak>N\A</label>
+								Delivery: <label v-if="isDelivery && deliveryDateText !== 'N/A' && deliveryDateText !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be <span class="font-weight-bolder">DELIVERED</span> By <span class="font-weight-bolder">{{deliveryDateText}}</span></label>
+                                <label v-if="isDelivery && (deliveryDateText === 'N/A' || deliveryDateText == null)" class="text-black mt-2 ml-2" v-cloak>N\A</label>
                             </label>
                         </div>
                         <div>
                             <label for="pickup" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
                                 <input type="radio" id="pickup" v-bind:checked="!isDelivery" name="ship" value="pickup" v-on:click="isDelivery = false; getShippingRate()">
-                                 <span class="checkout-checkmark"></span>Will Call: <label v-if="!isDelivery && deliveryDate !== 'N/A' && deliveryDate !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be Available For <span class="font-weight-bolder">PICK UP</span> On <span class="font-weight-bolder">{{deliveryDate}}</span></label>
-                                <label v-if="!isDelivery && (deliveryDate === 'N/A' || deliveryDate == null)" class="text-black mt-2 ml-2" v-cloak>N\A</label>
+                                 <span class="checkout-checkmark"></span>Will Call: <label v-if="!isDelivery && deliveryDateText !== 'N/A' && deliveryDateText !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be Available For <span class="font-weight-bolder">PICK UP</span> On <span class="font-weight-bolder">{{deliveryDateText}}</span></label>
+                                <label v-if="!isDelivery && (deliveryDateText === 'N/A' || deliveryDateText == null)" class="text-black mt-2 ml-2" v-cloak>N\A</label>
                             </label>
                         </div>
                     </div>
@@ -615,6 +615,7 @@ Content2 =
             errorMessages: [],
             shared: store.state,
             deliveryDate: null,
+            deliveryDateText: null,
             pickupTime: null,
             purchaseOrder,
             isDelivery,
@@ -821,6 +822,7 @@ Content2 =
 
                 this.disableSubmit = true;
                 this.deliveryDate = null;
+                this.deliveryDateText = null;
 
                 let address;
                 if (this.isDelivery) {
@@ -860,7 +862,8 @@ Content2 =
                         self.orderTotal = data.orderTotal?.replace("$", "")?.replace(/,/g, '');
                         self.taxAmount = data.tax?.replace("$", "");
                         self.shippingAmount = data.shipping?.replace("$", "");
-                        self.deliveryDate = self.formatDate(data.shippingCalculatorResponse.date);
+                        self.deliveryDate = data.shippingCalculatorResponse.date;
+                        self.deliveryDateText = self.formatDate(data.shippingCalculatorResponse.date);
                         //self.deliveryDate = data.shippingCalculatorResponse.date || 'N/A';
                         self.pickupTime = data.shippingCalculatorResponse.time;
                         if (!data.shippingCalculatorResponse.allowed)
