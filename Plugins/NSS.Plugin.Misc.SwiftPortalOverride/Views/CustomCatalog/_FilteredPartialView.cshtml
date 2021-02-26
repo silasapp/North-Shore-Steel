@@ -517,8 +517,9 @@
         if (seQty === "" && !qty && !addToFavorite) { displayBarNotification("Please enter quantity", 'error', 0);return;}
         if (!qty || addToFavorite)
             qty = 1;
-        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
-        $('#qty' + itemId).val("");
+        let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`;
+        // don't clear qty
+        //$('#qty' + itemId).val("");
         AjaxCart.addproducttocart_catalog(link);
         if (addToFavorite && isMobile) {
             $('#mh-add-to-wishlist-' + itemId).hide();
