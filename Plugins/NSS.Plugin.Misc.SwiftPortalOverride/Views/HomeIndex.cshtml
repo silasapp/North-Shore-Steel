@@ -177,7 +177,7 @@
                             </div>
                         }
 
-                        @if (isOperations || isBuyer)
+                        @if ((Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP)) || isOperations || isBuyer)
                         {
 
                             <div class="col-md-5 col-sm-6 col-12 m-b2">
@@ -186,17 +186,35 @@
                                         <div class="card-title border-bottom-0">
                                             <h1 style="font: normal normal 500 34px/24px 'Teko';">STATISTICS</h1>
                                         </div>
-                                        <div class="row" v-for="stats in companyStats">
-                                            <div class="col-md-12 d-block my-1">
-                                                <label class="float-left h5-default" v-cloak>{{stats.statName}}</label>
-                                                <h5 class="float-right nss-dark-blue" v-cloak>{{stats.statValue}}</h5>
+                                        @if (isOperations || isBuyer)
+                                        {
+                                            <div class="row" v-for="stats in companyStats">
+                                                <div class="col-md-12 d-block my-1">
+                                                    <label class="float-left h5-default" v-cloak>{{stats.statName}}</label>
+                                                    <h5 class="float-right nss-dark-blue" v-cloak>{{stats.statValue}}</h5>
+                                                </div>
                                             </div>
-                                        </div>
+                                        }
+                                        @if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP))
+                                        {
+                                            <div class="row">
+
+                                                <div class="col-md-12 d-block my-1">
+                                                    <label class="float-left h5-default">Total Open Invoices</label>
+                                                    <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
+                                                </div>
+                                                <div class="col-md-12 d-block my-1">
+                                                    <label class="float-left h5-default">Total Past Due</label>
+                                                    <h5 class="float-right @(Model.CreditSummary?.PastDueAmount == 0 ? "nss-dark-blue" : "text-danger")">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
+                                                </div>
+
+                                            </div>
+                                        }
+
                                     </div>
                                 </div>
                             </div>
                         }
-
                         @if (isOperations || isBuyer)
                         {
                             @if (Model.ClosedOrders.Count > 0)
@@ -243,37 +261,7 @@
                         }
 
 
-                        @if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP))
-                        {
-                            <div class="col-md-5 col-sm-6 col-12 m-b2">
-                                <div class="tab-content" id="pills-tabContent">
-                                    <div class="text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                                        <div class="card-title border-bottom-0">
-                                            <h1>CREDIT SUMMARY</h1>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12 d-block">
-                                                <label class="float-left h5-default">Credit Limit</label>
-                                                <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditLimit)</h5>
-                                            </div>
-                                            <div class="col-md-12 d-block">
-                                                <label class="float-left h5-default">Total Open Invoices</label>
-                                                <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
-                                            </div>
-                                            <div class="col-md-12 d-block">
-                                                <label class="float-left h5-default">Total Past Due</label>
-                                                <h5 class="float-right @(Model.CreditSummary?.PastDueAmount == 0 ? "nss-dark-blue" : "text-danger")">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
-                                            </div>
-                                            <div class="col-md-12 d-block">
-                                                <label class="float-left h5-default">Open Credit</label>
-                                                <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditAmount)</h5>
-                                            </div>
 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -337,7 +325,7 @@
 
                 </div>
 
-                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
+                  @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
 
             </div>
             <a href="/catalog">
@@ -484,53 +472,37 @@
                     </div>
                 </div>
             }
-            @if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP))
+
+            @if ((Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP)) || isOperations || isBuyer)
             {
-                <div class="col-md-5 col-sm-6 col-12 m-b2 p-0 mt-2">
-                    <div class="tab-content p-b1" id="pills-tabContent">
-                        <div class="text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                            <div class="card-title border-bottom-0">
-                                <h1>CREDIT SUMMARY</h1>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 d-block">
-                                    <label class="float-left h5-default">Credit Limit</label>
-                                    <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditLimit)</h5>
-                                </div>
-                                <div class="col-md-12 d-block">
-                                    <label class="float-left h5-default">Total Open Invoices</label>
-                                    <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
-                                </div>
-                                <div class="col-md-12 d-block">
-                                    <label class="float-left h5-default">Total Past Due</label>
-                                    <h5 style="color: red;" class="float-right">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
-                                </div>
-                                <div class="col-md-12 d-block">
-                                    <label class="float-left h5-default">Open Credit</label>
-                                    <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.CreditAmount)</h5>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-
-            @if (isOperations || isBuyer)
-            {
-
                 <div class="col-md-7 col-sm-6 col-12 m-b2 p-0">
                     <div class="tab-content" id="pills-tabContent">
                         <div class=" text-center tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
                             <div class="card-title border-bottom-0">
                                 <h1>STATISTICS</h1>
                             </div>
-                            <div class="row" v-for="stats in companyStats">
-                                <div class="col-md-12 d-block">
-                                    <label class="float-left h5-default" v-cloak>{{stats.statName}}</label>
-                                    <h5 class="float-right nss-dark-blue" v-cloak>{{stats.statValue}}</h5>
+                            @if (isOperations || isBuyer)
+                            {
+                                <div class="row" v-for="stats in companyStats">
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left h5-default" v-cloak>{{stats.statName}}</label>
+                                        <h5 class="float-right nss-dark-blue" v-cloak>{{stats.statValue}}</h5>
+                                    </div>
                                 </div>
-                            </div>
+                            }
+                            @if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP))
+                            {
+                                <div class="row">
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left h5-default">Total Open Invoices</label>
+                                        <h5 class="float-right nss-dark-blue">$@DoFormat(Model.CreditSummary?.OpenInvoiceAmount)</h5>
+                                    </div>
+                                    <div class="col-md-12 d-block">
+                                        <label class="float-left h5-default">Total Past Due</label>
+                                        <h5 style="color: red;" class="float-right">$@DoFormat(Model.CreditSummary?.PastDueAmount)</h5>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

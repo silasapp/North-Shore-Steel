@@ -2632,15 +2632,10 @@ table input {
 }
 
 .use-address {
-    background-color: #f6f6f6;
-    color: #000000;
+    background-color: #1899E1;
+    color: #ffffff;
     padding: 10px;
 }
-
-    .use-address:hover {
-        background-color: #1899E1;
-        color: #ffffff;
-    }
 
 .radio-button:hover input ~ .rad-checkmark {
     background-color: #ccc;
