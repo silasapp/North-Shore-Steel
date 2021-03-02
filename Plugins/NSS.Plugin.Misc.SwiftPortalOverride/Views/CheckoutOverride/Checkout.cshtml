@@ -244,14 +244,14 @@ Content2 =
                             <label for="customer" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
                                 <input type="radio" id="customer" v-bind:checked="isDelivery" name="ship" value="customer" v-on:click="isDelivery = true; getShippingRate();">
                                 <span class="checkout-checkmark"></span>
-								Delivery: <label v-if="isDelivery && deliveryDateText !== 'N/A' && deliveryDateText !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be <span class="font-weight-bolder">DELIVERED</span> By <span class="font-weight-bolder">{{deliveryDateText}}</span></label>
+                                Delivery: <label v-if="isDelivery && deliveryDateText !== 'N/A' && deliveryDateText !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be <span class="font-weight-bolder">DELIVERED</span> By <span class="font-weight-bolder">{{deliveryDateText}}</span></label>
                                 <label v-if="isDelivery && (deliveryDateText === 'N/A' || deliveryDateText == null)" class="text-black mt-2 ml-2" v-cloak>N\A</label>
                             </label>
                         </div>
                         <div>
                             <label for="pickup" class="radio control-label radio-button text-black d-flex align-items-center" style="font-size: 14px;padding-left: 25px;height: 20px;">
                                 <input type="radio" id="pickup" v-bind:checked="!isDelivery" name="ship" value="pickup" v-on:click="isDelivery = false; getShippingRate()">
-                                 <span class="checkout-checkmark"></span>Will Call: <label v-if="!isDelivery && deliveryDateText !== 'N/A' && deliveryDateText !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be Available For <span class="font-weight-bolder">PICK UP</span> On <span class="font-weight-bolder">{{deliveryDateText}}</span></label>
+                                <span class="checkout-checkmark"></span>Will Call: <label v-if="!isDelivery && deliveryDateText !== 'N/A' && deliveryDateText !== null" class="text-black mt-2 ml-2" v-cloak>Your Order Will be Available For <span class="font-weight-bolder">PICK UP</span> On <span class="font-weight-bolder">{{deliveryDateText}}</span></label>
                                 <label v-if="!isDelivery && (deliveryDateText === 'N/A' || deliveryDateText == null)" class="text-black mt-2 ml-2" v-cloak>N\A</label>
                             </label>
                         </div>
@@ -501,8 +501,8 @@ Content2 =
 
                 </div>
             </div>
-            <div class="col-md-3" v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}">
-                <div class="card card-mod checkout-summary">
+            <div class="col-md-3" v-bind:style="{'margin-bottom': isMobile ? '40px':'0'}" id="detailsParent">
+                <div class="card card-mod checkout-summary" id="orderDetailsFixed" v-bind:style="computedDetailParentStyle">
                     <label class="h5 text-primary text-center" style="font:normal normal 500 26px/20px 'Teko';">ORDER SUMMARY</label>
                     <div class="order-summary mt-2">
                         <div class="price-summary">
@@ -669,6 +669,7 @@ Content2 =
             },
             isPaymentSelection: false,
             cvvText: 'CVV',
+            detailParentWidth: 0,
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
@@ -681,8 +682,17 @@ Content2 =
 			this.setupCreditCardMethod();
             this.setupPaypalMethod();
             this.getShippingRate(true);
+            this.detailParentWidth = document.getElementById('detailsParent').offsetWidth;
         },
         computed: {
+            computedDetailParentStyle: function () {
+                var el = document.getElementById('detailsParent');
+                var padding = parseFloat(getComputedStyle(el).paddingLeft)* 2;
+                return {
+                    width: (this.detailParentWidth - padding) + 'px',
+                    paddingRight: '20px'
+                };
+            },
             isMobile: function () {
                 return this.window.width <= 767.98;
             },
@@ -694,10 +704,14 @@ Content2 =
             },
             switchToPaymentSelection: function () {
                 isPaymentSelection = true;
-            }
+            },
         },
         methods: {
+            resizeDetails: function () {
+                this.detailParentWidth = document.getElementById('detailsParent').offsetWidth;
+            },
             handleResize: function () {
+                this.resizeDetails();
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
             },
