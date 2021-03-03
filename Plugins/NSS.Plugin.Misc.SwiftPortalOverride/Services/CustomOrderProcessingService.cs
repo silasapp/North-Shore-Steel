@@ -153,15 +153,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                 //prepare order details
                 var details = PreparePlaceOrderDetails(processPaymentRequest);
 
-                //override shipping cost and total
-                //decimal shippingCost = decimal.Zero;
-                //var isNum = processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.ShippingCostKey, out var shippingCostObj) && decimal.TryParse(shippingCostObj?.ToString(), out shippingCost);
-
-                //details.OrderShippingTotalExclTax += shippingCost;
-                //details.OrderShippingTotalInclTax += shippingCost;
-
-                //details.OrderTotal += shippingCost;
-
                 var processPaymentResult = GetProcessPaymentResult(processPaymentRequest, details);
 
                 if (processPaymentResult == null)
@@ -600,11 +591,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         processPaymentResult = ProcessPayPalPayment(processPaymentRequest);
                         break;
                     case "CREDIT":
-                        processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.CreditBalanceKey, out var creditAmount);
-                        var isElligible = Convert.ToDecimal(creditAmount ?? 0.00) >= details.OrderTotal;
-                        if (!isElligible)
-                            throw new Exception("Credit Amount is less than the Order Total");
-
                         break;
 
                     default:
@@ -625,35 +611,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             AddOrderNote(order, _workContext.OriginalCustomerIfImpersonated != null
                 ? $"Order placed by a store owner ('{_workContext.OriginalCustomerIfImpersonated.Email}'. ID = {_workContext.OriginalCustomerIfImpersonated.Id}) impersonating the customer."
                 : "Order placed");
-
-            //send email notifications
-            //var orderPlacedStoreOwnerNotificationQueuedEmailIds = _workflowMessageService.SendOrderPlacedStoreOwnerNotification(order, _localizationSettings.DefaultAdminLanguageId);
-            //if (orderPlacedStoreOwnerNotificationQueuedEmailIds.Any())
-            //    AddOrderNote(order, $"\"Order placed\" email (to store owner) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedStoreOwnerNotificationQueuedEmailIds)}.");
-
-            //var orderPlacedAttachmentFilePath = _orderSettings.AttachPdfInvoiceToOrderPlacedEmail ?
-            //    _pdfService.PrintOrderToPdf(order) : null;
-            //var orderPlacedAttachmentFileName = _orderSettings.AttachPdfInvoiceToOrderPlacedEmail ?
-            //    "order.pdf" : null;
-            //var orderPlacedCustomerNotificationQueuedEmailIds = _workflowMessageService
-            //    .SendOrderPlacedCustomerNotification(order, order.CustomerLanguageId, orderPlacedAttachmentFilePath, orderPlacedAttachmentFileName);
-            //if (orderPlacedCustomerNotificationQueuedEmailIds.Any())
-            //    AddOrderNote(order, $"\"Order placed\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedCustomerNotificationQueuedEmailIds)}.");
-
-            //var vendors = GetVendorsInOrder(order);
-            //foreach (var vendor in vendors)
-            //{
-            //    var orderPlacedVendorNotificationQueuedEmailIds = _workflowMessageService.SendOrderPlacedVendorNotification(order, vendor, _localizationSettings.DefaultAdminLanguageId);
-            //    if (orderPlacedVendorNotificationQueuedEmailIds.Any())
-            //        AddOrderNote(order, $"\"Order placed\" email (to vendor) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedVendorNotificationQueuedEmailIds)}.");
-            //}
-
-            //if (order.AffiliateId == 0)
-            //    return;
-
-            //var orderPlacedAffiliateNotificationQueuedEmailIds = _workflowMessageService.SendOrderPlacedAffiliateNotification(order, _localizationSettings.DefaultAdminLanguageId);
-            //if (orderPlacedAffiliateNotificationQueuedEmailIds.Any())
-            //    AddOrderNote(order, $"\"Order placed\" email (to affiliate) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedAffiliateNotificationQueuedEmailIds)}.");
         }
 
 

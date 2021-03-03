@@ -663,14 +663,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 processPaymentRequest = new ProcessPaymentRequest();
 
-                // get shipping cost
-                //var request = BuildShippingCostRequest(model);
-                //var shipObj = GetShippingCost(requestOverride: request);
-
-                //if (!shipObj.Allowed)
-                //    shipObj.ShippingCost = decimal.Zero;
-
-                //processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingCostKey, shipObj.ShippingCost);
                 processPaymentRequest.CustomValues.Add(PaypalDefaults.ShippingDeliveryDateKey, model.DeliveryDate);
             }
 
