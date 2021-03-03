@@ -46,22 +46,22 @@
             <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
             <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
             <e-grid-columns>
-                <e-grid-column textAlign="Center" headerText="Order #" template="#orderNo" width="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Center" field="PoNo" headerText="PO #" width="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" width="130" format="N0" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Right" field="OrderTotal" headerText="Order Amount" width="130" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Center" field="OrderDate" headerText="Order Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Center" field="PromiseDate" headerText="Promise Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" headerText="Order #" template="#orderNo" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="PoNo" headerText="PO #" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="OrderDate" headerText="Order Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="PromiseDate" headerText="Promise Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
-                    <e-grid-column textAlign="Center" field="DeliveryDate" headerText="Delivery Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column textAlign="Center" template="#viewTicket" headerText="POD" width="130" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="DeliveryDate" headerText="Delivery Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" template="#viewTicket" headerText="POD" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
-                    <e-grid-column textAlign="Center" field="ScheduledDate" headerText="Scheduled Date" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column textAlign="Center" field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" width="130"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="ScheduledDate" headerText="Scheduled Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })"></e-grid-column>
                 }
+                <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" format="N0" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Right" field="OrderTotal" headerText="Order Amount" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>
         </ejs-grid>
@@ -72,11 +72,6 @@
         </div>
 
         <div v-for="order in paginatedData" class="d-flex">
-            @*<label v-if="isExportMode" class="pure-material-checkbox mr-3 d-flex align-items-center" style="position: relative;">
-                    <input type="checkbox" name="order-checkox"
-                           v-on:click="onCheck(order.orderId)">
-                    <span class="checkmark"></span>
-                </label>*@
             <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
 
                 <div class="d-flex flex-row">
@@ -94,23 +89,7 @@
                         <a class="fs12-link" v-cloak>{{order.poNo}}</a>
                     </div>
                 </div>
-                <div class="d-flex flex-row">
-                    <div class="d-flex bg-primary p-2 home-table-sm-header">
-                        <label class="fs12-white mb-0">Tot. Weight (lbs)</label>
-                    </div>
-                    <div class="d-flex p-2">
-                        <label class="fs12-default mb-0" v-cloak>{{order.weight}}</label>
-                    </div>
-                </div>
 
-                <div class="d-flex flex-row">
-                    <div class="d-flex bg-primary p-2 home-table-sm-header">
-                        <label class="fs12-white mb-0">Order Amount</label>
-                    </div>
-                    <div class="d-flex p-2">
-                        <label class="fs12-default mb-0" v-cloak>{{order.orderTotal}}</label>
-                    </div>
-                </div>
                 <div class="d-flex flex-row">
                     <div class="d-flex bg-primary p-2 home-table-sm-header">
                         <label class="fs12-white mb-0">Order Date</label>
@@ -168,7 +147,22 @@
                         </div>
                     </div>
                 }
-
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Weight (lb)</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0" v-cloak>{{order.weight}}</label>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Order Amount</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0" v-cloak>{{order.orderTotal}}</label>
+                    </div>
+                </div>
 
             </div>
         </div>

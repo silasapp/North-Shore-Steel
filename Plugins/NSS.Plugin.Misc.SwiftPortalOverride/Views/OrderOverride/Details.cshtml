@@ -191,17 +191,17 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                       !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                       !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                       !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                      !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                      !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                      !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                               !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                               !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                              !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                              !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -211,7 +211,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                   !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                                  !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -266,8 +266,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                               !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                               !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                              !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                              !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -276,7 +276,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                               !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                              !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -375,14 +375,14 @@
         <table class="table table-striped nss-table">
             <thead>
                 <tr>
-                    <th class="sku">Line #</th>
-                    <th class="name">Description</th>
-                    <th class="vendor">Customer Part #</th>
-                    <th class="text-center">Qty.</th>
-                    <th class="total text-right">Weight (lb)</th>
-                    <th class="price text-right">Unit Price</th>
-                    <th class="text-center">UOM</th>
-                    <th class="quantity text-right">Total Price</th>
+                    <th class="sku" style="width:1%">Line #</th>
+                    <th class="name" style="width:1%">Description</th>
+                    <th class="vendor" style="width:1%">Customer Part #</th>
+                    <th class="text-center" style="width:1%">UOM</th>
+                    <th class="text-center" style="width:1%">Qty.</th>
+                    <th class="total text-center" style="width:1%">Weight (lb)</th>
+                    <th class="price text-center" style="width:1%">Unit Price</th>
+                    <th class="quantity text-center" style="width:1%">Total Price</th>
                 </tr>
             </thead>
             <tbody>
@@ -392,10 +392,10 @@
                         <td class="sku">@item.LineNo</td>
                         <td class="product">@item.Description</td>
                         <td>@item.CustomerPartNo</td>
-                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-center">@item.UOM</td>
+                        <td class="text-right">@item.Quantity</td>
                         <td class="text-right">@string.Format("{0:N0}", item.TotalWeight)</td>
                         <td class="text-right">$@DoFormat(item.UnitPrice)</td>
-                        <td class="text-center">@item.UOM</td>
                         <td class="text-right">$@DoFormat(item.TotalPrice)</td>
                     </tr>
                 }

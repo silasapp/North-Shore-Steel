@@ -1298,7 +1298,7 @@ input:focus {
     }
 
 .hover-icon:hover {
-    fill: gray !important;
+    fill: #1899E1 !important;
 }
 
 table a {
