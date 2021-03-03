@@ -26,6 +26,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         #region ProductAttributes
         public static string CutOptionsAttribute => "Cut Options";
         public static string WorkOrderInstructionsAttribute => "Work Order Instructions";
+        public static string NotesAttribute => "Notes";
         public static string LengthToleranceCutAttribute => "Length Tolerance Cut";
         public static string PurchaseUnitAttribute => "Purchase Unit";
         public static string CustomerPartNoAttribute => "Customer Part No";

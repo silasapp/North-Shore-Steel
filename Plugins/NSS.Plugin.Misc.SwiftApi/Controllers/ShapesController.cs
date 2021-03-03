@@ -85,7 +85,10 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                 _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.CutOptionsAttribute });
             // work order instructions
             if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.WorkOrderInstructionsAttribute))
-                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.WorkOrderInstructionsAttribute });
+                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.WorkOrderInstructionsAttribute });            
+            // notes
+            if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.NotesAttribute))
+                _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.NotesAttribute });
             // tolerance cut
             if (!_productAttributeService.GetAllProductAttributes().Any(x => x.Name == Constants.LengthToleranceCutAttribute))
                 _productAttributeService.InsertProductAttribute(new ProductAttribute { Name = Constants.LengthToleranceCutAttribute });

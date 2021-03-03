@@ -462,6 +462,11 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                         var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.TextBox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
                         _productAttributeService.InsertProductAttributeMapping(attributeMapping);
                     }
+                    else if (productAttribute.Name == Constants.NotesAttribute)
+                    {
+                        var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.TextBox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
+                        _productAttributeService.InsertProductAttributeMapping(attributeMapping);
+                    }
                     else if (productAttribute.Name == Constants.CustomerPartNoAttribute)
                     {
                         var attributeMapping = new ProductAttributeMapping { AttributeControlType = AttributeControlType.TextBox, ProductAttributeId = productAttribute.Id, ProductId = product.Id, ValidationMaxLength = 100 };
