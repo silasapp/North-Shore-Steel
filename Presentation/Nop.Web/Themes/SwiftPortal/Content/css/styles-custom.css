@@ -482,9 +482,9 @@ a:not([href]):not([class]) {
     background: #ffffff;
 }
 
-.cart-summary-content {
+./*cart-summary-content {
     margin-bottom: 100px;
-}
+}*/
 
     .nss-table > thead,
     .cart-summary-content thead {
