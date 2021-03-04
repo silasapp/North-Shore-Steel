@@ -482,15 +482,11 @@ a:not([href]):not([class]) {
     background: #ffffff;
 }
 
-./*cart-summary-content {
-    margin-bottom: 100px;
-}*/
-
-    .nss-table > thead,
-    .cart-summary-content thead {
-        background-color: #123250;
-        color: #ffffff;
-    }
+.nss-table > thead,
+.cart-summary-content thead {
+    background-color: #123250;
+    color: #ffffff;
+}
 
 /*.header-menu {
     padding: 15px 0;
