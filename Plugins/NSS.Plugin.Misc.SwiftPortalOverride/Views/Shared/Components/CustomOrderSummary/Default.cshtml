@@ -213,6 +213,7 @@ Content1 =
 
                                         <td>
                                             <div class="text-right">
+                                                <label style="margin:4px 0px 0px 0px;" v-bind:id="'itemunitprice' + item.id" v-cloak>${{ item.unitPrice }} /</label>
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                         v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
                                                     <option v-if="attribute.name === 'EA' && item.pricePerPiece || attribute.name === 'CWT' && item.pricePerCWT || attribute.name === 'FT' && item.pricePerFt"
@@ -221,7 +222,7 @@ Content1 =
                                                         {{ attribute.name }}
                                                     </option>
                                                 </select>
-                                                <label class="float-left" style="margin:4px 8px 0px 0px;" v-bind:id="'itemunitprice' + item.id" v-cloak>${{ item.unitPrice }} /</label>
+
                                             </div>
                                         </td>
                                         <td class="pt-3 text-right" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;" v-cloak>{{ item.subTotal }}</label></td>
