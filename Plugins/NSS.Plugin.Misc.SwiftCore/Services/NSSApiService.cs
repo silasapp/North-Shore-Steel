@@ -301,7 +301,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                     if (response.IsSuccessStatusCode)
                         retVal = JsonConvert.DeserializeObject<ERPCreateOrderResponse>(respContent);
                     else
-                        throw new NopException($"An error ocurred while placing order: {respContent}", $"request => {JsonConvert.SerializeObject(request)}, result: {respContent}");
+                        throw new NopException($"An error ocurred while placing order: status = {response.StatusCode}, reasonPharse = {response.ReasonPhrase}, message = {respContent}", $"request => {JsonConvert.SerializeObject(request)}, result: {respContent}");
                 }
             }
             catch (Exception ex)
