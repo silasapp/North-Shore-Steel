@@ -1133,7 +1133,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                 //body params
                 var param = request.ToKeyValue();
 
-                var content = new FormUrlEncodedContent(param);
+                HttpContent content = new FormUrlEncodedContent(param);
 
                 using (var requestMessage =
                             new HttpRequestMessage(HttpMethod.Post, resource))
@@ -1209,8 +1209,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return (retVal, error);
                     }
 
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource

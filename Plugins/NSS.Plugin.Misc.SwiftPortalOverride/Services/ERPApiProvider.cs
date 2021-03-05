@@ -1282,8 +1282,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return (retVal, error);
                     }
 
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
