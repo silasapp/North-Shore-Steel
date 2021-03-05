@@ -209,7 +209,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             else
                 subtotal = unitPrice * qty;
 
-            return subtotal;
+            return Math.Round(subtotal, 2);
         }
 
         private (string, decimal, decimal, decimal) GetPriceUnits(Product product, ShoppingCartItem item)

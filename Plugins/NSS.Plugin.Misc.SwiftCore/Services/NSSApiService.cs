@@ -283,8 +283,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         _logger.Warning($"NSS.CreateNSSOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
                     }
 
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = $"companies/{companyId}/orders";
@@ -1091,7 +1091,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         #region Shipping API
 
-        public ERPCalculateShippingResponse GetShippingRate(ERPCalculateShippingRequest request)
+        public (string, ERPCalculateShippingResponse) GetShippingRate(ERPCalculateShippingRequest request)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -1099,67 +1099,71 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //initialize
             var retVal = new ERPCalculateShippingResponse();
             var respContent = string.Empty;
+            string error = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
-                _logger.Warning("Swift Api provider - GetShippingRate", new Exception("NSS API attributes not configured correctly."));
-                return retVal;
+                error = "NSS API attributes not configured correctly.";
+                _logger.Warning("Swift Api provider - GetShippingRate", new Exception(error));
+                return (error, retVal);
             }
 
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+
+                //httpClient.DefaultRequestHeaders.Clear();
+
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
+                    error = "NSS token returned empty";
+                    _logger.Warning($"NSS.CalculateShipping -> {request.DestinationAddressLine1}", new Exception(error));
+                    return (error, retVal);
+                }
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
+                //  resource
+                var resource = "/shipping-charges";
 
-                    //get token
-                    var token = GetNSSToken(httpClient);
+                //body params
+                var param = request.ToKeyValue();
 
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        _logger.Warning($"NSS.CalculateShipping -> {request.DestinationAddressLine1}", new Exception("NSS token returned empty"));
-                        return retVal;
-                    }
+                var content = new FormUrlEncodedContent(param);
 
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
+                using (var requestMessage =
+                            new HttpRequestMessage(HttpMethod.Post, resource))
+                {
+                    //requestMessage.Headers.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
 
-                    //  resource
-                    var resource = "/shipping-charges";
+                    requestMessage.Content = content;
 
-                    //body params
-                    var param = request.ToKeyValue();
-
-                    var content = new FormUrlEncodedContent(param);
-
-                    var response = httpClient.PostAsync(resource, content).Result;
-
-                    respContent = response.Content.ReadAsStringAsync().Result;
+                    var response = httpClient.SendAsync(requestMessage).Result;
 
                     // throw error if not successful
                     if (response.IsSuccessStatusCode)
                         retVal = JsonConvert.DeserializeObject<ERPCalculateShippingResponse>(respContent);
 
                     else
-                        throw new NopException($"An error occured when getting shipping rate : {respContent}", respContent);
-
+                        error = $"An error occured when getting shipping rate : status = {(int)response.StatusCode}, message = {respContent}";
                 }
-
             }
             catch (Exception ex)
             {
                 _logger.Error($"NSS.CalculateShipping -> request => {JsonConvert.SerializeObject(request)}", ex);
 
-                throw;
+                //throw;
             }
 
             // log request & resp
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetShippingRate => email: {request.DestinationAddressLine1}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
-            return retVal;
+            return (error, retVal);
         }
 
         #endregion

@@ -276,8 +276,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    client.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
+                    //client.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
 
                     var resource = $"/companies/{ERPCompanyId}/orders/recent";
 
@@ -1201,8 +1201,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
+                    //httpClient.DefaultRequestHeaders.Authorization =
+                    //    new AuthenticationHeaderValue("Bearer", token);
 
                     //  resource
                     var resource = "/shipping-charges";

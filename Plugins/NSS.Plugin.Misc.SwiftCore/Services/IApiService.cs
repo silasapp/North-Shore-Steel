@@ -50,7 +50,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         #region Shipping API
 
-        public ERPCalculateShippingResponse GetShippingRate(ERPCalculateShippingRequest request);
+        public (string, ERPCalculateShippingResponse) GetShippingRate(ERPCalculateShippingRequest request);
 
         #endregion
 

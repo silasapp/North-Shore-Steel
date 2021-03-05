@@ -54,11 +54,11 @@ namespace NSS.Plugin.Shipping.NSS.Services
         private (IList<ShippingOption> shippingOptions, string error) GetShippingOptions(GetShippingOptionRequest shippingOptionRequest)
         {
             var request = CreateShippingChargeRequest(shippingOptionRequest);
-            var response = _apiService.GetShippingRate(request);
+            var (error, response) = _apiService.GetShippingRate(request);
 
             var options = new List<ShippingOption>();
 
-            if (response != null)
+            if (response != null && string.IsNullOrEmpty(error))
             {
                 var option = new ShippingOption
                 {
@@ -70,7 +70,7 @@ namespace NSS.Plugin.Shipping.NSS.Services
                 options.Add(option);
             }
 
-            return (options, null);
+            return (options, error);
         }
 
         private ERPCalculateShippingRequest CreateShippingChargeRequest(GetShippingOptionRequest shippingOptionRequest)
