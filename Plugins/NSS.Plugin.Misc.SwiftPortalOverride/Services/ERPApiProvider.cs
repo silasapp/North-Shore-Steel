@@ -145,8 +145,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = "/users";
@@ -221,8 +221,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         _logger.Warning($"NSS.UpdateNSSUser erpId -> {erpId}", new Exception("NSS token returned empty"));
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = $"/users/{erpId}";
@@ -338,8 +338,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         _logger.Warning($"NSS.CreateNSSOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = $"companies/{companyId}/orders";
@@ -410,8 +410,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                             return retVal;
                         }
 
-                        //httpClient.DefaultRequestHeaders.Authorization =
-                        //    new AuthenticationHeaderValue("Bearer", token);
+                        httpClient.DefaultRequestHeaders.Authorization =
+                            new AuthenticationHeaderValue("Bearer", token);
                     }
 
                     // create user resource
@@ -481,8 +481,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                             return ("", retVal);
                         }
 
-                        //httpClient.DefaultRequestHeaders.Authorization =
-                        //    new AuthenticationHeaderValue("Bearer", token);
+                        httpClient.DefaultRequestHeaders.Authorization =
+                            new AuthenticationHeaderValue("Bearer", token);
                     }
 
                     // create user resource
@@ -547,8 +547,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return ("", retVal);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
@@ -614,8 +614,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return ("", retVal);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
@@ -742,8 +742,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                             return ("", retVal);
                         }
 
-                        //httpClient.DefaultRequestHeaders.Authorization =
-                        //    new AuthenticationHeaderValue("Bearer", token);
+                        httpClient.DefaultRequestHeaders.Authorization =
+                            new AuthenticationHeaderValue("Bearer", token);
                     }
 
                     // create user resource
@@ -815,8 +815,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                             return ("", retVal);
                         }
 
-                        //httpClient.DefaultRequestHeaders.Authorization =
-                        //    new AuthenticationHeaderValue("Bearer", token);
+                        httpClient.DefaultRequestHeaders.Authorization =
+                            new AuthenticationHeaderValue("Bearer", token);
                     }
 
                     // create user resource
@@ -872,6 +872,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         _logger.Warning($"NSS.GetCompanyInfo -> ", new Exception("NSS token returned empty"));
                         return retVal;
                     }
+
+                    client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     var resource = $"/companies/{erpCompanyId}";
 
@@ -935,8 +938,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // acc credit bal resource
                     var resource = $"companies/{companyId}/credit";
@@ -995,8 +998,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return (result, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     //  resource
                     var resource = $"users/{userId}/companies/{companyId}/notifications";
@@ -1059,8 +1062,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return (result, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     //  resource
                     var resource = $"users/{userId}/companies/{companyId}/notifications";
@@ -1198,8 +1201,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     //  resource
                     var resource = "/shipping-charges";
@@ -1279,8 +1282,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return (retVal, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
@@ -1292,9 +1295,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                     var content = new FormUrlEncodedContent(param);
 
                     var response = httpClient.PostAsync(resource, content).Result;
-
-                    //// throw error if not successful
-                    //response.EnsureSuccessStatusCode();
 
                     respContent = response.Content.ReadAsStringAsync().Result;
 
@@ -1357,8 +1357,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return error;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = $"/userregistration/{regId}/reject";
@@ -1424,8 +1424,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return (retVal, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource

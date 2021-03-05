@@ -144,8 +144,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return retVal;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = "/users";
@@ -220,8 +220,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         _logger.Warning($"NSS.UpdateNSSUser erpId -> {erpId}", new Exception("NSS token returned empty"));
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = $"/users/{erpId}";
@@ -283,8 +283,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         _logger.Warning($"NSS.CreateNSSOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = $"companies/{companyId}/orders";
@@ -351,8 +351,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return retVal;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
                 }
 
                 // create user resource
@@ -418,8 +418,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return ("", retVal);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
                 }
 
                 // create user resource
@@ -484,8 +484,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return ("", retVal);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
@@ -551,8 +551,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return ("", retVal);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
@@ -694,8 +694,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return ("", retVal);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
                 }
 
                 // create user resource
@@ -763,8 +763,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return ("", retVal);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
                 }
 
                 // create user resource
@@ -803,7 +803,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             var retVal = new ERPCompanyInfoResponse();
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
-                _logger.Warning("Swift Api provider - Get Recent Invoices", new Exception("NSS API attributes not configured correctly."));
+                _logger.Warning("Swift Api provider - GetCompanyInfo", new Exception("NSS API attributes not configured correctly."));
                 return retVal;
             }
 
@@ -820,6 +820,9 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         _logger.Warning($"NSS.GetCompanyInfo -> ", new Exception("NSS token returned empty"));
                         return retVal;
                     }
+
+                    client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     var resource = $"/companies/{erpCompanyId}";
 
@@ -874,8 +877,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return retVal;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // acc credit bal resource
                     var resource = $"companies/{companyId}/credit";
@@ -934,8 +937,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return (result, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     //  resource
                     var resource = $"users/{userId}/companies/{companyId}/notifications";
@@ -998,8 +1001,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return (result, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     //  resource
                     var resource = $"users/{userId}/companies/{companyId}/notifications";
@@ -1121,8 +1124,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return retVal;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     //  resource
                     var resource = "/shipping-charges";
@@ -1202,8 +1205,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return (retVal, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
@@ -1280,8 +1283,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return error;
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
                     // create user resource
                     var resource = $"/userregistration/{regId}/reject";
@@ -1347,8 +1350,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         return (retVal, error);
                     }
 
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
 
 
                     // create user resource
