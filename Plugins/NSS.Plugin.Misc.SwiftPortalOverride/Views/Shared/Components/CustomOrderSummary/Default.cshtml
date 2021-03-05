@@ -32,7 +32,21 @@
 @inject ICustomerCompanyProductService customerCompanyProductService
 @inject ICustomerCompanyService customerCompanyService
 @inject ICompanyService companyService
+@inject IShapeService shapeService
+@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 
+
+<style>
+    .nss-btn-default {
+        color: white !important;
+        background-color: #1899E1 !important;
+    }
+
+    .disabled, .disabled:hover {
+        background: #C3C3C3 !important;
+        cursor: not-allowed !important;
+    }
+</style>
 @{
 
     var themeName = themeContext.WorkingThemeName;
@@ -51,8 +65,37 @@
     {
         var _cartItem = new Dictionary<string, object>();
 
+
+
         var product = productService.GetProductById(item.ProductId);
         var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+        var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.ProductId);
+
+        var mappingIds = mappings.Select(x => x.Id).ToArray();
+
+        var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
+        var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
+        var hasSawOption = false;
+        if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
+        {
+            var shape = shapeService.GetShapeById(shapeId);
+            hasSawOption = shape != null ? shape.SawOption : false;
+        }
+
+        var prodAttrs = new List<SawOptionsAttribute>();
+        foreach (var it in attrs)
+        {
+            var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
+            var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
+            var obj = new SawOptionsAttribute
+            {
+                Name = it.Name,
+                Values = xValues,
+                Id = xMapping.Id,
+            };
+
+            prodAttrs.Add(obj);
+        }
 
         var itemTagNo = attr.FirstOrDefault(x => x.Key == "itemTagNo")?.Value;
         var itemNo = attr.FirstOrDefault(x => x.Key == "itemNo")?.Value;
@@ -76,13 +119,21 @@
         var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == Constants.CustomerPartNoAttribute);
         var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
         var selectedPurchaseUnit = purchaseUnitAttr?.Values?.FirstOrDefault(x => x.IsPreSelected) ?? purchaseUnitAttr?.Values?.FirstOrDefault();
-        var noteAttr = attributes.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
-
-        var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}{item.Id}" : $"itemuom{item.Id}";
-        var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr.Id}{item.Id}";
+        var sawOptionsAttr = attributes.FirstOrDefault(x => x.Name == Constants.CutOptionsAttribute);
+        var cutOptionIsPreselected = sawOptionsAttr?.Values?.FirstOrDefault(x => x.IsPreSelected == true)?.IsPreSelected;
+        var sawOptionId = sawOptionsAttr?.Values?.FirstOrDefault(x => x.IsPreSelected == true)?.Id;
+        var sawOptionName = sawOptionsAttr?.Values?.FirstOrDefault(x => x.IsPreSelected == true)?.Name;
+        var workOrderAttr = attributes.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
+        var noteAttr = attributes.FirstOrDefault(x => x.Name == Constants.NotesAttribute);
+        var unitControlId = purchaseUnitAttr != null ? $"{NopCatalogDefaults.ProductAttributePrefix}{purchaseUnitAttr.Id}_{item.Id}" : $"itemuom{item.Id}";
+        var noteControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{noteAttr?.Id}_{item.Id}";
+        var workOrderInstructionsControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{workOrderAttr?.Id}_{item.Id}";
+        var sawOptionControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{sawOptionsAttr?.Id}_{item.Id}";
 
         _cartItem.Add("id", item.Id);
         _cartItem.Add("productName", item.ProductName);
+        _cartItem.Add("hasSawOption", hasSawOption);
+        _cartItem.Add("prodAttrs", prodAttrs);
         _cartItem.Add("productId", item.ProductId);
         _cartItem.Add("unitPrice", item.UnitPrice);
         _cartItem.Add("quantity", item.Quantity);
@@ -102,16 +153,24 @@
         _cartItem.Add("purchaseUnitAttr", Serialize(purchaseUnitAttr));
         _cartItem.Add("selectedPurchaseUnit", selectedPurchaseUnit?.Id);
         _cartItem.Add("noteAttr", Serialize(noteAttr));
+        _cartItem.Add("workOrderAttr", Serialize(workOrderAttr));
         _cartItem.Add("unitControlId", unitControlId);
-        _cartItem.Add("controlId", controlId);
+        _cartItem.Add("noteControlId", noteControlId);
+        _cartItem.Add("workOrderInstructionsControlId", workOrderInstructionsControlId);
         _cartItem.Add("warnings", Serialize(item.Warnings));
+        _cartItem.Add("itemWorkOrderValue", workOrderAttr.DefaultValue);
+        _cartItem.Add("sawOptionControlId", sawOptionControlId);
+        _cartItem.Add("isCutOptionPreselected", cutOptionIsPreselected);
+        _cartItem.Add("itemQuantity", 0);
+        _cartItem.Add("sawOptionsName", sawOptionName);
+        _cartItem.Add("sawOptionRadioId", sawOptionId);
+
 
         items.Add(_cartItem);
+
     }
 }
 
-<!-- Modal -->
-<div id="overlay"></div>
 
 @{
     Func<object, object>
@@ -136,6 +195,41 @@ Content1 =
     </div>;
 }
 
+
+@{
+    Func<object, object>
+Content3 =
+    @<div id="sawOptionModal">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <label class="h4-default-500-teko mb-1">SAW OPTIONS</label>
+                <div class="d-flex flex-row">
+                    <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
+                           class="mr-3 d-flex align-items-center cursor-pointer mb-0">
+                        <input v-bind:id="sawOptionControlId + '_' +option.id" v-bind:name="sawOptionControlId + '_' + currentItemId" type="radio" v-on:click="getSawOptionControlName(sawOptionControlId + '_' + currentItemId, option.name, option.id)" class="nss-radio mr-2 cursor-pointer"
+                               v-bind:value="option.id" v-model="sawOption">
+                        {{ option.name }}
+                    </label>
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex flex-column">
+                <label class="h4-primary-500-teko mb-1">WORK ORDER INSTRUCTIONS</label>
+                <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model.trim="workOrderInstructions"></textarea>
+            </div>
+
+            <div class="d-flex flex-row-reverse mt-4">
+
+                <button v-bind:class="{
+                                 'disabled': sawOptionName == 'Other' && !workOrderInstructions
+                                 }" type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
+                        v-on:click="saveSawOptions">
+                    SAVE
+                </button>
+            </div>
+        </div>
+    </div>;
+}
 
 <div id="cart-section" class="cart-summary-content card" v-cloak>
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentBefore })
@@ -184,6 +278,7 @@ Content1 =
                                         <th scope="col" class="text-center">Weight (lb)</th>
                                         <th scope="col" class="text-center">Unit Price</th>
                                         <th scope="col" class="text-center">Total Price</th>
+                                        <th scope="col" class="text-center">Cut To Length</th>
                                         <th scope="col" class="text-center">Notes</th>
                                         <th scope="col" class="text-center">Remove</th>
                                     </tr>
@@ -226,11 +321,21 @@ Content1 =
                                             </div>
                                         </td>
                                         <td class="pt-3 text-right" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;" v-cloak>{{ item.subTotal }}</label></td>
+                                        <td class="text-center" v-if=item.hasSawOption>
+                                            <input v-show="!item.isCutOptionPreselected" type="button" class="nss-btn-default px-2 py-2" style="width:fit-content" value="CUT TO LENGTH "
+                                                   v-on:click="handleSawOptionModal(item)" />
 
+                                            <h6 style="color:#0099E1" class="text-decoration-underline cursor-pointer" v-show="item.isCutOptionPreselected" v-on:click="handleSawOptionModal(item)">{{item.itemQuantity}} pieces - {{item.sawOptionsName}}</h6>
+
+                                            <input type="hidden" v-bind:id='item.workOrderInstructionsControlId' v-bind:name="item.workOrderInstructionsControlId" v-model="item.itemWorkOrderValue" />
+                                            <input type="hidden" v-bind:name="item.sawOptionControlId" v-model="item.sawOptionRadioId" />
+
+                                        </td>
+                                        <td class="text-center" v-if=!item.hasSawOption></td>
                                         <td class="text-center">
                                             <a v-if="item.noteAttr" style="background: none; border: none;" data-toggle="modal"
                                                v-on:click="handleNotesModal(item)" data-target="#noteModal">
-                                                <svg :id=`removedNote-${item.controlId}` v-show="!item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                <svg :id=`removedNote-${item.noteControlId}` v-show="!item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                                      class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
                                                      viewBox="0 0 24 24"
                                                      style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #2F2F2F; opacity: 0.5;">
@@ -238,7 +343,7 @@ Content1 =
                                                     <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z" />
                                                     <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                 </svg>
-                                                <svg :id=`addedNote-${item.controlId}` v-show="item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                <svg :id=`addedNote-${item.noteControlId}` v-show="item.noteAttr.defaultValue" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                                      class="hover-icon" width="24" height="24" preserveAspectRatio="xMidYMid meet"
                                                      viewBox="0 0 24 24"
                                                      style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg); fill: #1899E1;">
@@ -247,8 +352,12 @@ Content1 =
                                                     <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                 </svg>
                                             </a>
-                                            <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
+                                            <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-bind:value="item.noteAttr.defaultValue" />
+
+
                                         </td>
+
+
                                         <td class="remove-from-cart text-center pt-3">
                                             <label class="pure-material-checkbox">
                                                 <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
@@ -282,7 +391,15 @@ Content1 =
                                 </div>
                                 <label class="h5-default-500" v-cloak>Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
-                                <input type="hidden" v-bind:id='item.controlId' v-bind:name="item.controlId" v-bind:value="item.noteAttr.defaultValue" />
+                                <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-bind:value="item.noteAttr.defaultValue" />
+                                <template v-if=item.hasSawOption>
+                                    <a v-show="!item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">Cut To Length</a>
+                                    <a v-show="item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">{{item.itemQuantity}} pieces - {{item.sawOptionsName}}</a>
+                                    <input type="hidden" v-bind:id='item.workOrderInstructionsControlId' v-bind:name="item.workOrderInstructionsControlId" v-model="item.itemWorkOrderValue" />
+                                    <input type="hidden" v-bind:name="item.sawOptionControlId" v-model="item.sawOptionRadioId" />
+                                </template>
+
+                               
 
                                 <div class="d-flex flex-row justify-content-between align-items-center">
                                     <label class="h5-default-500">Quantity</label>
@@ -334,10 +451,7 @@ Content1 =
                                             <input v-if="purchasechkattr" class="purchase-order" type="text" v-bind:name="'checkout_attribute_' + purchasechkattr.id" placeholder="Enter..."
                                                    v-bind:id="'checkout_attribute_' + purchasechkattr.id" v-model="purchasechkattr.defaultValue" />
                                         </div>
-                                        @*<div class="d-flex flex-column ml-2 w-50 w-md-100">
-                                                <label class="fs12-default-500 mb-2">Promise Date</label>
-                                                <label id="estimated-date" name="estimated-date" class="h5-default-normal mt-1 ml-2">TBD</label>
-                                            </div>*@
+
                                     </div>
                                     <div class="deals" style="width: 100%;max-width: 100%;">
                                         @*@await Html.PartialAsync("_DiscountBox", Model.DiscountBox)*@
@@ -420,8 +534,12 @@ Content1 =
         }
     </div>
 
+    @{ var title = "<span class='dialog-header'>SAW OPTIONS FOR <span id='dialog-product-description'></span></span>"; }
+
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("500px").Target("body").Render()
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onSawDialogCreated").Header(title).ContentTemplate(
+@Content3).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
 </div>
 
@@ -584,11 +702,20 @@ Content1 =
     var items = @Html.Raw(Serialize(items));
     var pageModel = @Html.Raw(Serialize(Model));
     var purchasechkattr = @Html.Raw(Serialize(purchasechkattr));
-
     new Vue({
         el: '#cart-section',
         data: {
             items,
+            currentItemId: null,
+            sawOptionName: "Saw in half",
+            sawOptionControlId: null,
+            sawOptions: [],
+            sawOption: null,
+            workOrderInstructions: null,
+            workOrderInstructionsId: null,
+            productId: null,
+            workOrderInstructionsControlId: null,
+            sawOptionsControlId: null,
             pageModel,
             isEditable: pageModel.isEditable,
             purchasechkattr,
@@ -606,6 +733,21 @@ Content1 =
         },
         mounted: function () {
             this.items.forEach(item => {
+                item.itemQuantity = $('#itemquantity' + item.id).val();
+                switch (item.sawOptionsName) {
+                    case "Saw in half":
+                        item.itemQuantity *= 2;
+                        break;
+                    case "Saw in thirds":
+                        item.itemQuantity *= 3;
+                        break;
+                    case "Saw in quarters":
+                        item.itemQuantity *= 4;
+                        break;
+                    case "Others":
+                        break;
+                    default:
+                }
                 item.unitPrice = item.unitPrice?.replace('$', '');
                 item.noteAttr = JSON.parse(item.noteAttr);
                 item.warnings = JSON.parse(item.warnings);
@@ -619,15 +761,75 @@ Content1 =
             },
         },
         methods: {
+            getSawOptionControlName: function (sawOptionCtrlId, sawOptionsName, sawOption) {
+                this.items.forEach(x => {
+                    if (x.id == this.currentItemId) {
+                        x.sawOptionControlId = sawOptionCtrlId;
+                        x.sawOptionRadioId = sawOption;
+                    }
+                })
+                this.sawOptionName = sawOptionsName;
+            },
+            handleSawOptionModal: function ({ id, productId, prodAttrs, productName, workOrderInstructionsControlId, itemWorkOrderValue, sawOptionRadioId }) {
+                this.currentItemId = id;
+                this.workOrderInstructionsControlId = workOrderInstructionsControlId;
+                const at = prodAttrs;
+                $('#dialog-product-description').html(productName);
+                const cutOptions = at.find(x => x.name === "Cut Options");
+                const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
+                this.productId = productId;
+                this.sawOptionControlId = prefix + cutOptions.id;
+                this.sawOptions = cutOptions.values;
+
+                this.sawOption = sawOptionRadioId == null ? cutOptions.values[0]?.id : sawOptionRadioId;
+                this.workOrderInstructions = itemWorkOrderValue;
+                this.workOrderInstructionsId = prefix + at.find(x => x.name === "Work Order Instructions")?.id;
+                sawOptionModal.show();
+            },
+            getsawOptionsQuantityAndValues: function (it) {
+                it.forEach(x => {
+                    if (x.id == this.currentItemId) {
+                        x.sawOptionsName = this.sawOptionName;
+                        x.itemQuantity = $('#itemquantity' + x.id).val();
+                        x.itemWorkOrderValue = this.workOrderInstructions;
+                        x.isCutOptionPreselected = true;
+                        x.sawOptionRadioId = this.sawOption;
+                        switch (this.sawOptionName) {
+                            case "Saw in half":
+                                x.itemQuantity *= 2;
+                                break;
+                            case "Saw in thirds":
+                                x.itemQuantity *= 3;
+                                break;
+                            case "Saw in quarters":
+                                x.itemQuantity *= 4;
+                                break;
+                            case "Others":
+                                break;
+                            default:
+                        }
+                    }
+                });
+            },
+            saveSawOptions: function () {
+                this.getsawOptionsQuantityAndValues(this.items);
+
+                $(this).find("textarea").val('').end();
+
+                let request = {
+                    [this.sawOptionControlId]: this.sawOption,
+                    [this.workOrderInstructionsId]: this.workOrderInstructions,
+                };
+
+                sawOptionModal.hide();
+            },
+
             handleResize: function () {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
             },
-            handleNotesModal: function ({ controlId }) {
-                //$("#productNote").val($(`#${controlId}`).val());
-                //viewNotesModal.show();
-
-                handleNotesModal(controlId);
+            handleNotesModal: function ({ noteControlId }) {
+                handleNotesModal(noteControlId);
             },
             toggleUnitPrice: function (item) {
                 const { unitControlId, id, pricePerCWT, pricePerPiece, pricePerFt } = item;
@@ -661,6 +863,7 @@ Content1 =
                 return arr.reduceRight((rest, value) => ({ value, rest }), null);
             },
             calculateItemTotalPrice: function ({ unitControlId, id, length, weight, quantity, unitPrice }) {
+                this.getsawOptionsQuantityAndValues(this.items);
                 const el = document.getElementById(unitControlId);
                 const itemUnit = el.options[el.selectedIndex].text;
                 let totalPrice = 0.00;
@@ -681,6 +884,21 @@ Content1 =
                 }
                 this.items.forEach(item => {
                     if (item.id === id) {
+                        item.itemQuantity = $('#itemquantity' + item.id).val();
+                        switch (item.sawOptionsName) {
+                            case "Saw in half":
+                                item.itemQuantity *= 2;
+                                break;
+                            case "Saw in thirds":
+                                item.itemQuantity *= 3;
+                                break;
+                            case "Saw in quarters":
+                                item.itemQuantity *= 4;
+                                break;
+                            case "Others":
+                                break;
+                            default:
+                        }
                         item.subTotal = `$${totalPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;
                     }
                 });
@@ -694,16 +912,15 @@ Content1 =
         },
     });
 
+    function onSawDialogCreated() {
+        sawOptionModal = this;
+    }
     function onDialogCreated() {
         viewNotesModal = this;
     }
-
-
     function onAcceptCreated() {
         acceptTOSModal = this;
     }
-
-
     function handleAcceptTOSModal() {
         acceptTOSModal.show();
     }
@@ -742,3 +959,15 @@ Content1 =
     }
 </script>
 <ejs-scripts></ejs-scripts>
+
+@functions {
+    String GetJson(object input)
+    {
+        var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
+        {
+            ContractResolver = contractResolver,
+            Formatting = Formatting.None
+        });
+    }
+}

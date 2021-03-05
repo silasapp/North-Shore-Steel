@@ -166,59 +166,9 @@
 }
 
 <script>
-   let dialogContent = `
-        <form id="sawOptionModal">
-                <div class="d-flex flex-column">
-                    <div class="d-flex flex-column mt-4 mb-2">
-                        <label class="nss-modal-title">SAW OPTIONS</label>
-                        <div class="d-flex flex-row">
-                            <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
-                                    class="mr-3 d-flex align-items-center cursor-pointer">
-                                <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
-                                        v-bind:value="option.id" v-model="sawOption">
-                                {{ option.name }}
-                            </label>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="d-flex flex-column">
-                        <label class="nss-modal-title">Work Order Instructions (tolerance, etc.)</label>
-                        <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
-                    </div>
-                    <hr />
-                    <div class="d-flex flex-row justify-content-between mb-3">
-                       <div class="d-flex flex-column">
-                            <label class="nss-modal-title">ITEM QUANTITY</label>
-                            <div class="d-flex flex-row">
-                                <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
-                                <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
-                                <button type="button" class="nss-btn-box" v-on:click="incrementQuantity">+</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row-reverse mt-4">
-                        <button type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
-                                v-on:click="addToCart">
-                            ADD TO CART
-                        </button>
-                    </div>
-                </div>
-            </form>
-        `;
-
-    let dialogHeader = `
-        <span class='dialog-header'>SAW OPTIONS FOR <span id='dialog-product-description'></span></span>
-    `;
-</script>
-
-<script>
     const shapes = @Html.Raw(Serialize(Model.Shapes));
     const specs = @Html.Raw(Serialize(groupedSpecs));
     const shapesCountData = @Html.Raw(Serialize(shapesCountData));
-
-    console.log("shapes: ", shapes);
-    console.log("specs: ", specs);
-    console.log("shapesCountData: ", shapesCountData);
 
     let gridData = [];
     let gridColumns = [];
@@ -279,7 +229,6 @@
             shouldRebuildSpecs: false,
         },
         mounted: function () {
-            this.buildDialog();
             this.updateShapesCount(this.shared.defaultShapesCount);
             this.buildTreeview();
             this.prepareGroupedSpecs();
@@ -414,18 +363,7 @@
                 this.toggleShape(shape);
             },
 
-            buildDialog: function () {
-                this.dialog = new ej.popups.Dialog({
-                    header: dialogHeader,
-                    content: dialogContent,
-                    target: 'body',
-                    showCloseIcon: true,
-                    visible: false,
-                    width: '650px',
-                    isModal: true,
-                });
-                this.dialog.appendTo('#dialog');
-            },
+           
             buildTreeview: function () {
                 ej.base.enableRipple(false);
 
@@ -553,14 +491,14 @@
                 let searchKeyword = getUrlParameter('q');
                 const shapeIds = this.filterTags.filter(x => x.type === 'shape').map(x => x.id);
                 let activeShapeAttributes = [];
-                let sawOption = false;
+                
                 if (shapeIds.length > 0) {
                     const shape = this.shared.groupedShapes.find(x => x.id === shapeIds[0]);
                     activeShapeAttributes = shape.shapeAttributes;
-                    sawOption = shape.sawOption;
+                   
                 }
                 const specIds = this.filterTags.filter(x => x.type === 'spec').map(x => x.id);
-                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes, sawOption };
+                var filterParams = { SpecIds: specIds, ShapeIds: shapeIds, SearchKeyword: searchKeyword, activeShapeAttributes };
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("FilteredProductsResult", "CatalogOverride")",
@@ -672,75 +610,6 @@
             },
             handleSortChanged: function () {
                 gridVm.grid.sortColumn(this.sortOption.sort.toLowerCase(), this.sortOption.sortType, false);
-            },
-        },
-    });
-
-    const modalVm = new Vue({
-        el: '#sawOptionModal',
-        data: {
-            currentProductDescription: 'Init',
-            sawOptionControlId: null,
-            sawOptions: [],
-            sawOption: null,
-            workOrderInstructions: null,
-            workOrderInstructionsId: null,
-            quantity: 0,
-            quantityId: 0,
-            productId: null,
-        },
-        methods: {
-            handleSawOption: function (productId, attributes, productName) {
-                const at = JSON.parse(attributes);
-                $('#dialog-product-description').html(productName);
-                let qty = $('#qty' + productId).val();
-                const cutOptions = at.find(x => x.name === "Cut Options");
-                const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
-                this.quantity = qty ? qty : 1;
-                this.productId = productId;
-                this.sawOptionControlId = prefix + cutOptions.id;
-                this.sawOptions = cutOptions.values;
-                this.sawOption = cutOptions.values.find(x => x.isPreSelected)?.id || cutOptions.values.find(e => true)?.id;
-                this.workOrderInstructions = null;
-                this.workOrderInstructionsId = prefix + at.find(x => x.name === "Work Order Instructions")?.id;
-                shopVm.dialog.show();
-            },
-
-            addToCart: function () {
-                let request = {
-                    [this.sawOptionControlId]: this.sawOption,
-                    [this.workOrderInstructionsId]: this.workOrderInstructions,
-                    [`addtocart_${this.productId}.EnteredQuantity`]: this.quantity,
-                };
-                shopVm.dialog.hide();
-                shopVm.showLoading();
-                self = this;
-                $.ajax({
-                    cache: false,
-                    url: `/addproducttocart/details/${this.productId}/@Html.Raw((int)ShoppingCartType.ShoppingCart)`,
-                    type: 'POST',
-                    data: request,
-                    success: function (data) {
-                        shopVm.hideLoading();
-                        if (data != null) {
-                            $('#qty' + self.productId).val("");
-                            AjaxCart.success_process(data);
-                        }
-                    },
-                    error: function (xhr, _, thrownError) {
-                        if (thrownError == "Unauthorized") {
-                            location.reload();
-                        }
-                        shopVm.hideLoading();
-                    }
-                });
-            },
-
-            incrementQuantity: function () {
-                this.quantity = Number(this.quantity) + 1;
-            },
-            decrementQuantity: function () {
-                this.quantity = this.quantity > 1 ? Number(this.quantity) - 1 : 1;
             },
         },
     });

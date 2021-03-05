@@ -47,48 +47,12 @@
         color: white !important;
         background-color: #1899E1 !important;
     }
+
+    .table td {
+        border-top-width: 0px !important;
+    }
 </style>
-@{
-    Func<object, object>
-Content1 =
-    @<form id="sawOptionModal">
-        <div class="d-flex flex-column">
-            <div class="d-flex flex-column mt-4 mb-2">
-                <label class="h4-default-500-teko mb-1">SAW OPTIONS</label>
-                <div class="d-flex flex-row">
-                    <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
-                           class="mr-3 d-flex align-items-center cursor-pointer mb-0">
-                        <input v-bind:id="sawOptionControlId + '_' + option.id" type="radio" class="nss-radio mr-2 cursor-pointer"
-                               v-bind:value="option.id" v-model="sawOption">
-                        {{ option.name }}
-                    </label>
-                </div>
-            </div>
-            <hr />
-            <div class="d-flex flex-column">
-                <label class="h4-primary-500-teko mb-1">WORK ORDER INSTRUCTIONS</label>
-                <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model="workOrderInstructions"></textarea>
-            </div>
-            <hr />
-            <div class="d-flex flex-row justify-content-between mb-3">
-                <div class="d-flex flex-column">
-                    <label class="h4-primary-500-teko mb-1">ITEM QUANTITY</label>
-                    <div class="d-flex flex-row">
-                        <button type="button" class="nss-btn-box" v-on:click="decrementQuantity">-</button>
-                        <input id="itemQuantity" type="number" class="nss-input" v-model="quantity" />
-                        <button type="button" class="nss-btn-box" v-on:click="incrementQuantity">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex flex-row-reverse mt-4">
-                <button type="button" v-bind:id="'add-to-cart-button-' + productId" class="nss-btn-default px-2 py-2"
-                        v-on:click="addToCart">
-                    ADD TO CART
-                </button>
-            </div>
-        </div>
-    </form>;
-}
+
 <div id="wishlist" class="page wishlist-page">
     <div class="page-title">
 
@@ -135,37 +99,14 @@ Content1 =
                                             var product = productService.GetProductById(item.ProductId);
                                             var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
                                             var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
-                                            var hasSawOption = false;
                                             if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
                                             {
                                                 var shape = shapeService.GetShapeById(shapeId);
-                                                hasSawOption = shape != null ? shape.SawOption : false;
                                             }
                                             var itemId = item.Id;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
-                                            var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.ProductId);
 
-                                            var mappingIds = mappings.Select(x => x.Id).ToArray();
-
-                                            var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
-                                            var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
-                                            var _productAttributes = GetJson(attrs);
-                                            var prodAttrs = new List<SawOptionsAttribute>();
-
-                                            foreach (var it in attrs)
-                                            {
-                                                var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
-                                                var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
-                                                var obj = new SawOptionsAttribute
-                                                {
-                                                    Name = it.Name,
-                                                    Values = xValues,
-                                                    Id = xMapping.Id,
-                                                };
-
-                                                prodAttrs.Add(obj);
-                                            }
 
                                             <tr>
                                                 <td class="product align-middle">
@@ -215,17 +156,7 @@ Content1 =
                                                 </td>
                                                 <td style="justify-content: flex-end;" class="d-flex align-items-center w-100">
 
-                                                    @if (hasSawOption)
-                                                    {
-                                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" class="hover-icon mx-1" width="24" height="24"
-                                                             v-on:click="handleSawOption(@item.ProductId, @GetJson(prodAttrs))">
-                                                            <g transform="translate(-580 -80)">
-                                                                <title>Saw Options</title>
-                                                                <path d="M0,0H24V24H0Z" transform="translate(580 80)" fill="rgba(0, 0, 0, 0)" />
-                                                                <path d="M7.031,11.781h2.52l-.72,6.36,1.42,1.42,1.78-1.78,4,5h2v-2.52l6.36.7,1.42-1.42-1.78-1.76,5-4v-2h-2.52l.7-6.36L25.791,4l-1.76,1.78-4-5h-2V3.3l-6.36-.72L10.251,4l1.78,1.78-5,4Zm11-3a3,3,0,1,1-3,3,3,3,0,0,1,3-3Z" transform="translate(574.409 80.409)" />
-                                                            </g>
-                                                        </svg>
-                                                    }
+
                                                     @if (!string.IsNullOrEmpty(mtr))
                                                     {
                                                         <a class="table-action-button" style="text-decoration:none" href="@mtr" target="_blank">
@@ -275,37 +206,13 @@ Content1 =
                                 var product = productService.GetProductById(item.ProductId);
                                 var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
                                 var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
-                                var hasSawOption = false;
                                 if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
                                 {
                                     var shape = shapeService.GetShapeById(shapeId);
-                                    hasSawOption = shape != null ? shape.SawOption : false;
                                 }
                                 var itemId = item.Id;
                                 string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
 
-                                var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
-
-                                var mappingIds = mappings.Select(x => x.Id).ToArray();
-
-                                var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
-                                var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
-                                var _productAttributes = GetJson(attrs);
-                                var prodAttrs = new List<SawOptionsAttribute>();
-
-                                foreach (var it in attrs)
-                                {
-                                    var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
-                                    var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
-                                    var obj = new SawOptionsAttribute
-                                    {
-                                        Name = it.Name,
-                                        Values = xValues,
-                                        Id = xMapping.Id,
-                                    };
-
-                                    prodAttrs.Add(obj);
-                                }
 
                                 <div class="product-sm d-flex flex-column align-items-start mb-2">
                                     <label class="h2-primary my-2">@item.ProductName</label>
@@ -327,11 +234,7 @@ Content1 =
                                                 </label>
                                             </div>
 
-                                            @if (hasSawOption)
-                                            {
-                                                <img src="Themes/SwiftPortal/Content/assets/icn-saw.svg" class="product-action-sm" width="24" height="24" alt=""
-                                                     v-on:click="handleSawOption(@item.ProductId, @GetJson(prodAttrs))">
-                                            }
+
 
                                             @if (!string.IsNullOrEmpty(mtr))
                                             {
@@ -385,11 +288,6 @@ Content1 =
             </a>
         </div>
     </div>
-
-    @{ var title = "<span class='dialog-header'>SAW OPTIONS FOR PRODUCT</span>"; }
-
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header(title).ContentTemplate(
-@Content1).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
 </div>
 
 @functions{
@@ -411,9 +309,7 @@ Content1 =
 </script>
 
 <script>
-    var sawOptionModal;
 
-    var title = 'TESTING...';
      var items = @Html.Raw(Serialize(Model.Items));
     var pageModel = @Html.Raw(Serialize(Model));
     var modalVm = new Vue({
@@ -422,11 +318,6 @@ Content1 =
             items,
             pageModel,
             isEditable: pageModel.isEditable,
-            sawOptionControlId: null,
-            sawOptions: [],
-            sawOption: null,
-            workOrderInstructions: null,
-            workOrderInstructionsId: null,
             quantity: 0,
             quantityId: 0,
             productId: null,
@@ -454,71 +345,14 @@ Content1 =
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
             },
-            addToCart: function () {
-                let request = {
-                    [this.sawOptionControlId]: this.sawOption,
-                    [this.workOrderInstructionsId]: this.workOrderInstructions,
-                    [`addtocart_${this.productId}.EnteredQuantity`]: this.quantity,
-                };
-                sawOptionModal.hide();
-                AjaxCart.setLoadWaiting(true);
 
-                $.ajax({
-                    cache: false,
-                    url: `/addproducttocart/details/${this.productId}/@Html.Raw((int)ShoppingCartType.ShoppingCart)`,
-                    type: 'POST',
-                    data: request,
-                    success: function (data, textStatus, XMLHttpRequest) {
-                        AjaxCart.setLoadWaiting(false);
-                        if (data != null) {
-                            AjaxCart.success_process(data);
-                        }
-                    },
-                    error: function (xhr, _, thrownError) {
-                        if (thrownError == "Unauthorized") {
-                            location.reload();
-                        }
-                        AjaxCart.setLoadWaiting(false);
-                    }
-                });
-            },
-
-            handleSawOption: function (productId, attributes) {
-                const _attributes = attributes;
-                const cutOptions = _attributes.find(x => x.name === "Cut Options");
-                const prefix = '@Html.Raw(NopCatalogDefaults.ProductAttributePrefix)';
-                this.quantity = 1;
-                this.productId = productId;
-                this.sawOptionControlId = prefix + cutOptions.id;
-                this.sawOptions = cutOptions.values;
-                this.sawOption = cutOptions.values.find(x => x.isPreSelected)?.id || cutOptions.values.find(x => true)?.id;
-                this.workOrderInstructions = null;
-                this.workOrderInstructionsId = prefix + _attributes.find(x => x.name === "Work Order Instructions")?.id;
-                sawOptionModal.show();
-            },
-
-            incrementQuantity: function () {
-                this.quantity = Number(this.quantity) + 1;
-            },
-            decrementQuantity: function () {
-                this.quantity = this.quantity > 1 ? Number(this.quantity) - 1 : 1;
-            },
-            handleDecrementQuantity: function (itemId) {
-                const quantityEl = $('#itemquantity' + itemId);
-                const quantity = Number(quantityEl.val());
-                quantityEl.val(quantity && quantity - 1 > 1 ? quantity - 1 : 1);
-            },
-
-            handleIncrementQuantity: function (itemId) {
-                const quantityEl = $('#itemquantity' + itemId);
-                const quantity = Number(quantityEl.val());
-                quantityEl.val(quantity ? quantity + 1 : 1);
-            },
         },
     });
     function getInputQuantity(itemId, cartId) {
         event.preventDefault();
         let qty = $('#itemquantity' + itemId).val();
+        let seQty = $('#itemquantity' + itemId).text();
+        if (seQty === "" && !qty) { displayBarNotification("Please enter quantity", 'error', 0); return; }
         if (!qty)
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`
@@ -526,21 +360,6 @@ Content1 =
         AjaxCart.addproducttocart_catalog(link);
     }
 
-    function onDialogCreated() {
-        sawOptionModal = this;
-    }
 </script>
 
 <ejs-scripts></ejs-scripts>
-
-@functions {
-    String GetJson(object input)
-    {
-        var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
-        return JsonConvert.SerializeObject(input, new JsonSerializerSettings
-        {
-            ContractResolver = contractResolver,
-            Formatting = Formatting.None
-        });
-    }
-}

@@ -213,7 +213,6 @@
 
     var shapeIds = Model.FilterParams.ShapeIds;
 
-    bool sawOption = Model.FilterParams.SawOption;
 
     if (shapeIds.Count > 0)
     {
@@ -249,26 +248,7 @@
         var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
 
         var mappingIds = mappings.Select(x => x.Id).ToArray();
-
-        var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
-        var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
-        var _productAttributes = Serialize(attrs);
-        var prodAttrs = new List<SawOptionsAttribute>();
-
-
-        foreach (var it in attrs)
-        {
-            var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
-            var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
-            var obj = new SawOptionsAttribute
-            {
-                Name = it.Name,
-                Values = xValues,
-                Id = xMapping.Id,
-            };
-
-            prodAttrs.Add(obj);
-        }
+        
 
         @foreach (var it in headerColumns)
         {
@@ -291,11 +271,9 @@
 
         productRowData.Add("_itemId", item.Id.ToString());
         productRowData.Add("_mtr", item.ProductCustomAttributes.FirstOrDefault(x => x.Key == "mtr")?.Value);
-        productRowData.Add("_sawOption", sawOption);
         productRowData.Add("_cartId", shoppingCartTypeId.ToString());
         productRowData.Add("_wishListId", wishListShoppingCartId.ToString());
         productRowData.Add("_isSerialized", _isSerialized.ToString().ToLower());
-        productRowData.Add("_productAttributes", Serialize(prodAttrs));
         productRowData.Add("_productName", item.Name);
         productRowData.Add("_isWishlistItem", item.IsFavoriteItem);
 
@@ -343,9 +321,6 @@
 
                         <img v-if="!data._isWishlistItem" :id=`m-add-to-wishlist-${data._itemId}` src="Themes/SwiftPortal/Content/assets/c-heart.svg" class="product-action-sm"
                              v-on:click="handleAddToWishList(data)" title="add to wishlist" width="24" height="24" alt="">
-
-                        <img v-if="data._sawOption" src="Themes/SwiftPortal/Content/assets/icn-saw.svg" class="product-action-sm" width="24" height="24" alt=""
-                             v-on:click="handleSawOption(data)">
 
                         <a v-if="data._mtr" class="table-action-button" style="text-decoration: none" v-bind:href="data._mtr" target="_blank">
                             <img class="product-action-sm" src="Themes/SwiftPortal/Content/assets/icn-mt-report.svg" title="mtr report" width="24" height="24" alt="">
@@ -498,10 +473,7 @@
             },
             handleAddToCart: function (data) {
                 getInputQuantity(data._itemId, data._cartId);
-            },
-            handleSawOption: function (data) {
-                handleSawOption(data._itemId, data._productAttributes, data._productName)
-            },
+            }
         },
     });
 </script>
@@ -520,8 +492,6 @@
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`;
 
         AjaxCart.addproducttocart_catalog(link);
-        // don't clear qty
-        //$('#qty' + itemId).val("");
 
         if (addToFavorite && isMobile) {
             $('#mh-add-to-wishlist-' + itemId).hide();
@@ -537,9 +507,7 @@
         }
     }
 
-    function handleSawOption(productId, attributes, product) {
-        modalVm.handleSawOption(productId, attributes, product);
-    }
+ 
 
     function removeFromFavorites(itemId, isMobile) {
         $('#custom-loading').show();
@@ -589,24 +557,6 @@
 <script id="optionsTemplate" type="text/x-template">
 
     <div class="d-flex align-items-center w-100" style="justify-content: flex-end;">
-
-        ${if(_sawOption)}
-        <svg xmlns="http://www.w3.org/2000/svg" class="hover-icon mr-1" onclick="handleSawOption(`${_itemId}`, `${_productAttributes}`, `${_productName}`); return false;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" width="24" height="24" viewBox="0 0 24 24">
-            <defs>
-                <style>
-                    .a {
-                        fill: none;
-                    }
-
-                    .b {
-                        fill: #aaa;
-                    }
-                </style>
-            </defs>
-            <g transform="translate(-580 -80)"><path class="a" d="M0,0H24V24H0Z" transform="translate(580 80)" /><path class="hover-icon" d="M7.031,11.781h2.52l-.72,6.36,1.42,1.42,1.78-1.78,4,5h2v-2.52l6.36.7,1.42-1.42-1.78-1.76,5-4v-2h-2.52l.7-6.36L25.791,4l-1.76,1.78-4-5h-2V3.3l-6.36-.72L10.251,4l1.78,1.78-5,4Zm11-3a3,3,0,1,1-3,3,3,3,0,0,1,3-3Z" transform="translate(574.409 80.409)" /></g>
-        </svg>
-
-        ${/if}
 
         ${if(_mtr)}
         <a class="table-action-button mr-1" style="text-decoration:none" href="${_mtr}" target="_blank">

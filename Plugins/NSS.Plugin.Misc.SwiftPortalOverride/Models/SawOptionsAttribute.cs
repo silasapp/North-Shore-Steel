@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nop.Core.Domain.Catalog;
 using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
@@ -8,6 +9,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public object Values { get; set; }
+        public IList<ProductAttributeValue> Values { get; set; }
     }
 }

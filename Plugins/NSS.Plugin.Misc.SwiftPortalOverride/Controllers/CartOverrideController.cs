@@ -789,7 +789,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             foreach (var map in attrsMapping)
             {
-                var formControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{map.Id}{cartItem.Item.Id}";
+                var formControlId = $"{NopCatalogDefaults.ProductAttributePrefix}{map.Id}_{cartItem.Item.Id}";
                 if (form.TryGetValue(formControlId, out var value) && !string.IsNullOrEmpty(value))
                 {
                     cartItem.Item.AttributesXml = _productAttributeParser.RemoveProductAttribute(cartItem.Item.AttributesXml, map);
