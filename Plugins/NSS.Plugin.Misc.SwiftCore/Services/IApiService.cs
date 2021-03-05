@@ -26,6 +26,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
         public (string, List<ERPGetOrderMTRResponse>) GetOrderMTRs(int companyId, int erpOrderId, int? lineItemId = null);
 
+        public (string, ERPGetOrderShippingDetailsResponse) GetOrderShippingDetails(int companyId, int erpOrderId);
+
         #endregion
 
         #region Invoices API

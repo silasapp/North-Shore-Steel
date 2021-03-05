@@ -393,11 +393,11 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             var token = string.Empty;
 
 
-                if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
-                {
-                    _logger.Warning("Swift Api provider - SearchClosedOrders", new Exception("NSS API attributes not configured correctly."));
-                    return ("", retVal);
-                }
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - SearchClosedOrders", new Exception("NSS API attributes not configured correctly."));
+                return ("", retVal);
+            }
 
             //create swift user
             try
@@ -586,6 +586,72 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetOrderMTRs => companyId: {companyId}, orderId: {erpOrderId}", $"resp content ==> {respContent ?? "empty"}");
 
             return (token, retVal);
+        }
+
+        public (string, ERPGetOrderShippingDetailsResponse) GetOrderShippingDetails(int companyId, int erpOrderId)
+        {
+            //initialize
+            var retVal = new ERPGetOrderShippingDetailsResponse();
+            var respContent = string.Empty;
+            var error = string.Empty;
+            var token = string.Empty;
+
+
+            if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
+            {
+                _logger.Warning("Swift Api provider - GetOrderShippingDetails", new Exception("NSS API attributes not configured correctly."));
+                return ("", retVal);
+            }
+
+            //create swift user
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient();
+                {
+                    httpClient.DefaultRequestHeaders.Clear();
+
+                    httpClient.BaseAddress = new Uri(_baseUrl);
+
+                    //get token
+                    token = GetNSSToken(httpClient);
+
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        _logger.Warning($"NSS.GetOrderShippingDetails companyId -> {companyId}, orderId -> {erpOrderId}", new Exception("NSS token returned empty"));
+                        return ("NSS auth token returned empty", retVal);
+                    }
+
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
+
+                    // create user resource
+                    var resource = $"/companies/{companyId}/orders/{erpOrderId}/shipments";
+
+                    HttpResponseMessage response;
+
+                    response = httpClient.GetAsync(resource).Result;
+
+                    respContent = response.Content.ReadAsStringAsync().Result;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        error = respContent;
+                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
+                    }
+
+                    retVal = ERPGetOrderShippingDetailsResponse.FromJson(respContent) ?? new ERPGetOrderShippingDetailsResponse();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"NSS.GetOrderShippingDetails companyId -> {companyId}, orderId -> {erpOrderId}", ex);
+            }
+
+            // log request & resp
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetOrderShippingDetails => companyId: {companyId}, orderId: {erpOrderId}", $"resp content ==> {respContent ?? "empty"}");
+
+            return (error, retVal);
         }
 
         #endregion
@@ -1314,6 +1380,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
             return (retVal, error);
         }
+
         #endregion
 
 
