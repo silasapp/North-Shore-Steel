@@ -21,7 +21,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         {
             // search nss api
             var response = new List<ERPSearchInvoicesResponse>();
-            var token = string.Empty;
 
             if ((!filter.InvoiceId.HasValue && !filter.OrderId.HasValue && filter.PONo == null) && (filter.FromDate == null || filter.ToDate == null))
             {
@@ -51,9 +50,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             };
 
             if (filter.IsClosed)
-                (token, response) = _nSSApiProvider.SearchClosedInvoices(companyId, request, useMock: false);
+                (_, response) = _nSSApiProvider.SearchClosedInvoices(companyId, request, useMock: false);
             else
-                (token, response) = _nSSApiProvider.SearchOpenInvoices(companyId, request, useMock: false);
+                (_, response) = _nSSApiProvider.SearchOpenInvoices(companyId, request, useMock: false);
 
             // map response
             var invoices = response.Select(invoice => new CompanyInvoiceListModel.InvoiceDetailsModel
@@ -67,7 +66,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 InvoiceStatusName = invoice.InvoiceStatusName,
                 OrderNo = invoice.OrderNo,
                 PoNo = invoice.PoNo,
-                InvoiceFile = $"{invoice.InvoiceFile}{token}"
+                InvoiceFile = $"{invoice.InvoiceFile}"
 
         }).ToList();
 

@@ -246,7 +246,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
         public TransactionModel PrepareCustomerHomeModel(string companyId)
         {
-            var token = string.Empty;
             var openOrdersResponse = new List<ERPSearchOrdersResponse>();
             var closedOrdersResponse = new List<ERPSearchOrdersResponse>();
             bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Int32.Parse(companyId), ERPRole.AP);
@@ -261,7 +260,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var currentCustomer = _workContext.CurrentCustomer;
 
             openOrdersResponse = _nSSApiProvider.SearchOpenOrders(Convert.ToInt32(companyId), request, useMock: false);
-            (token, closedOrdersResponse) = _nSSApiProvider.SearchClosedOrders(Convert.ToInt32(companyId), request, useMock: false);
+            (_, closedOrdersResponse) = _nSSApiProvider.SearchClosedOrders(Convert.ToInt32(companyId), request, useMock: false);
 
             var openOrders = openOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
@@ -278,7 +277,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 PoNo = order.PoNo,
                 DeliveryDate = order.DeliveryDate,
                 DeliveryStatus = order.DeliveryStatus,
-                DeliveryTicketFile = $"{order.DeliveryTicketFile}{token}",
+                DeliveryTicketFile = $"{order.DeliveryTicketFile}",
                 DeliveryTicketCount = order.DeliveryTicketCount
             }).ToList();
 

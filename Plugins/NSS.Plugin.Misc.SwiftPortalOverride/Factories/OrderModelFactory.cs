@@ -49,7 +49,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         {
             // search nss api
             var response = new List<ERPSearchOrdersResponse>();
-            var token = string.Empty;
 
             if ((filter.OrderId == null && filter.PONo == null) && (filter.FromDate == null || filter.ToDate == null))
             {
@@ -78,7 +77,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             };
 
             if (filter.IsClosed)
-                (token, response) = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: false);
+                (_, response) = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: false);
             else
                 response = _nSSApiProvider.SearchOpenOrders(companyId, request, useMock: false);
 
@@ -94,7 +93,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 PromiseDate = order.PromiseDate,
                 ScheduledDate = order.ScheduledDate,
                 Weight = order.Weight,
-                DeliveryTicketFile = $"{order.DeliveryTicketFile}{token}"
+                DeliveryTicketFile = $"{order.DeliveryTicketFile}"
             }).ToList();
 
             var model = new CompanyOrderListModel
@@ -106,7 +105,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-        public OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs, string token)
+        public OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs)
         {
             var model = new OrderDetailsModel();
             var orderedMTRs = new List<ERPGetOrderMTRResponse>();
@@ -129,15 +128,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
                 model.DeliveryTicketFile = orderDetailsResponse.DeliveryTicketFile;
                 if (!string.IsNullOrEmpty(model.DeliveryTicketFile))
-                    model.DeliveryTicketFile = $"{orderDetailsResponse.DeliveryTicketFile}{token}";
+                    model.DeliveryTicketFile = $"{orderDetailsResponse.DeliveryTicketFile}";
 
                 model.InvoiceFile = orderDetailsResponse.InvoiceFile;
                 if (!string.IsNullOrEmpty(model.InvoiceFile))
-                    model.InvoiceFile = $"{orderDetailsResponse.InvoiceFile}{token}";
+                    model.InvoiceFile = $"{orderDetailsResponse.InvoiceFile}";
 
                 model.OrderFile = orderDetailsResponse.OrderFile;
                 if (!string.IsNullOrEmpty(model.OrderFile))
-                    model.OrderFile = $"{orderDetailsResponse.OrderFile}{token}";
+                    model.OrderFile = $"{orderDetailsResponse.OrderFile}";
 
                 model.MtrCount = mtrCount;
 
@@ -229,7 +228,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         LineNo = mtr.LineNo,
                         HeatNo = mtr.HeatNo,
                         Description = mtr.Description,
-                        MtrFile = $"{mtr.MtrFile}{token}"
+                        MtrFile = $"{mtr.MtrFile}"
                     };
 
                     model.MTRs.Add(orderMTR);

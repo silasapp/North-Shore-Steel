@@ -120,9 +120,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var model = new OrderDetailsModel();
 
-            var token = string.Empty;
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
-            (token, orderMTRs) = _erpApiProvider.GetOrderMTRs(companyId, orderId);
+            (_, orderMTRs) = _erpApiProvider.GetOrderMTRs(companyId, orderId);
 
             var orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo)?.ToList();
 
@@ -134,7 +133,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     LineNo = mtr.LineNo,
                     HeatNo = mtr.HeatNo,
                     Description = mtr.Description,
-                    MtrFile = $"{mtr.MtrFile}{token}"
+                    MtrFile = $"{mtr.MtrFile}"
                 };
 
                 model.MTRs.Add(orderMTR);

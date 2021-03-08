@@ -114,11 +114,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
             ERPGetOrderDetailsResponse orderDetailsResponse = null;
-            var token = string.Empty;
 
             // call api
             if (eRPCompanyId > 0 && orderId > 0)
-                (token, orderDetailsResponse) = _erpApiProvider.GetOrderDetails(eRPCompanyId, orderId);
+                (_, orderDetailsResponse) = _erpApiProvider.GetOrderDetails(eRPCompanyId, orderId);
 
             if (orderDetailsResponse == null)
                 return Challenge();
@@ -127,11 +126,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
             if (int.TryParse(orderDetailsResponse.MtrCount, out int mtrCount) && mtrCount > 0)
             {
-                (token, orderMTRs) = _erpApiProvider.GetOrderMTRs(eRPCompanyId, orderId);
+                (_, orderMTRs) = _erpApiProvider.GetOrderMTRs(eRPCompanyId, orderId);
             }
             
 
-            var model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs, token);
+            var model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs);
             model.CanBuy = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
             
             return View(model);
