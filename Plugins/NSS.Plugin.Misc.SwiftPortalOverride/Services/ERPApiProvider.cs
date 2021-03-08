@@ -1108,6 +1108,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
                         return retVal;
                     }
 
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
+
                     var resource = $"companies/{companyId}/stats";
 
                     var response = httpClient.GetAsync(resource).Result;
