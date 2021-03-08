@@ -160,7 +160,7 @@
                         <label class="fs12-white mb-0">Order Amount</label>
                     </div>
                     <div class="d-flex p-2">
-                        <label class="fs12-default mb-0" v-cloak>{{order.orderTotal}}</label>
+                        <label class="fs12-default mb-0" v-cloak>${{order.orderTotal}}</label>
                     </div>
                 </div>
 
@@ -222,6 +222,9 @@
                 return this.window.width <= 767.98;
             },
         },
+        mounted: function () {
+            this.formatText();
+        },
         methods: {
             handleResize: function () {
                 this.window.width = window.innerWidth;
@@ -233,6 +236,12 @@
             cancelExportMode: function () {
                 this.isExportMode = false;
                 mobileExcelData = [];
+            },
+            formatText: function () {
+                this.paginatedData.map(g => {
+                    g.weight = Math.round(g.weight)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    g.orderTotal = g.orderTotal.toLocaleString();
+                });
             },
             paginate: function (page_number, page_size) {
                 page_number = page_number > 0 ? page_number : 1;

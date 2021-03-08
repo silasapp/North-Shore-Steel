@@ -389,7 +389,7 @@ Content3 =
                                         <li v-for="warning in item.warnings" v-cloak>{{ warning }}</li>
                                     </ul>
                                 </div>
-                                <label class="h5-default-500" v-cloak>Weight: {{  evenRound(item.weight * item.quantity) }} lb</label>
+                                <label class="h5-default-500" v-cloak>Weight: {{  evenRound(item.weight * item.quantity)  | amount(0) }} lb</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
                                 <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-bind:value="item.noteAttr.defaultValue" />
                                 <template v-if=item.hasSawOption>
@@ -399,7 +399,7 @@ Content3 =
                                     <input type="hidden" v-bind:name="item.sawOptionControlId" v-model="item.sawOptionRadioId" />
                                 </template>
 
-                               
+
 
                                 <div class="d-flex flex-row justify-content-between align-items-center">
                                     <label class="h5-default-500">Quantity</label>

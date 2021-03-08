@@ -439,18 +439,10 @@
 
                         <div class="d-flex flex-row">
                             <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0"> Order Date</label>
+                                <label class="fs12-white mb-0"> PO #</label>
                             </div>
                             <div class="d-flex p-2">
-                                <label class="fs12-default mb-0" v-cloak>{{ order.orderDate | date }}</label>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row">
-                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0"> Promise Date</label>
-                            </div>
-                            <div class="d-flex p-2">
-                                <label class="fs12-default mb-0" v-cloak>{{ order.promiseDate | date }}</label>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.poNo}}</label>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -463,10 +455,26 @@
                         </div>
                         <div class="d-flex flex-row">
                             <div class="d-flex bg-primary2 p-2 home-table-sm-header">
-                                <label class="fs12-white mb-0">Status</label>
+                                <label class="fs12-white mb-0">On Time</label>
                             </div>
                             <div class="d-flex p-2">
                                 <label class="fs12-default mb-0" v-cloak>{{ order.deliveryStatus }}</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">MTR</label>
+                            </div>
+                            <div class="d-flex p-2">
+                                <a v-on:click="handleMtrModal(companyId, order.orderId)" class="light-blue" v-cloak>View</a>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="d-flex bg-primary2 p-2 home-table-sm-header">
+                                <label class="fs12-white mb-0">POD</label>
+                            </div>
+                            <div class="d-flex p-2" v-if="order.deliveryTicketCount > 0">
+                                 <a v-bind:href="order.deliveryTicketFile" target="_blank" class="light-blue" v-cloak>View</a>
                             </div>
                         </div>
                     </div>
@@ -584,13 +592,13 @@
     // for mobile view
     let openOrders = @Html.Raw(Serialize(Model.OpenOrders));
     let closedOrders = @Html.Raw(Serialize(Model.ClosedOrders));
-
     var companyId = @Html.Raw(eRPCompanyId)
 
     new Vue({
         el: '#app',
         data: {
             openOrders,
+            companyId,
             closedOrders,
             companyStats,
             showRecentOrders: true,
