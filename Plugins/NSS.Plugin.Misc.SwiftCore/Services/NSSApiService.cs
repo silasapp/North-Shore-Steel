@@ -19,6 +19,7 @@ using NSS.Plugin.Misc.SwiftCore.Configuration;
 using Newtonsoft.Json.Linq;
 using NSS.Plugin.Misc.SwiftCore.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftCore.Services
 {
@@ -1108,14 +1109,13 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                 return (error, retVal);
             }
 
-            //create swift user
+            //calculate shipping rate
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-
-                //httpClient.DefaultRequestHeaders.Clear();
-
                 httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
 
                 //get token
                 var token = GetNSSToken(httpClient);
@@ -1130,28 +1130,14 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                 //  resource
                 var resource = "/shipping-charges";
 
-                //body params
-                var param = request.ToKeyValue();
+                (error, retVal) = client.PostAsync<ERPCalculateShippingRequest, ERPCalculateShippingResponse>(resource, request, token);
 
-                HttpContent content = new FormUrlEncodedContent(param);
+                // throw error if not successful
+                if (string.IsNullOrEmpty(error))
+                    retVal ??= new ERPCalculateShippingResponse();
 
-                using (var requestMessage =
-                            new HttpRequestMessage(HttpMethod.Post, resource))
-                {
-                    //requestMessage.Headers.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
-
-                    requestMessage.Content = content;
-
-                    var response = httpClient.SendAsync(requestMessage).Result;
-
-                    // throw error if not successful
-                    if (response.IsSuccessStatusCode)
-                        retVal = JsonConvert.DeserializeObject<ERPCalculateShippingResponse>(respContent);
-
-                    else
-                        error = $"An error occured when getting shipping rate : status = {(int)response.StatusCode}, message = {respContent}";
-                }
+                else
+                    throw new NopException($"An error occured when getting shipping rate : {error}", error);
             }
             catch (Exception ex)
             {
