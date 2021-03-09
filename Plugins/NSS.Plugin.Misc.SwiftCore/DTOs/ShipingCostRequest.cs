@@ -12,7 +12,8 @@ namespace NSS.Plugin.Misc.SwiftCore.DTOs
         public int? StateProvinceId { get; set; }
         public string City { get; set; }
         public string ZipPostalCode { get; set; }
-
         public bool SaveToMyAddress { get; set; }
+        public string PickupPointId { get; set; }
+        public int? ExistingAddressId { get; set; }
     }
 }

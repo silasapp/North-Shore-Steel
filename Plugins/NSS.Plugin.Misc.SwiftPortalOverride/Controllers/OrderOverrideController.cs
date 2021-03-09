@@ -1,38 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
-using Nop.Core.Caching;
-using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Orders;
-using Nop.Core.Domain.Security;
-using Nop.Core.Domain.Vendors;
-using Nop.Core.Infrastructure;
-using Nop.Services.Caching;
-using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Customers;
-using Nop.Services.Directory;
-using Nop.Services.Discounts;
-using Nop.Services.Localization;
-using Nop.Services.Logging;
-using Nop.Services.Media;
-using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
-using Nop.Services.Security;
-using Nop.Services.Seo;
 using Nop.Services.Shipping;
-using Nop.Services.Stores;
-using Nop.Services.Tax;
-using Nop.Services.Vendors;
 using Nop.Web.Controllers;
-//using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftCore.DTOs;
+using NSS.Plugin.Misc.SwiftCore.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftCore.Services;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
@@ -56,15 +35,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkContext _workContext;
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly IOrderModelFactory _orderModelFactory;
-        private readonly ERPApiProvider _erpApiProvider;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IApiService _apiService;
 
         #endregion
 
         #region Ctor
 
-        public OrderOverrideController(ERPApiProvider erpApiProvider, 
+        public OrderOverrideController(IApiService apiService,
             ICustomerService customerService,
             Nop.Web.Factories.IOrderModelFactory orderNopModelFactory,
             IOrderProcessingService orderProcessingService,
@@ -90,9 +69,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workContext = workContext;
             _rewardPointsSettings = rewardPointsSettings;
             _orderModelFactory = orderModelFactory;
-            _erpApiProvider = erpApiProvider;
             _customerCompanyService = customerCompanyService;
             _genericAttributeService = genericAttributeService;
+            _apiService = apiService;
         }
 
         #endregion
@@ -117,7 +96,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // call api
             if (eRPCompanyId > 0 && orderId > 0)
-                (_, orderDetailsResponse) = _erpApiProvider.GetOrderDetails(eRPCompanyId, orderId);
+                (_, orderDetailsResponse) = _apiService.GetOrderDetails(eRPCompanyId, orderId);
 
             if (orderDetailsResponse == null)
                 return Challenge();
@@ -126,7 +105,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
             if (int.TryParse(orderDetailsResponse.MtrCount, out int mtrCount) && mtrCount > 0)
             {
-                (_, orderMTRs) = _erpApiProvider.GetOrderMTRs(eRPCompanyId, orderId);
+                (_, orderMTRs) = _apiService.GetOrderMTRs(eRPCompanyId, orderId);
             }
             
 

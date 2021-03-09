@@ -2,7 +2,6 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories

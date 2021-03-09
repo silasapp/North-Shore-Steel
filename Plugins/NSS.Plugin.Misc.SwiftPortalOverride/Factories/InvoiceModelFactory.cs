@@ -1,5 +1,5 @@
-﻿using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
+﻿using NSS.Plugin.Misc.SwiftCore.DTOs;
+using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
@@ -11,10 +11,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public class InvoiceModelFactory : IInvoiceModelFactory
     {
-        private readonly ERPApiProvider _nSSApiProvider;
-        public InvoiceModelFactory(ERPApiProvider nSSApiProvider)
+        private readonly IApiService _apiService;
+        public InvoiceModelFactory(IApiService apiService)
         {
-            _nSSApiProvider = nSSApiProvider;
+            _apiService = apiService;
         }
 
         public CompanyInvoiceListModel PrepareInvoiceListModel(int companyId, CompanyInvoiceListModel.SearchFilter filter)
@@ -50,9 +50,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             };
 
             if (filter.IsClosed)
-                (_, response) = _nSSApiProvider.SearchClosedInvoices(companyId, request, useMock: false);
+                (_, response) = _apiService.SearchClosedInvoices(companyId, request);
             else
-                (_, response) = _nSSApiProvider.SearchOpenInvoices(companyId, request, useMock: false);
+                (_, response) = _apiService.SearchOpenInvoices(companyId, request);
 
             // map response
             var invoices = response.Select(invoice => new CompanyInvoiceListModel.InvoiceDetailsModel

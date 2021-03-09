@@ -9,6 +9,7 @@ namespace NSS.Plugin.Misc.SwiftCore.DTOs
         public int CompanyId { get; set; }
         public string CompanyName { get; set; }
         public SalesContact SalesPerson { get; set; }
+        public bool HasCredit { get; set; }
 
 
         public class SalesContact

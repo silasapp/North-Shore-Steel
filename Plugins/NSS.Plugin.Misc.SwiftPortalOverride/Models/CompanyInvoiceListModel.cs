@@ -16,13 +16,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         }
 
         public IList<InvoiceDetailsModel> Invoices { get; set; }
-
         public CreditSummaryModel CreditSummary { get; set; }
-
         public CustomerRolesModel CustomerRoles { get; set; }
-
         public SearchFilter FilterContext { get; set; }
-
         public bool IsClosed { get; set; }
 
 

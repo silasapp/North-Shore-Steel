@@ -4,10 +4,9 @@ using Nop.Services.Directory;
 using Nop.Services.Orders;
 using Nop.Web.Factories;
 using Nop.Web.Models.Common;
-using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.DTOs;
+using NSS.Plugin.Misc.SwiftCore.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftCore.Services;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
@@ -20,27 +19,27 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
     {
         #region Fields
 
-        private readonly ERPApiProvider _nSSApiProvider;
         private readonly IAddressModelFactory _addressModelFactory;
         private readonly IAddressService _addressService;
         private readonly AddressSettings _addressSettings;
         private readonly ICountryService _countryService;
         private readonly IOrderService _orderService;
         private readonly CustomGenericAttributeService _genericAttributeService;
+        private readonly IApiService _apiService;
 
         #endregion
 
         #region Ctor
 
-        public OrderModelFactory(CustomGenericAttributeService genericAttributeService, IOrderService orderService, ERPApiProvider nSSApiProvider, IAddressModelFactory addressModelFactory, AddressSettings addressSettings, ICountryService countryService, IAddressService addressService)
+        public OrderModelFactory(IApiService apiService, CustomGenericAttributeService genericAttributeService, IOrderService orderService, IAddressModelFactory addressModelFactory, AddressSettings addressSettings, ICountryService countryService, IAddressService addressService)
         {
-            _nSSApiProvider = nSSApiProvider;
             _addressModelFactory = addressModelFactory;
             _addressSettings = addressSettings;
             _countryService = countryService;
             _addressService = addressService;
             _orderService = orderService;
             _genericAttributeService = genericAttributeService;
+            _apiService = apiService;
         }
 
         #endregion
@@ -77,9 +76,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             };
 
             if (filter.IsClosed)
-                (_, response) = _nSSApiProvider.SearchClosedOrders(companyId, request, useMock: false);
+                (_, response) = _apiService.SearchClosedOrders(companyId, request);
             else
-                response = _nSSApiProvider.SearchOpenOrders(companyId, request, useMock: false);
+                response = _apiService.SearchOpenOrders(companyId, request);
 
             var orders = response.Select(order => new CompanyOrderListModel.OrderDetailsModel 
             {

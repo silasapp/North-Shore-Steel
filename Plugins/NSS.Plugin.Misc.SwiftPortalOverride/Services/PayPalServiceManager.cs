@@ -48,7 +48,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         private readonly IWorkContext _workContext;
         private readonly CurrencySettings _currencySettings;
         private readonly IShapeService _shapeService;
-        private readonly ERPApiProvider _nSSApiProvider;
+        private readonly IApiService _apiService;
 
         #endregion
 
@@ -71,7 +71,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             IWorkContext workContext,
             CurrencySettings currencySettings,
             IShapeService shapeService,
-            ERPApiProvider nSSApiProvider)
+            IApiService apiService)
         {
             _addresService = addresService;
             _checkoutAttributeParser = checkoutAttributeParser;
@@ -90,7 +90,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             _workContext = workContext;
             _currencySettings = currencySettings;
             _shapeService = shapeService;
-            _nSSApiProvider = nSSApiProvider;
+            _apiService = apiService;
         }
 
         #endregion

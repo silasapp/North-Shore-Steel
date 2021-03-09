@@ -13,7 +13,6 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
-using NSS.Plugin.Misc.SwiftPortalOverride.Requests;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Authentication;
 using Nop.Services.Authentication.External;
@@ -40,11 +39,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftCore.Services;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using RegisterModel = Nop.Web.Models.Customer.RegisterModel;
 using Nop.Web.Extensions;
+using NSS.Plugin.Misc.SwiftCore.DTOs;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -80,7 +79,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly LocalizationSettings _localizationSettings;
         private readonly TaxSettings _taxSettings;
-        private readonly ERPApiProvider _nSSApiProvider;
         private readonly WorkFlowMessageServiceOverride _workFlowMessageServiceOverride;
         private readonly ICountryService _countryService;
         private readonly IShoppingCartService _shoppingCartService;
@@ -88,12 +86,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly ICompanyService _companyService;
         private readonly IAddressAttributeParser _addressAttributeParser;
+        private readonly IApiService _apiService;
 
         #endregion
 
         #region Constructor
 
-        public CustomerOverrideController(ICompanyService companyService, Factories.ICustomerModelFactory overrideCustomerModelFactory, ICustomerCompanyService customerCompanyService, AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, ERPApiProvider nSSApiProvider, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
+        public CustomerOverrideController(IApiService apiService, ICompanyService companyService, Factories.ICustomerModelFactory overrideCustomerModelFactory, ICustomerCompanyService customerCompanyService, AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
         {
             _customerSettings = customerSettings;
             _customerModelFactory = customerModelFactory;
@@ -122,7 +121,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _workflowMessageService = workflowMessageService;
             _localizationSettings = localizationSettings;
             _taxSettings = taxSettings;
-            _nSSApiProvider = nSSApiProvider;
             _workFlowMessageServiceOverride = workFlowMessageServiceOverride;
             _countryService = countryService;
             _forumSettings = forumSettings;
@@ -131,6 +129,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _customerCompanyService = customerCompanyService;
             _companyService = companyService;
             _addressAttributeParser = addressAttributeParser;
+            _apiService = apiService;
         }
 
         #endregion
@@ -253,7 +252,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 #endregion
 
-                var response = _nSSApiProvider.CreateNSSUser(request);
+                var response = _apiService.CreateNSSUser(request);
 
                 if (response != null && response.WitnrixId != null)
                 {
@@ -1093,7 +1092,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     #endregion
 
-                    _nSSApiProvider.UpdateNSSUser(ErpId, request);
+                    _apiService.UpdateNSSUser(ErpId, request);
 
 
                     return RedirectToRoute("CustomerInfo");
@@ -1278,7 +1277,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // call api
             var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
-            var (result, error) = _nSSApiProvider.GetCompanyNotificationPreferences(custNo, eRPCompanyId);
+            var (result, error) = _apiService.GetCompanyNotificationPreferences(custNo, eRPCompanyId);
 
             var model = _overrideCustomerModelFactory.PrepareNotificationsModel(eRPCompanyId, error, result);
 
@@ -1315,7 +1314,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
             }
 
-            var (result, error) = _nSSApiProvider.UpdateCompanyNotificationPreferences(custNo, eRPCompanyId, preferences);
+            var (result, error) = _apiService.UpdateCompanyNotificationPreferences(custNo, eRPCompanyId, preferences);
 
             var model = _overrideCustomerModelFactory.PrepareNotificationsModel(eRPCompanyId, error, result);
 

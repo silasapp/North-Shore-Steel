@@ -1,13 +1,13 @@
-﻿using NSS.Plugin.Misc.SwiftPortalOverride.Models;
-using System;
+﻿using NSS.Plugin.Misc.SwiftCore.DTOs;
+using NSS.Plugin.Misc.SwiftCore.DTOs.Responses;
+using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
     public interface IOrderModelFactory
     {
         CompanyOrderListModel PrepareOrderListModel(int companyId, CompanyOrderListModel.SearchFilter filter);
-        OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, DTOs.Responses.ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<DTOs.Responses.ERPGetOrderMTRResponse> orderMTRs);
+        OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs);
     }
 }

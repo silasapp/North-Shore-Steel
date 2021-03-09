@@ -23,22 +23,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IInvoiceModelFactory _invoiceModelFactory;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly SwiftCoreSettings _swiftCoreSettings;
-        private readonly ERPApiProvider _eRPApiProvider;
         private readonly IGenericAttributeService _genericAttributeService;
+        private readonly IApiService _apiService;
 
         #endregion
 
         #region Ctor
 
-        public InvoiceController(IGenericAttributeService genericAttributeService, IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory, ICustomerCompanyService customerCompanyService, SwiftCoreSettings swiftCoreSettings, ERPApiProvider eRPApiProvider)
+        public InvoiceController(IApiService apiService, IGenericAttributeService genericAttributeService, IWorkContext workContext, ICustomerService customerService, IInvoiceModelFactory invoiceModelFactory, ICustomerCompanyService customerCompanyService, SwiftCoreSettings swiftCoreSettings)
         {
             _workContext = workContext;
             _customerService = customerService;
             _invoiceModelFactory = invoiceModelFactory;
             _customerCompanyService = customerCompanyService;
             _swiftCoreSettings = swiftCoreSettings;
-            _eRPApiProvider = eRPApiProvider;
             _genericAttributeService = genericAttributeService;
+            _apiService = apiService;
         }
 
         #endregion
@@ -62,7 +62,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // get company info
             var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
-            var company = _eRPApiProvider.GetCompanyInfo(eRPCompanyId);
+            var company = _apiService.GetCompanyInfo(eRPCompanyId.ToString());
 
             // build credit summary
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
@@ -74,7 +74,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if ( creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))
             {
-                var creditResposne = _eRPApiProvider.GetCompanyCreditBalance(eRPCompanyId);
+                var creditResposne = _apiService.GetCompanyCreditBalance(eRPCompanyId);
 
                 creditSummary.CreditAmount = creditResposne?.CreditAmount ?? decimal.Zero;
                 creditSummary.CreditLimit = creditResposne?.CreditLimit ?? decimal.Zero;

@@ -1,22 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
-using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using Nop.Services.Authentication;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Events;
 using Nop.Web.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using NSS.Plugin.Misc.SwiftCore.Configuration;
+using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
+using NSS.Plugin.Misc.SwiftCore.DTOs;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftCore.Services;
+using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
-using NSS.Plugin.Misc.SwiftCore.Helpers;
-using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using ICustomerModelFactory = NSS.Plugin.Misc.SwiftPortalOverride.Factories.ICustomerModelFactory;
-using NSS.Plugin.Misc.SwiftCore.Services;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
-using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
-using NSS.Plugin.Misc.SwiftCore.Configuration;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -32,13 +31,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
         private readonly IUserRegistrationService _userRegistrationService;
-        private readonly ERPApiProvider _nSSApiProvider;
-        private readonly ICustomerRegistrationService _customerRegistrationService;
-        private readonly IGenericAttributeService _genericAttributeService;
-        private readonly ICompanyService _companyService;
-        private readonly ICustomerCompanyService _customerCompanyService;
         private readonly WorkFlowMessageServiceOverride _workflowMessageService;
         private readonly SwiftCoreSettings _swiftCoreSettings;
+        private readonly IApiService _apiService;
         #endregion
 
         #region Ctor
@@ -51,13 +46,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IStoreContext storeContext,
             IWorkContext workContext,
             IUserRegistrationService userRegistrationService,
-            ERPApiProvider nSSApiProvider,
-            ICustomerRegistrationService customerRegistrationService,
-            IGenericAttributeService genericAttributeService,
-            ICompanyService companyService,
-            ICustomerCompanyService customerCompanyService,
             WorkFlowMessageServiceOverride workflowMessageService,
-            SwiftCoreSettings swiftCoreSettings
+            SwiftCoreSettings swiftCoreSettings,
+            IApiService apiService
             )
         {
             _customerSettings = customerSettings;
@@ -68,14 +59,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _storeContext = storeContext;
             _workContext = workContext;
             _userRegistrationService = userRegistrationService;
-            _nSSApiProvider = nSSApiProvider;
-            _customerRegistrationService = customerRegistrationService;
-            _genericAttributeService = genericAttributeService;
             _workflowMessageService = workflowMessageService;
-            _companyService = companyService;
-            _customerCompanyService = customerCompanyService;
             _workflowMessageService = workflowMessageService;
             _swiftCoreSettings = swiftCoreSettings;
+            _apiService = apiService;
         }
 
         #endregion
@@ -198,7 +185,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     request.Buyer = res.IsExistingCustomer ? res.BuyerRole : (bool?)null;
                     request.Operations = res.IsExistingCustomer ? res.OperationsRole : (bool?)null;
 
-                    var response = _nSSApiProvider.CreateUserRegistration(request);
+                    var response = _apiService.CreateUserRegistration(request);
                     // check if error in response
                     // return error to screen
 
@@ -268,7 +255,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (ModelState.IsValid)
             {
                 // approve user from nss
-                var (response, error) = _nSSApiProvider.ApproveUserRegistration(regId);
+                var (response, error) = _apiService.ApproveUserRegistration(regId);
 
                 if (!string.IsNullOrEmpty(error))
                 {
@@ -296,7 +283,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
             }
 
-            var response = _nSSApiProvider.RejectUserRegistration(regId);
+            var response = _apiService.RejectUserRegistration(regId);
             // update user state and modified state 
             _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Rejected);
 

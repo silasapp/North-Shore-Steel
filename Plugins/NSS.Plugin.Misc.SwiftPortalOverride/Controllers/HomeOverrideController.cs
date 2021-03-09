@@ -12,14 +12,13 @@ using System.Collections.Generic;
 using Nop.Services.Common;
 using Nop.Core.Domain.Customers;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
+using NSS.Plugin.Misc.SwiftCore.DTOs;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
     public class HomeOverrideController : HomeController
     {
         #region Fields
-        private readonly ERPApiProvider _nSSApiProvider;
         private readonly ISettingService _settingService;
         private readonly IStoreContext _storeContext;
         private readonly IWorkContext _workContext;
@@ -27,16 +26,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ICompanyService _companyService;
         private readonly ICustomerModelFactory _customerModelFactory;
-        private readonly ERPApiProvider _erpApiProvider;
+        private readonly IApiService _apiService;
 
         #endregion
 
         #region Constructor
         public HomeOverrideController(
-            ERPApiProvider erpApiProvider,
+            IApiService apiService,
             ISettingService settingService,
             IStoreContext storeContext,
-            ERPApiProvider nSSApiProvider,
             IWorkContext workContext,
             ICustomerCompanyService customerCompanyService,
             IGenericAttributeService genericAttributeService,
@@ -47,13 +45,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             _settingService = settingService;
             _storeContext = storeContext;
-            _nSSApiProvider = nSSApiProvider;
             _workContext = workContext;
             _customerCompanyService = customerCompanyService;
             _genericAttributeService = genericAttributeService;
             _companyService = companyService;
             _customerModelFactory = customerModelFactory;
-            _erpApiProvider = erpApiProvider;
+            _apiService = apiService;
         }
         #endregion
 
@@ -121,7 +118,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var model = new OrderDetailsModel();
 
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
-            (_, orderMTRs) = _erpApiProvider.GetOrderMTRs(companyId, orderId);
+            (_, orderMTRs) = _apiService.GetOrderMTRs(companyId, orderId);
 
             var orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo)?.ToList();
 

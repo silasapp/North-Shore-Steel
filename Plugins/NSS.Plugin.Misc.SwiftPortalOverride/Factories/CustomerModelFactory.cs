@@ -10,14 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using Nop.Services.Common;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using Nop.Web.Models.Common;
 using Nop.Web.Factories;
 using Nop.Services.Customers;
 using Nop.Services.Stores;
 using Nop.Services.Directory;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using NSS.Plugin.Misc.SwiftCore.DTOs;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 {
@@ -30,9 +29,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         private readonly IThemeContext _themeContext;
         private readonly CustomerSettings _customerSettings;
         private readonly CommonSettings _commonSettings;
-        private readonly ERPApiProvider _nSSApiProvider;
         private readonly ICustomerCompanyService _customerCompanyService;
-        private readonly ERPApiProvider _eRPApiProvider;
         private readonly IWorkContext _workContext;
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ICompanyService _companyService;
@@ -42,7 +39,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         private readonly IStoreMappingService _storeMappingService;
         private readonly ICustomerService _customerService;
         private readonly IAddressService _addressService;
+        private readonly IApiService _apiService;
         public CustomerModelFactory(
+            IApiService apiService,
             IAddressService addressService,
             ICustomerService customerService,
             IStoreMappingService storeMappingService,
@@ -51,16 +50,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             IAddressModelFactory addressModelFactory,
             IGenericAttributeService genericAttributeService,
             ICompanyService companyService,
-            ERPApiProvider eRPApiProvider,
             IWorkContext workContext,
-        IThemeContext themeContext, ICustomerCompanyService customerCompanyService, ERPApiProvider nSSApiProvider, CommonSettings commonSettings, CustomerSettings customerSettings)
+        IThemeContext themeContext, ICustomerCompanyService customerCompanyService, CommonSettings commonSettings, CustomerSettings customerSettings)
         {
             _themeContext = themeContext;
             _customerSettings = customerSettings;
             _commonSettings = commonSettings;
-            _eRPApiProvider = eRPApiProvider;
             _workContext = workContext;
-            _nSSApiProvider = nSSApiProvider;
             _genericAttributeService = genericAttributeService;
             _companyService = companyService;
             _customerCompanyService = customerCompanyService;
@@ -70,6 +66,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             _countryService = countryService;
             _addressSettings = addressSettings;
             _addressService = addressService;
+            _apiService = apiService;
         }
         /// <summary>
         /// Prepare the customer navigation model
@@ -259,8 +256,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var model = new TransactionModel();
             var currentCustomer = _workContext.CurrentCustomer;
 
-            openOrdersResponse = _nSSApiProvider.SearchOpenOrders(Convert.ToInt32(companyId), request, useMock: false);
-            (_, closedOrdersResponse) = _nSSApiProvider.SearchClosedOrders(Convert.ToInt32(companyId), request, useMock: false);
+            openOrdersResponse = _apiService.SearchOpenOrders(Convert.ToInt32(companyId), request);
+            (_, closedOrdersResponse) = _apiService.SearchClosedOrders(Convert.ToInt32(companyId), request);
 
             var openOrders = openOrdersResponse.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
@@ -285,7 +282,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             model.CompanySalesContact = customerCompany?.Company ?? new Company();
             model.OpenOrders = openOrders?.OrderByDescending(x => x.OrderId)?.Take(5)?.ToList();
             model.ClosedOrders = closedOrders?.OrderByDescending(x => x.OrderId)?.Take(5)?.ToList();
-            var companyStats = _nSSApiProvider.GetCompanyStats(companyId);
+            var companyStats = _apiService.GetCompanyStats(companyId);
 
             if (companyStats != null && companyStats.Count > 0)
             {
@@ -303,7 +300,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             }
 
             // build credit summary
-            var companyInfo = _nSSApiProvider.GetCompanyInfo(Convert.ToInt32(companyId));
+            var companyInfo = _apiService.GetCompanyInfo(companyId);
 
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
             {
@@ -313,7 +310,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             if ( creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))
             {
-                var creditResponse = _eRPApiProvider.GetCompanyCreditBalance(Convert.ToInt32(companyId));
+                var creditResponse = _apiService.GetCompanyCreditBalance(Convert.ToInt32(companyId));
 
                 creditSummary.CreditAmount = creditResponse?.CreditAmount ?? decimal.Zero;
                 creditSummary.CreditLimit = creditResponse?.CreditLimit ?? decimal.Zero;

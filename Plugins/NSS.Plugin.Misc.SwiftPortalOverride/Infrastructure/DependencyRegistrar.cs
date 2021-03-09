@@ -17,7 +17,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
             // self
-            builder.RegisterType<ERPApiProvider>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<WorkFlowMessageServiceOverride>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PayPalServiceManager>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PayPalProcessor>().AsSelf().InstancePerLifetimeScope();
@@ -28,7 +27,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             builder.RegisterType<AzureStorageService>().As<IStorageService>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerCompanyProductService>().As<ICustomerCompanyProductService>().InstancePerLifetimeScope();
             builder.RegisterType<NSSApiService>().As<IApiService>().InstancePerLifetimeScope();
-
 
             // overrides
             builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();

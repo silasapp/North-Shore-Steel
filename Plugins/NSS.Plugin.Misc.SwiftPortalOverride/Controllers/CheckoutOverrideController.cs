@@ -24,7 +24,6 @@ using Nop.Web.Factories;
 using Nop.Web.Models.Checkout;
 using Nop.Web.Models.ShoppingCart;
 using NSS.Plugin.Misc.SwiftCore.Services;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Requests;
 using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
@@ -34,11 +33,11 @@ using Nop.Core.Http.Extensions;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
 using Nop.Services.Discounts;
 using Nop.Web.Models.Common;
-using NSS.Plugin.Misc.SwiftPortalOverride.DTOs.Responses;
 using NSS.Plugin.Misc.SwiftCore.Domain.Customers;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftCore;
 using System.Diagnostics;
+using NSS.Plugin.Misc.SwiftCore.DTOs;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -71,7 +70,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ShippingSettings _shippingSettings;
         private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
-        private readonly ERPApiProvider _nSSApiProvider;
         private readonly IShapeService _shapeService;
         private readonly ICountryModelFactory _countryModelFactory;
         private readonly PayPalServiceManager _payPalServiceManager;
@@ -86,14 +84,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly Factories.ICheckoutModelFactory _overrideCheckoutModelFactory;
         private readonly ICompanyService _companyService;
+        private readonly IApiService _apiService;
 
         #endregion
 
         #region Ctor
         public CheckoutOverrideController(
+            IApiService apiService,
             ICompanyService companyService,
             Factories.ICheckoutModelFactory overrideCheckoutModelFactory,
-            IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService, SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, ERPApiProvider nSSApiProvider, AddressSettings addressSettings,
+            IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, ICustomerCompanyProductService customerCompanyProductService, ICustomerCompanyService customerCompanyService, IOrderTotalCalculationService orderTotalCalculationService, IDiscountService discountService, ICheckoutAttributeParser checkoutAttributeParser, IStateProvinceService stateProvinceService, SwiftCoreSettings swiftCoreSettings, PayPalServiceManager payPalServiceManager, IShapeService shapeService, AddressSettings addressSettings,
             IShoppingCartModelFactory shoppingCartModelFactory, CustomerSettings customerSettings,
             IAddressAttributeParser addressAttributeParser, IAddressService addressService,
             ICheckoutModelFactory checkoutModelFactory, ICountryService countryService, ICustomerService customerService,
@@ -129,7 +129,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _rewardPointsSettings = rewardPointsSettings;
             _shippingSettings = shippingSettings;
             _shoppingCartModelFactory = shoppingCartModelFactory;
-            _nSSApiProvider = nSSApiProvider;
             _shapeService = shapeService;
             _countryModelFactory = countryModelFactory;
             _payPalServiceManager = payPalServiceManager;
@@ -144,6 +143,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _productAttributeService = productAttributeService;
             _overrideCheckoutModelFactory = overrideCheckoutModelFactory;
             _companyService = companyService;
+            _apiService = apiService;
         }
         #endregion
 
@@ -274,11 +274,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             // account credit
             var creditModel = new AccountCreditModel();
             var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
-            var companyInfo = _nSSApiProvider.GetCompanyInfo(eRPCompanyId);
+            var companyInfo = _apiService.GetCompanyInfo(eRPCompanyId.ToString());
 
             if (customerCompany != null && companyInfo != null && companyInfo.HasCredit && customerCompany.CanCredit)
             {
-                var creditResult = _nSSApiProvider.GetCompanyCreditBalance(erpCompId, useMock: false);
+                var creditResult = _apiService.GetCompanyCreditBalance(erpCompId);
                 creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero };
 
                 // save credit bal, cached purposes
@@ -647,7 +647,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             request.Items = JsonConvert.SerializeObject(orderItems.ToArray());
 
-            var response = _nSSApiProvider.GetShippingRate(request, useMock: false);
+            var (_, response) = _apiService.GetShippingRate(request);
             return response;
         }
 
@@ -803,7 +803,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // order items
             var orderItemList = _orderService.GetOrderItems(order.Id);
-            var orderItems = new List<DTOs.Requests.OrderItem>();
+            var orderItems = new List<SwiftCore.DTOs.OrderItem>();
             foreach (var item in orderItemList)
             {
                 var genAttrs = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
@@ -842,7 +842,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     }
                 }
 
-                orderItems.Add(new DTOs.Requests.OrderItem
+                orderItems.Add(new SwiftCore.DTOs.OrderItem
                 {
                     Description = genAttrs.FirstOrDefault(x => x.Key == "itemName")?.Value,
                     ItemId = (int.TryParse(genAttrs.FirstOrDefault(x => x.Key == "itemId")?.Value, out var itemId) ? itemId : 0),
@@ -902,7 +902,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var sw2 = new Stopwatch();
             sw2.Start();
             // api call
-            var resp = _nSSApiProvider.CreateNSSOrder(erpCompId, request, useMock: false);
+            var resp = _apiService.CreateNSSOrder(erpCompId, request);
             sw2.Stop();
             _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"nss api time elapsed - {sw2.ElapsedMilliseconds} ms");
 
