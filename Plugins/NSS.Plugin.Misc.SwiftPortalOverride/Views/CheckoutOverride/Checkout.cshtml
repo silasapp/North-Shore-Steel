@@ -299,8 +299,8 @@ Content2 =
                 <div class="card card-mod">
                     <label class="h5 text-primary mb-4" style="font:normal normal 500 26px/20px 'Teko';">PAYMENT METHOD</label>
                     <div class="d-flex flex-column mb-3">
-                        <div class="d-flex flex-row flex-wrap justify-content-between" v-if="isPaymentSelection">
-                            <div class="d-flex flex-row align-items-start p-4"
+                        <div class="d-flex flex-row flex-wrap justify-content-between">
+                            <div class="d-flex flex-row payment-item-card align-items-start p-4"
                                  v-bind:class="{'active': paymentMethodIndex === shared.constants.PAYMENT_METHOD_CREDIT_CARD, 'payment-item-card': shared.accountCredit.canCredit, 'payment-item-card-2':!shared.accountCredit.canCredit}"
                                  v-on:click="paymentMethodIndex = shared.constants.PAYMENT_METHOD_CREDIT_CARD">
                                 <img src="Themes/@themeName/Content/assets/credit-card.svg" alt="" width="24">
@@ -341,12 +341,7 @@ Content2 =
                                     <input id="cardholdername" type="text" class="nss-form-control" v-model="paymentCard.cardHolderName" placeholder="Ex: James Doe" />
                                     <label class="text-danger mt-1 mb-0" v-if="dirty && !paymentCard.cardHolderName">Cardholder name is required.</label>
                                 </div>
-                                <div class="col-md-4 d-flex" v-if="!isPaymentSelection">
-                                    <button class="fs-14 text-primary justify-content-end text-decoration-underline"
-                                            v-on:click="isPaymentSelection=true;">
-                                        View payment options
-                                    </button>
-                                </div>
+
                             </div>
                             <div class="row d-flex flex-row mt-3">
                                 <div class="col-md-6 d-flex flex-column">
@@ -666,7 +661,6 @@ Content2 =
                 width: 0,
                 height: 0,
             },
-            isPaymentSelection: false,
             cvvText: 'CVV',
             detailParentWidth: 0,
         },
@@ -700,10 +694,7 @@ Content2 =
                     return true;
 
                 return this.shared.accountCredit.creditAmount < parseFloat(this.orderTotal);
-            },
-            switchToPaymentSelection: function () {
-                isPaymentSelection = true;
-            },
+            }
         },
         methods: {
             resizeDetails: function () {
@@ -1168,9 +1159,6 @@ Content2 =
                             return self.finalizeOrder();
                         },
                     }).render('#paypal-button-container');
-            },
-            switchToPaymentSelection: function () {
-                isPaymentSelection = true;
             }
         },
     });
