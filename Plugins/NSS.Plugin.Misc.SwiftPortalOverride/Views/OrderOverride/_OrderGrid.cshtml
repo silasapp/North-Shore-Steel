@@ -1,10 +1,16 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
-
+@using NSS.Plugin.Misc.SwiftPortalOverride
 @model CompanyOrderListModel
 @using Syncfusion.EJ2
 @using Nop.Core
 @using Nop.Services.Common
+@inject IWorkContext workContext
+@inject IGenericAttributeService genericAttributeService
 
+@{
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
+    string eRPCompanyId = genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey);
+}
 <style>
 
     .e-headercelldiv {
@@ -35,10 +41,46 @@
         color: #ffffff;
     }
 
-    thead > tr > :nth-child(3) > div, thead > tr > :nth-child(4) > div {
+    thead > tr > :nth-child(6) > div, thead > tr > :nth-child(7) > div, thead > tr > :nth-child(8) > div {
         text-align: center !important;
     }
 </style>
+@{
+
+    Func<object, object>
+    Content1 =
+    @<div id="viewMtrModal">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <table class="table table-striped nss-table">
+                    <thead class="thead-default">
+                        <tr>
+                            <td scope="col">MTR #</td>
+                            <td scope="col">Heat #</td>
+                            <td scope="col" class="text-center">Line #</td>
+                            <td scope="col">Description</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="p in orderMTRs">
+                            <tr>
+                                <td><a v-bind:href="p.MtrFile" target="_blank" scope="row" v-cloak>{{p.MtrId}}</a></td>
+                                <td v-cloak>{{p.HeatNo}}</td>
+                                <td class="text-center" v-cloak>{{p.LineNo}}</td>
+                                <td v-cloak>{{p.Description}}</td>
+                            </tr>
+                        </template>
+                        <template v-if="orderMTRs.length == 0">
+                            MTR not available.
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>;
+}
+
 <div id="ordersGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
         <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" rowHeight="38" allowExcelExport="true"
@@ -53,7 +95,6 @@
                 @if (Model.IsClosed)
                 {
                     <e-grid-column textAlign="Center" field="DeliveryDate" headerText="Delivery Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column textAlign="Center" template="#viewTicket" headerText="POD" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
@@ -62,9 +103,16 @@
                 }
                 <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" format="N0" allowFiltering="false"></e-grid-column>
                 <e-grid-column textAlign="Right" field="OrderTotal" headerText="Order Amount" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
+                @if (Model.IsClosed)
+                {
+                    <e-grid-column textAlign="Center" template="#viewMtr" headerText="MTR" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" template="#viewTicket" headerText="POD" allowFiltering="false"></e-grid-column>
+                }
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>
         </ejs-grid>
+        @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
+
     </div>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
         <div v-if="paginatedData.length == 0" style="background:#ffffff; padding: 10px;">
@@ -196,6 +244,8 @@
 }
 <script>
     var pageModel = @Html.Raw(Serialize(Model));
+    var companyId = @Html.Raw(eRPCompanyId);
+
     var ordergridvm = new Vue({
         el: '#ordersGrid',
         data: {
@@ -203,6 +253,8 @@
                 width: 0,
                 height: 0,
             },
+            companyId,
+            orderMTRs: [],
             isExportMode: false,
             paginatedData: [],
             currentPage: 1,
@@ -257,10 +309,55 @@
                 if (this.isExportMode) {
                     selectAll(false);
                 }
-            }
+            },
+            showLoading: function () {
+                $('#custom-loading').show();
+            },
+            hideLoading: function () {
+                $('#custom-loading').hide();
+            },
+            handleMtrModal: function (orderId) {
+
+                const request = {
+                    companyId,
+                    orderId
+                }
+                this.showLoading();
+                const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
+                for (var i = 0; i < elements.length; i++) {
+                    $(elements[i]).removeClass("e-dlg-closeicon-btn");
+                }
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("GetOrderMTRs", "OrderOverride")",
+                    type: 'GET',
+                    data: request,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, _, _) {
+                        self.orderMTRs = data.MTRs;
+                        viewMtrModal.show();
+                        self.hideLoading();
+                    },
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
+                        self.hideLoading();
+                    }
+                });
+            },
 
         },
     });
+
+    function onDialogCreated() {
+        viewMtrModal = this;
+    }
+
+    function handleMtrModal(orderId) {
+        ordergridvm.handleMtrModal(orderId);
+    }
 </script>
 <script>
     var pageModel = @Html.Raw(Serialize(Model));
@@ -349,6 +446,7 @@
 
 </script>
 
+
 <script id="orderNo" type="text/x-template">
     <a href="/orders/${OrderId}">${OrderId}</a>
 </script>
@@ -357,4 +455,8 @@
     <a href="${DeliveryTicketFile}" target="_blank">View</a>
     ${/if}
 </script>
+<script id="viewMtr" type="text/x-template">
+    <td class="text-center"><a onclick="handleMtrModal(${OrderId})" scope="row" class="light-blue">View</a></td>
+</script>
+
 <ejs-scripts></ejs-scripts>
