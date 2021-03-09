@@ -130,30 +130,26 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
+                    _logger.Warning($"NSS.CreateUser -> {request.WorkEmail}", new Exception("NSS token returned empty"));
+                    return retVal;
+                }
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
+                // create user resource
+                var resource = "/users";
 
-                    //get token
-                    var token = GetNSSToken(httpClient);
-
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        _logger.Warning($"NSS.CreateUser -> {request.WorkEmail}", new Exception("NSS token returned empty"));
-                        return retVal;
-                    }
-
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
-
-                    // create user resource
-                    var resource = "/users";
-
-                    //body params
-                    var param = new KeyValuePair<string, string>[]
-                    {
+                //body params
+                var param = new KeyValuePair<string, string>[]
+                {
                         new KeyValuePair<string, string>("swiftUserId", request.SwiftUserId),
                         new KeyValuePair<string, string>("firstName", request.Firstname),
                         new KeyValuePair<string, string>("lastName", request.LastName),
@@ -165,18 +161,18 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                         new KeyValuePair<string, string>("hearAboutUs", request.HearAboutUs),
                         new KeyValuePair<string, string>("other", request.Other),
                         new KeyValuePair<string, string>("itemsForNextProject", request.ItemsForNextProject)
-                    };
+                };
 
-                    var content = new FormUrlEncodedContent(param);
+                var content = new FormUrlEncodedContent(param);
 
-                    var response = httpClient.PostAsync(resource, content).Result;
+                var response = httpClient.PostAsync(resource, content).Result;
 
-                    // throw error if not successful
-                    response.EnsureSuccessStatusCode();
+                // throw error if not successful
+                response.EnsureSuccessStatusCode();
 
-                    respContent = response.Content.ReadAsStringAsync().Result;
-                    retVal = JsonConvert.DeserializeObject<ERPCreateUserResponse>(respContent);
-                }
+                respContent = response.Content.ReadAsStringAsync().Result;
+                retVal = JsonConvert.DeserializeObject<ERPCreateUserResponse>(respContent);
+
 
             }
             catch (Exception ex)
@@ -197,7 +193,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                 throw new ArgumentNullException(nameof(request));
 
             //initialize
-            var respContent = string.Empty;
+            var error = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
@@ -207,37 +203,29 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
-
-                    httpClient.BaseAddress = new Uri(_baseUrl);
-
-                    //get token
-                    var token = GetNSSToken(httpClient);
-
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        _logger.Warning($"NSS.UpdateNSSUser erpId -> {erpId}", new Exception("NSS token returned empty"));
-                    }
-
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
-
-                    // create user resource
-                    var resource = $"/users/{erpId}";
-
-                    //body params
-                    var param = request.ToKeyValue();
-
-                    var content = new FormUrlEncodedContent(param);
-
-                    var response = httpClient.PutAsync(resource, content).Result;
-
-                    // throw error if not successful
-                    response.EnsureSuccessStatusCode();
+                    _logger.Warning($"NSS.UpdateNSSUser erpId -> {erpId}", new Exception("NSS token returned empty"));
                 }
 
+                // create user resource
+                var resource = $"/users/{erpId}";
+
+                (error, _) = client.PutAsync<ERPUpdateUserRequest, string>(resource, request, token);
+
+                // throw error if not successful
+                if (!string.IsNullOrEmpty(error))
+                {
+                    error = $"An error has occured: {error}";
+                }
             }
             catch (Exception ex)
             {
@@ -245,7 +233,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateNSSUser details => erpId: {erpId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request.ToKeyValue())}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateNSSUser details => erpId: {erpId}", $"resp content ==> {error ?? "empty"}, request ==> {JsonConvert.SerializeObject(request.ToKeyValue())}");
         }
 
         #endregion
@@ -259,7 +247,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
             //initialize
             var retVal = new ERPCreateOrderResponse();
-            var respContent = string.Empty;
+            string error = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
@@ -270,40 +258,29 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
-
-                    httpClient.BaseAddress = new Uri(_baseUrl);
-
-                    //get token
-                    var token = GetNSSToken(httpClient);
-
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        _logger.Warning($"NSS.CreateNSSOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
-                    }
-
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
-
-                    // create user resource
-                    var resource = $"companies/{companyId}/orders";
-
-                    //body params
-                    var param = request.ToKeyValue();
-
-                    var content = new FormUrlEncodedContent(param);
-
-                    var response = httpClient.PostAsync(resource, content).Result;
-
-                    respContent = response.Content.ReadAsStringAsync().Result;
-
-                    if (response.IsSuccessStatusCode)
-                        retVal = JsonConvert.DeserializeObject<ERPCreateOrderResponse>(respContent);
-                    else
-                        throw new NopException($"An error ocurred while placing order: status = {response.StatusCode}, reasonPharse = {response.ReasonPhrase}, message = {respContent}", $"request => {JsonConvert.SerializeObject(request)}, result: {respContent}");
+                    _logger.Warning($"NSS.CreateNSSOrder -> {request.OrderId}", new Exception("NSS token returned empty"));
                 }
+
+                // create user resource
+                var resource = $"companies/{companyId}/orders";
+
+                (error, retVal) = client.PostAsync<ERPCreateOrderRequest, ERPCreateOrderResponse>(resource, request, token);
+
+                if (string.IsNullOrEmpty(error))
+                    retVal ??= new ERPCreateOrderResponse();
+                else
+                    throw new NopException($"An error ocurred while placing order: message = {error}", $"request => {JsonConvert.SerializeObject(request)}");
+
             }
             catch (Exception ex)
             {
@@ -312,7 +289,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateOrder details => orderid: {request.OrderId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateOrder details => orderid: {request.OrderId}", $"resp content ==> {JsonConvert.SerializeObject(retVal) ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return retVal;
         }
@@ -973,9 +950,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             string error = string.Empty;
             var result = new Dictionary<string, bool>();
 
-            //initialize
-            var respContent = string.Empty;
-
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
                 error = "NSS API attributes not configured correctly.";
@@ -986,41 +960,31 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
-
-                    httpClient.BaseAddress = new Uri(_baseUrl);
-
-                    //get token
-                    var token = GetNSSToken(httpClient);
-
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        error = "NSS token returned empty";
-                        _logger.Warning($"NSS.UpdateCompanyNotificationPreferences", new Exception(error));
-                        return (result, error);
-                    }
-
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
-
-                    //  resource
-                    var resource = $"users/{userId}/companies/{companyId}/notifications";
-
-                    var param = preferences.ToKeyValue();
-
-                    var response = httpClient.PutAsync(resource, new FormUrlEncodedContent(param)).Result;
-
-                    respContent = response.Content.ReadAsStringAsync().Result;
-
-                    // throw error if not successful
-                    if (response.IsSuccessStatusCode)
-                        result = ERPGetNotificationPreferencesResponse.FromJson(respContent);
-                    else
-                        throw new NopException($"An error occured when updating user company notification preferences : api status => {response.StatusCode}, message => {respContent}", respContent);
-
+                    error = "NSS token returned empty";
+                    _logger.Warning($"NSS.UpdateCompanyNotificationPreferences", new Exception(error));
+                    return (result, error);
                 }
+
+                //  resource
+                var resource = $"users/{userId}/companies/{companyId}/notifications";
+
+                (error, result) = client.PutAsync<IDictionary<string, bool>, Dictionary<string, bool>>(resource, preferences, token);
+
+                // throw error if not successful
+                if (string.IsNullOrEmpty(error))
+                    result ??= new Dictionary<string, bool>();
+                else
+                    error = $"An error occured when updating user company notification preferences : message = {error}";
 
             }
             catch (Exception ex)
@@ -1029,7 +993,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateCompanyNotificationPreferences => userId: {userId}", $"resp content ==> {respContent ?? "empty"}, companyId  ==> {companyId}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateCompanyNotificationPreferences => userId: {userId}", $"resp content ==> {error ?? JsonConvert.SerializeObject(result) ?? "empty"}, companyId  ==> {companyId}");
 
             return (result, error);
         }
@@ -1165,7 +1129,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
             //initialize
             var retVal = new ERPRegisterUserResponse();
-            var respContent = string.Empty;
             string error = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -1180,61 +1143,42 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
+                    error = "NSS token returned empty";
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
+                    _logger.Warning($"NSS.CreateUserRegistration -> {request.SwiftRegistrationId}", new Exception(error));
 
-                    //get token
-                    var token = GetNSSToken(httpClient);
-
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        error = "NSS token returned empty";
-
-                        _logger.Warning($"NSS.CreateUserRegistration -> {request.SwiftRegistrationId}", new Exception(error));
-
-                        return (retVal, error);
-                    }
-
-                    //httpClient.DefaultRequestHeaders.Authorization =
-                    //    new AuthenticationHeaderValue("Bearer", token);
-
-
-                    // create user resource
-                    var resource = $"/userregistration";
-
-                    //body params
-                    var param = request.ToKeyValue();
-
-                    var content = new FormUrlEncodedContent(param);
-
-                    var response = httpClient.PostAsync(resource, content).Result;
-
-                    //// throw error if not successful
-                    //response.EnsureSuccessStatusCode();
-
-                    respContent = response.Content.ReadAsStringAsync().Result;
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        error = respContent;
-                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}, request ==> {JsonConvert.SerializeObject(request)}");
-                    }
-
-                    retVal = ERPRegisterUserResponse.FromJson(respContent) ?? new ERPRegisterUserResponse();
+                    return (retVal, error);
                 }
 
+                // create user resource
+                var resource = $"/userregistration";
+
+                //body params
+                (error, retVal) = client.PostAsync<ERPRegisterUserRequest, ERPRegisterUserResponse>(resource, request, token);
+
+                if (string.IsNullOrEmpty(error))
+                    retVal ??= new ERPRegisterUserResponse();
+
+                else
+                    error = $"An error occured registring user : {error}";
             }
             catch (Exception ex)
             {
                 _logger.Error($"NSS.CreateUserRegistration -> {request.SwiftRegistrationId}, request ==> {JsonConvert.SerializeObject(request)}", ex);
-                return (retVal, error);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUserRegistration => regId: {request.SwiftRegistrationId}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUserRegistration => regId: {request.SwiftRegistrationId}", $"resp content ==> {error ?? JsonConvert.SerializeObject(retVal) ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return (retVal, error);
         }
@@ -1242,9 +1186,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         public string RejectUserRegistration(int regId)
         {
             //initialize
-            var respContent = string.Empty;
             var error = string.Empty;
-
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
             {
@@ -1258,50 +1200,40 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
+                    error = "NSS token returned empty";
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
+                    _logger.Warning($"NSS.RejectUserRegistration -> {regId}", new NopException(error));
 
-                    //get token
-                    var token = GetNSSToken(httpClient);
-
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        error = "NSS token returned empty";
-
-                        _logger.Warning($"NSS.RejectUserRegistration -> {regId}", new NopException(error));
-
-                        return error;
-                    }
-
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
-
-                    // create user resource
-                    var resource = $"/userregistration/{regId}/reject";
-
-                    var response = httpClient.PutAsync(resource, null).Result;
-
-                    respContent = response.Content.ReadAsStringAsync().Result;
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        error = respContent;
-                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
-                    }
+                    return error;
                 }
 
+                // create user resource
+                var resource = $"/userregistration/{regId}/reject";
+
+                (error, _) = client.PutAsync<string, string>(resource, null, token);
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    error = $"An error has occured: {error}";
+                }
             }
             catch (Exception ex)
             {
                 _logger.Error($"NSS.RejectUserRegistration -> {regId}", ex);
-                return error;
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.RejectUserRegistration => regId: {regId}", $"resp content ==> {respContent ?? "empty"}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.RejectUserRegistration => regId: {regId}", $"resp content ==> {error ?? "empty"}");
 
             return error;
         }
@@ -1310,7 +1242,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
         {
             //initialize
             var retVal = new ERPApproveUserRegistrationResponse();
-            var respContent = string.Empty;
             var error = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -1325,54 +1256,45 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             //create swift user
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri(_baseUrl);
+
+                var client = new CustomRestClient(new RestSharp.RestClient(_baseUrl));
+
+                //get token
+                var token = GetNSSToken(httpClient);
+
+                if (string.IsNullOrEmpty(token))
                 {
-                    httpClient.DefaultRequestHeaders.Clear();
+                    error = "NSS token returned empty";
 
-                    httpClient.BaseAddress = new Uri(_baseUrl);
+                    _logger.Warning($"NSS.ApproveUserRegistration -> {regId}", new Exception(error));
 
-                    //get token
-                    var token = GetNSSToken(httpClient);
+                    return (retVal, error);
+                }
 
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        error = "NSS token returned empty";
+                // create user resource
+                var resource = $"/userregistration/{regId}/approve";
 
-                        _logger.Warning($"NSS.ApproveUserRegistration -> {regId}", new Exception(error));
+                (error, retVal) = client.PutAsync<string, ERPApproveUserRegistrationResponse>(resource, null);
 
-                        return (retVal, error);
-                    }
-
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", token);
-
-
-                    // create user resource
-                    var resource = $"/userregistration/{regId}/approve";
-
-                    var response = httpClient.PutAsync(resource, null).Result;
-
-                    respContent = response.Content.ReadAsStringAsync().Result;
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        error = respContent;
-                        throw new NopException($"Request returned status of {response.StatusCode.ToString()} and message: {respContent}");
-                    }
-
-                    retVal = ERPApproveUserRegistrationResponse.FromJson(respContent) ?? new ERPApproveUserRegistrationResponse();
+                if (!string.IsNullOrEmpty(error))
+                {
+                    error = $"An error has occured: {error}";
+                }
+                else
+                {
+                    retVal ??= new ERPApproveUserRegistrationResponse();
                 }
 
             }
             catch (Exception ex)
             {
                 _logger.Error($"NSS.ApproveUserRegistration -> {regId}", ex);
-
-                return (retVal, error);
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.ApproveUserRegistration => regId: {regId}", $"resp content ==> {respContent ?? "empty"}");
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.ApproveUserRegistration => regId: {regId}", $"resp content ==> {error?? JsonConvert.SerializeObject(retVal) ?? "empty"}");
 
             return (retVal, error);
         }
