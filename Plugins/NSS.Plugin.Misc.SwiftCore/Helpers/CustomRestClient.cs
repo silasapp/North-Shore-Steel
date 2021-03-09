@@ -2,6 +2,7 @@
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -67,9 +68,15 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         {
             return CreateRequestMessage(url, method, token, async (req) =>
             {
-                req.AddObject(input);
-                return GetResult<Response>(req);
+                var reqKVPairs = JToken.FromObject(input).ToObject<Dictionary<string, object>>();
 
+                foreach (var kv in reqKVPairs)
+                {
+                    req.AddParameter(kv.Key, kv.Value);
+                }
+                //req.AddObject(input);
+
+                return GetResult<Response>(req);
             });
         }
 
@@ -81,10 +88,10 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         {
             var req = new RestRequest(url, method);
 
-            req.AddHeader("content-type", "application/x-www-form-urlencoded");
+            req.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
             if (token != null)
-                req.AddHeader("authorization", $"Bearer {token}");
+                req.AddHeader("Authorization", $"Bearer {token}");
 
             return functor(req).Result;
         }
