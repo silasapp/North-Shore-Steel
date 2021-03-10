@@ -248,7 +248,7 @@
         var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
 
         var mappingIds = mappings.Select(x => x.Id).ToArray();
-        
+
 
         @foreach (var it in headerColumns)
         {
@@ -292,15 +292,16 @@
             <div class="product-sm d-flex flex-column align-items-start mb-2" v-for="data in gridData">
                 <label class="h2-primary my-2" v-cloak>{{ data.itemname }}</label>
                 <div class="d-flex flex-row flex-wrap">
-                    <label v-if="data.height" class="fs12-default mr-3 mb-1" v-cloak>Height(in): {{ data.height }}</label>
-                    <label v-if="data.length" class="fs12-default mr-3 mb-1" v-cloak>Length(in): {{ data.length }}</label>
+                    <label v-if="data.height" class="fs12-default mr-3 mb-1" v-cloak>Height(in): {{ data.displayheight }}</label>
+                    <label v-if="data.length" class="fs12-default mr-3 mb-1" v-cloak>Length(ft): {{ data.displaylength }}</label>
                     <label v-if="data.weight" class="fs12-default mr-3 mb-1" v-cloak>Weight(lb): {{ data.weight }}</label>
-                    <label v-if="data.leg1" class="fs12-default mr-3 mb-1" v-cloak>Leg 1: {{ data.leg1 }}</label>
-                    <label v-if="data.leg2" class="fs12-default mr-3 mb-1" v-cloak>Leg 2: {{ data.leg2 }}</label>
-                    <label v-if="data.thickness" class="fs12-default mr-3 mb-1" v-cloak>Thickness: {{ data.thickness }}</label>
-                    <label v-if="data.width" class="fs12-default mr-3 mb-1" v-cloak>Width: {{ data.width }}</label>
+                    <label v-if="data.leg1" class="fs12-default mr-3 mb-1" v-cloak>Leg 1: {{ data.displayleg1 }}</label>
+                    <label v-if="data.leg2" class="fs12-default mr-3 mb-1" v-cloak>Leg 2: {{ data.displayleg2 }}</label>
+                    <label v-if="data.thickness" class="fs12-default mr-3 mb-1" v-cloak>Thickness: {{ data.displaythickness }}</label>
+                    <label v-if="data.width" class="fs12-default mr-3 mb-1" v-cloak>Width: {{ data.displaywidth }}</label>
                     <label v-if="data.weightperfoot" class="fs12-default mr-3 mb-1" v-cloak>Weight Per Foot: {{ data.weightperfoot }}</label>
-                    <label v-if="data.pipesize" class="fs12-default mr-3 mb-1" v-cloak>Pipe Size: {{ data.pipesize }}</label>
+                    <label v-if="data.pipesize" class="fs12-default mr-3 mb-1" v-cloak>Pipe Size: {{ data.displaypipesize }}</label>
+                    <label v-if="data.size" class="fs12-default mr-3 mb-1" v-cloak>Size: {{ data.displaysize }}</label>
                     <label v-if="data.wall" class="fs12-default mr-3 mb-1" v-cloak>Wall: {{ data.wall }}</label>
                     <label v-if="data.grade" class="fs12-default mr-3 mb-1" v-cloak>Grade: {{ data.grade }}</label>
                     <label v-if="data.dimensions" class="fs12-default mr-3 mb-1" v-cloak>Dimensions: {{ data.dimensions }}</label>
@@ -507,7 +508,7 @@
         }
     }
 
- 
+
 
     function removeFromFavorites(itemId, isMobile) {
         $('#custom-loading').show();
