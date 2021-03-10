@@ -9,5 +9,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
     {
         CompanyOrderListModel PrepareOrderListModel(int companyId, CompanyOrderListModel.SearchFilter filter);
         OrderDetailsModel PrepareOrderDetailsModel(int companyId, int erpOrderId, ERPGetOrderDetailsResponse orderDetailsResponse, int mtrCount, List<ERPGetOrderMTRResponse> orderMTRs);
+        OrderShippingDetailsModel PrepareOrderShippingDetailsModel(ERPGetOrderShippingDetailsResponse orderShippingDetailsResponse);
     }
 }

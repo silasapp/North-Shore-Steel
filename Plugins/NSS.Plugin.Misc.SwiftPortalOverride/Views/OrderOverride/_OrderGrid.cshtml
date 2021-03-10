@@ -322,11 +322,8 @@
                     companyId,
                     orderId
                 }
+
                 this.showLoading();
-                const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
-                for (var i = 0; i < elements.length; i++) {
-                    $(elements[i]).removeClass("e-dlg-closeicon-btn");
-                }
                 const self = this;
                 $.ajax({
                     url: "@Url.Action("GetOrderMTRs", "OrderOverride")",
@@ -336,6 +333,10 @@
                     dataType: "json",
                     success: function (data, _, _) {
                         self.orderMTRs = data.MTRs;
+                        const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
+                        for (var i = 0; i < elements.length; i++) {
+                            $(elements[i]).removeClass("e-dlg-closeicon-btn");
+                        }
                         viewMtrModal.show();
                         self.hideLoading();
                     },
@@ -361,7 +362,6 @@
 </script>
 <script>
     var pageModel = @Html.Raw(Serialize(Model));
-    //var mobileExcelData = [];
     function formatDate(date) {
         date = new Date(date);
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();

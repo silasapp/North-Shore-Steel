@@ -207,6 +207,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
             new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
             );
 
+            //order shipments
+            endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Orders", "orders/{orderId}/shipments/",
+            new { controller = "OrderOverride", action = "Shipments" },
+            new { },
+            new[] { "NSS.Plugin.Misc.SwiftPortalOverride.Controllers" }
+            );
+
             // invoices
             endpointRouteBuilder.MapControllerRoute("Plugin.Misc.SwiftPortalOverride.Invoices", "invoices/",
             new { controller = "Invoice", action = "CompanyInvoices" },

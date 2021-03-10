@@ -17,6 +17,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -157,6 +158,45 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             model.IsClosed = filter.IsClosed;
 
             return PartialView("_OrderGrid", model);
+        }
+
+        public OrderDetailsModel GetOrderMTRs(int companyId, int orderId)
+        {
+            var model = new OrderDetailsModel();
+
+            var orderMTRs = new List<ERPGetOrderMTRResponse>();
+            (_, orderMTRs) = _apiService.GetOrderMTRs(companyId, orderId);
+
+            var orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo)?.ToList();
+
+            foreach (var mtr in orderedMTRs)
+            {
+                var orderMTR = new OrderDetailsModel.OrderMTRModel
+                {
+                    MtrId = mtr.MtrId,
+                    LineNo = mtr.LineNo,
+                    HeatNo = mtr.HeatNo,
+                    Description = mtr.Description,
+                    MtrFile = $"{mtr.MtrFile}"
+                };
+
+                model.MTRs.Add(orderMTR);
+            }
+            return model;
+        }
+
+        //Order Shipments
+        [HttpsRequirement]
+        public OrderShippingDetailsModel Shipments(int orderId)
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+
+            var (_, orderShippingDetails) = _apiService.GetOrderShippingDetails(eRPCompanyId, orderId);
+
+            var model = _orderModelFactory.PrepareOrderShippingDetailsModel(orderShippingDetails);
+            return model;
+
         }
 
         #endregion

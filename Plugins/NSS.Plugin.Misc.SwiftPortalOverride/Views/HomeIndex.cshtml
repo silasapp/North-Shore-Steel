@@ -83,6 +83,50 @@
         </div>
     </div>;
 }
+
+@{
+
+    Func<object, object>
+    Content2 =
+    @<div id="viewMultipleShipmentModal">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <div class="col-md-12 pb-3">
+                    <label class="h4-primary-500-teko text-uppercase mb-0">PO #</label>
+                    <ul class="h5-default">
+                        <li class="name">{{multipleShipments.PoNo}}</li>
+                    </ul>
+                </div>
+                <table class="table table-striped nss-table">
+                    <thead class="thead-default">
+                        <tr>
+                            <td scope="col">Item</td>
+                            <td scope="col">Tot. Item Weight (lb)</td>
+                            <td scope="col" class="text-center">Qty.</td>
+                            <td scope="col">Scheduled Date</td>
+                            <td scope="col">Shipment Weight (lb)</td>
+                            <td scope="col">Status</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="m in multipleShipments.Shipments">
+                            <tr rowspan="m.Items.length">
+                                <td> {{m.Items.Description}}</td>
+                                <td class="text-right"> {{m.Items.Weight}}</td>
+                                <td class="text-right"> {{m.Items.Quantity}}</td>
+                                <td> {{m.ScheduledDate | date }}</td>
+                                <td class="text-right"> {{m.TotalWeight}}</td>
+                                <td> {{m.Status}}</td>
+                            </tr>
+                        </template>
+                        
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>;
+}
 <style>
     .m-b2 {
         margin-bottom: 2rem;
@@ -148,13 +192,20 @@
                                                 <tbody>
                                                     @foreach (var order in Model.OpenOrders)
                                                     {
-                                                        <tr>
-                                                            <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
-                                                            <td>@order.PoNo</td>
-                                                            <td class="text-center">@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
-                                                            <td class="text-center">@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
+                                                    <tr>
+                                                        <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
+                                                        <td>@order.PoNo</td>
+                                                        <td class="text-center">@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
+                                                        <td class="text-center">@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
+                                                        @*@if (@order.OrderStatusName != "*MULTIPLE*")
+                                                        {
+                                                            <td class="text-center"><a v-on:click="handleMultipleShipmentModal(@order.OrderId)" scope="row" class="light-blue">Multiple (View)</a></td>
+                                                        }
+                                                        else
+                                                        {
+                                                        }*@
                                                             <td class="text-center cursor-pointer">@order.OrderStatusName</td>
-                                                        </tr>
+                                                    </tr>
                                                     }
                                                 </tbody>
                                             </table>
@@ -324,8 +375,9 @@
                     </div>
 
                 </div>
-
+                @{ var title = "<span class='dialog-header'>ORDER <span id='order-detail-id'></span></span>"; }
                 @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
+                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
 
             </div>
             <a href="/catalog">
@@ -474,7 +526,7 @@
                                 <label class="fs12-white mb-0">POD</label>
                             </div>
                             <div class="d-flex p-2" v-if="order.deliveryTicketCount > 0">
-                                 <a v-bind:href="order.deliveryTicketFile" target="_blank" class="light-blue" v-cloak>View</a>
+                                <a v-bind:href="order.deliveryTicketFile" target="_blank" class="light-blue" v-cloak>View</a>
                             </div>
                         </div>
                     </div>
@@ -604,7 +656,8 @@
             showRecentOrders: true,
             isCustomerServiceOpen: false,
             isHoveringViewMTR: false,
-            orderMTRs: []
+            orderMTRs: [],
+            multipleShipments: {}
         },
         methods: {
             showLoading: function () {
@@ -612,6 +665,35 @@
             },
             hideLoading: function () {
                 $('#custom-loading').hide();
+            },
+            handleMultipleShipmentModal: function (orderId) {
+                const request = { orderId }
+                this.showLoading();
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("Shipments", "OrderOverride")",
+                    type: 'GET',
+                    data: request,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, _, _) {
+                        console.log('data-data-data', data);
+                        self.multipleShipments = data;
+                        $('#order-detail-id').html(self.multipleShipments.PoNo);
+                        const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
+                        for (var i = 0; i < elements.length; i++) {
+                            $(elements[i]).removeClass("e-dlg-closeicon-btn");
+                        }
+                        viewMultipleShipmentModal.show();
+                        self.hideLoading();
+                    },
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
+                        self.hideLoading();
+                    }
+                });
             },
             handleMtrModal: function (companyId, orderId) {
 
@@ -623,7 +705,7 @@
                 this.showLoading();
                 const self = this;
                 $.ajax({
-                    url: "@Url.Action("GetOrderMTRs", "HomeOverride")",
+                    url: "@Url.Action("GetOrderMTRs", "OrderOverride")",
                     type: 'GET',
                     data: request,
                     contentType: "application/json; charset=utf-8",
@@ -646,6 +728,10 @@
 
     function onDialogCreated() {
         viewMtrModal = this;
+    }
+
+    function onMultipleDialogCreated() {
+        viewMultipleShipmentModal = this;
     }
 
 </script>

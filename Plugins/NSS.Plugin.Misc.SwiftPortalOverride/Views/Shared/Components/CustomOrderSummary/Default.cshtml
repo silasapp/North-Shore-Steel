@@ -164,6 +164,7 @@
         _cartItem.Add("workOrderInstructionsControlId", workOrderInstructionsControlId);
         _cartItem.Add("warnings", Serialize(item.Warnings));
         _cartItem.Add("itemWorkOrderValue", workOrderAttr.DefaultValue);
+        _cartItem.Add("noteAttrValue", noteAttr.DefaultValue);
         _cartItem.Add("sawOptionControlId", sawOptionControlId);
         _cartItem.Add("isCutOptionPreselected", cutOptionIsPreselected);
         _cartItem.Add("itemQuantity", 0);
@@ -183,7 +184,7 @@ Content1 =
     @<div id="viewNotesModal">
         <div class="modal-body">
             <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
-            <div class="buttons float-right pt-3" id="saveNote">
+            <div class="buttons float-right pt-3" id="saveNote" v-on:click="saveNote">
                 <input type="button" class="button-1 register-button" value="Add" />
             </div>
         </div>
@@ -357,7 +358,7 @@ Content3 =
                                                     <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                 </svg>
                                             </a>
-                                            <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttr.defaultValue" />
+                                            <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttrValue" />
 
 
                                         </td>
@@ -396,7 +397,7 @@ Content3 =
                                 </div>
                                 <label class="h5-default-500" v-cloak>Weight: {{  evenRound(item.weight * item.quantity)  | amount(0) }} lb</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
-                                <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttr.defaultValue" />
+                                <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttrValue" />
                                 <template v-if=item.hasSawOption>
                                     <a v-show="!item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">Cut To Length</a>
                                     <a v-show="item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">{{item.itemQuantity}} pieces - {{item.sawOptionsName}}</a>
@@ -848,13 +849,34 @@ Content3 =
 
                 sawOptionModal.hide();
             },
+            saveNote: function () {
+                var productNoteValue = $("#productNote").val().trim();
+                if (productNoteValue.length == 0) {
+                    productNoteValue = " ";
+                    $('#removedNote-' + itemNoteId).show();
+                    $('#addedNote-' + itemNoteId).hide();
+                }
+                else {
+                    $('#addedNote-' + itemNoteId).show();
+                    $('#removedNote-' + itemNoteId).hide();
+                }
+                this.items.forEach(x => {
+                    if (x.id == this.currentItemId) {
+                        x.noteAttrValue = productNoteValue;
+                    }
+                })
+
+                $(this).find("textarea").val('').end();
+                viewNotesModal.hide();
+            },
 
             handleResize: function () {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
             },
-            handleNotesModal: function ({ noteControlId }) {
-                handleNotesModal(noteControlId);
+            handleNotesModal: function ({ id, noteAttrValue, noteControlId }) {
+                this.currentItemId = id;
+                handleNotesModal(noteAttrValue, noteControlId);
             },
             toggleUnitPrice: function (item) {
                 const { unitControlId, id, pricePerCWT, pricePerPiece, pricePerFt } = item;
@@ -951,27 +973,11 @@ Content3 =
     }
 
     let itemNoteId;
-    function handleNotesModal(itemId) {
+    function handleNotesModal(noteAttrValue, itemId) {
         itemNoteId = itemId;
-        $("#productNote").val($(`#${itemNoteId}`).val());
+        $("#productNote").val(noteAttrValue);
         viewNotesModal.show();
     }
-
-    $('#saveNote').on('click', function () {
-        var productNoteValue = $("#productNote").val().trim();
-        if (productNoteValue.length == 0) {
-            productNoteValue = " ";
-            $('#removedNote-' + itemNoteId).show();
-            $('#addedNote-' + itemNoteId).hide();
-        }
-        else {
-            $('#addedNote-' + itemNoteId).show();
-            $('#removedNote-' + itemNoteId).hide();
-        }
-        $(`#${itemNoteId}`).val(productNoteValue);
-        $(this).find("textarea").val('').end();
-        viewNotesModal.hide();
-    });
     function evenRound(num, decimalPlaces) {
         var d = decimalPlaces || 0;
         var m = Math.pow(10, d);

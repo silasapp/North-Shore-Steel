@@ -113,30 +113,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
         }
 
-        public OrderDetailsModel GetOrderMTRs(int companyId, int orderId)
-        {
-            var model = new OrderDetailsModel();
-
-            var orderMTRs = new List<ERPGetOrderMTRResponse>();
-            (_, orderMTRs) = _apiService.GetOrderMTRs(companyId, orderId);
-
-            var orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo)?.ToList();
-
-            foreach (var mtr in orderedMTRs)
-            {
-                var orderMTR = new OrderDetailsModel.OrderMTRModel
-                {
-                    MtrId = mtr.MtrId,
-                    LineNo = mtr.LineNo,
-                    HeatNo = mtr.HeatNo,
-                    Description = mtr.Description,
-                    MtrFile = $"{mtr.MtrFile}"
-                };
-
-                model.MTRs.Add(orderMTR);
-            }
-            return model;
-        }
 
         private void saveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
         {

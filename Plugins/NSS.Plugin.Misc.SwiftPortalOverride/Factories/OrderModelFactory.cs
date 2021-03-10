@@ -80,7 +80,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             else
                 response = _apiService.SearchOpenOrders(companyId, request);
 
-            var orders = response.Select(order => new CompanyOrderListModel.OrderDetailsModel 
+            var orders = response.Select(order => new CompanyOrderListModel.OrderDetailsModel
             {
                 DeliveryDate = order.DeliveryDate,
                 DeliveryTicketCount = order.DeliveryTicketCount,
@@ -99,7 +99,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             {
                 FilterContext = filter,
                 Orders = orders?.OrderByDescending(x => x.OrderId)?.ToList()
-        };
+            };
 
             return model;
         }
@@ -231,6 +231,41 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     };
 
                     model.MTRs.Add(orderMTR);
+                }
+            }
+
+            return model;
+        }
+
+        public OrderShippingDetailsModel PrepareOrderShippingDetailsModel(ERPGetOrderShippingDetailsResponse orderShippingDetailsResponse)
+        {
+            var model = new OrderShippingDetailsModel();
+
+            if (orderShippingDetailsResponse != null)
+            {
+                model.PoNo = orderShippingDetailsResponse.PoNo;
+                var shipments = new OrderShippingDetailsModel.Shipment();
+                var items = new OrderShippingDetailsModel.Item();
+                if (orderShippingDetailsResponse.Shipments != null)
+                {
+                    foreach (var respShipment in orderShippingDetailsResponse.Shipments)
+                    {
+                        shipments.ShipmentId = respShipment.ShipmentId;
+                        shipments.Status = respShipment.Status;
+                        shipments.ScheduledDate = respShipment.ScheduledDate;
+                        shipments.TotalWeight = respShipment.TotalWeight;
+                        if (respShipment.Items != null)
+                        {
+                            foreach (var item in respShipment.Items)
+                            {
+                                items.Description = item.Description;
+                                items.Quantity = item.Quantity;
+                                items.Weight = item.Weight;
+                            }
+                            shipments.Items.Add(items);
+                        }
+                    }
+                    model.Shipments.Add(shipments);
                 }
             }
 

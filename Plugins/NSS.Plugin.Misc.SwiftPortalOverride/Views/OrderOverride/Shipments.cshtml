@@ -1,9 +1,12 @@
 ﻿@using NSS.Plugin.Misc.SwiftPortalOverride.Models
 
-@model CompanyInvoiceListModel
+@model OrderShippingDetailsModel
 @using Syncfusion.EJ2
+@using Nop.Core
+@using Nop.Services.Common
 
 <style>
+
     .e-headercelldiv {
         padding: 0 1.8em 0 1.8em !important;
     }
@@ -19,6 +22,7 @@
     .home-table-sm-header {
         width: 110px !important;
         background-color: #1899E1 !important;
+        /* border-bottom: 0.1px solid white; */
     }
 
     .invisible-grid {
@@ -31,144 +35,137 @@
         color: #ffffff;
     }
 
-    thead > tr > :nth-child(7) > div, .e-table.e-sortfilter tr:last-child th > div {
+    thead > tr > :nth-child(3) > div, thead > tr > :nth-child(4) > div {
         text-align: center !important;
     }
 </style>
-<div id="invoicesGrid">
+<div id="ordersGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
-        <ejs-grid id="InvoiceGrid" dataSource="@Model.Invoices" excelQueryCellInfo="excelQueryCellInfo"
-                  queryCellInfo="customiseCell" allowExcelExport="true" allowPaging="true" allowFiltering="true"
-                  rowSelected="onRowSelected" rowDeselected="onRowDeselected">
+        <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" rowHeight="38" allowExcelExport="true"
+                  allowPaging="true" allowFiltering="true" rowSelected="onRowSelected" rowDeselected="onRowDeselected">
             <e-grid-filtersettings type="Menu"></e-grid-filtersettings>
             <e-grid-pagesettings pageSize="100"></e-grid-pagesettings>
             <e-grid-columns>
-                <e-grid-column template="#invoiceNo" headerText="Invoice #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column template="#orderNo" headerText="Order #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="PoNo" headerText="PO #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="InvoiceDate" headerText="Invoice Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" headerText="Order #" template="#orderNo" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="PoNo" headerText="PO #" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="OrderDate" headerText="Order Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="PromiseDate" headerText="Promise Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
-                    <e-grid-column field="InvoicePaidDate" headerText="Paid Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="DeliveryDate" headerText="Delivery Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" template="#viewTicket" headerText="POD" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
-                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" textAlign="Center" width="130"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="ScheduledDate" headerText="Scheduled Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })"></e-grid-column>
                 }
-                <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" textAlign="Right" width="130" allowFiltering="false"></e-grid-column>
-                @if (!Model.IsClosed)
-                {
-                    <e-grid-column field="BalanceAmount" textAlign="Right" width="130" headerText="Balance Amount" format="C2" allowFiltering="false"></e-grid-column>
-                }
+                <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" format="N0" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Right" field="OrderTotal" headerText="Order Amount" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>
         </ejs-grid>
     </div>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
-        <div v-if="@Model.Invoices.Count == 0" style="background:#ffffff; padding: 10px;">
+        <div v-if="paginatedData.length == 0" style="background:#ffffff; padding: 10px;">
             <label class=".fs12-default"> No records to display</label>
         </div>
 
-        <div v-for="invoice in paginatedData" class="d-flex">
-            <label v-if="isExportMode" class="pure-material-checkbox mr-3  d-flex align-items-center" style="position: relative;">
-                <input type="checkbox" name="invoice-checkox"
-                       v-on:click="onCheck(invoice.invoiceId)">
-                <span class="checkmark"></span>
-            </label>
+        <div v-for="order in paginatedData" class="d-flex">
             <div class="d-flex flex-column bg-white-shadow mb-3 w-100">
 
-                <div class="d-flex flex-row">
-                    <div class="d-flex bg-primary p-2 home-table-sm-header">
-                        <label class="fs12-white mb-0">Invoice #</label>
-                    </div>
-                    <div class="d-flex p-2">
-                        <a v-bind:href="invoice.invoiceFile" class="fs12-link" target="_blank" v-cloak>{{invoice.invoiceId}}</a>
-                    </div>
-                </div>
                 <div class="d-flex flex-row">
                     <div class="d-flex bg-primary p-2 home-table-sm-header">
                         <label class="fs12-white mb-0">Order #</label>
                     </div>
                     <div class="d-flex p-2">
-                        <a class="fs12-link" v-bind:href="'/orders/'+invoice.orderNo" v-cloak>{{invoice.orderNo}}</a>
+                        <a class="fs12-link" v-bind:href="'/orders/'+order.orderId" v-cloak>{{order.orderId}}</a>
                     </div>
-                </div>
-                <div class="d-flex flex-row">
+                </div><div class="d-flex flex-row">
                     <div class="d-flex bg-primary p-2 home-table-sm-header">
-                        <label class="fs12-white mb-0">PO #</label>
+                        <label class="fs12-white mb-0">Purchase Order #</label>
                     </div>
                     <div class="d-flex p-2">
-                        <a class="fs12-default" v-cloak>{{invoice.poNo}}</a>
+                        <a class="fs12-link" v-cloak>{{order.poNo}}</a>
                     </div>
                 </div>
 
                 <div class="d-flex flex-row">
                     <div class="d-flex bg-primary p-2 home-table-sm-header">
-                        <label class="fs12-white mb-0">Invoice Date</label>
+                        <label class="fs12-white mb-0">Order Date</label>
                     </div>
                     <div class="d-flex p-2">
-                        <label class="fs12-default mb-0" v-cloak>{{invoice.invoiceDate|date}}</label>
+                        <label class="fs12-default mb-0" v-cloak>
+                            {{order.orderDate|date}}
+                        </label>
                     </div>
                 </div>
-
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Promise Date</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0" v-cloak>
+                            {{order.promiseDate|date}}
+                        </label>
+                    </div>
+                </div>
                 @if (Model.IsClosed)
                 {
                     <div class="d-flex flex-row">
                         <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Paid Date</label>
+                            <label class="fs12-white mb-0">Delivery Date</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0">{{invoice.invoicePaidDate|date}}</label>
+                            <label class="fs12-default mb-0" v-cloak>{{order.deliveryDate|date}}</label>
                         </div>
                     </div>
-
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0"></label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-link mb-0"><a href="">View</a></label>
+                        </div>
+                    </div>
                 }
                 else
                 {
                     <div class="d-flex flex-row">
                         <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Due Date</label>
+                            <label class="fs12-white mb-0">Scheduled Date</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0" v-cloak>{{invoice.invoiceDueDate|date}}</label>
+                            <label class="fs12-default mb-0" style="color: #DB0606 !important;" v-cloak>{{order.scheduledDate|date}}</label>
                         </div>
-                    </div>
-                    <div class="d-flex flex-row">
+                    </div><div class="d-flex flex-row">
                         <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0" v-cloak>Status</label>
+                            <label class="fs12-white mb-0">Status</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0" v-cloak>{{invoice.invoiceStatusName}}</label>
+                            <label class="fs12-default mb-0" v-cloak>{{order.orderStatusName}}</label>
                         </div>
                     </div>
                 }
                 <div class="d-flex flex-row">
                     <div class="d-flex bg-primary p-2 home-table-sm-header">
-                        <label class="fs12-white mb-0">Invoice Amount</label>
+                        <label class="fs12-white mb-0">Weight (lb)</label>
                     </div>
                     <div class="d-flex p-2">
-                        <label class="fs12-default mb-0" v-cloak>${{invoice.invoiceAmount}}</label>
+                        <label class="fs12-default mb-0" v-cloak>{{order.weight}}</label>
+                    </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <div class="d-flex bg-primary p-2 home-table-sm-header">
+                        <label class="fs12-white mb-0">Order Amount</label>
+                    </div>
+                    <div class="d-flex p-2">
+                        <label class="fs12-default mb-0" v-cloak>${{order.orderTotal}}</label>
                     </div>
                 </div>
 
-
-                @if (!Model.IsClosed)
-                {
-                    <div class="d-flex flex-row">
-                        <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0">Balance Amount</label>
-                        </div>
-                        <div class="d-flex p-2">
-                            <label class="fs12-default mb-0" v-cloak>${{invoice.balanceAmount}}</label>
-                        </div>
-                    </div>
-
-                }
-
             </div>
         </div>
-
         <div class="pagination-mobile  d-flex bg-white-shadow py-3 px-2 justify-content-between align-items-center" v-if="isMobile">
             <select id="paginationPageCount" v-on:change="setPageSize(); paginate(currentPage, pageSize);" style="border: none;">
                 <option value="10">10 per page</option>
@@ -198,9 +195,9 @@
     }
 }
 <script>
-    var invPageModel = @Html.Raw(Serialize(Model));
-    var invoicegridvm = new Vue({
-        el: '#invoicesGrid',
+    var pageModel = @Html.Raw(Serialize(Model));
+    var ordergridvm = new Vue({
+        el: '#ordersGrid',
         data: {
             window: {
                 width: 0,
@@ -238,25 +235,25 @@
             },
             cancelExportMode: function () {
                 this.isExportMode = false;
-                mobileExcelInvoiceData = [];
+                mobileExcelData = [];
             },
             formatText: function () {
                 this.paginatedData.map(g => {
-                    g.balanceAmount = g.balanceAmount.toLocaleString();
-                    g.invoiceAmount = g.invoiceAmount.toLocaleString();
+                    g.weight = Math.round(g.weight)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    g.orderTotal = g.orderTotal.toLocaleString();
                 });
             },
             paginate: function (page_number, page_size) {
                 page_number = page_number > 0 ? page_number : 1;
                 this.currentPage = page_number;
-                this.paginatedData = invPageModel.invoices.slice((page_number - 1) * page_size, page_number * page_size);
-                var pageCountDiv = invPageModel.invoices.length / page_size;
+                this.paginatedData = pageModel.orders.slice((page_number - 1) * page_size, page_number * page_size);
+                var pageCountDiv = pageModel.orders.length / page_size;
                 var pageCountRound = Math.round(pageCountDiv);
                 this.pageCount = pageCountRound > pageCountDiv ? pageCountRound : pageCountRound + 1;
 
             },
             setPageSize() {
-                this.pageSize = Number(document.getElementById('paginationPageCountInv').value);
+                this.pageSize = Number(document.getElementById('paginationPageCount').value);
                 if (this.isExportMode) {
                     selectAll(false);
                 }
@@ -266,84 +263,85 @@
     });
 </script>
 <script>
-    var invPageModel = @Html.Raw(Serialize(Model));
-
+    var pageModel = @Html.Raw(Serialize(Model));
+    //var mobileExcelData = [];
     function formatDate(date) {
         date = new Date(date);
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
+
     function toolbarClick() {
-        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
-       gridObj.excelExport();
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        gridObj.excelExport();
 
     }
-    async function cloneArray(invoices) {
-        return invoices.slice();
+
+    async function cloneArray(orders) {
+        return orders.slice();
     }
-    async function updateArray(invoices) {
-        var newInvoices = [];
-        for (var i in invoices) {
-            var _invoice = { ...invoices[i] };
-            _invoice.InvoiceDate = formatDate(_invoice.InvoiceDate);
-            _invoice.InvoicePaidDate = formatDate(_invoice.InvoicePaidDate);
-            _invoice.InvoiceDueDate = formatDate(_invoice.InvoiceDueDate);
-            newInvoices.push(_invoice);
+    async function updateArray(orders) {
+        var newOrders = [];
+        for (var i in orders) {
+            var _order = { ...orders[i] };
+            _order.OrderDate = formatDate(_order.OrderDate);
+            _order.DeliveryDate = formatDate(_order.DeliveryDate);
+            _order.PromiseDate = formatDate(_order.PromiseDate);
+            _order.ScheduledDate = formatDate(_order.ScheduledDate);
+            newOrders.push(_order);
         }
-        return newInvoices;
+        return newOrders;
     }
-    async function keyToUpperCase(invoices) {
-        var newInvoices = [];
-        for (var i in invoices) {
-            var invoice = { ...invoices[i] };
-            for (var key in invoice) {
+    async function keyToUpperCase(orders) {
+        var newOrders = [];
+        for (var i in orders) {
+            var order = { ...orders[i] };
+            for (var key in order) {
                 var upper = key.charAt(0).toUpperCase() + key.slice(1);;
                 // check if it already wasn't uppercase
-                if( upper !== key ){
-                    invoice[upper] = invoice[key];
-                    delete invoice[key];
+                if (upper !== key) {
+                    order[upper] = order[key];
+                    delete order[key];
                 }
             }
-            newInvoices.push(invoice);
+            newOrders.push(order);
         }
-        return newInvoices;
+        return newOrders;
     }
-   async function exportExcelMobile() {
-        var _invoices = await cloneArray(invoicegridvm.paginatedData);
-        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
-       _invoices = await keyToUpperCase(_invoices);
-       _invoices = await updateArray(_invoices);
+    async function exportExcelMobile() {
+        var _orders = await cloneArray(ordergridvm.paginatedData);
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
+        _orders = await keyToUpperCase(_orders);
+        _orders = await updateArray(_orders);
 
-        if (_invoices.length > 0) {
+        if (_orders.length > 0) {
             var exportProperties = {
-                dataSource: _invoices,
-                fileName: "InvoiceExport.xlsx"
+                dataSource: _orders,
+                fileName: "OrdersExport.xlsx"
             };
             gridObj.excelExport(exportProperties);
         }
     }
 
     function excelQueryCellInfo(args) {
-        if (args.column.headerText == "Invoice #" && args.value.length === 0) { args.value = args.data.InvoiceId; }
-        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderNo; }
-        if (args.column.headerText == "Invoice Amount" && args.value.length === 0) { args.value = args.data.InvoiceAmount; }
-        if (args.column.headerText == "Balance Amount" && args.value.length === 0) { args.value = args.data.BalanceAmount; }
+        if (args.column.headerText == "Order #" && args.value.length === 0) { args.value = args.data.OrderId; }
+        if (args.column.headerText == "Order Amount" && args.value.length === 0) { args.value = args.data.OrderTotal; }
     }
 
     function onRowSelected(args) {
-        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
         vm.selectedRowCount = exceldata.length;
     }
 
     function onRowDeselected(args) {
-        var gridObj = document.getElementById("InvoiceGrid").ej2_instances[0];
+        var gridObj = document.getElementById("OrderGrid").ej2_instances[0];
         var exceldata = gridObj.getSelectedRecords();
         vm.selectedRowCount = exceldata.length;
     }
 
     function customiseCell(args) {
-        if (args.column.field === 'InvoiceStatusName') {
-            if (args.data['InvoiceStatusName'].indexOf("past due") > -1) {
+        if (args.column.field === 'OrderStatusName') {
+            if (args.data['OrderStatusName'].indexOf("past due") > -1) {
                 args.cell.classList.add('colorRed');
             }
         }
@@ -351,10 +349,12 @@
 
 </script>
 
-<script id="invoiceNo" type="text/x-template">
-    <a href="${InvoiceFile}" target="_blank">${InvoiceId}</a>
-</script>
 <script id="orderNo" type="text/x-template">
-    <a href="/orders/${OrderNo}">${OrderNo}</a>
+    <a href="/orders/${OrderId}">${OrderId}</a>
+</script>
+<script id="viewTicket" type="text/x-template">
+    ${if(DeliveryTicketCount > 0)}
+    <a href="${DeliveryTicketFile}" target="_blank">View</a>
+    ${/if}
 </script>
 <ejs-scripts></ejs-scripts>
