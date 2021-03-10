@@ -42,6 +42,10 @@
         background-color: #1899E1 !important;
     }
 
+        .nss-btn-default img {
+            filter: brightness(0) invert(1) !important;
+        }
+
     .disabled, .disabled:hover {
         background: #C3C3C3 !important;
         cursor: not-allowed !important;
@@ -148,6 +152,7 @@
         _cartItem.Add("weight", product.Weight);
         _cartItem.Add("length", product.Length);
         _cartItem.Add("customerCompanyProduct", Serialize(customerCompanyProduct));
+        _cartItem.Add("customerPartNo", customerCompanyProduct?.CustomerPartNo);
         _cartItem.Add("cartItem", Serialize(cartItem));
         _cartItem.Add("custPartNoAttr", Serialize(custPartNoAttr));
         _cartItem.Add("purchaseUnitAttr", Serialize(purchaseUnitAttr));
@@ -259,7 +264,7 @@ Content3 =
                                     <img class="mr-1" src="Themes/SwiftPortal/Content/assets/return-dark-blue.svg" width="24" height="24" alt="" v-cloak>
                                     {{ isMobile ? 'Keep Shopping' : 'Continue Shopping' }}
                                 </button>
-                                <button type="submit" class="nss-btn-white" name="updatecart">
+                                <button type="submit" v-bind:class="{'nss-btn-white': !cartModified, 'nss-btn-default': cartModified}" class="nss-btn-white" name="updatecart">
                                     <img class="mr-1" src="Themes/SwiftPortal/Content/assets/icn-refresh-dark-blue.svg" width="24" height="24" alt="">
                                     Update Cart
                                 </button>
@@ -272,8 +277,8 @@ Content3 =
                             <table class="table table-bordered cart-table">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Description</th>
-                                        <th scope="col">Customer Part #</th>
+                                        <th scope="col" class="">Description</th>
+                                        <th scope="col" class="text-center">Customer Part #</th>
                                         <th scope="col" class="text-center">Qty.</th>
                                         <th scope="col" class="text-center">Weight (lb)</th>
                                         <th scope="col" class="text-center">Unit Price</th>
@@ -293,14 +298,14 @@ Content3 =
                                                 </ul>
                                             </div>
                                         </td>
-                                        <td class="">
+                                        <td class="text-center">
                                             <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
-                                                   v-bind:id="'no-' + item.id" v-bind:value="item?.customerCompanyProduct?.customerPartNo" />
+                                                   v-bind:id="'no-' + item.id" v-model="item.customerPartNo" />
                                         </td>
                                         <td class="text-center">
                                             <input class="cart-qty-input text-center" type="text" v-bind:name="'itemquantity' + item.id"
                                                    style="height: 24px; width: 56px;" v-bind:id="'itemquantity' + item.id"
-                                                   v-bind:value="item.quantity" v-bind:disabled="item.isSerialized == 'true'"
+                                                   v-model="item.quantity" v-bind:disabled="item.isSerialized == 'true'"
                                                    aria-label="@T("ShoppingCart.Quantity")"
                                                    min="1" v-on:input="item.quantity = $event.target.value; calculateItemTotalPrice(item);" />
                                         </td>
@@ -352,7 +357,7 @@ Content3 =
                                                     <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                 </svg>
                                             </a>
-                                            <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-bind:value="item.noteAttr.defaultValue" />
+                                            <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttr.defaultValue" />
 
 
                                         </td>
@@ -361,7 +366,7 @@ Content3 =
                                         <td class="remove-from-cart text-center pt-3">
                                             <label class="pure-material-checkbox">
                                                 <input type="checkbox" name="removefromcart" v-bind:id="'removefromcart' + item.id"
-                                                       v-bind:value="item.id" style=" position: unset !important;"
+                                                       v-bind:value="item.id" v-model="item.removefromcart" style=" position: unset !important;"
                                                        aria-label="@T("ShoppingCart.Remove")" />
                                                 <span class="checkmark"></span>
                                             </label>
@@ -391,7 +396,7 @@ Content3 =
                                 </div>
                                 <label class="h5-default-500" v-cloak>Weight: {{  evenRound(item.weight * item.quantity)  | amount(0) }} lb</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
-                                <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-bind:value="item.noteAttr.defaultValue" />
+                                <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttr.defaultValue" />
                                 <template v-if=item.hasSawOption>
                                     <a v-show="!item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">Cut To Length</a>
                                     <a v-show="item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">{{item.itemQuantity}} pieces - {{item.sawOptionsName}}</a>
@@ -723,6 +728,8 @@ Content3 =
                 width: 0,
                 height: 0,
             },
+            cartModified: false,
+            mounted: 0,
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
@@ -754,10 +761,28 @@ Content3 =
                 item.purchaseUnitAttr = JSON.parse(item.purchaseUnitAttr);
                 item.customerCompanyProduct = JSON.parse(item.customerCompanyProduct);
             });
+            this.mounted = false;
         },
         computed: {
             isMobile: function () {
                 return this.window.width <= 767.98;
+            },
+        },
+        watch: {
+            items: {
+                deep: true,
+
+                handler() {
+                    this.mounted = this.mounted + 1;
+                    if(this.mounted > 1)
+                        this.cartModified = true;
+                }
+            },
+            purchasechkattr: {
+                deep: true,
+                handler() {
+                    this.cartModified = true;
+                }
             },
         },
         methods: {
