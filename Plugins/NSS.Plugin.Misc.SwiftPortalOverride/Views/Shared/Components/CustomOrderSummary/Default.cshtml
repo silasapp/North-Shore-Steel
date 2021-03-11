@@ -853,7 +853,7 @@ Content3 =
                     case "Saw in half":
                     case "Saw in thirds":
                     case "Saw in quarters":
-                        item.sawDisplayText = `${item.sawOptionsName} - ${item.itemQuantity} final ${pieceText}`;
+                        item.sawDisplayText = `${item.sawOptionsName} - ${this.formatNumber(item.itemQuantity)} final ${pieceText}`;
                         break;
                     case "Other":
                         item.sawDisplayText = 'Custom';
