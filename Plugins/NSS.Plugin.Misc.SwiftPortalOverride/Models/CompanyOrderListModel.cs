@@ -28,6 +28,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
             public string PoNo { get; set; }
 
+            public bool IsMultipleShipment { get; set; }
+
             public DateTimeOffset? OrderDate { get; set; }
 
             public DateTimeOffset? PromiseDate { get; set; }

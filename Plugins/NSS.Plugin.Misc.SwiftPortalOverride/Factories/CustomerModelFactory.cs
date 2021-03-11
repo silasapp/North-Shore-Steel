@@ -179,11 +179,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         {
             switch (keyValue.Key)
             {
-                case Constants.MyOrderConfirmedEmail:
-                case Constants.MyOrderConfirmedSms:
-                    if (isBuyer)
-                        AddPreference(keyValue, "When my order has been confirmed (offline orders only).", ref model);
-                    break;
+                
                 case Constants.MyOrderScheduleEmail:
                 case Constants.MyOrderScheduleSms:
                     if (isBuyer)
@@ -194,11 +190,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     if (isBuyer)
                         AddPreference(keyValue, "When my order has a promise date change.", ref model);
                     break;
-                case Constants.MyOrderReadyEmail:
-                case Constants.MyOrderReadySms:
-                    if (isBuyer)
-                        AddPreference(keyValue, "When my order is ready.", ref model);
-                    break;
+                
                 case Constants.MyOrderLoadingEmail:
                 case Constants.MyOrderLoadingSms:
                     if (isBuyer)

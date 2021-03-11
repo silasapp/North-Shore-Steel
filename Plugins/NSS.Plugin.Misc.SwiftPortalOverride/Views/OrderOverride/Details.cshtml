@@ -54,6 +54,57 @@
     </div>;
 }
 
+@{
+
+    Func<object, object>
+    Content2 =
+    @<div id="viewMultipleShipmentModal">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <div class="col-md-12 pb-3">
+                    <label class="h4-primary-500-teko text-uppercase mb-0">PO #</label>
+                    <ul class="h5-default">
+                        <li class="name">{{multipleShipments.PoNo}}</li>
+                    </ul>
+                </div>
+                <table class="table table-striped nss-table">
+                    <thead class="thead-default">
+                        <tr>
+                            <td scope="col">Status</td>
+                            <td scope="col" class="text-center">Scheduled Date</td>
+                            <td scope="col">Shipment Weight (lb)</td>
+                            <td scope="col">Item</td>
+                            <td scope="col" class="text-right">Qty.</td>
+                            <td scope="col">Tot. Item Weight (lb)</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="mS in multipleShipments.Shipments">
+                            <tr>
+                                <td v-bind:rowspan="mS.Items.length+1">{{mS.Status }}</td>
+                                <template v-if="mS.Status != `Shipped`">
+                                    <td v-bind:rowspan="mS.Items.length+1" class="text-center">{{mS.ScheduledDate | date }}</td>
+                                </template>
+                                <template v-else>
+                                    <td v-bind:rowspan="mS.Items.length+1"></td>
+                                </template>
+                                <td v-bind:rowspan="mS.Items.length+1">{{mS.TotalWeight }}</td>
+                            </tr>
+                            <template v-for="item in mS.Items">
+                                <tr>
+                                    <td>{{item.Description}}</td>
+                                    <td class="text-right">{{item.Quantity}}</td>
+                                    <td>{{item.Weight}}</td>
+                                </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>;
+}
+
 <style>
     .cart-total-left, .cart-total-right {
         display: table-cell !important;
@@ -62,6 +113,10 @@
     .eqaul-width {
         flex-basis: 0;
         flex-grow: 1;
+    }
+
+    .nss-light-blue {
+        color: #0076b4 !important;
     }
 </style>
 
@@ -191,17 +246,17 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                      !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                      !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                      !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                 !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+                 !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                 !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                              !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                              !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                         !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                         !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -211,7 +266,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                                  !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                             !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -266,8 +321,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                              !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                              !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                         !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                         !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -276,7 +331,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                              !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                         !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -311,7 +366,14 @@
             <div class="col-md-12 pb-3 pl-0 pr-0">
                 <label class="h4-primary-500-teko text-uppercase mb-0">STATUS</label>
                 <ul class="h5-default">
-                    <li class="name">@Model.OrderStatusName</li>
+                    @if (Model.OrderStatusName == "*MULTIPLE*")
+                    {
+                        <li class="name"><a v-on:click="handleMultipleShipmentModal(@Model.OrderId)" scope="row" class="nss-light-blue">Multiple (View)</a></li>
+                    }
+                    else
+                    {
+                        <li class="name">@Model.OrderStatusName</li>
+                    }
                 </ul>
             </div>
         </div>
@@ -370,6 +432,7 @@
             }
 
         </div>
+
     </div>
     <div v-if="!isMobile" class="mt-4 bg-white-shadow">
         <table class="table table-striped nss-table">
@@ -467,7 +530,9 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderDetailsPageBottom, additionalData = Model })
     </div>
 
+    @{ var title = "<span class='dialog-header'>ORDER <span id='order-detail-id'></span> - Multiple Delivery Details</span>"; }
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
 
 </div>
 
@@ -508,6 +573,7 @@
                 width: 0,
                 height: 0,
             },
+            multipleShipments: {}
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
@@ -519,6 +585,40 @@
             },
         },
         methods: {
+            showLoading: function () {
+                $('#custom-loading').show();
+            },
+            hideLoading: function () {
+                $('#custom-loading').hide();
+            },
+            handleMultipleShipmentModal: function (orderId) {
+                const request = { orderId }
+                this.showLoading();
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("Shipments", "OrderOverride")",
+                    type: 'GET',
+                    data: request,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, _, _) {
+                        $('#order-detail-id').html(orderId);
+                        self.multipleShipments = data;
+                        const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
+                        for (var i = 0; i < elements.length; i++) {
+                            $(elements[i]).removeClass("e-dlg-closeicon-btn");
+                        }
+                        viewMultipleShipmentModal.show();
+                        self.hideLoading();
+                    },
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
+                        self.hideLoading();
+                    }
+                });
+            },
             handleResize: function () {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
@@ -534,6 +634,10 @@
 
     function handleMtrModal() {
         viewMtrModal.show();
+    }
+
+    function onMultipleDialogCreated() {
+        viewMultipleShipmentModal = this;
     }
 
 </script>

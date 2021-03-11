@@ -10,6 +10,20 @@
 @{
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
     string eRPCompanyId = genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey);
+
+
+}
+@{List<object> ObjectData = new List<object>(); }
+@{
+
+    @foreach (var order in Model.Orders)
+    {
+        @if (order.OrderStatusName == "*MULTIPLE*")
+        {
+            order.IsMultipleShipment = true;
+        }
+
+    }
 }
 <style>
 
@@ -80,7 +94,56 @@
         </div>
     </div>;
 }
+@{
 
+    Func<object, object>
+    Content2 =
+    @<div id="viewMultipleShipmentModal">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4 mb-2">
+                <div class="col-md-12 pb-3">
+                    <label class="h4-primary-500-teko text-uppercase mb-0">PO #</label>
+                    <ul class="h5-default">
+                        <li class="name">{{multipleShipments.PoNo}}</li>
+                    </ul>
+                </div>
+                <table class="table table-striped nss-table">
+                    <thead class="thead-default">
+                        <tr>
+                            <td scope="col">Status</td>
+                            <td scope="col" class="text-center">Scheduled Date</td>
+                            <td scope="col">Shipment Weight (lb)</td>
+                            <td scope="col">Item</td>
+                            <td scope="col" class="text-right">Qty.</td>
+                            <td scope="col">Tot. Item Weight (lb)</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="mS in multipleShipments.Shipments">
+                            <tr>
+                                <td v-bind:rowspan="mS.Items.length+1">{{mS.Status }}</td>
+                                <template v-if="mS.Status != `Shipped`">
+                                    <td v-bind:rowspan="mS.Items.length+1" class="text-center">{{mS.ScheduledDate | date }}</td>
+                                </template>
+                                <template v-else>
+                                    <td v-bind:rowspan="mS.Items.length+1"></td>
+                                </template>
+                                <td v-bind:rowspan="mS.Items.length+1">{{mS.TotalWeight }}</td>
+                            </tr>
+                            <template v-for="item in mS.Items">
+                                <tr>
+                                    <td>{{item.Description}}</td>
+                                    <td class="text-right">{{item.Quantity}}</td>
+                                    <td>{{item.Weight}}</td>
+                                </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>;
+}
 <div id="ordersGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
         <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" rowHeight="38" allowExcelExport="true"
@@ -99,7 +162,7 @@
                 else
                 {
                     <e-grid-column textAlign="Center" field="ScheduledDate" headerText="Scheduled Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                    <e-grid-column textAlign="Center" field="OrderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })"></e-grid-column>
+                    <e-grid-column textAlign="Center" template="#orderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })"></e-grid-column>
                 }
                 <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" format="N0" allowFiltering="false"></e-grid-column>
                 <e-grid-column textAlign="Right" field="OrderTotal" headerText="Order Amount" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
@@ -111,7 +174,9 @@
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>
         </ejs-grid>
-        @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()<span class='dialog-header'></span><span class='dialog-header'></span>
+        @{ var title = "<span class='dialog-header'>ORDER <span id='order-detail-id'></span> - Multiple Delivery Details</span>"; }
+        @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
+        @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("850px").Target("body").Render()
 
     </div>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
@@ -191,7 +256,12 @@
                             <label class="fs12-white mb-0">Status</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-default mb-0" v-cloak>{{order.orderStatusName}}</label>
+                            <template v-if="order.orderStatusName == `*MULTIPLE*`">
+                                <a v-on:click="handleMultipleShipmentModal(order.orderId)" class="fs12-link" v-cloak>Multiple (View)</a>
+                            </template>
+                            <template v-else>
+                                <label class="fs12-default mb-0" v-cloak>{{ order.orderStatusName }}</label>
+                            </template>
                         </div>
                     </div>
                 }
@@ -260,6 +330,7 @@
             currentPage: 1,
             pageSize: 10,
             pageCount: 0,
+            multipleShipments: {}
         },
         created: function () {
             window.addEventListener("resize", this.handleResize);
@@ -316,6 +387,34 @@
             hideLoading: function () {
                 $('#custom-loading').hide();
             },
+            handleMultipleShipmentModal: function (orderId) {
+                const request = { orderId }
+                this.showLoading();
+                const self = this;
+                $.ajax({
+                    url: "@Url.Action("Shipments", "OrderOverride")",
+                    type: 'GET',
+                    data: request,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, _, _) {
+                        $('#order-detail-id').html(orderId);
+                        self.multipleShipments = data;
+                        const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
+                        for (var i = 0; i < elements.length; i++) {
+                            $(elements[i]).removeClass("e-dlg-closeicon-btn");
+                        }
+                        viewMultipleShipmentModal.show();
+                        self.hideLoading();
+                    },
+                    error: function (xhr, _, thrownError) {
+                        if (thrownError == "Unauthorized") {
+                            location.reload();
+                        }
+                        self.hideLoading();
+                    }
+                });
+            },
             handleMtrModal: function (orderId) {
 
                 const request = {
@@ -354,6 +453,13 @@
 
     function onDialogCreated() {
         viewMtrModal = this;
+    }
+
+    function onMultipleDialogCreated() {
+        viewMultipleShipmentModal = this;
+    }
+    function handleMultipleShipmentModal(orderId) {
+        ordergridvm.handleMultipleShipmentModal(orderId);
     }
 
     function handleMtrModal(orderId) {
@@ -453,6 +559,13 @@
 <script id="viewTicket" type="text/x-template">
     ${if(DeliveryTicketCount > 0)}
     <a href="${DeliveryTicketFile}" target="_blank">View</a>
+    ${/if}
+</script>
+<script id="orderStatusName" type="text/x-template">
+    ${if(IsMultipleShipment)}
+    <td class="text-center"><a onclick="handleMultipleShipmentModal(${OrderId})" scope="row" class="light-blue">Multiple (View)</a></td>
+    ${else}
+    <label class="fs12-default mb-0">${OrderStatusName}</label>
     ${/if}
 </script>
 <script id="viewMtr" type="text/x-template">
