@@ -164,12 +164,12 @@
         _cartItem.Add("workOrderInstructionsControlId", workOrderInstructionsControlId);
         _cartItem.Add("warnings", Serialize(item.Warnings));
         _cartItem.Add("itemWorkOrderValue", workOrderAttr.DefaultValue);
-        _cartItem.Add("noteAttrValue", noteAttr.DefaultValue);
         _cartItem.Add("sawOptionControlId", sawOptionControlId);
         _cartItem.Add("isCutOptionPreselected", cutOptionIsPreselected);
         _cartItem.Add("itemQuantity", 0);
         _cartItem.Add("sawOptionsName", sawOptionName);
         _cartItem.Add("sawOptionRadioId", sawOptionId);
+        _cartItem.Add("sawDisplayText", null);
 
 
         items.Add(_cartItem);
@@ -184,7 +184,7 @@ Content1 =
     @<div id="viewNotesModal">
         <div class="modal-body">
             <textarea class="form-control rounded-0" maxlength="100" name="productNote" id="productNote" rows="3"></textarea>
-            <div class="buttons float-right pt-3" id="saveNote" v-on:click="saveNote">
+            <div class="buttons float-right pt-3" id="saveNote">
                 <input type="button" class="button-1 register-button" value="Add" />
             </div>
         </div>
@@ -331,7 +331,7 @@ Content3 =
                                             <input v-show="!item.isCutOptionPreselected" type="button" class="nss-btn-default px-2 py-2" style="width:fit-content" value="CUT TO LENGTH "
                                                    v-on:click="handleSawOptionModal(item)" />
 
-                                            <h6 style="color:#0099E1" class="text-decoration-underline cursor-pointer" v-show="item.isCutOptionPreselected" v-on:click="handleSawOptionModal(item)">{{item.itemQuantity}} pieces - {{item.sawOptionsName}}</h6>
+                                            <h6 style="color:#0099E1" class="text-decoration-underline cursor-pointer" v-show="item.isCutOptionPreselected" v-on:click="handleSawOptionModal(item)">{{item.sawDisplayText}}</h6>
 
                                             <input type="hidden" v-bind:id='item.workOrderInstructionsControlId' v-bind:name="item.workOrderInstructionsControlId" v-model="item.itemWorkOrderValue" />
                                             <input type="hidden" v-bind:name="item.sawOptionControlId" v-model="item.sawOptionRadioId" />
@@ -358,7 +358,7 @@ Content3 =
                                                     <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
                                                 </svg>
                                             </a>
-                                            <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttrValue" />
+                                            <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttr.defaultValue" />
 
 
                                         </td>
@@ -397,7 +397,7 @@ Content3 =
                                 </div>
                                 <label class="h5-default-500" v-cloak>Weight: {{  evenRound(item.weight * item.quantity)  | amount(0) }} lb</label>
                                 <a v-if="item.noteAttr" data-toggle="modal" v-on:click="handleNotesModal(item)" data-target="#noteModal" class="fs12-link-500 mb-3">View Notes</a>
-                                <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttrValue" />
+                                <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttr.defaultValue" />
                                 <template v-if=item.hasSawOption>
                                     <a v-show="!item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">Cut To Length</a>
                                     <a v-show="item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">{{item.itemQuantity}} pieces - {{item.sawOptionsName}}</a>
@@ -713,7 +713,7 @@ Content3 =
         data: {
             items,
             currentItemId: null,
-            sawOptionName: "Saw in half",
+            sawOptionName: "None",
             sawOptionControlId: null,
             sawOptions: [],
             sawOption: null,
@@ -756,6 +756,7 @@ Content3 =
                         break;
                     default:
                 }
+                this.buildSawOptionItemDisplay(item);
                 item.unitPrice = item.unitPrice?.replace('$', '');
                 item.noteAttr = JSON.parse(item.noteAttr);
                 item.warnings = JSON.parse(item.warnings);
@@ -796,8 +797,9 @@ Content3 =
                 })
                 this.sawOptionName = sawOptionsName;
             },
-            handleSawOptionModal: function ({ id, productId, prodAttrs, productName, workOrderInstructionsControlId, itemWorkOrderValue, sawOptionRadioId }) {
+            handleSawOptionModal: function ({ id, productId, prodAttrs, productName, workOrderInstructionsControlId, itemWorkOrderValue, sawOptionRadioId, sawOptionsName }) {
                 this.currentItemId = id;
+                this.sawOptionName = sawOptionsName;
                 this.workOrderInstructionsControlId = workOrderInstructionsControlId;
                 const at = prodAttrs;
                 $('#dialog-product-description').html(productName);
@@ -820,7 +822,7 @@ Content3 =
                         x.itemWorkOrderValue = this.workOrderInstructions;
                         x.isCutOptionPreselected = true;
                         x.sawOptionRadioId = this.sawOption;
-                        switch (this.sawOptionName) {
+                        switch (x.sawOptionsName) {
                             case "Saw in half":
                                 x.itemQuantity *= 2;
                                 break;
@@ -830,12 +832,37 @@ Content3 =
                             case "Saw in quarters":
                                 x.itemQuantity *= 4;
                                 break;
-                            case "Others":
+                            case "Other":
+                            case "None":
                                 break;
                             default:
-                        }
+                        };
+
+                        this.buildSawOptionItemDisplay(x);
+
+                        return;
                     }
                 });
+            },
+            buildSawOptionItemDisplay: function (item) {
+                let pieceText = 'pieces';
+                if (item.itemQuantity <= 1)
+                    pieceText = 'piece';
+
+                switch (item.sawOptionsName) {
+                    case "Saw in half":
+                    case "Saw in thirds":
+                    case "Saw in quarters":
+                        item.sawDisplayText = `${item.sawOptionsName} - ${item.itemQuantity} final ${pieceText}`;
+                        break;
+                    case "Other":
+                        item.sawDisplayText = 'Custom';
+                        break;
+                    case "None":
+                        item.isCutOptionPreselected = false;
+                        break;
+                    default:
+                };
             },
             saveSawOptions: function () {
                 this.getsawOptionsQuantityAndValues(this.items);
@@ -849,34 +876,13 @@ Content3 =
 
                 sawOptionModal.hide();
             },
-            saveNote: function () {
-                var productNoteValue = $("#productNote").val().trim();
-                if (productNoteValue.length == 0) {
-                    productNoteValue = " ";
-                    $('#removedNote-' + itemNoteId).show();
-                    $('#addedNote-' + itemNoteId).hide();
-                }
-                else {
-                    $('#addedNote-' + itemNoteId).show();
-                    $('#removedNote-' + itemNoteId).hide();
-                }
-                this.items.forEach(x => {
-                    if (x.id == this.currentItemId) {
-                        x.noteAttrValue = productNoteValue;
-                    }
-                })
-
-                $(this).find("textarea").val('').end();
-                viewNotesModal.hide();
-            },
 
             handleResize: function () {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
             },
-            handleNotesModal: function ({ id, noteAttrValue, noteControlId }) {
-                this.currentItemId = id;
-                handleNotesModal(noteAttrValue, noteControlId);
+            handleNotesModal: function ({ noteControlId }) {
+                handleNotesModal(noteControlId);
             },
             toggleUnitPrice: function (item) {
                 const { unitControlId, id, pricePerCWT, pricePerPiece, pricePerFt } = item;
@@ -947,6 +953,9 @@ Content3 =
                             default:
                         }
                         item.subTotal = `$${totalPrice.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`;
+                        this.buildSawOptionItemDisplay(item);
+
+                        return;
                     }
                 });
             },
@@ -973,11 +982,27 @@ Content3 =
     }
 
     let itemNoteId;
-    function handleNotesModal(noteAttrValue, itemId) {
+    function handleNotesModal(itemId) {
         itemNoteId = itemId;
-        $("#productNote").val(noteAttrValue);
+        $("#productNote").val($(`#${itemNoteId}`).val());
         viewNotesModal.show();
     }
+
+    $('#saveNote').on('click', function () {
+        var productNoteValue = $("#productNote").val().trim();
+        if (productNoteValue.length == 0) {
+            productNoteValue = " ";
+            $('#removedNote-' + itemNoteId).show();
+            $('#addedNote-' + itemNoteId).hide();
+        }
+        else {
+            $('#addedNote-' + itemNoteId).show();
+            $('#removedNote-' + itemNoteId).hide();
+        }
+        $(`#${itemNoteId}`).val(productNoteValue);
+        $(this).find("textarea").val('').end();
+        viewNotesModal.hide();
+    });
     function evenRound(num, decimalPlaces) {
         var d = decimalPlaces || 0;
         var m = Math.pow(10, d);
