@@ -446,6 +446,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
                         _productAttributeService.InsertProductAttributeMapping(attributeMapping);
 
                         // options
+                        _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "None", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 0, IsPreSelected = true});
                         _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in half", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 1});
                         _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in thirds", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 2 });
                         _productAttributeService.InsertProductAttributeValue(new ProductAttributeValue { AttributeValueType = AttributeValueType.Simple, Name = "Saw in quarters", ProductAttributeMappingId = attributeMapping.Id, DisplayOrder = 3 });
