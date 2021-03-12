@@ -1,6 +1,8 @@
-﻿@using Nop.Web.Models.Topics 
+﻿@using Nop.Web.Models.Topics
 @model TopicModel
 @using Nop.Core.Domain.Seo
+@using System.Text.RegularExpressions;
+
 @inject Nop.Core.IWebHelper webHelper
 @inject SeoSettings seoSettings
 @{
@@ -27,6 +29,17 @@
 
     //page class
     Html.AppendPageCssClassParts("html-topic-page");
+}
+@{
+    string url = Model.Body;
+    url = Regex.Replace(url, @"</?p[^>]*>", "");
+    //Regex to check if string starts with http or https
+    Regex rgx = new Regex(@"^(http|https)://.*$");
+    if (rgx.IsMatch(url))
+    {
+        Context.Response.Redirect(url);
+    }
+
 }
 @if (Model.IsPasswordProtected)
 {
@@ -79,8 +92,8 @@
                 @T("Topic.EnterPassword")
             </div>
             <div class="enter-password-form">
-                <input name="password" id="password" type="password"/>
-                <input type="submit" id="button-password" value="@T("Topic.Button")" class="button-1 topic-password-button"/>
+                <input name="password" id="password" type="password" />
+                <input type="submit" id="button-password" value="@T("Topic.Button")" class="button-1 topic-password-button" />
             </div>
             <div class="password-error" id="password-error" style="display: none;"></div>
         </form>
