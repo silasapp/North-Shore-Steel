@@ -67,54 +67,58 @@
                         <p>SMS</p>
                     </div>
                 </div>
-                <div class="notification" v-for="preference in preferenceArr">
-                    <p>{{preference.title}}</p>
-                    <div class="notification-actions">
-                        <div v-for="p in preference.preferences" :class="{'iconContainer': p.Value}">
-                            <label class="mb-1">
-                                <input type="checkbox" hidden v-model="p.Value">
-                                <template v-if="itemsContains(p.Key, 'email')">
-                                    <svg v-if="p.Value" xmlns="http://www.w3.org/2000/svg"
-                                         xmlns:xlink="http://www.w3.org/1999/xlink"
-                                         aria-hidden="true" focusable="false" width="1em" height="1em"
-                                         style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
-                                         preserveAspectRatio="xMidYMid meet"
-                                         viewBox="0 0 24 24">
-                                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.4 4.25l-6.54 4.09c-.65.41-1.47.41-2.12 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44z"
-                                              fill="#FFFFFF" />
-                                    </svg>
-                                    <svg v-if="!p.Value" xmlns="http://www.w3.org/2000/svg"
-                                         xmlns:xlink="http://www.w3.org/1999/xlink"
-                                         aria-hidden="true" focusable="false" width="1em" height="1em"
-                                         style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
-                                         preserveAspectRatio="xMidYMid meet"
-                                         viewBox="0 0 24 24">
-                                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.4 4.25l-6.54 4.09c-.65.41-1.47.41-2.12 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44z"
-                                              fill="#AAAAAA" />
-                                    </svg>
+                <template v-for="preference in preferenceArr">
+                    <template v-if="preference.title != 'When my order has been confirmed (offline orders only).' && preference.title != 'When my order is ready.'">
+                        <div class="notification">
+                            <p>{{preference.title}}</p>
+                            <div class="notification-actions">
+                                <div v-for="p in preference.preferences" :class="{'iconContainer': p.Value}">
+                                    <label class="mb-1">
+                                        <input type="checkbox" hidden v-model="p.Value">
+                                        <template v-if="itemsContains(p.Key, 'email')">
+                                            <svg v-if="p.Value" xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 aria-hidden="true" focusable="false" width="1em" height="1em"
+                                                 style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+                                                 preserveAspectRatio="xMidYMid meet"
+                                                 viewBox="0 0 24 24">
+                                                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.4 4.25l-6.54 4.09c-.65.41-1.47.41-2.12 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44z"
+                                                      fill="#FFFFFF" />
+                                            </svg>
+                                            <svg v-if="!p.Value" xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 aria-hidden="true" focusable="false" width="1em" height="1em"
+                                                 style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+                                                 preserveAspectRatio="xMidYMid meet"
+                                                 viewBox="0 0 24 24">
+                                                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.4 4.25l-6.54 4.09c-.65.41-1.47.41-2.12 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44z"
+                                                      fill="#AAAAAA" />
+                                            </svg>
 
-                                </template>
-                                <template v-if="itemsContains(p.Key, 'sms')">
-                                    <svg v-if="p.Value" xmlns="http://www.w3.org/2000/svg"
-                                         xmlns:xlink="http://www.w3.org/1999/xlink"
-                                         aria-hidden="true" focusable="false" width="1em" height="1em"
-                                         style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
-                                         preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
-                                        <path d="M17 19H7V5h10m0-4H7c-1.11 0-2 .89-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2z" fill="#FFFFFF" />
-                                    </svg>
-                                    <svg v-if="!p.Value" xmlns="http://www.w3.org/2000/svg"
-                                         xmlns:xlink="http://www.w3.org/1999/xlink"
-                                         aria-hidden="true" focusable="false" width="1em" height="1em"
-                                         style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
-                                         preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
-                                        <path d="M17 19H7V5h10m0-4H7c-1.11 0-2 .89-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2z" fill="#AAAAAA" />
-                                    </svg>
+                                        </template>
+                                        <template v-if="itemsContains(p.Key, 'sms')">
+                                            <svg v-if="p.Value" xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 aria-hidden="true" focusable="false" width="1em" height="1em"
+                                                 style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+                                                 preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+                                                <path d="M17 19H7V5h10m0-4H7c-1.11 0-2 .89-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2z" fill="#FFFFFF" />
+                                            </svg>
+                                            <svg v-if="!p.Value" xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 aria-hidden="true" focusable="false" width="1em" height="1em"
+                                                 style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);"
+                                                 preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+                                                <path d="M17 19H7V5h10m0-4H7c-1.11 0-2 .89-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2z" fill="#AAAAAA" />
+                                            </svg>
 
-                                </template>
-                            </label>
+                                        </template>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </template>
+                </template>
             </div>
             <div class="buttons save-customer-info-button notification-btn" v-bind:class="{'justify-content-center': isMobile}">
                 <input type=submit v-on:click="updatePreferences" v-bind:class="{'bg-primary': isMobile,'color-white': isMobile}"
@@ -159,7 +163,7 @@
             },
             transformDataForClient: function (data) {
                 this.preferenceArr = [];
-                    data.map(item => {
+                data.map(item => {
                         this.preferenceArr.push({
                             title: item.Title,
                             preferences: item.Preferences

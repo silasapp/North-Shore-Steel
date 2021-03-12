@@ -179,7 +179,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         {
             switch (keyValue.Key)
             {
-                
+                case Constants.MyOrderConfirmedEmail:
+                case Constants.MyOrderConfirmedSms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order has been confirmed (offline orders only).", ref model);
+                    break;
                 case Constants.MyOrderScheduleEmail:
                 case Constants.MyOrderScheduleSms:
                     if (isBuyer)
@@ -190,7 +194,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     if (isBuyer)
                         AddPreference(keyValue, "When my order has a promise date change.", ref model);
                     break;
-                
+                case Constants.MyOrderReadyEmail:
+                case Constants.MyOrderReadySms:
+                    if (isBuyer)
+                        AddPreference(keyValue, "When my order is ready.", ref model);
+                    break;
                 case Constants.MyOrderLoadingEmail:
                 case Constants.MyOrderLoadingSms:
                     if (isBuyer)
@@ -221,15 +229,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         private static void AddPreference(KeyValuePair<string, bool> keyValue, string title, ref NotificationsModel model)
         {
             if (model.Notifications.Any(x => x.Title == title))
-                    model.Notifications.FirstOrDefault(x => x.Title == title).Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
-                else
-                {
-                    var itemModel = new NotificationsModel.NotificationItemModel();
-                    itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? title : itemModel.Title;
-                    itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+                model.Notifications.FirstOrDefault(x => x.Title == title).Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
+            else
+            {
+                var itemModel = new NotificationsModel.NotificationItemModel();
+                itemModel.Title = string.IsNullOrEmpty(itemModel.Title) ? title : itemModel.Title;
+                itemModel.Preferences.Add(new NotificationsModel.PreferenceModel { Key = keyValue.Key, Value = keyValue.Value });
 
-                    model.Notifications.Add(itemModel);
-                }
+                model.Notifications.Add(itemModel);
+            }
         }
 
 
@@ -300,7 +308,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 CompanyHasCreditTerms = companyInfo?.HasCredit ?? false
             };
 
-            if ( creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))
+            if (creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))
             {
                 var creditResponse = _apiService.GetCompanyCreditBalance(Convert.ToInt32(companyId));
 

@@ -148,27 +148,28 @@
     </div>;
 }
 
+
 @{
     Func<object, object>
     Content3 =
     @<div id="viewMultipleShipmentMobileModal">
-        <div class="mx-0 bg-white-shadow mt-4" v-for="mS in multipleShipments.Shipments">
+        <div class="mx-0 bg-white-shadow mt-4" style="box-shadow: 0px 0px 15px 3px #00000029;" v-for="mS in multipleShipments.Shipments">
             <div class="shipment-data-grid">
                 <div>
-                    <label class="h4-primary-500-teko text-uppercase mb-0">PO #</label>
+                    <label class="h4-primary-500-teko mb-0">PO #</label>
                     <ul class="h5-default pb-3">
                         <li>{{multipleShipments.PoNo}}</li>
                     </ul>
                 </div>
                 <div>
-                    <label class="h4-primary-500-teko text-uppercase mb-0">Status</label>
+                    <label class="h4-primary-500-teko mb-0">Status</label>
                     <ul class="h5-default pb-3">
                         <li>{{mS.Status}}</li>
                     </ul>
                 </div>
                 <div>
+                    <label class="h4-primary-500-teko mb-0">Scheduled Date</label>
                     <template v-if="mS.Status.toLowerCase() != `shipped`">
-                        <label class="h4-primary-500-teko text-uppercase mb-0">Scheduled Date</label>
                         <ul class="h5-default pb-3">
                             <li>{{mS.ScheduledDate}}</li>
                         </ul>
@@ -178,7 +179,7 @@
 
                 </div>
                 <div>
-                    <label class="h4-primary-500-teko text-uppercase mb-0">Shipment Weight (lb)</label>
+                    <label class="h4-primary-500-teko mb-0">Shipment Weight (Lb)</label>
                     <ul class="h5-default pb-3">
                         <li>{{mS.TotalWeight}}</li>
                     </ul>
@@ -188,19 +189,19 @@
             <template v-for="item in mS.Items">
                 <div class="shipment-data-grid">
                     <div>
-                        <label class="h4-primary-500-teko text-uppercase mb-0">Item</label>
+                        <label class="h4-primary-500-teko mb-0">Item</label>
                         <ul class="h5-default pb-3">
                             <li>{{item.Description}}</li>
                         </ul>
                     </div>
                     <div>
-                        <label class="h4-primary-500-teko text-uppercase mb-0">Qty.</label>
+                        <label class="h4-primary-500-teko mb-0">Qty.</label>
                         <ul class="h5-default pb-3">
                             <li>{{item.Quantity}}</li>
                         </ul>
                     </div>
                     <div>
-                        <label class="h4-primary-500-teko text-uppercase mb-0">TotalWeight (lb)</label>
+                        <label class="h4-primary-500-teko mb-0">Total Item Weight (Lb)</label>
                         <ul class="h5-default pb-3">
                             <li>{{item.Weight}}</li>
                         </ul>
@@ -211,6 +212,8 @@
         </div>
     </div>;
 }
+
+
 <div id="ordersGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
         <ejs-grid id="OrderGrid" dataSource="@Model.Orders" excelQueryCellInfo="excelQueryCellInfo" queryCellInfo="customiseCell" rowHeight="38" allowExcelExport="true"
@@ -245,7 +248,7 @@
         @{ var title = "<span class='dialog-header'>ORDER <span class='order-detail-id'></span> - Multiple Delivery Details</span>"; }
         @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
         @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("850px").Target("body").Render()
-        @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleMobileDialogCreated").Header(title).ContentTemplate(@Content3).ShowCloseIcon(true).Visible(false).Height("95%").Width("95%").Target("body").Render()
+        @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleMobileDialogCreated").Header(title).ContentTemplate(@Content3).ShowCloseIcon(true).Visible(false).Height("100%").Width("100%").Target("body").Render()
 
     </div>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
@@ -468,7 +471,8 @@
                     dataType: "json",
                     success: function (data, _, _) {
                         $('.order-detail-id').html(orderId);
-                        self.multipleShipments = data;
+                        self.formatNumber(data.Shipments);
+						self.multipleShipments = data;
                         const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
                         for (var i = 0; i < elements.length; i++) {
                             $(elements[i]).removeClass("e-dlg-closeicon-btn");
@@ -482,6 +486,14 @@
                         }
                         self.hideLoading();
                     }
+                });
+            },
+            formatNumber: function (data) {
+                data.map(g => {
+                    g.TotalWeight = (g.TotalWeight).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+                    g.Items.map(it => {
+                        it.Weight = (it.Weight).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+                    })
                 });
             },
             handleMtrModal: function (orderId) {
