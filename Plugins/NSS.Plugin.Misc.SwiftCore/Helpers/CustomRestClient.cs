@@ -30,7 +30,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
             Request input,
             string token = null)
         {
-            return CreateRequest<Response>(url, Method.POST, input, token);
+            return CreateRequest<Response>(url, Method.PUT, input, token);
         }
 
         public (string, Response) GetAsync<Response>(
@@ -68,13 +68,17 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
         {
             return CreateRequestMessage(url, method, token, async (req) =>
             {
-                var reqKVPairs = JToken.FromObject(input).ToObject<Dictionary<string, object>>();
-
-                foreach (var kv in reqKVPairs)
+                if(input != null)
                 {
-                    req.AddParameter(kv.Key, kv.Value);
+                    var reqKVPairs = JToken.FromObject(input).ToObject<Dictionary<string, object>>();
+
+                    foreach (var kv in reqKVPairs)
+                    {
+                        req.AddParameter(kv.Key, kv.Value);
+                    }
+
+                    //req.AddObject(input);
                 }
-                //req.AddObject(input);
 
                 return GetResult<Response>(req);
             });

@@ -233,7 +233,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateNSSUser details => erpId: {erpId}", $"resp content ==> {error ?? "empty"}, request ==> {JsonConvert.SerializeObject(request.ToKeyValue())}");
+            var msg = string.IsNullOrEmpty(error) ? "empty" : error;
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateNSSUser details => erpId: {erpId}", $"resp content ==> {msg}, request ==> {JsonConvert.SerializeObject(request.ToKeyValue())}");
         }
 
         #endregion
@@ -993,7 +994,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateCompanyNotificationPreferences => userId: {userId}", $"resp content ==> {error ?? JsonConvert.SerializeObject(result) ?? "empty"}, companyId  ==> {companyId}");
+            var msg = string.IsNullOrEmpty(error) ? JsonConvert.SerializeObject(result) : error;
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.UpdateCompanyNotificationPreferences => userId: {userId}", $"resp content ==> {msg}, companyId  ==> {companyId}");
 
             return (result, error);
         }
@@ -1066,7 +1068,6 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
 
             //initialize
             var retVal = new ERPCalculateShippingResponse();
-            var respContent = string.Empty;
             string error = string.Empty;
 
             if (string.IsNullOrEmpty(_baseUrl) || string.IsNullOrEmpty(_user) || string.IsNullOrEmpty(_pword))
@@ -1114,7 +1115,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetShippingRate => email: {request.DestinationAddressLine1}", $"resp content ==> {respContent ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            var msg = string.IsNullOrEmpty(error) ? JsonConvert.SerializeObject(retVal) : error;
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.GetShippingRate => email: {request.DestinationAddressLine1}", $"resp content ==> {msg}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return (error, retVal);
         }
@@ -1178,7 +1180,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUserRegistration => regId: {request.SwiftRegistrationId}", $"resp content ==> {error ?? JsonConvert.SerializeObject(retVal) ?? "empty"}, request ==> {JsonConvert.SerializeObject(request)}");
+            var msg = string.IsNullOrEmpty(error) ? JsonConvert.SerializeObject(retVal) : error;
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.CreateUserRegistration => regId: {request.SwiftRegistrationId}", $"resp content ==> {msg}, request ==> {JsonConvert.SerializeObject(request)}");
 
             return (retVal, error);
         }
@@ -1233,7 +1236,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.RejectUserRegistration => regId: {regId}", $"resp content ==> {error ?? "empty"}");
+            var msg = string.IsNullOrEmpty(error) ? "empty" : error;
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.RejectUserRegistration => regId: {regId}", $"resp content ==> {msg}");
 
             return error;
         }
@@ -1276,7 +1280,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
                 // create user resource
                 var resource = $"/userregistration/{regId}/approve";
 
-                (error, retVal) = client.PutAsync<string, ERPApproveUserRegistrationResponse>(resource, null);
+                (error, retVal) = client.PutAsync<string, ERPApproveUserRegistrationResponse>(resource, null, token);
 
                 if (!string.IsNullOrEmpty(error))
                 {
@@ -1294,7 +1298,8 @@ namespace NSS.Plugin.Misc.SwiftCore.Services
             }
 
             // log request & resp
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.ApproveUserRegistration => regId: {regId}", $"resp content ==> {error?? JsonConvert.SerializeObject(retVal) ?? "empty"}");
+            var msg = string.IsNullOrEmpty(error) ? JsonConvert.SerializeObject(retVal) : error;
+            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"NSS.ApproveUserRegistration => regId: {regId}", $"resp content ==> {msg}");
 
             return (retVal, error);
         }
