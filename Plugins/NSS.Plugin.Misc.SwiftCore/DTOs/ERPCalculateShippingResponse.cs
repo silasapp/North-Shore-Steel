@@ -21,5 +21,8 @@ namespace NSS.Plugin.Misc.SwiftCore.DTOs
 
         [JsonProperty("time")]
         public string PickupTime { get; set; }
+
+        [JsonProperty("immediate")]
+        public bool Immediate { get; set; }
     }
 }
