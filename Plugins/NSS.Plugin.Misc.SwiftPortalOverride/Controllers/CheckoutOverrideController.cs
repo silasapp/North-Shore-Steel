@@ -811,14 +811,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var mappings = _productAttributeParser.ParseProductAttributeMappings(item.AttributesXml);
                 var attrs = _productAttributeService.GetAllProductAttributes();
 
-                string uom = null, notes = null, sawoptions = null, sawTolerance = null;
+                string uom = null, notes = null, sawoptions = null, sawTolerance = null, workOrderInstructions = null;
 
                 // build prod attr
                 foreach (var mapping in mappings)
                 {
                     if (mapping != null)
                     {
-                        var noteAttr = attrs.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
+                        var workOrderAttr = attrs.FirstOrDefault(x => x.Name == Constants.WorkOrderInstructionsAttribute);
+                        var noteAttr = attrs.FirstOrDefault(x => x.Name == Constants.NotesAttribute);
                         var sawOptionAttr = attrs.FirstOrDefault(x => x.Name == Constants.CutOptionsAttribute);
                         var sawToleranceAttr = attrs.FirstOrDefault(x => x.Name == Constants.LengthToleranceCutAttribute);
                         var uomAttr = attrs.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
@@ -831,13 +832,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         {
                             sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name;
                         }
-                        else if (mapping.ProductAttributeId == sawToleranceAttr?.Id)
+                        else if (mapping.ProductAttributeId == workOrderAttr?.Id)
                         {
-                            sawTolerance = _productAttributeParser.ParseValues(item.AttributesXml, mapping.Id)?.FirstOrDefault();
+                            workOrderInstructions = _productAttributeParser.ParseValues(item.AttributesXml, mapping.Id)?.FirstOrDefault();
                         }
                         else if (mapping.ProductAttributeId == uomAttr?.Id)
                         {
-                            uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? SwiftCore.Helpers.Constants.UnitPerPieceField;
+                            uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? Constants.UnitPerPieceField;
                         }
                     }
                 }
@@ -854,7 +855,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     // product attr
                     Notes = notes ?? string.Empty,
                     SawOptions = sawoptions?? string.Empty,
-                    SawTolerance = sawTolerance ?? string.Empty,
+                    SawTolerance = workOrderInstructions ?? string.Empty,
                     Uom = uom ?? string.Empty
                 });
             }
