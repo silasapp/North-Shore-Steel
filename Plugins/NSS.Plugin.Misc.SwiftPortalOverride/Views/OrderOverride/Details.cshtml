@@ -17,6 +17,22 @@
     string CLOSED_ORDER_STATUS_NAME = "Invoiced";
 }
 
+<style>
+    .cart-total-left, .cart-total-right {
+        display: table-cell !important;
+    }
+
+    .eqaul-width {
+        flex-basis: 0;
+        flex-grow: 1;
+    }
+
+    hr {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+</style>
+
 @{
 
     Func<object, object>
@@ -82,7 +98,7 @@
                         <template v-for="mS in multipleShipments.Shipments">
                             <tr>
                                 <td v-bind:rowspan="mS.Items.length+1">{{mS.Status }}</td>
-                                <template v-if="mS.Status != `Shipped`">
+                                <template v-if="mS.Status.toLowerCase() != `shipped`">
                                     <td v-bind:rowspan="mS.Items.length+1" class="text-center">{{mS.ScheduledDate | date }}</td>
                                 </template>
                                 <template v-else>
@@ -105,20 +121,70 @@
     </div>;
 }
 
-<style>
-    .cart-total-left, .cart-total-right {
-        display: table-cell !important;
-    }
+@{
+    Func<object, object>
+    Content3 =
+    @<div id="viewMultipleShipmentMobileModal">
+        <div class="mx-0 bg-white-shadow mt-4" v-for="mS in multipleShipments.Shipments">
+            <div class="shipment-data-grid">
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">PO #</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{multipleShipments.PoNo}}</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">Status</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{mS.Status}}</li>
+                    </ul>
+                </div>
+                <div>
+                    <template v-if="mS.Status.toLowerCase() != `shipped`">
+                        <label class="h4-primary-500-teko text-uppercase mb-0">Scheduled Date</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{mS.ScheduledDate}}</li>
+                        </ul>
+                    </template>
+                    <template v-else>
+                    </template>
 
-    .eqaul-width {
-        flex-basis: 0;
-        flex-grow: 1;
-    }
+                </div>
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">Shipment Weight (lb)</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{mS.TotalWeight}}</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <template v-for="item in mS.Items">
+                <div class="shipment-data-grid">
+                    <div>
+                        <label class="h4-primary-500-teko text-uppercase mb-0">Item</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{item.Description}}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <label class="h4-primary-500-teko text-uppercase mb-0">Qty.</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{item.Quantity}}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <label class="h4-primary-500-teko text-uppercase mb-0">TotalWeight (lb)</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{item.Weight}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </template>
 
-    .nss-light-blue {
-        color: #0076b4 !important;
-    }
-</style>
+        </div>
+    </div>;
+}
+
 
 <div id="order-detail" class="page order-details-page">
     <div class="d-flex flex-md-row justify-content-between align-items-md-start bg-white-shadow px-5 py-2" v-bind:style="{'background': isMobile ? '#f6f6f6' : '#ffffff'}">
@@ -246,17 +312,18 @@
                                 }
 
                                 @if (Model.ShippingAddress.CityEnabled && !string.IsNullOrEmpty(Model.ShippingAddress.City) ||
-                 !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                 !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                 !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+              !string.IsNullOrEmpty(Model.ShippingAddress.County) ||
+              !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+              !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+
                                 {
                                     <li class="city-state-zip">
                                         @if (!string.IsNullOrEmpty(Model.ShippingAddress.City))
                                         {
                                             @Model.ShippingAddress.City
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.County) ||
-                         !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                         !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                      !string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
+                      !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -266,7 +333,7 @@
                                         {
                                             @Model.ShippingAddress.County
                                             @if (!string.IsNullOrEmpty(Model.ShippingAddress.StateProvinceName) ||
-                             !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
+                          !string.IsNullOrEmpty(Model.ShippingAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -321,8 +388,8 @@
                                         {
                                             @Model.PickupAddress.City
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.County) ||
-                         !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                         !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                      !string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
+                      !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -331,7 +398,7 @@
                                         {
                                             @Model.PickupAddress.County
                                             @if (!string.IsNullOrEmpty(Model.PickupAddress.StateProvinceName) ||
-                         !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
+                      !string.IsNullOrEmpty(Model.PickupAddress.ZipPostalCode))
                                             {
                                                 <text>, </text>
                                             }
@@ -368,7 +435,7 @@
                 <ul class="h5-default">
                     @if (Model.OrderStatusName == "*MULTIPLE*")
                     {
-                        <li class="name"><a v-on:click="handleMultipleShipmentModal(@Model.OrderId)" scope="row" class="nss-light-blue">Multiple (View)</a></li>
+                        <li class="name"><a v-on:click="handleMultipleShipmentModal(@Model.OrderId)" scope="row" class="nss-light-blue">Multiple</a></li>
                     }
                     else
                     {
@@ -530,10 +597,10 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderDetailsPageBottom, additionalData = Model })
     </div>
 
-    @{ var title = "<span class='dialog-header'>ORDER <span id='order-detail-id'></span> - Multiple Delivery Details</span>"; }
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
+    @{ var title = "<span class='dialog-header'>ORDER <span class='order-detail-id'></span> - Multiple Delivery Details</span>"; }
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()    
     @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
-
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleMobileDialogCreated").Header(title).ContentTemplate(@Content3).ShowCloseIcon(true).Visible(false).Height("95%").Width("95%").Target("body").Render()
 </div>
 
 @{
@@ -602,13 +669,13 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (data, _, _) {
-                        $('#order-detail-id').html(orderId);
+                        $('.order-detail-id').html(orderId);
                         self.multipleShipments = data;
                         const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
                         for (var i = 0; i < elements.length; i++) {
                             $(elements[i]).removeClass("e-dlg-closeicon-btn");
                         }
-                        viewMultipleShipmentModal.show();
+                        self.isMobile ? viewMultipleShipmentMobileModal.show() : viewMultipleShipmentModal.show();
                         self.hideLoading();
                     },
                     error: function (xhr, _, thrownError) {
@@ -636,10 +703,13 @@
         viewMtrModal.show();
     }
 
+    function onMultipleMobileDialogCreated() {
+        viewMultipleShipmentMobileModal = this;
+    }
+
     function onMultipleDialogCreated() {
         viewMultipleShipmentModal = this;
     }
-
 </script>
 
 <ejs-scripts></ejs-scripts>

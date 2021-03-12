@@ -3378,7 +3378,7 @@ hr {
     .e-dlg-header-content .dialog-header * {
         color: #fff;
         font-weight: 700;
-        font: normal normal 500 26px/24px "Teko";
+        font: normal normal 300 26px/24px "Teko";
         letter-spacing: 0px;
         text-transform: uppercase;
         letter-spacing: 0.21px;
@@ -4132,3 +4132,17 @@ and also iPads specifically.
     position: relative;
     width: 30px;
 }
+
+.nss-light-blue {
+    color: #0076b4 !important;
+}
+
+/*#region Shipment data grid*/
+.shipment-data-grid {
+    display: grid;
+    padding: 15px;
+    justify-content: center;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 8em;
+}
+/*#endregion*/

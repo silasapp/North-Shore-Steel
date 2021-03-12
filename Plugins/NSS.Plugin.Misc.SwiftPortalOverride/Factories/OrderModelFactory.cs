@@ -244,12 +244,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (orderShippingDetailsResponse != null)
             {
                 model.PoNo = orderShippingDetailsResponse.PoNo;
-                var shipments = new OrderShippingDetailsModel.Shipment();
-                var items = new OrderShippingDetailsModel.Item();
                 if (orderShippingDetailsResponse.Shipments != null)
                 {
                     foreach (var respShipment in orderShippingDetailsResponse.Shipments)
                     {
+                        var shipments = new OrderShippingDetailsModel.Shipment();
                         shipments.ShipmentId = respShipment.ShipmentId;
                         shipments.Status = respShipment.Status;
                         shipments.ScheduledDate = respShipment.ScheduledDate;
@@ -258,14 +257,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         {
                             foreach (var item in respShipment.Items)
                             {
-                                items.Description = item.Description;
-                                items.Quantity = item.Quantity;
-                                items.Weight = item.Weight;
+                                var items = new OrderShippingDetailsModel.Item
+                                {
+                                    Description = item.Description,
+                                    Quantity = item.Quantity,
+                                    Weight = item.Weight
+                                };
+                                shipments.Items.Add(items);
                             }
-                            shipments.Items.Add(items);
                         }
+                        model.Shipments.Add(shipments);
                     }
-                    model.Shipments.Add(shipments);
                 }
             }
 

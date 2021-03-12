@@ -48,6 +48,43 @@
     }
 }
 
+
+<style>
+    .m-b2 {
+        margin-bottom: 2rem;
+    }
+
+    .p-t9 {
+        padding-top: 9rem;
+    }
+
+    .p-t6 {
+        padding: 5.7rem 0;
+    }
+
+    .p-b11 {
+        padding-bottom: 11.8rem;
+    }
+
+    .p-b1 {
+        padding-bottom: 1.2rem;
+    }
+
+    .nss-no-orders {
+        text-align: center;
+        font: normal normal 500 34px/24px "Teko";
+        letter-spacing: 0.27px;
+        color: #03175B;
+        opacity: 1;
+    }
+
+
+    hr {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+</style>
+
 @{
 
     Func<object, object>
@@ -85,7 +122,6 @@
 }
 
 @{
-
     Func<object, object>
     Content2 =
     @<div id="viewMultipleShipmentModal">
@@ -112,7 +148,7 @@
                         <template v-for="mS in multipleShipments.Shipments">
 	                       <tr>
 				                <td v-bind:rowspan="mS.Items.length+1">{{mS.Status }}</td>
-                                <template v-if="mS.Status != `Shipped`">
+                                <template v-if="mS.Status.toLowerCase() != `shipped`">
                                     <td v-bind:rowspan="mS.Items.length+1" class="text-center">{{mS.ScheduledDate | date }}</td>
                                 </template>
                                <template v-else>
@@ -134,39 +170,69 @@
         </div>
     </div>;
 }
-<style>
-    .m-b2 {
-        margin-bottom: 2rem;
-    }
+@{
+    Func<object, object>
+    Content3 =
+    @<div id="viewMultipleShipmentMobileModal">
+         <div class="mx-0 bg-white-shadow mt-4" v-for="mS in multipleShipments.Shipments">
+             <div class="shipment-data-grid">
+                 <div>
+                     <label class="h4-primary-500-teko text-uppercase mb-0">PO #</label>
+                     <ul class="h5-default pb-3">
+                         <li>{{multipleShipments.PoNo}}</li>
+                     </ul>
+                 </div>
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">Status</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{mS.Status}}</li>
+                    </ul>
+                </div>
+                <div>
+                    <template v-if="mS.Status.toLowerCase() != `shipped`">
+                        <label class="h4-primary-500-teko text-uppercase mb-0">Scheduled Date</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{mS.ScheduledDate}}</li>
+                        </ul>
+                    </template>
+                    <template v-else></template>
 
-    .p-t9 {
-        padding-top: 9rem;
-    }
+                </div>
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">Shipment Weight (lb)</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{mS.TotalWeight}}</li>
+                    </ul>
+                </div>
+             </div>
+             <hr>
+             <template v-for="item in mS.Items">
+                 <div class="shipment-data-grid">
+                         <div>
+                            <label class="h4-primary-500-teko text-uppercase mb-0">Item</label>
+                            <ul class="h5-default pb-3">
+                                <li>{{item.Description}}</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <label class="h4-primary-500-teko text-uppercase mb-0">Qty.</label>
+                            <ul class="h5-default pb-3">
+                                <li>{{item.Quantity}}</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <label class="h4-primary-500-teko text-uppercase mb-0">TotalWeight (lb)</label>
+                            <ul class="h5-default pb-3">
+                                <li>{{item.Weight}}</li>
+                            </ul>
+                        </div>
+                 </div>
+             </template>
 
-    .p-t6 {
-        padding: 5.7rem 0;
-    }
+         </div>
+    </div>;
+}
 
-    .p-b11 {
-        padding-bottom: 11.8rem;
-    }
-
-    .p-b1 {
-        padding-bottom: 1.2rem;
-    }
-
-    .nss-no-orders {
-        text-align: center;
-        font: normal normal 500 34px/24px "Teko";
-        letter-spacing: 0.27px;
-        color: #03175B;
-        opacity: 1;
-    }
-
-    .light-blue {
-        color: #0076b4 !important;
-    }
-</style>
 
 
 <div id="app" class="page home-page">
@@ -206,7 +272,7 @@
                                                         <td class="text-center">@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
                                                         @if (@order.OrderStatusName == "*MULTIPLE*")
                                                         {
-                                                            <td class="text-center"><a v-on:click="handleMultipleShipmentModal(@order.OrderId)" scope="row" class="light-blue">Multiple (View)</a></td>
+                                                            <td class="text-center"><a v-on:click="handleMultipleShipmentModal(@order.OrderId, false)" scope="row" class="nss-light-blue">Multiple</a></td>
                                                         }
                                                         else
                                                         {
@@ -302,10 +368,10 @@
                                                             <td>@order.PoNo</td>
                                                             <td class="text-center">@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
                                                             <td class="text-center">@order.DeliveryStatus</td>
-                                                            <td class="text-center"><a v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" scope="row" class="light-blue">View</a></td>
+                                                            <td class="text-center"><a v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" scope="row" class="nss-light-blue">View</a></td>
                                                             <td class="text-center">
                                                                 @if (order.DeliveryTicketCount > 0)
-                                                                {<a href="@order.DeliveryTicketFile" target="_blank" scope="row" class="light-blue">View</a>}
+                                                                {<a href="@order.DeliveryTicketFile" target="_blank" scope="row" class="nss-light-blue">View</a>}
                                                             </td>
                                                         </tr>
                                                     }
@@ -382,9 +448,10 @@
                     </div>
 
                 </div>
-                @{ var title = "<span class='dialog-header'>ORDER <span id='order-detail-id'></span> - Multiple Delivery Details</span>"; }
+                @{ var title = "<span class='dialog-header'>ORDER <span class='order-detail-id'></span> - Multiple Delivery Details</span>"; }
                 @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
                 @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
+                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleMobileDialogCreated").Header(title).ContentTemplate(@Content3).ShowCloseIcon(true).Visible(false).Height("95%").Width("95%").Target("body").Render()
 
             </div>
             <a href="/catalog">
@@ -467,11 +534,10 @@
                             </div>
                             <div class="d-flex p-2">
                                 <template v-if="order.orderStatusName == `*MULTIPLE*`">
-                                    <a v-on:click="handleMultipleShipmentModal(order.orderId)" class="fs12-link" v-cloak>Multiple (View)</a>
+                                    <a v-on:click="handleMultipleShipmentModal(order.orderId, true)" class="fs12-link" v-cloak>Multiple</a>
                                 </template>
                                 <template v-else>
                                     <label class="fs12-default mb-0" v-cloak>{{ order.orderStatusName }}</label>
-
                                 </template>
                             </div>
                         </div>
@@ -531,7 +597,7 @@
                                 <label class="fs12-white mb-0">MTR</label>
                             </div>
                             <div class="d-flex p-2">
-                                <a v-on:click="handleMtrModal(companyId, order.orderId)" class="light-blue" v-cloak>View</a>
+                                <a v-on:click="handleMtrModal(companyId, order.orderId)" class="nss-light-blue" v-cloak>View</a>
                             </div>
                         </div>
                         <div class="d-flex flex-row">
@@ -539,7 +605,7 @@
                                 <label class="fs12-white mb-0">POD</label>
                             </div>
                             <div class="d-flex p-2" v-if="order.deliveryTicketCount > 0">
-                                <a v-bind:href="order.deliveryTicketFile" target="_blank" class="light-blue" v-cloak>View</a>
+                                <a v-bind:href="order.deliveryTicketFile" target="_blank" class="nss-light-blue" v-cloak>View</a>
                             </div>
                         </div>
                     </div>
@@ -646,9 +712,6 @@
 
         <img src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%" style=" margin-bottom: 80px;">
     </div>
-
-</div>
-
 </div>
 
 <script>
@@ -679,7 +742,7 @@
             hideLoading: function () {
                 $('#custom-loading').hide();
             },
-            handleMultipleShipmentModal: function (orderId) {
+            handleMultipleShipmentModal: function (orderId, isMobile) {
                 const request = { orderId }
                 this.showLoading();
                 const self = this;
@@ -690,13 +753,13 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (data, _, _) {
-                        $('#order-detail-id').html(orderId);
+                        $('.order-detail-id').html(orderId);
                         self.multipleShipments = data;
                         const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
                         for (var i = 0; i < elements.length; i++) {
                             $(elements[i]).removeClass("e-dlg-closeicon-btn");
                         }
-                        viewMultipleShipmentModal.show();
+                        isMobile ? viewMultipleShipmentMobileModal.show() : viewMultipleShipmentModal.show();
                         self.hideLoading();
                     },
                     error: function (xhr, _, thrownError) {
@@ -744,6 +807,9 @@
 
     function onMultipleDialogCreated() {
         viewMultipleShipmentModal = this;
+    }
+    function onMultipleMobileDialogCreated() {
+        viewMultipleShipmentMobileModal = this;
     }
 
 </script>

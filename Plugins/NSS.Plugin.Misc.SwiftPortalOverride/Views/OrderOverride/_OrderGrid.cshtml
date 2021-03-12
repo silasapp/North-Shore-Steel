@@ -42,7 +42,6 @@
     .home-table-sm-header {
         width: 110px !important;
         background-color: #1899E1 !important;
-        /* border-bottom: 0.1px solid white; */
     }
 
     .invisible-grid {
@@ -57,6 +56,11 @@
 
     thead > tr > :nth-child(6) > div, thead > tr > :nth-child(7) > div, thead > tr > :nth-child(8) > div {
         text-align: center !important;
+    }
+
+    hr {
+        margin-left: 1rem;
+        margin-right: 1rem;
     }
 </style>
 @{
@@ -95,7 +99,6 @@
     </div>;
 }
 @{
-
     Func<object, object>
     Content2 =
     @<div id="viewMultipleShipmentModal">
@@ -122,7 +125,7 @@
                         <template v-for="mS in multipleShipments.Shipments">
                             <tr>
                                 <td v-bind:rowspan="mS.Items.length+1">{{mS.Status }}</td>
-                                <template v-if="mS.Status != `Shipped`">
+                                <template v-if="mS.Status.toLowerCase() != `shipped`">
                                     <td v-bind:rowspan="mS.Items.length+1" class="text-center">{{mS.ScheduledDate | date }}</td>
                                 </template>
                                 <template v-else>
@@ -141,6 +144,70 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>;
+}
+
+@{
+    Func<object, object>
+    Content3 =
+    @<div id="viewMultipleShipmentMobileModal">
+        <div class="mx-0 bg-white-shadow mt-4" v-for="mS in multipleShipments.Shipments">
+            <div class="shipment-data-grid">
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">PO #</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{multipleShipments.PoNo}}</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">Status</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{mS.Status}}</li>
+                    </ul>
+                </div>
+                <div>
+                    <template v-if="mS.Status.toLowerCase() != `shipped`">
+                        <label class="h4-primary-500-teko text-uppercase mb-0">Scheduled Date</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{mS.ScheduledDate}}</li>
+                        </ul>
+                    </template>
+                    <template v-else>
+                    </template>
+
+                </div>
+                <div>
+                    <label class="h4-primary-500-teko text-uppercase mb-0">Shipment Weight (lb)</label>
+                    <ul class="h5-default pb-3">
+                        <li>{{mS.TotalWeight}}</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <template v-for="item in mS.Items">
+                <div class="shipment-data-grid">
+                    <div>
+                        <label class="h4-primary-500-teko text-uppercase mb-0">Item</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{item.Description}}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <label class="h4-primary-500-teko text-uppercase mb-0">Qty.</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{item.Quantity}}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <label class="h4-primary-500-teko text-uppercase mb-0">TotalWeight (lb)</label>
+                        <ul class="h5-default pb-3">
+                            <li>{{item.Weight}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </template>
+
         </div>
     </div>;
 }
@@ -174,9 +241,11 @@
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>
         </ejs-grid>
-        @{ var title = "<span class='dialog-header'>ORDER <span id='order-detail-id'></span> - Multiple Delivery Details</span>"; }
+
+        @{ var title = "<span class='dialog-header'>ORDER <span class='order-detail-id'></span> - Multiple Delivery Details</span>"; }
         @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
         @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("850px").Target("body").Render()
+        @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleMobileDialogCreated").Header(title).ContentTemplate(@Content3).ShowCloseIcon(true).Visible(false).Height("95%").Width("95%").Target("body").Render()
 
     </div>
     <div v-if="isMobile" v-bind:style="{'margin-bottom': isMobile ? '40px':'0', 'margin-right': isMobile && isExportMode ? '-21px' : '0'}">
@@ -257,7 +326,7 @@
                         </div>
                         <div class="d-flex p-2">
                             <template v-if="order.orderStatusName == `*MULTIPLE*`">
-                                <a v-on:click="handleMultipleShipmentModal(order.orderId)" class="fs12-link" v-cloak>Multiple (View)</a>
+                                <a v-on:click="handleMultipleShipmentModal(order.orderId, true)" class="fs12-link" v-cloak>Multiple</a>
                             </template>
                             <template v-else>
                                 <label class="fs12-default mb-0" v-cloak>{{ order.orderStatusName }}</label>
@@ -387,7 +456,7 @@
             hideLoading: function () {
                 $('#custom-loading').hide();
             },
-            handleMultipleShipmentModal: function (orderId) {
+            handleMultipleShipmentModal: function (orderId, isMobile) {
                 const request = { orderId }
                 this.showLoading();
                 const self = this;
@@ -398,13 +467,13 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (data, _, _) {
-                        $('#order-detail-id').html(orderId);
+                        $('.order-detail-id').html(orderId);
                         self.multipleShipments = data;
                         const elements = document.getElementsByClassName("e-dlg-closeicon-btn")
                         for (var i = 0; i < elements.length; i++) {
                             $(elements[i]).removeClass("e-dlg-closeicon-btn");
                         }
-                        viewMultipleShipmentModal.show();
+                        isMobile ? viewMultipleShipmentMobileModal.show() : viewMultipleShipmentModal.show();
                         self.hideLoading();
                     },
                     error: function (xhr, _, thrownError) {
@@ -454,14 +523,17 @@
     function onDialogCreated() {
         viewMtrModal = this;
     }
-
     function onMultipleDialogCreated() {
         viewMultipleShipmentModal = this;
     }
-    function handleMultipleShipmentModal(orderId) {
-        ordergridvm.handleMultipleShipmentModal(orderId);
+
+    function onMultipleMobileDialogCreated() {
+        viewMultipleShipmentMobileModal = this;
     }
 
+    function handleMultipleShipmentModal(orderId, isMobile) {
+        ordergridvm.handleMultipleShipmentModal(orderId, isMobile);
+    }
     function handleMtrModal(orderId) {
         ordergridvm.handleMtrModal(orderId);
     }
@@ -563,13 +635,13 @@
 </script>
 <script id="orderStatusName" type="text/x-template">
     ${if(IsMultipleShipment)}
-    <td class="text-center"><a onclick="handleMultipleShipmentModal(${OrderId})" scope="row" class="light-blue">Multiple (View)</a></td>
+    <td class="text-center"><a onclick="handleMultipleShipmentModal(${OrderId}, false)" scope="row" class="nss-light-blue">Multiple</a></td>
     ${else}
     <label class="fs12-default mb-0">${OrderStatusName}</label>
     ${/if}
 </script>
 <script id="viewMtr" type="text/x-template">
-    <td class="text-center"><a onclick="handleMtrModal(${OrderId})" scope="row" class="light-blue">View</a></td>
+    <td class="text-center"><a onclick="handleMtrModal(${OrderId})" scope="row" class="nss-light-blue">View</a></td>
 </script>
 
 <ejs-scripts></ejs-scripts>
