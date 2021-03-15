@@ -853,10 +853,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     UnitPrice = Math.Round(item.UnitPriceExclTax, 2),
                     TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int)Math.Round(weight * item.Quantity) : 0),
                     // product attr
-                    Notes = notes ?? string.Empty,
-                    SawOptions = sawoptions?? string.Empty,
-                    SawTolerance = workOrderInstructions ?? string.Empty,
-                    Uom = uom ?? string.Empty
+                    Notes =  notes,
+                    SawOptions = (sawoptions?.ToLower() == "other" || sawoptions?.ToLower() == "none") ? null : sawoptions,
+                    SawTolerance = sawoptions?.ToLower() == "none" ? null : workOrderInstructions,
+                    Uom = uom
                 });
             }
 
