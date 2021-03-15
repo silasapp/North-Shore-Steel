@@ -164,7 +164,7 @@
         _cartItem.Add("workOrderInstructionsControlId", workOrderInstructionsControlId);
         _cartItem.Add("warnings", Serialize(item.Warnings));
         _cartItem.Add("itemWorkOrderValue", workOrderAttr.DefaultValue);
-		_cartItem.Add("noteAttrValue", noteAttr.DefaultValue);
+        _cartItem.Add("noteAttrValue", noteAttr.DefaultValue);
         _cartItem.Add("sawOptionControlId", sawOptionControlId);
         _cartItem.Add("isCutOptionPreselected", cutOptionIsPreselected);
         _cartItem.Add("itemQuantity", 0);
@@ -213,7 +213,7 @@ Content3 =
                 <div class="d-flex flex-row">
                     <label v-for="option in sawOptions" v-bind:for="sawOptionControlId + '_' + option.id"
                            class="mr-3 d-flex align-items-center cursor-pointer mb-0">
-                        <input v-bind:id="sawOptionControlId + '_' +option.id" v-bind:name="sawOptionControlId + '_' + currentItemId" type="radio" v-on:click="getSawOptionControlName(sawOptionControlId + '_' + currentItemId, option.name, option.id)" class="nss-radio mr-2 cursor-pointer"
+                        <input v-bind:id="sawOptionControlId + '_' +option.id" type="radio" v-on:click="getSawOptionControlName(sawOptionControlId + '_' + currentItemId, option.name, option.id)" class="nss-radio mr-2 cursor-pointer"
                                v-bind:value="option.id" v-model="sawOption">
                         {{ option.name }}
                     </label>
@@ -543,10 +543,8 @@ Content3 =
 
     @{ var title = "<span class='dialog-header'>SAW OPTIONS FOR <span id='dialog-product-description'></span></span>"; }
 
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("500px").Target("body").Render()
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onAcceptCreated").Header("TERMS OF SERVICE").ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("1200px").Target("body").Render()
-    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onSawDialogCreated").Header(title).ContentTemplate(
-@Content3).ShowCloseIcon(true).Visible(false).Width("650px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("NOTES").ContentTemplate(@Content1).ShowCloseIcon(true).Width("500px").Target("body").Render()
+    @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onSawDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Width("650px").Target("body").Render()
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.OrderSummaryContentAfter })
 </div>
 
