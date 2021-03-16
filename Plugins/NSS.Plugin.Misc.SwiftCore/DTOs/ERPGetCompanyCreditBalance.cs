@@ -11,12 +11,12 @@ namespace NSS.Plugin.Misc.SwiftCore.DTOs
         public decimal CreditAmount { get; set; }
 
         [JsonProperty("creditLimit")]
-        public long CreditLimit { get; set; }
+        public decimal CreditLimit { get; set; }
 
         [JsonProperty("openInvoiceAmount")]
-        public long OpenInvoiceAmount { get; set; }
+        public decimal OpenInvoiceAmount { get; set; }
 
         [JsonProperty("pastDueAmount")]
-        public long PastDueAmount { get; set; }
+        public decimal PastDueAmount { get; set; }
     }
 }
