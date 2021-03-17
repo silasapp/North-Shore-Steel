@@ -210,7 +210,7 @@ Content2 =
                 </div>
             </div>
             <hr />
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-column" v-if="!isNoneOptionSelected">
                 <label class="h4-primary-500-teko mb-1">WORK ORDER INSTRUCTIONS</label>
                 <textarea name="workOrderInstructionsId" rows="4" maxlength="100" class="nss-textarea" placeholder="Max 100 characters" v-model.trim="workOrderInstructions"></textarea>
             </div>
@@ -757,6 +757,9 @@ Content2 =
         computed: {
             isMobile: function () {
                 return this.window.width <= 767.98;
+            },
+            isNoneOptionSelected: function () {
+                return this.sawOptionName === "None" ? true : false;
             },
         },
         watch: {

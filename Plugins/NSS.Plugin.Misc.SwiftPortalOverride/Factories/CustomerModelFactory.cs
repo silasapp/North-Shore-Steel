@@ -367,28 +367,33 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             int ERPCId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
             var company = _companyService.GetCompanyEntityByErpEntityId(ERPCId);
             //get address by entity id
-            var attributes = _genericAttributeService.GetAttributesForEntity(company.Id, "Company");
             List<Address> addresses = new List<Address>();
 
-
-            foreach (var attr in attributes)
+            if (company != null)
             {
-                int.TryParse(attr.Value, out addressId);
-                var addy = _addressService.GetAddressById(addressId);
-                addresses.Add(addy);
+                var attributes = _genericAttributeService.GetAttributesForEntity(company.Id, "Company");
+                foreach (var attr in attributes)
+                {
+                    int.TryParse(attr.Value, out addressId);
+                    var addy = _addressService.GetAddressById(addressId);
+                    addresses.Add(addy);
+                }
             }
 
 
             var model = new Nop.Web.Models.Customer.CustomerAddressListModel();
-            foreach (var address in addresses)
+            if(addresses != null)
             {
-                var addressModel = new AddressModel();
-                _addressModelFactory.PrepareAddressModel(addressModel,
-                    address: address,
-                    excludeProperties: false,
-                    addressSettings: _addressSettings,
-                    loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
-                model.Addresses.Add(addressModel);
+                foreach (var address in addresses)
+                {
+                    var addressModel = new AddressModel();
+                    _addressModelFactory.PrepareAddressModel(addressModel,
+                        address: address,
+                        excludeProperties: false,
+                        addressSettings: _addressSettings,
+                        loadCountries: null);
+                    model.Addresses.Add(addressModel);
+                }
             }
             return model;
         }
