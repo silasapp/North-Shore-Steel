@@ -410,8 +410,8 @@ Content2 =
                         <table class="table table-striped nss-table checkout-table" id="catalogTable" onload="sortTable(0)">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="text-center">Description</th>
-                                    <th scope="col" class="text-center">Customer Part #</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Customer Part #</th>
                                     <th scope="col" class="text-center">Qty.</th>
                                     <th scope="col" class="text-center">Weight (lb)</th>
                                     <th scope="col" class="text-center">Unit Price</th>
@@ -447,7 +447,7 @@ Content2 =
                                             @item.ProductName
                                         </td>
                                         <td>@customerPathNo</td>
-                                        <td class="text-right">@item.Quantity</td>
+                                        <td class="text-center">@item.Quantity</td>
                                         <td class="text-right">@DoFormat(totalWeight)</td>
                                         <td class="text-center">@item.UnitPrice / @uom</td>
                                         <td class="text-right">@item.SubTotal</td>
