@@ -24,7 +24,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
                 RequiredUniqueChars = 4,
                 RequireDigit = true,
                 RequireLowercase = true,
-                RequireNonAlphanumeric = true,
+                RequireNonAlphanumeric = false,
                 RequireUppercase = true
             };
 
@@ -32,7 +32,7 @@ namespace NSS.Plugin.Misc.SwiftCore.Helpers
                 "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
                 "abcdefghijkmnopqrstuvwxyz",    // lowercase
                 "0123456789",                   // digits
-                //"!@$?_-"                        // non-alphanumeric
+                "_"                        // non-alphanumeric
             };
             Random rand = new Random(Environment.TickCount);
             List<char> chars = new List<char>();
