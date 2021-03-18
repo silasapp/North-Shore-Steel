@@ -730,7 +730,7 @@ Content2 =
             formatDate: function (date) {
                 if (!date) return 'N/A';
                 const localTime = moment.utc(date).toDate();
-                return moment(localTime).format("dddd, MMMM Do [at] h:mm A [CST]");
+                return moment(localTime).format("dddd, MMMM Do [at] h:mm A [CT]");
 
             },
             handleShowNewShippingAddress: function () {
