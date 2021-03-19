@@ -54,19 +54,22 @@
             @if (!Model.IsExistingCustomer)
             {
                 @Html.Raw(T("Plugins.Misc.SwiftPortalOverride.Fields.NewCustomerWelcomeMessage.Text"))
-                <div class="video-container">
-                    <iframe height="315"
-                            src=@Model.MarketingVideoUrl
-                            frameborder="0"
-                            allow="accelerometer"
-                            autoplay
-                            clipboard-write
-                            encrypted-media
-                            gyroscope
-                            picture-in-picture
-                            allowfullscreen>
-                    </iframe>
-                </div>
+                @if (!string.IsNullOrEmpty(@Model.MarketingVideoUrl))
+                {
+                    <div class="video-container">
+                        <iframe height="315"
+                                src=@Model.MarketingVideoUrl
+                                frameborder="0"
+                                allow="accelerometer"
+                                autoplay
+                                clipboard-write
+                                encrypted-media
+                                gyroscope
+                                picture-in-picture
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                }
             }
             else
             {
