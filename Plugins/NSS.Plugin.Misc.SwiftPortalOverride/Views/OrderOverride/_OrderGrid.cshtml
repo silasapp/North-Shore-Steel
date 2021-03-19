@@ -226,15 +226,15 @@
             <e-grid-columns>
                 <e-grid-column textAlign="Center" headerText="Order #" template="#orderNo" allowFiltering="false"></e-grid-column>
                 <e-grid-column textAlign="Center" field="PoNo" headerText="PO #" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Center" field="OrderDate" headerText="Order Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Center" field="PromiseDate" headerText="Promise Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="OrderDateUTC" headerText="Order Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Center" field="PromiseDateUTC" headerText="Promise Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
-                    <e-grid-column textAlign="Center" field="DeliveryDate" headerText="Delivery Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="DeliveryDateUTC" headerText="Delivery Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
-                    <e-grid-column textAlign="Center" field="ScheduledDate" headerText="Scheduled Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="ScheduledDateUTC" headerText="Scheduled Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                     <e-grid-column textAlign="Center" template="#orderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })"></e-grid-column>
                 }
                 <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" format="N0" allowFiltering="false"></e-grid-column>

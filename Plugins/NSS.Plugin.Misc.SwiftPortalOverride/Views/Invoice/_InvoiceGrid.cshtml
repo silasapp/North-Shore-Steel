@@ -46,14 +46,14 @@
                 <e-grid-column template="#invoiceNo" headerText="Invoice #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
                 <e-grid-column template="#orderNo" headerText="Order #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
                 <e-grid-column field="PoNo" headerText="PO #" textAlign="Center" width="130" allowFiltering="false"></e-grid-column>
-                <e-grid-column field="InvoiceDate" headerText="Invoice Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="InvoiceDateUTC" headerText="Invoice Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
-                    <e-grid-column field="InvoicePaidDate" headerText="Paid Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="InvoicePaidDateUTC" headerText="Paid Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
-                    <e-grid-column field="InvoiceDueDate" headerText="Due Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="InvoiceDueDateUTC" headerText="Due Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                     <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" textAlign="Center" width="130"></e-grid-column>
                 }
                 <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" textAlign="Right" width="130" allowFiltering="false"></e-grid-column>
