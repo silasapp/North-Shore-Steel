@@ -55,9 +55,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public string InvoiceFile { get; set; }
 
             // computed
-            public DateTimeOffset InvoiceDateUTC { get => InvoiceDate.ToUniversalTime(); }
-            public DateTimeOffset InvoiceDueDateUTC { get => InvoiceDueDate.ToUniversalTime(); }
-            public DateTimeOffset? InvoicePaidDateUTC { get => InvoicePaidDate?.ToUniversalTime(); }
+            public DateTimeOffset InvoiceDateUTC { get => new DateTimeOffset(DateTime.SpecifyKind(InvoiceDate.UtcDateTime, DateTimeKind.Unspecified), TimeSpan.FromHours(-7)).ToUniversalTime(); }
+            public DateTimeOffset InvoiceDueDateUTC { get => new DateTimeOffset(DateTime.SpecifyKind(InvoiceDueDate.UtcDateTime, DateTimeKind.Unspecified), TimeSpan.FromHours(-7)).ToUniversalTime(); }
+            public DateTimeOffset? InvoicePaidDateUTC { get => InvoicePaidDate.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(InvoicePaidDate.Value.UtcDateTime, DateTimeKind.Unspecified), TimeSpan.FromHours(-7)).ToUniversalTime() : InvoicePaidDate; }
         }
 
         public partial class SearchFilter

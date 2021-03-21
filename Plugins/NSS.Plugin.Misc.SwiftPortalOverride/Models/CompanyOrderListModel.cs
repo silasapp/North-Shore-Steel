@@ -46,10 +46,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public int? DeliveryTicketCount { get; set; }
 
             // computed
-            public DateTimeOffset? OrderDateUTC { get => OrderDate?.ToUniversalTime(); }
-            public DateTimeOffset? PromiseDateUTC { get => PromiseDate?.ToUniversalTime(); }
-            public DateTimeOffset? ScheduledDateUTC { get => ScheduledDate?.ToUniversalTime(); }
-            public DateTimeOffset? DeliveryDateUTC { get => DeliveryDate?.ToUniversalTime(); }
+            public DateTimeOffset? OrderDateUTC { get => OrderDate.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(OrderDate.Value.UtcDateTime, DateTimeKind.Unspecified), TimeSpan.FromHours(-7)).ToUniversalTime() : OrderDate; }
+            public DateTimeOffset? PromiseDateUTC { get => PromiseDate.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(PromiseDate.Value.UtcDateTime, DateTimeKind.Unspecified), TimeSpan.FromHours(-7)).ToUniversalTime() : PromiseDate; }
+            public DateTimeOffset? ScheduledDateUTC { get => ScheduledDate.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(ScheduledDate.Value.UtcDateTime, DateTimeKind.Unspecified), TimeSpan.FromHours(-7)).ToUniversalTime() : ScheduledDate; }
+            public DateTimeOffset? DeliveryDateUTC { get => DeliveryDate.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(DeliveryDate.Value.UtcDateTime, DateTimeKind.Unspecified), TimeSpan.FromHours(-7)).ToUniversalTime() : DeliveryDate; }
         }
 
         public partial class SearchFilter
