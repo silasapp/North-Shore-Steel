@@ -449,6 +449,7 @@
                 var pageCountRound = Math.round(pageCountDiv);
                 this.pageCount = pageCountRound > pageCountDiv ? pageCountRound : pageCountRound + 1;
 
+                console.log('paginated data', this.paginatedData);
             },
             setPageSize() {
                 this.pageSize = Number(document.getElementById('paginationPageCount').value);
