@@ -270,7 +270,7 @@ Content2 =
                                 <thead>
                                     <tr>
                                         <th scope="col" class="">Description</th>
-                                        <th scope="col" class="text-center">Customer Part #</th>
+                                        <th scope="col">Customer Part #</th>
                                         <th scope="col" class="text-center">Qty.</th>
                                         <th scope="col" class="text-center">Weight (lb)</th>
                                         <th scope="col" class="text-center">Unit Price</th>
@@ -290,7 +290,7 @@ Content2 =
                                                 </ul>
                                             </div>
                                         </td>
-                                        <td class="text-center">
+                                        <td>
                                             <input class="cart-qty-input" type="text" style="height: 24px;width: 100px;" v-bind:name="'customerpartNo' + item.productId"
                                                    v-bind:id="'no-' + item.id" v-model="item.customerPartNo" />
                                         </td>
@@ -304,7 +304,7 @@ Content2 =
                                         <td class="pt-3 text-right"><label v-bind:id="'itemweight' + item.id" style="margin:0;" v-cloak>{{ evenRound(item.weight * item.quantity) | amount(0) }}</label></td>
 
                                         <td>
-                                            <div class="text-right">
+                                            <div class="text-center">
                                                 <label style="margin:4px 0px 0px 0px;" v-bind:id="'itemunitprice' + item.id" v-cloak>${{ item.unitPrice }} /</label>
                                                 <select v-if="item.purchaseUnitAttr" v-bind:name="item.unitControlId" v-bind:id="item.unitControlId"
                                                         v-on:change="toggleUnitPrice(item)" class="cart-price-select" v-model="item.selectedPurchaseUnit">
@@ -319,7 +319,7 @@ Content2 =
                                         </td>
                                         <td class="pt-3 text-right" v-bind:id="'itemsubtotal' + item.id"><label style="margin:0;" v-cloak>{{ item.subTotal }}</label></td>
                                         <td class="text-center" v-if=item.hasSawOption>
-                                            <input v-show="!item.isCutOptionPreselected" type="button" class="nss-btn-default px-2 py-2" style="width:fit-content" value="CUT TO LENGTH "
+                                            <input v-show="!item.isCutOptionPreselected" type="button" class="nss-btn-default px-2 py-2" style="width:auto" value="CUT TO LENGTH"
                                                    v-on:click="handleSawOptionModal(item)" />
 
                                             <h6 style="color:#0099E1" class="text-decoration-underline cursor-pointer" v-show="item.isCutOptionPreselected" v-on:click="handleSawOptionModal(item)">{{item.sawDisplayText}}</h6>
