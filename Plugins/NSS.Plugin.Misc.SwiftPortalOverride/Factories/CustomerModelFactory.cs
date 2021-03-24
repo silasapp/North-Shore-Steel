@@ -145,25 +145,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 IDictionary<string, bool> notifs = new Dictionary<string, bool>();
                 if (isBuyer)
                 {
-                    notifs.Add(Constants.MyOrderConfirmedEmail, false);
-                    notifs.Add(Constants.MyOrderConfirmedSms, false);
                     notifs.Add(Constants.MyOrderScheduleEmail, false);
                     notifs.Add(Constants.MyOrderScheduleSms, false);
                     notifs.Add(Constants.MyOrderPromiseEmail, false);
                     notifs.Add(Constants.MyOrderPromiseSms, false);
-                    notifs.Add(Constants.MyOrderReadyEmail, false);
-                    notifs.Add(Constants.MyOrderReadySms, false);
                     notifs.Add(Constants.MyOrderLoadingEmail, false);
                     notifs.Add(Constants.MyOrderLoadingSms, false);
                     notifs.Add(Constants.MyOrderShippedEmail, false);
                     notifs.Add(Constants.MyOrderShippedSms, false);
                     notifs.Add(Constants.AnyOrderConfirmedEmail, false);
-                    notifs.Add(Constants.AnyOrderConfirmedSms, false);
                 }
                 if (isBuyer || isOperations)
                 {
                     notifs.Add(Constants.AnyOrderShippedEmail, false);
-                    notifs.Add(Constants.AnyOrderShippedSms, false);
                 }
                 foreach (var keyValue in notifs)
                 {

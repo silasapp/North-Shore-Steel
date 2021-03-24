@@ -68,12 +68,12 @@
                     </div>
                 </div>
                 <template v-for="preference in preferenceArr">
-                    <template v-if="preference.title != 'When my order has been confirmed (offline orders only).' && preference.title != 'When my order is ready.'">
-                        <div class="notification">
-                            <p>{{preference.title}}</p>
-                            <div class="notification-actions">
-                                <div v-for="p in preference.preferences" :class="{'iconContainer': p.Value}">
-                                    <label class="mb-1">
+                    <div class="notification">
+                        <p>{{preference.title}}</p>
+                        <div class="notification-actions">
+                            <template v-for="p in preference.preferences">
+                                <div class="cursor-pointer" :class="{'iconContainer': p.Value}">
+                                    <label class="mb-1 cursor-pointer">
                                         <input type="checkbox" hidden v-model="p.Value">
                                         <template v-if="itemsContains(p.Key, 'email')">
                                             <svg v-if="p.Value" xmlns="http://www.w3.org/2000/svg"
@@ -115,9 +115,11 @@
                                         </template>
                                     </label>
                                 </div>
-                            </div>
+                                <div style="background-color:transparent;" v-if="preference.title == 'When any order has shipped.' || preference.title == 'When any order has been confirmed.'"></div>
+                            </template>
                         </div>
-                    </template>
+                    </div>
+
                 </template>
             </div>
             <div class="buttons save-customer-info-button notification-btn" v-bind:class="{'justify-content-center': isMobile}">

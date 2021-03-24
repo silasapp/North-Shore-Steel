@@ -25,6 +25,7 @@
 }
 @if (routeUrl.Contains("/catalog"))
 {
+
     <div id="banner-block" v-bind:class="{'px-6': !isMobile}" style="margin-top: 10px; margin-bottom: 58px;">
         <img v-if="!isMobile" srcset="~/Themes/@(themeName)/Content/assets/discounts-banner@2x.png 2x, /Themes/@(themeName)/Content/assets/discounts-banner.png 1x" src="~/Themes/@(themeName)/Content/assets/discounts-banner.png" alt="discounts-banner" width="100%">
         <img v-if="isMobile"  src="~/Themes/@(themeName)/Content/assets/bg-discount-mobile.png" alt="" width="100%" style="margin-top: 50px;">
