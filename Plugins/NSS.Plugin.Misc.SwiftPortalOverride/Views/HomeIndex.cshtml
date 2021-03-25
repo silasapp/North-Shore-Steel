@@ -27,7 +27,7 @@
     var themeName = themeContext.WorkingThemeName;
     var currentCustomer = workContext.CurrentCustomer;
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-    string eRPCompanyId = genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
+    string eRPCompanyId  = string.IsNullOrEmpty(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey)) ? "0000" : genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
     bool isAP = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.AP);
     bool isOperations = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Operations);
     bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
@@ -719,7 +719,7 @@
     // for mobile view
     let openOrders = @Html.Raw(Serialize(Model.OpenOrders));
     let closedOrders = @Html.Raw(Serialize(Model.ClosedOrders));
-    var companyId = @Html.Raw(eRPCompanyId) != "" ? @Html.Raw(eRPCompanyId) : "";
+    var companyId = @Html.Raw(eRPCompanyId);
 
     new Vue({
         el: '#app',
