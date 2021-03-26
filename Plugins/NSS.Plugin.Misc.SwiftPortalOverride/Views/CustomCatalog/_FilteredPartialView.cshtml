@@ -404,22 +404,47 @@
             },
             getGridColumns: function () {
                 let retVal = [];
+                let retLength = false;
+                let retSize = false;
                 gridColumns.forEach(col => {
+                    if (col.displayName.includes("Size"))
+                        retSize = true;
+                    if (col.displayName.includes("Weight Per Foot"))
+                        retLength = true;
                     if (col.displayName[0] === "_") return;
                     let column;
-                    if (col.code !== col.sort)
+                    if (col.code !== col.sort) {
                         column = {
                             field: `${col.sort.toLowerCase()}`, headerText: col.displayName,
                             template: `#${col.code.toLowerCase()}Template`, width: 120,
+                            textAlign: !retSize && retLength && col.displayName.includes("Length") ? "Right" : "Center"
                         };
-                    else
+                    }
+                    else {
                         column = {
                             field: col.displayName.includes("Weight") ? "sortweight" : col.code.toLowerCase(), headerText: col.displayName,
                             template: `#${col.code.toLowerCase()}Template`,
-                            width: col.displayName.includes("Description") ? 230 : col.displayName.includes("Item #") ? 170 : col.displayName.includes("Weight Per Foot") ? 170 : 150,
-                            textAlign: col.displayName.includes("Weight") ? "Right" : col.displayName.includes("Amount") ? "Right" : "Left",
+                            width: col.displayName.includes("Description") ? 230
+                                : col.displayName.includes("Item #") ? 170
+                                : col.displayName.includes("Weight Per Foot") ? 170
+                                : 150,
+                            textAlign: col.displayName.includes("Country of Origin")
+                                    || col.displayName.includes("Mill Name")
+                                    || col.displayName.includes("Condition")
+                                    || col.displayName.includes("Dimensions")
+                                    || col.displayName.includes("Grade")
+                                    || col.displayName.includes("Wall")
+                                    || col.displayName.includes("Description") ? "Left"
+                                : col.displayName.includes("Weight")
+                                    || col.displayName.includes("Amount") ? "Right"
+                                : "Center",
+                            headerTextAlign: col.displayName.includes("Dimensions")
+                                || col.displayName.includes("Grade")
+                                || col.displayName.includes("Description") ? "Left"
+                                : "Center"
                         };
 
+                    }
                     retVal = [...retVal, column];
                 });
                 return retVal;
@@ -540,7 +565,6 @@
                 if (thrownError == "Unauthorized") {
                     location.reload();
                 }
-                console.log('data-xhr', xhr)
                 $('#custom-loading').hide();
                 displayBarNotification(xhr.message, 'error', 0);
             }

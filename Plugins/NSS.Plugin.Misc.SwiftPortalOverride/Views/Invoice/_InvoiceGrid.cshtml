@@ -30,10 +30,6 @@
         background-color: #1899E1 !important;
         color: #ffffff;
     }
-
-    thead > tr > :nth-child(7) > div, .e-table.e-sortfilter tr:last-child th > div {
-        text-align: center !important;
-    }
 </style>
 <div id="invoicesGrid">
     <div v-bind:class="{'invisible-grid': isMobile}">
@@ -56,10 +52,10 @@
                     <e-grid-column field="InvoiceDueDateUTC" headerText="Due Date" textAlign="Center" width="130" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                     <e-grid-column field="InvoiceStatusName" headerText="Status" filter="@(new { type = "CheckBox" })" textAlign="Center" width="130"></e-grid-column>
                 }
-                <e-grid-column field="InvoiceAmount" headerText="Invoice Amount" format="C2" textAlign="Right" width="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column field="InvoiceAmount" headerTextAlign="Center" headerText="Invoice Amount" format="C2" textAlign="Right" width="130" allowFiltering="false"></e-grid-column>
                 @if (!Model.IsClosed)
                 {
-                    <e-grid-column field="BalanceAmount" textAlign="Right" width="130" headerText="Balance Amount" format="C2" allowFiltering="false"></e-grid-column>
+                    <e-grid-column field="BalanceAmount" headerTextAlign="Center" textAlign="Right" width="130" headerText="Balance Amount" format="C2" allowFiltering="false"></e-grid-column>
                 }
                 <e-grid-column width="1"></e-grid-column>
             </e-grid-columns>

@@ -54,17 +54,16 @@
         color: #ffffff;
     }
 
-    thead > tr > :nth-child(6) > div, thead > tr > :nth-child(7) > div, thead > tr > :nth-child(8) > div {
-        text-align: center !important;
-    }
 
     hr {
         margin-left: 1rem;
         margin-right: 1rem;
     }
+
     .position-align {
         line-height: 21px;
     }
+
     tbody:nth-child(odd) {
         background: #F2F2F2;
     }
@@ -146,7 +145,7 @@
                         </tr>
                     </template>
                 </tbody>
-                </table>
+            </table>
         </div>
     </div>;
 }
@@ -237,8 +236,8 @@
                     <e-grid-column textAlign="Center" field="ScheduledDateUTC" headerText="Scheduled Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                     <e-grid-column textAlign="Center" template="#orderStatusName" headerText="Status" filter="@(new { type = "CheckBox" })"></e-grid-column>
                 }
-                <e-grid-column textAlign="Right" field="Weight" headerText="Weight (lb)" format="N0" allowFiltering="false"></e-grid-column>
-                <e-grid-column textAlign="Right" field="OrderTotal" headerText="Order Amount" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Right" field="Weight" headerTextAlign="Center" headerText="Weight (lb)" format="N0" allowFiltering="false"></e-grid-column>
+                <e-grid-column textAlign="Right" field="OrderTotal" headerTextAlign="Center" headerText="Order Amount" format="C2" maxWidth="130" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
                     <e-grid-column textAlign="Center" template="#viewMtr" headerText="MTR" allowFiltering="false"></e-grid-column>
