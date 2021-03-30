@@ -144,9 +144,10 @@ a:not([href]):not([class]) {
 .bar-notification-container {
     width: fit-content !important;
     bottom: unset !important;
-    right: 20px !important;
-    left: unset !important;
-    top: 220px !important;
+    right: 0 !important;
+    left: 0 !important;
+    top: 5px !important;
+    margin: auto;
 }
 
 .bar-notification.success, .bar-notification.error {
@@ -3975,9 +3976,10 @@ and also iPads specifically.
     .bar-notification-container {
         width: 80% !important;
         bottom: unset !important;
-        left: 20px !important;
-        left: unset !important;
-        top: 170px !important;
+        right: 0 !important;
+        left: 0 !important;
+        top: 5px !important;
+        margin: auto;
     }
 
     .bar-notification.success, .bar-notification.error {
