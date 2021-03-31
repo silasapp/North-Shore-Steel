@@ -391,7 +391,7 @@ Content2 =
                                 <input type="hidden" v-bind:id='item.noteControlId' v-bind:name="item.noteControlId" v-model="item.noteAttrValue" />
                                 <template v-if=item.hasSawOption>
                                     <a v-show="!item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">Cut To Length</a>
-                                    <a v-show="item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">{{item.itemQuantity}} pieces - {{item.sawOptionsName}}</a>
+                                    <a v-show="item.isCutOptionPreselected" data-toggle="modal" v-on:click="handleSawOptionModal(item)" class="fs12-link-500 mb-3">{{item.sawDisplayText}}</a>
                                     <input type="hidden" v-bind:id='item.workOrderInstructionsControlId' v-bind:name="item.workOrderInstructionsControlId" v-model="item.itemWorkOrderValue" />
                                     <input type="hidden" v-bind:name="item.sawOptionControlId" v-model="item.sawOptionRadioId" />
                                 </template>
