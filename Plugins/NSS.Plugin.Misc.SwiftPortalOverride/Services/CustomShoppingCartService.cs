@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using Nop.Core.Domain.Customers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
 {
@@ -99,6 +100,136 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             _shoppingCartSettings = shoppingCartSettings;
         }
         #endregion
+
+        public override IList<string> AddToCart(Nop.Core.Domain.Customers.Customer customer, 
+            Product product, ShoppingCartType shoppingCartType, int storeId, string attributesXml = null, 
+            decimal customerEnteredPrice = 0, DateTime? rentalStartDate = null, DateTime? rentalEndDate = null, 
+            int quantity = 1, bool addRequiredProducts = true)
+        {
+            if (customer == null)
+                throw new ArgumentNullException(nameof(customer));
+
+            if (product == null)
+                throw new ArgumentNullException(nameof(product));
+
+            var warnings = new List<string>();
+            if (shoppingCartType == ShoppingCartType.ShoppingCart && !_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart, customer))
+            {
+                warnings.Add("Shopping cart is disabled");
+                return warnings;
+            }
+
+            if (shoppingCartType == ShoppingCartType.Wishlist && !_permissionService.Authorize(StandardPermissionProvider.EnableWishlist, customer))
+            {
+                warnings.Add("Wishlist is disabled");
+                return warnings;
+            }
+
+            if (customer.IsSearchEngineAccount())
+            {
+                warnings.Add("Search engine can't add to cart");
+                return warnings;
+            }
+
+            if (quantity <= 0)
+            {
+                warnings.Add(_localizationService.GetResource("ShoppingCart.QuantityShouldPositive"));
+                return warnings;
+            }
+
+            //reset checkout info
+            _customerService.ResetCheckoutData(customer, storeId);
+
+            var cart = GetShoppingCart(customer, shoppingCartType, storeId);
+
+            var shoppingCartItem = FindShoppingCartItemInTheCart(cart,
+                shoppingCartType, product, attributesXml, customerEnteredPrice,
+                rentalStartDate, rentalEndDate);
+
+            if (shoppingCartItem != null)
+            {
+                //update existing shopping cart item
+                var newQuantity = quantity;
+                warnings.AddRange(GetShoppingCartItemWarnings(customer, shoppingCartType, product,
+                    storeId, attributesXml,
+                    customerEnteredPrice, rentalStartDate, rentalEndDate,
+                    newQuantity, addRequiredProducts, shoppingCartItem.Id));
+
+                if (warnings.Any())
+                    return warnings;
+
+                //shoppingCartItem.AttributesXml = attributesXml;
+                shoppingCartItem.Quantity = newQuantity;
+                shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
+
+                _sciRepository.Update(shoppingCartItem);
+
+                //event notification
+                _eventPublisher.EntityUpdated(shoppingCartItem);
+            }
+            else
+            {
+                //new shopping cart item
+                warnings.AddRange(GetShoppingCartItemWarnings(customer, shoppingCartType, product,
+                    storeId, attributesXml, customerEnteredPrice,
+                    rentalStartDate, rentalEndDate,
+                    quantity, addRequiredProducts));
+
+                if (warnings.Any())
+                    return warnings;
+
+                //maximum items validation
+                switch (shoppingCartType)
+                {
+                    case ShoppingCartType.ShoppingCart:
+                        if (cart.Count >= _shoppingCartSettings.MaximumShoppingCartItems)
+                        {
+                            warnings.Add(string.Format(_localizationService.GetResource("ShoppingCart.MaximumShoppingCartItems"), _shoppingCartSettings.MaximumShoppingCartItems));
+                            return warnings;
+                        }
+
+                        break;
+                    case ShoppingCartType.Wishlist:
+                        if (cart.Count >= _shoppingCartSettings.MaximumWishlistItems)
+                        {
+                            warnings.Add(string.Format(_localizationService.GetResource("ShoppingCart.MaximumWishlistItems"), _shoppingCartSettings.MaximumWishlistItems));
+                            return warnings;
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+
+                var now = DateTime.UtcNow;
+                shoppingCartItem = new ShoppingCartItem
+                {
+                    ShoppingCartType = shoppingCartType,
+                    StoreId = storeId,
+                    ProductId = product.Id,
+                    AttributesXml = attributesXml,
+                    CustomerEnteredPrice = customerEnteredPrice,
+                    Quantity = quantity,
+                    RentalStartDateUtc = rentalStartDate,
+                    RentalEndDateUtc = rentalEndDate,
+                    CreatedOnUtc = now,
+                    UpdatedOnUtc = now,
+                    CustomerId = customer.Id
+                };
+
+                _sciRepository.Insert(shoppingCartItem);
+
+                //updated "HasShoppingCartItems" property used for performance optimization
+                customer.HasShoppingCartItems = !IsCustomerShoppingCartEmpty(customer);
+
+                _customerService.UpdateCustomer(customer);
+
+                //event notification
+                _eventPublisher.EntityInserted(shoppingCartItem);
+            }
+
+            return warnings;
+        }
 
         public override decimal GetUnitPrice(ShoppingCartItem shoppingCartItem, bool includeDiscounts, out decimal discountAmount, out List<Discount> appliedDiscounts)
         {

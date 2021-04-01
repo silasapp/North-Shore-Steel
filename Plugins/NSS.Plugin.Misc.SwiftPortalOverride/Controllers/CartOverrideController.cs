@@ -434,11 +434,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //get standard warnings without attribute validations
             //first, try to find existing shopping cart item
             var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, cartType, _storeContext.CurrentStore.Id);
-            var shoppingCartItem = _shoppingCartService.FindShoppingCartItemInTheCart(cart, cartType, product);
-
+            var shoppingCartItem = cart.FirstOrDefault(x => x.ProductId == product.Id);
 
             //if we already have the same product in the cart, then use the total quantity to validate
-            var quantityToValidate = shoppingCartItem != null ? shoppingCartItem.Quantity + quantity : quantity;
+            var quantityToValidate = quantity;
             product.OrderMaximumQuantity = product.OrderMaximumQuantity > 0 ? product.OrderMaximumQuantity : 0;
 
             var addToCartWarnings = _shoppingCartService
@@ -463,10 +462,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     product: product,
                     shoppingCartType: cartType,
                     storeId: _storeContext.CurrentStore.Id,
-                    attributesXml: attXml,
+                    attributesXml: shoppingCartItem?.AttributesXml ?? attXml,
                     quantity: quantity);
             }
-            if (cartType == ShoppingCartType.ShoppingCart &&  addToCartWarnings.Any())
+            if (cartType == ShoppingCartType.ShoppingCart && addToCartWarnings.Any())
             {
                 //cannot be added to the cart
                 //but we do not display attribute and gift card warnings here. let's do it on the product details page
@@ -548,91 +547,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         });
                     }
             }
-        }
-
-        //add product to cart using AJAX
-        //currently we use this method on the product details pages
-        [HttpPost]
-        [IgnoreAntiforgeryToken]
-        public override IActionResult AddProductToCart_Details(int productId, int shoppingCartTypeId, IFormCollection form)
-        {
-            var product = _productService.GetProductById(productId);
-            if (product == null)
-            {
-                return Json(new
-                {
-                    redirect = Url.RouteUrl("Homepage")
-                });
-            }
-
-            //we can add only simple products
-            if (product.ProductType != ProductType.SimpleProduct)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Only simple products could be added to the cart"
-                });
-            }
-
-            //update existing shopping cart item
-            var updatecartitemid = 0;
-            foreach (var formKey in form.Keys)
-                if (formKey.Equals($"addtocart_{productId}.UpdatedShoppingCartItemId", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    int.TryParse(form[formKey], out updatecartitemid);
-                    break;
-                }
-
-            ShoppingCartItem updatecartitem = null;
-            if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
-            {
-                //search with the same cart type as specified
-                var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, (ShoppingCartType)shoppingCartTypeId, _storeContext.CurrentStore.Id);
-
-                updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
-                //not found? let's ignore it. in this case we'll add a new item
-                //if (updatecartitem == null)
-                //{
-                //    return Json(new
-                //    {
-                //        success = false,
-                //        message = "No shopping cart item found to update"
-                //    });
-                //}
-                //is it this product?
-                if (updatecartitem != null && product.Id != updatecartitem.ProductId)
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "This product does not match a passed shopping cart item identifier"
-                    });
-                }
-            }
-
-            var addToCartWarnings = new List<string>();
-
-            //customer entered price
-            var customerEnteredPriceConverted = _productAttributeParser.ParseCustomerEnteredPrice(product, form);
-
-            //entered quantity
-            var quantity = _productAttributeParser.ParseEnteredQuantity(product, form);
-
-            //product and gift card attributes
-            var attributes = _productAttributeParser.ParseProductAttributes(product, form, addToCartWarnings);
-
-            //rental attributes
-            _productAttributeParser.ParseRentalDates(product, form, out var rentalStartDate, out var rentalEndDate);
-
-            var cartType = updatecartitem == null ? (ShoppingCartType)shoppingCartTypeId :
-                //if the item to update is found, then we ignore the specified "shoppingCartTypeId" parameter
-                updatecartitem.ShoppingCartType;
-
-            SaveItem(updatecartitem, addToCartWarnings, product, cartType, attributes, customerEnteredPriceConverted, rentalStartDate, rentalEndDate, quantity);
-
-            //return result
-            return GetProductToCartDetails(addToCartWarnings, cartType, product);
         }
 
         protected override IActionResult GetProductToCartDetails(List<string> addToCartWarnings, ShoppingCartType cartType, Product product)
