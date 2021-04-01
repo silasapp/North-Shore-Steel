@@ -108,8 +108,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             //products
             IList<int> filterableSpecificationAttributeOptionIds = new List<int>();
 
-            Stopwatch searchTimer = Stopwatch.StartNew();
-
             products = _productService.SearchProducts(out filterableSpecificationAttributeOptionIds,
                 true,
                 categoryIds: shapeIds,
@@ -124,17 +122,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 //pageIndex: command.PageNumber - 1,
                 //pageSize: command.PageSize
                 );
-
-            searchTimer.Stop();
-            TimeSpan timespan = searchTimer.Elapsed;
-            Console.WriteLine("search timer (ms)", timespan.Milliseconds.ToString());
-
-
-            Stopwatch productModelTimer = Stopwatch.StartNew();
             
             model.Products = _productModelFactory.PrepareSwiftProductOverviewmodel(products).OrderBy(o => o.Sku).ToList();
-            productModelTimer.Stop();
-            Console.WriteLine("prod model timer (ms)", productModelTimer.Elapsed.Milliseconds.ToString());
 
             model.NoResults = !model.Products.Any();
 
@@ -172,7 +161,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             }
 
             //specs
-            Stopwatch specFilterTimer = Stopwatch.StartNew();
             if(!isPageLoad && (shapeIds.Count > 0 || specIds.Count > 0 || !string.IsNullOrEmpty(searchTerms)))
                 PrepareSpecsFilters(specIds,
                     filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
@@ -181,16 +169,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 PrepareSpecsFilters(specIds,
                     filterableSpecificationAttributeOptionIds?.ToArray(), _cacheKeyService,
                     _specificationAttributeService, _localizationService, _webHelper, _workContext, _staticCacheManager, ref model);
-            specFilterTimer.Stop();
-            Console.WriteLine("spec timer (ms)", specFilterTimer.Elapsed.Milliseconds.ToString());
-
-            Stopwatch shapeFilterTimer = Stopwatch.StartNew();
             
             PrepareShapeFilterModel(ref model);
             if (isPageLoad)
                 PrepareShapeData(ref model);
-            shapeFilterTimer.Stop();
-            Console.WriteLine("shape timer (ms)", shapeFilterTimer.Elapsed.Milliseconds.ToString());
 
             model.PagingFilteringContext.LoadPagedList(products);
 

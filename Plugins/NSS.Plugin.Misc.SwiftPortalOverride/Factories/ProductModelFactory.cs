@@ -56,6 +56,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
             var models = new List<ProductOverviewModel>();
             var wishlistItems = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+            var cartItems = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
             foreach (var product in products)
             {
@@ -63,6 +64,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 {
                     Id = product.Id,
                     IsFavoriteItem = wishlistItems.Any(x => x.ProductId == product.Id),
+                    IsCartItem = cartItems.Any(x => x.ProductId == product.Id),
+                    CartQuantity = cartItems.FirstOrDefault(x => x.ProductId == product.Id)?.Quantity,
                     Name = _localizationService.GetLocalized(product, x => x.Name),
                     ShortDescription = _localizationService.GetLocalized(product, x => x.ShortDescription),
                     FullDescription = _localizationService.GetLocalized(product, x => x.FullDescription),

@@ -30,6 +30,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string SeName { get; set; }
 
         public bool IsFavoriteItem { get; set; }
+        public bool IsCartItem { get; set; }
+        public int? CartQuantity { get; set; }
 
         public string Sku { get; set; }
 
