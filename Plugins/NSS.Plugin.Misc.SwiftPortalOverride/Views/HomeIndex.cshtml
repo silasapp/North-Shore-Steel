@@ -367,7 +367,7 @@
                                                         <tr>
                                                             <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                             <td>@order.PoNo</td>
-                                                            <td class="text-center">@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
+                                                            <td class="text-center">@(order.DeliveryDate?.ToString("MM/dd/yyyy") ?? "N/A")</td>
                                                            @* <td class="text-center">@order.DeliveryStatus</td>*@
                                                             <td class="text-center"><a v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" scope="row" class="nss-light-blue">View</a></td>
                                                             <td class="text-center">
