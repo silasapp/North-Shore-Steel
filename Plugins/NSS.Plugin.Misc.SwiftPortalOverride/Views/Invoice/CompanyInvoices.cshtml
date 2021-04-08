@@ -21,7 +21,7 @@
                 <a href="@Model.CreditSummary.ApplyForCreditUrl" target="_blank"><img src="~/Themes/@(themeName)/Content/assets/icn-chevrons.svg" alt="" style="height:1rem;" class="pr-2">Apply For Credit</a>
             </div>
         }
-        else if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || Model.CustomerRoles.IsAP))
+        else if (Model.CreditSummary.CompanyHasCreditTerms && Model.CustomerRoles.IsAP)
         {
             <div class="bg-white-shadow d-flex flex-row flex-wrap align-items-center mb-3 p-4" v-bind:style="{'background': isMobile ? '#f6f6f6': '#ffffff'}">
                 <label class="h2-primary my-4 text-center" v-bind:style="{'width':isMobile ? '100%':'auto'}">CREDIT SUMMARY</label>
@@ -42,89 +42,82 @@
             </div>
         }
 
-        <div class="orders-search-block bg-white-shadow" id=ordersTableBlock role="tabpanel" aria-labelledby="ordersTableBlock">
-            <div>
-                <div class="orders-title">SEARCH INVOICES</div>
-                <div class="orders-export cursor-pointer" v-on:click="isSearchExpanded = !isSearchExpanded;">
-                    <img class="collapse-icon" v-bind:class="{'down': isSearchExpanded}" id="collapseIcon"
-                         src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
-                </div>
-            </div>
-
-            <div v-show="isSearchExpanded" class="row m-0 py-0 px-2">
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label for=orderFromDate>Invoice Dates</label>
-                    <div class="input-with-icon">
-                        <input style="height: 36px; border-radius: 0;" id="startDate" v-model="fromDate" class="datepicker nss-form-control"
-                               data-date-format="mm/dd/yyyy" placeholder="From (mm/dd/yyyy)"
-                               v-on:change="!$event.target.value ? (fromDate = null) : null" maxlength="10" onpaste="return false;">
-                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+        @if (Model.CustomerRoles.IsAP)
+        {
+            <div class="orders-search-block bg-white-shadow" id=ordersTableBlock role="tabpanel" aria-labelledby="ordersTableBlock">
+                <div>
+                    <div class="orders-title">SEARCH INVOICES</div>
+                    <div class="orders-export cursor-pointer" v-on:click="isSearchExpanded = !isSearchExpanded;">
+                        <img class="collapse-icon" v-bind:class="{'down': isSearchExpanded}" id="collapseIcon"
+                             src="~/Themes/@(themeName)/Content/assets/icn-expand.svg" alt="" />
                     </div>
-
                 </div>
-                <div class="col-lg-2 col-md-6 col-sm-6d-flex flex-column my-3 py-0">
-                    <label for=orderToDate> &nbsp;</label>
-                    <div class="input-with-icon">
-                        <input style="height: 36px; border-radius: 0;" id="endDate" v-model="toDate" class="datepicker nss-form-control"
-                               data-date-format="mm/dd/yyyy" placeholder="To (mm/dd/yyyy)"
-                               v-on:change="!$event.target.value ? (toDate = null) : null" maxlength="10" onpaste="return false;">
-                        <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+
+                <div v-show="isSearchExpanded" class="row m-0 py-0 px-2">
+                    <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                        <label for=orderFromDate>Invoice Dates</label>
+                        <div class="input-with-icon">
+                            <input style="height: 36px; border-radius: 0;" id="startDate" v-model="fromDate" class="datepicker nss-form-control"
+                                   data-date-format="mm/dd/yyyy" placeholder="From (mm/dd/yyyy)"
+                                   v-on:change="!$event.target.value ? (fromDate = null) : null" maxlength="10" onpaste="return false;">
+                            <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+                        </div>
+
                     </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6d-flex flex-column my-3 py-0">
+                        <label for=orderToDate> &nbsp;</label>
+                        <div class="input-with-icon">
+                            <input style="height: 36px; border-radius: 0;" id="endDate" v-model="toDate" class="datepicker nss-form-control"
+                                   data-date-format="mm/dd/yyyy" placeholder="To (mm/dd/yyyy)"
+                                   v-on:change="!$event.target.value ? (toDate = null) : null" maxlength="10" onpaste="return false;">
+                            <img src="~/Themes/@(themeName)/Content/assets/icn-cal-range.svg" alt="">
+                        </div>
 
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label for=purchaseOrder>Invoice #</label>
-                    <input class="nss-form-control" type="text" v-model="invoiceId" placeholder="Enter...">
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label for=purchaseOrder>Order #</label>
-                    <input class=nss-form-control type="text" v-model="orderId" placeholder="Enter...">
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
-                    <label for=purchaseOrder>Purchase Order #</label>
-                    <input class=nss-form-control type="text" v-model="poNo" placeholder="Enter...">
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
-                    <button class="nss-btn-default ml-lg-5 w-100 text-center" style=" padding: 10px 16px !important;" v-on:click="searchInvoices">Search</button>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                        <label for=purchaseOrder>Invoice #</label>
+                        <input class="nss-form-control" type="text" v-model="invoiceId" placeholder="Enter...">
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                        <label for=purchaseOrder>Order #</label>
+                        <input class=nss-form-control type="text" v-model="orderId" placeholder="Enter...">
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-column my-3 py-0">
+                        <label for=purchaseOrder>Purchase Order #</label>
+                        <input class=nss-form-control type="text" v-model="poNo" placeholder="Enter...">
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-6 d-flex flex-row-reverse align-items-end pl-lg-5 my-3 py-0">
+                        <button class="nss-btn-default ml-lg-5 w-100 text-center" style=" padding: 10px 16px !important;" v-on:click="searchInvoices">Search</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        @*<div v-if="isMobile && !isExportMode" class="mobile-export">
-                <button class=" ml-lg-5 text-center" v-on:click="switchToExport()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
-            </div>
-            <div v-if="isMobile && isExportMode" class="mobile-export">
-                <button class=" ml-lg-5 text-center mr-2" v-on:click="cancelExportMode()"><img src="~/Themes/@(themeName)/Content/assets/close.svg" alt="" width="25">Cancel</button>
-                <div class="ml-2">
-                    <label v-if="isExportMode" class="pure-material-checkbox" style="position: relative;">
-                        <input type="checkbox" class=" mr-2" onclick="selectAll(this)" id="select-all-invoices">
-                        <span class="checkmark"></span>Select All
-                    </label>
-                </div>
-            </div>*@
-        <div class="d-flex flex-row justify-content-between">
-            <div v-bind:style="{'padding-left': isMobile ? '20px':'0'}">
-                <ul class="nav nav-pills mb-1" id=pills-tab role="tablist">
-                    <li class=nav-item role="presentation" style=margin-right:.3em>
-                        <a class="nav-link active" id=pills-home-tab data-toggle=pill
-                           href=#pills-home role=tab aria-controls=pills-home
-                           aria-selected=true v-on:click="isClosed = false; searchInvoices(); selectedRowCount = 0;isExportMode=false;">Open Invoices</a>
-                    <li class=nav-item role="presentation">
-                        <a class=nav-link id=pills-profile-tab
-                           data-toggle=pill href=#pills-profile role=tab
-                           aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchInvoices(); selectedRowCount = 0;isExportMode=false;">Closed Invoices</a>
-                </ul>
-            </div>
-            <div class="order-export-btn-container" v-if="!isMobile">
-                <button class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
-            </div>
-            <div class="order-export-btn-container" v-if="isMobile">
-                <button id="export-mob-btn" class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="exportExcelMobile()" style="background-color: #033551 !important; font-size: 18px;">EXPORT INVOICES</button>
-            </div>
-        </div>
-        <div class="d-flex flex-column p-4 " v-bind:class="{'bg-white-shadow': !isMobile}">
 
-            <div id="invoice-grid"></div>
-        </div>
+            <div class="d-flex flex-row justify-content-between">
+                <div v-bind:style="{'padding-left': isMobile ? '20px':'0'}">
+                    <ul class="nav nav-pills mb-1" id=pills-tab role="tablist">
+                        <li class=nav-item role="presentation" style=margin-right:.3em>
+                            <a class="nav-link active" id=pills-home-tab data-toggle=pill
+                               href=#pills-home role=tab aria-controls=pills-home
+                               aria-selected=true v-on:click="isClosed = false; searchInvoices(); selectedRowCount = 0;isExportMode=false;">Open Invoices</a>
+                        <li class=nav-item role="presentation">
+                            <a class=nav-link id=pills-profile-tab
+                               data-toggle=pill href=#pills-profile role=tab
+                               aria-controls=pills-profile aria-selected=false v-on:click="isClosed = true; searchInvoices(); selectedRowCount = 0;isExportMode=false;">Closed Invoices</a>
+                    </ul>
+                </div>
+                <div class="order-export-btn-container" v-if="!isMobile">
+                    <button class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="toolbarClick()"><img src="~/Themes/@(themeName)/Content/assets/icn-download.svg" alt="">Export</button>
+                </div>
+                <div class="order-export-btn-container" v-if="isMobile">
+                    <button id="export-mob-btn" class="nss-btn-default order-export-btn ml-lg-5 text-center" onclick="exportExcelMobile()" style="background-color: #033551 !important; font-size: 18px;">EXPORT INVOICES</button>
+                </div>
+            </div>
+            <div class="d-flex flex-column p-4 " v-bind:class="{'bg-white-shadow': !isMobile}">
+
+                <div id="invoice-grid"></div>
+            </div>
+        }
+
     </div>
 </div>
 @functions{

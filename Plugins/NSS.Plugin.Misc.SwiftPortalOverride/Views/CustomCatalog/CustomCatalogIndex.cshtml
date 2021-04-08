@@ -354,7 +354,7 @@
             },
 
             getShapeIcon: function (shape) {
-                const name = shape.name.replaceAll(' ', '').replaceAll('-', '').toLowerCase();
+                const name = shape.name.replace(/\s/g, '').replace(/\-/g, '').toLowerCase();
                 return this.shared.shapeIcon[name];
             },
 

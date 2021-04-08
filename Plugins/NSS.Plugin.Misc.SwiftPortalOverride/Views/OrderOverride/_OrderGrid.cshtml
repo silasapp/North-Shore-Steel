@@ -229,7 +229,7 @@
                 <e-grid-column textAlign="Center" field="PromiseDateUTC" headerText="Promise Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
                 @if (Model.IsClosed)
                 {
-                    <e-grid-column textAlign="Center" field="DeliveryDateUTC" headerText="Delivery Date" format="MM/dd/yy" allowFiltering="false"></e-grid-column>
+                    <e-grid-column textAlign="Center" field="DeliveryDateUTC" headerText="Delivery Date" allowFiltering="false"></e-grid-column>
                 }
                 else
                 {
@@ -309,10 +309,18 @@
                     </div>
                     <div class="d-flex flex-row">
                         <div class="d-flex bg-primary p-2 home-table-sm-header">
-                            <label class="fs12-white mb-0"></label>
+                            <label class="fs12-white mb-0">MTR</label>
                         </div>
                         <div class="d-flex p-2">
-                            <label class="fs12-link mb-0"><a href="">View</a></label>
+                            <label class="fs12-link mb-0"><a v-on:click="handleMtrModal(order.orderId)">View</a></label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div class="d-flex bg-primary p-2 home-table-sm-header">
+                            <label class="fs12-white mb-0">POD</label>
+                        </div>
+                        <div class="d-flex p-2">
+                            <label class="fs12-link mb-0"><a v-bind:href="order.deliveryTicketFile" target="_blank">View</a></label>
                         </div>
                     </div>
                 }
@@ -503,7 +511,7 @@
                 const request = {
                     companyId,
                     orderId
-                }
+                };
 
                 this.showLoading();
                 const self = this;
@@ -555,6 +563,8 @@
 <script>
     var pageModel = @Html.Raw(Serialize(Model));
     function formatDate(date) {
+        if (!date)
+            return "N/A";
         date = new Date(date);
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }

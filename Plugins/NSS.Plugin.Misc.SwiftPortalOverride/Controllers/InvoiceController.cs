@@ -72,7 +72,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 CompanyHasCreditTerms = company?.HasCredit ?? false
             };
 
-            if ( creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))
+            if ( creditSummary.CompanyHasCreditTerms && (isAp))
             {
                 var creditResposne = _apiService.GetCompanyCreditBalance(eRPCompanyId);
 
@@ -103,9 +103,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP) && !_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
-                return (PartialViewResult)AccessDeniedView();
 
             var model = new CompanyInvoiceListModel();
 

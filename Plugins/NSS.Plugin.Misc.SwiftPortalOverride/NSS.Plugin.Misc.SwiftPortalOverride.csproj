@@ -44,9 +44,6 @@
     <None Remove="Views\CustomerOverride\ChangePasswordFirstTimeLogin.cshtml" />
     <None Remove="Views\CustomerOverride\Notifications.cshtml" />
     <None Remove="Views\CustomerOverride\Register.cshtml" />
-    <None Remove="Views\CustomOrder\CustomerOrders.cshtml" />
-    <None Remove="Views\CustomOrder\Details.cshtml" />
-    <None Remove="Views\CustomShoppingCart\Checkout.cshtml" />
     <None Remove="Views\Invoice\CompanyInvoices.cshtml" />
     <None Remove="Views\Invoice\_InvoiceGrid.cshtml" />
     <None Remove="Views\OrderOverride\CompanyOrders.cshtml" />
@@ -61,7 +58,6 @@
     <None Remove="Views\CustomCatalog\Cart.cshtml" />
     <None Remove="Views\CustomCatalog\CustomCatalogIndex.cshtml" />
     <None Remove="Views\CustomCatalog\_FilteredPartialView.cshtml" />
-    <None Remove="Views\CustomShoppingCart\_GiftCardBox.cshtml" />
     <None Remove="Views\CustomTopMenu.cshtml" />
     <None Remove="Views\HomeIndex.cshtml" />
     <None Remove="Views\SelectAccount.cshtml" />
@@ -181,15 +177,6 @@
     <Content Include="Views\UserRegistration\Register.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\CustomOrder\CustomerOrders.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\CustomOrder\Details.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="Views\CustomerOverride\Login.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -223,9 +210,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\UserRegistration\Confirmation.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Views\CustomShoppingCart\Cart.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\CustomCatalog\_FilteredPartialView.cshtml">

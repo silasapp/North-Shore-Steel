@@ -302,7 +302,7 @@
                             </div>
                         }
 
-                        @if ((Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP)) || isOperations || isBuyer)
+                        @if ((Model.CreditSummary.CompanyHasCreditTerms && isAP) || isOperations || isBuyer)
                         {
 
                             <div class="col-md-5 col-sm-6 col-12 m-b2">
@@ -320,7 +320,7 @@
                                                 </div>
                                             </div>
                                         }
-                                        @if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP))
+                                        @if (Model.CreditSummary.CompanyHasCreditTerms && isAP)
                                         {
                                             <div class="row">
 
@@ -356,7 +356,7 @@
                                                         <td scope="col">Order #</td>
                                                         <td scope="col">PO #</td>
                                                         <td scope="col" class="text-center">Delivery Date</td>
-                                                        <td scope="col" class="text-center">On Time</td>
+                                                        @*<td scope="col" class="text-center">On Time</td>*@
                                                         <td scope="col" class="text-center">MTR</td>
                                                         <td scope="col" class="text-center">POD</td>
                                                     </tr>
@@ -367,8 +367,8 @@
                                                         <tr>
                                                             <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                             <td>@order.PoNo</td>
-                                                            <td class="text-center">@order.DeliveryDate?.ToString("MM/dd/yyyy")</td>
-                                                            <td class="text-center">@order.DeliveryStatus</td>
+                                                            <td class="text-center">@(order.DeliveryDate?.ToString("MM/dd/yyyy") ?? "N/A")</td>
+                                                           @* <td class="text-center">@order.DeliveryStatus</td>*@
                                                             <td class="text-center"><a v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" scope="row" class="nss-light-blue">View</a></td>
                                                             <td class="text-center">
                                                                 @if (order.DeliveryTicketCount > 0)
@@ -583,14 +583,14 @@
                                 <label class="fs12-default mb-0" v-cloak>{{ order.deliveryDate | date }}</label>
                             </div>
                         </div>
-                        <div class="d-flex flex-row">
+                        @*<div class="d-flex flex-row">
                             <div class="d-flex bg-primary2 p-2 home-table-sm-header">
                                 <label class="fs12-white mb-0">On Time</label>
                             </div>
                             <div class="d-flex p-2">
                                 <label class="fs12-default mb-0" v-cloak>{{ order.deliveryStatus }}</label>
                             </div>
-                        </div>
+                        </div>*@
                         <div class="d-flex flex-row">
                             <div class="d-flex bg-primary2 p-2 home-table-sm-header">
                                 <label class="fs12-white mb-0">MTR</label>
@@ -611,7 +611,7 @@
                 </div>
             }
 
-            @if ((Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP)) || isOperations || isBuyer)
+            @if ((Model.CreditSummary.CompanyHasCreditTerms && isAP) || isOperations || isBuyer)
             {
                 <div class="col-md-7 col-sm-6 col-12 m-b2 p-0">
                     <div class="tab-content" id="pills-tabContent">
@@ -628,7 +628,7 @@
                                     </div>
                                 </div>
                             }
-                            @if (Model.CreditSummary.CompanyHasCreditTerms && (Model.CreditSummary.CanCredit || isAP))
+                            @if (Model.CreditSummary.CompanyHasCreditTerms && isAP)
                             {
                                 <div class="row">
                                     <div class="col-md-12 d-block">

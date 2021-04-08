@@ -302,7 +302,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 CompanyHasCreditTerms = companyInfo?.HasCredit ?? false
             };
 
-            if (creditSummary.CompanyHasCreditTerms && (creditSummary.CanCredit || isAp))
+            if (creditSummary.CompanyHasCreditTerms && isAp)
             {
                 var creditResponse = _apiService.GetCompanyCreditBalance(Convert.ToInt32(companyId));
 
