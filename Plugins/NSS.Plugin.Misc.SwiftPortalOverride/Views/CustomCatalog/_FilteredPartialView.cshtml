@@ -337,7 +337,7 @@
                         <button type="button" class="btn-sm-step" v-on:click="handleIncrementQuantity(data._itemId)">+</button>
                     </div>
                 </div>
-                <button :id=`wh-addToCart-${data._itemId}` v-show="data._isCartItem" type="button" class="btn-sm-add-to-cart" style="background-color:#123250;" v-on:click="handleAddToCart(data)">
+                <button :id=`wh-addToCart-${data._itemId}` v-show="data._isCartItem" type="button" class="btn-sm-add-to-cart" style="background-color:#123250;" v-on:click="handleAddToCart(data, true)">
                     <img src="Themes/SwiftPortal/Content/assets/shopping-cart.svg" class="product-action-sm" width="24" height="24" alt="">
                     Added to cart
                 </button>
@@ -504,8 +504,8 @@
             handleAddToWishList: function(data) {
                 getInputQuantity(data._itemId, data._wishListId, true, true);
             },
-            handleAddToCart: function (data) {
-                getInputQuantity(data._itemId, data._cartId);
+            handleAddToCart: function (data, addedToCart) {
+                getInputQuantity(data._itemId, data._cartId, null, null, addedToCart);
             }
         },
     });
@@ -517,7 +517,7 @@
 
 <script>
 
-    function addProductToCart(urladd, itemId) {
+    function addProductToCart(urladd, itemId, addedToCart) {
         $('#custom-loading').show();
         $.ajax({
             cache: false,
@@ -530,8 +530,11 @@
                 $('#custom-loading').hide();
                 if (response.message) {
                     if (response.success) {
-                        $('#wh-addToCart-' + itemId).show();
-                        $('#removeFromCart-' + itemId).hide();
+                        if (!addedToCart) {
+                            $('#wh-addToCart-' + itemId).show();
+                            $('#removeFromCart-' + itemId).hide();
+                        }
+
                         displayBarNotification(response.message, 'success', 3500);
                     } else {
                         displayBarNotification(response.message, 'error', 0);
@@ -548,7 +551,7 @@
         });
     }
 
-    function getInputQuantity(itemId, cartId, addToFavorite, isMobile) {
+    function getInputQuantity(itemId, cartId, addToFavorite, isMobile, addedToCart) {
         var qty = $('#qty' + itemId).val();
         var seQty = $('#qty' + itemId).text();
         if (seQty === "" && !qty && !addToFavorite) { displayBarNotification("Please enter quantity", 'error', 0);return;}
@@ -556,7 +559,7 @@
             qty = 1;
         let link = `/CartOverride/CustomAddProductToCart_Catalog?productId=${itemId}&shoppingCartTypeId=${cartId}&quantity=${qty}`;
 
-        addProductToCart(link, itemId);
+        addProductToCart(link, itemId, addedToCart);
 
         //AjaxCart.addproducttocart_catalog(link);
 
@@ -674,11 +677,11 @@
             <path d="M923 283.6a260.04 260.04 0 0 0-56.9-82.8a264.4 264.4 0 0 0-84-55.5A265.34 265.34 0 0 0 679.7 125c-49.3 0-97.4 13.5-139.2 39c-10 6.1-19.5 12.8-28.5 20.1c-9-7.3-18.5-14-28.5-20.1c-41.8-25.5-89.9-39-139.2-39c-35.5 0-69.9 6.8-102.4 20.3c-31.4 13-59.7 31.7-84 55.5a258.44 258.44 0 0 0-56.9 82.8c-13.9 32.3-21 66.6-21 101.9c0 33.3 6.8 68 20.3 103.3c11.3 29.5 27.5 60.1 48.2 91c32.8 48.9 77.9 99.9 133.9 151.6c92.8 85.7 184.7 144.9 188.6 147.3l23.7 15.2c10.5 6.7 24 6.7 34.5 0l23.7-15.2c3.9-2.5 95.7-61.6 188.6-147.3c56-51.7 101.1-102.7 133.9-151.6c20.7-30.9 37-61.5 48.2-91c13.5-35.3 20.3-70 20.3-103.3c.1-35.3-7-69.6-20.9-101.9z" />
         </svg>
 
-        <button id="wh-addToCart-${_itemId}" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;" style="border: none;background-color: #123250;color:#ffffff;display: none;align-items: center;padding: 5px 9px;margin-left: 5px;cursor:default;">
+        <button id="wh-addToCart-${_itemId}" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`, null, null, true);return false;" style="border: none;background-color: #123250;color:#ffffff;display: none;align-items: center;padding: 5px 9px;margin-left: 5px;cursor:pointer;">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" width="24" height="24"
                  preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
                  style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                <title>Add to cart</title>
+                <title>Update cart</title>
                 <path style="fill: #ffffff;" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
                 <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
             </svg>
@@ -687,11 +690,11 @@
 
         ${/if}
         ${if(_isCartItem)}
-        <button id="addToCart-${_itemId}" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`);return false;" style="border: none;background-color: #123250;color:#ffffff;display: flex;align-items: center;padding: 5px 9px;margin-left: 5px;cursor:default;">
+        <button id="addToCart-${_itemId}" onclick="getInputQuantity(`${_itemId}`, `${_cartId}`, null, null, true);return false;" style="border: none;background-color: #123250;color:#ffffff;display: flex;align-items: center;padding: 5px 9px;margin-left: 5px;cursor:pointer;">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="hover-icon mx-1" width="24" height="24"
                  preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
                  style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">
-                <title>Add to cart</title>
+                <title>Update Cart</title>
                 <path style="fill: #ffffff;" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 2v2h2l3.6 7.59l-1.35 2.45c-.16.28-.25.61-.25.96c0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
                 <rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" />
             </svg>
