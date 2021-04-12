@@ -112,6 +112,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs);
             model.CanBuy = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+            model.IsAPUser = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
             
             return View(model);
         }

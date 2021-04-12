@@ -35,6 +35,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public int MtrCount { get; set; }
 
         public bool CanBuy { get; set; }
+        public bool IsAPUser { get; set; }
+
+
         public string Token { get; set; }
         public string DeliveryTicketFileNo { get; set; }
         public string InvoiceFileNo { get; set; }

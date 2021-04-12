@@ -13,6 +13,7 @@ using Nop.Services.Common;
 using Nop.Core.Domain.Customers;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftCore.DTOs;
+using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -69,28 +70,26 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IEnumerable<CustomerCompany> customerCompanies = _customerCompanyService.GetCustomerCompanies(customerId);
 
             ERPCId = _genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
+
             if (ERPCId != null)
             {
                 // check if customer still has access to previously selected company
                 IEnumerable<CustomerCompany> cc = customerCompanies.Where(x => x.Company.ErpCompanyId.ToString() == ERPCId);
                 if (cc.Count() > 0)
                 {
-                    model = _customerModelFactory.PrepareCustomerHomeModel(ERPCId);
-                    return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
+                    return NavigateToPermittedHomeScreen(ERPCId, out model);
                 }
 
                 // remove cookie
-                saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, "");
-
-
+                SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, "");
             }
 
             if (customerCompanies.Count() == 1)
             {
                 ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
-                saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCId);
-                model = _customerModelFactory.PrepareCustomerHomeModel(ERPCId);
-                return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
+                SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCId);
+
+                return NavigateToPermittedHomeScreen(ERPCId, out model);
             }
             else if (customerCompanies.Count() > 1)
             {
@@ -102,22 +101,44 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // has access to no company
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
-
         }
 
-        public void SelectCompany(string ERPCompanyId)
+        private void SelectCompany(string ERPCompanyId)
         {
             var currentCustomer = _workContext.CurrentCustomer;
             int customerId = currentCustomer.Id;
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, customerId);
-            saveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
+            SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
         }
 
+        private IActionResult NavigateToPermittedHomeScreen(string ERPCId, out TransactionModel model)
+        {
+            model = new TransactionModel();
 
-        private void saveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
+            bool canViewDashboard = CanViewDashboard(ERPCId);
+
+            if (canViewDashboard)
+            {
+                model = _customerModelFactory.PrepareCustomerHomeModel(ERPCId);
+                return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
+            }
+            
+            return RedirectToAction("CompanyInvoices", "Invoice");
+        }
+
+        private bool CanViewDashboard(string ERPCId)
+        {
+            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.Buyer);
+            bool IsOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.Operations);
+
+            bool canViewDashboard = (isBuyer || IsOperations);
+
+            return canViewDashboard;
+        }
+
+        private void SaveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
         {
             _genericAttributeService.SaveAttribute(currentCustomer, compIdCookieKey, ERPCompanyId);
-
         }
     }
 }

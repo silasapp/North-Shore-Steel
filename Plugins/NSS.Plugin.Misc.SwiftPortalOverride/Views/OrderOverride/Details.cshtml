@@ -465,7 +465,7 @@
                 </a>
             }
 
-            @if (Model.InvoiceFile != null)
+            @if (Model.InvoiceFile != null && Model.IsAPUser)
             {
                 <a href="@Model.InvoiceFile" target="_blank" class="text-decoration-none">
                     <div class="d-flex flex-row mb-3 cursor-pointer" v-on:mouseover="isHoveringViewInvoice = true;" v-on:mouseleave="isHoveringViewInvoice = false;">

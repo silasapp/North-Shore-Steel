@@ -191,7 +191,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
                     // registration successful
-                    //TODO: send email with registrationId to Approval
                     _workflowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
                     _workflowMessageService.SendNSSCustomerRegisteredNotificationMessage(res.Id, res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
 

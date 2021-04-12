@@ -1,17 +1,36 @@
 ﻿@using Nop.Web.Models.Catalog
+@using Nop.Core
+@using NSS.Plugin.Misc.SwiftPortalOverride
+@using NSS.Plugin.Misc.SwiftCore.Helpers
+@using NSS.Plugin.Misc.SwiftCore.Services
+@using Nop.Services.Common
 @model SearchBoxModel
-<form action="/catalog" method="get" id="small-search-box-form">
-    @if (Model.ShowSearchBox)
-    {
-        <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" name="q" placeholder="Search products" aria-label="@T("Search.SearchBox.Text.Label")" v-bind:class="{'small-searchterms-mob': isMobile, 'small-searchterms': !isMobile}" />
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBoxBeforeSearchButton })
-        <button type="submit" class="button-1 search-box-button">
-            <img v-if="isMobile" style="position: absolute" src="~/Themes/SwiftPortal/Content/assets/search.svg" width="20" height="20" alt="">
-            <img v-if="!isMobile" style="position: absolute" src="~/Themes/SwiftPortal/Content/assets/search-black.svg" width="20" height="20" alt="">
-        </button>
-        @if (Model.SearchTermMinimumLength > 0)
+
+@inject ICustomerCompanyService customerCompanyService
+@inject IGenericAttributeService genericAttributeService
+@inject IWorkContext workContext
+
+@{
+    var currentCustomer = workContext.CurrentCustomer;
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
+    string eRPCompanyId = genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
+    bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
+}
+
+@if (isBuyer)
+{
+    <form action="/catalog" method="get" id="small-search-box-form">
+        @if (Model.ShowSearchBox)
         {
-            <script asp-location="Footer">
+            <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" name="q" placeholder="Search products" aria-label="@T("Search.SearchBox.Text.Label")" v-bind:class="{'small-searchterms-mob': isMobile, 'small-searchterms': !isMobile}" />
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBoxBeforeSearchButton })
+            <button type="submit" class="button-1 search-box-button">
+                <img v-if="isMobile" style="position: absolute" src="~/Themes/SwiftPortal/Content/assets/search.svg" width="20" height="20" alt="">
+                <img v-if="!isMobile" style="position: absolute" src="~/Themes/SwiftPortal/Content/assets/search-black.svg" width="20" height="20" alt="">
+            </button>
+            @if (Model.SearchTermMinimumLength > 0)
+            {
+                <script asp-location="Footer">
                 $("#small-search-box-form").on("submit", function(event) {
                     if ($("#small-searchterms").val() == "") {
                         alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Search.EnterSearchTerms").Text))');
@@ -19,12 +38,12 @@
                         event.preventDefault();
                     }
                 });
-            </script>
-        }
+                </script>
+            }
 
-        @if (Model.AutoCompleteEnabled)
-        {
-            <script asp-location="Footer">
+            @if (Model.AutoCompleteEnabled)
+            {
+                <script asp-location="Footer">
                 $(document).ready(function() {
                     var showLinkToResultSearch;
                     var searchText;
@@ -58,11 +77,12 @@
                             .appendTo(ul);
                     };
                 });
-            </script>
+                </script>
+            }
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBox })
         }
-        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBox })
-    }
-</form>
+    </form>
+}
 
 <script>
     var vm = new Vue({

@@ -136,6 +136,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         #region Utilities
+
+        private int GetERPCompanyId()
+        {
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
+            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            return eRPCompanyId;
+        }
+
         protected override void ValidateRequiredConsents(List<GdprConsent> consents, IFormCollection form)
         {
             foreach (var consent in consents)
@@ -1117,8 +1125,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
+            int eRPCompanyId = GetERPCompanyId();
 
-            var model = _overrideCustomerModelFactory.PrepareCustomerAddressListModel();
+            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+
+            if (!isBuyer)
+                return AccessDeniedView();
+
+            var model = _overrideCustomerModelFactory.PrepareCustomerAddressListModel(eRPCompanyId);
             return View(model);
         }
 
@@ -1258,8 +1272,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpsRequirement]
         public IActionResult Notifications()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            int eRPCompanyId = GetERPCompanyId();
 
             bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
             bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);

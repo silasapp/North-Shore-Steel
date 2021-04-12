@@ -52,9 +52,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
             bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
             bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
 
-            if (!isAp && !isBuyer)
+            if (!isAp)
                 return AccessDeniedView();
 
             if (!_customerService.IsRegistered(_workContext.CurrentCustomer))

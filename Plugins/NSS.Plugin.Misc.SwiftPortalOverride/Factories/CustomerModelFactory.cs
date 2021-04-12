@@ -73,7 +73,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
         /// </summary>
         /// <param name="selectedTabId">Identifier of the selected tab</param>
         /// <returns>Customer navigation model</returns>
-        public virtual CustomerNavigationModel PrepareCustomerNavigationModel(bool isABuyer, bool isOperations = false, int selectedTabId = 0)
+        public virtual CustomerNavigationModel PrepareCustomerNavigationModel(bool isBuyer, bool isOperations = false, int selectedTabId = 0)
         {
             var model = new CustomerNavigationModel();
             var themeName = _themeContext.WorkingThemeName;
@@ -87,14 +87,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-person.svg"
             });
 
-            model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
+            if (isBuyer)
             {
-                RouteName = "CustomerAddresses",
-                Title = "ADDRESSES",
-                Tab = CustomerNavigationEnum.Addresses,
-                ItemClass = "customer-addresses",
-                ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-location.svg"
-            });
+                model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
+                {
+                    RouteName = "CustomerAddresses",
+                    Title = "ADDRESSES",
+                    Tab = CustomerNavigationEnum.Addresses,
+                    ItemClass = "customer-addresses",
+                    ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-location.svg"
+                });
+            }
 
             model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
             {
@@ -104,7 +107,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 ItemClass = "change-password",
                 ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-key.svg"
             });
-            if (isABuyer || isOperations)
+
+            if (isBuyer || isOperations)
             {
                 model.CompanyNavigationItems.Add(new CompanyNavigationItemModel
                 {
@@ -115,7 +119,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     ItemLogo = "/Themes/" + @themeName + "/Content/assets/icn-notifications.svg"
                 });
             }
-
 
             model.SelectedTab = (CustomerNavigationEnum)selectedTabId;
 
@@ -136,7 +139,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             {
                 foreach (var keyValue in notifications)
                 {
-                    model = populateNotificationPreferenceModel(isOperations, isBuyer, model, keyValue);
+                    model = PopulateNotificationPreferenceModel(isOperations, isBuyer, model, keyValue);
                 }
 
             }
@@ -161,7 +164,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 }
                 foreach (var keyValue in notifs)
                 {
-                    model = populateNotificationPreferenceModel(isOperations, isBuyer, model, keyValue);
+                    model = PopulateNotificationPreferenceModel(isOperations, isBuyer, model, keyValue);
                 }
 
             }
@@ -169,7 +172,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-        private static NotificationsModel populateNotificationPreferenceModel(bool isOperations, bool isBuyer, NotificationsModel model, KeyValuePair<string, bool> keyValue)
+        private static NotificationsModel PopulateNotificationPreferenceModel(bool isOperations, bool isBuyer, NotificationsModel model, KeyValuePair<string, bool> keyValue)
         {
             switch (keyValue.Key)
             {
@@ -353,13 +356,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             return model;
         }
 
-        public virtual Nop.Web.Models.Customer.CustomerAddressListModel PrepareCustomerAddressListModel()
+        public virtual Nop.Web.Models.Customer.CustomerAddressListModel PrepareCustomerAddressListModel(int erpCompanyId)
         {
-            int addressId;
-            var currentCustomer = _workContext.CurrentCustomer;
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-            int ERPCId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
-            var company = _companyService.GetCompanyEntityByErpEntityId(ERPCId);
+            var company = _companyService.GetCompanyEntityByErpEntityId(erpCompanyId);
             //get address by entity id
             List<Address> addresses = new List<Address>();
 
@@ -368,7 +367,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 var attributes = _genericAttributeService.GetAttributesForEntity(company.Id, "Company");
                 foreach (var attr in attributes)
                 {
-                    int.TryParse(attr.Value, out addressId);
+                    int.TryParse(attr.Value, out int addressId);
                     var addy = _addressService.GetAddressById(addressId);
                     addresses.Add(addy);
                 }

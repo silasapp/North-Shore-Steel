@@ -44,9 +44,14 @@
             <li class=nav-item role="presentation" style="margin-right: .3em;">
                 <a class="nav-link " v-bind:class="{'active': pageModel.selectedTab == 0 || pageModel.selectedTab== 70}" id=pills-home-tab
                    href="@Url.RouteUrl("CustomerInfo")">My Preferences</a>
-            <li class=nav-item role="presentation">
-                <a class=nav-link v-bind:class="{'active': pageModel.selectedTab == 10 || pageModel.selectedTab== 140}" id=pills-profile-tab
-                   href="@Url.RouteUrl("CustomerAddresses")">Company Preferences</a>
+            </li>
+            @if (Model.CompanyNavigationItems.Count > 0)
+            {
+                <li class=nav-item role="presentation">
+                    <a class=nav-link v-bind:class="{'active': pageModel.selectedTab == 10 || pageModel.selectedTab== 140}" id=pills-profile-tab
+                       href="@Url.RouteUrl("CustomerAddresses")">Company Preferences</a>
+                </li>
+            }
         </ul>
     </div>
     <div class="account-page-card" v-bind:class="{'grey-bg': isMobile,  'mb-2': isMobile}">
@@ -68,23 +73,27 @@
             </div>
         </div>
 
-        <div class="block block-account-navigation " v-if="!isMobile || (pageModel.selectedTab == 10 || pageModel.selectedTab== 140)" v-bind:class="{'pt-5': !isMobile}">
-            <h6 v-if="!isMobile">Company Preferences</h6>
-            <div class="listbox" v-bind:class="{'no-border': isMobile}">
-                <ul class="list" v-bind:class="{'d-flex': isMobile}">
-                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationBefore })
-                    @foreach (var item in Model.CompanyNavigationItems)
-                    {
-                        <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")" v-bind:class="{'mob-nav-tab': isMobile, 'mr-2': isMobile}">
-                            <a href="@Url.RouteUrl(item.RouteName)" class="clickable" v-bind:class="{'mob-nav-link': isMobile}">
-                                <img src="@item.ItemLogo" alt="">@(item.Title)
-                            </a>
-                        </li>
-                    }
-                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationAfter })
-                </ul>
+        @if (Model.CompanyNavigationItems.Count > 0)
+        {
+            <div class="block block-account-navigation " v-if="!isMobile || (pageModel.selectedTab == 10 || pageModel.selectedTab== 140)" v-bind:class="{'pt-5': !isMobile}">
+                <h6 v-if="!isMobile">Company Preferences</h6>
+                <div class="listbox" v-bind:class="{'no-border': isMobile}">
+                    <ul class="list" v-bind:class="{'d-flex': isMobile}">
+                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationBefore })
+                        @foreach (var item in Model.CompanyNavigationItems)
+                        {
+                            <li class="customer-info @item.ItemClass @(Model.SelectedTab == item.Tab ? "active" : "inactive")" v-bind:class="{'mob-nav-tab': isMobile, 'mr-2': isMobile}">
+                                <a href="@Url.RouteUrl(item.RouteName)" class="clickable" v-bind:class="{'mob-nav-link': isMobile}">
+                                    <img src="@item.ItemLogo" alt="">@(item.Title)
+                                </a>
+                            </li>
+                        }
+                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.AccountNavigationAfter })
+                    </ul>
+                </div>
             </div>
-        </div>
+        }
+
     </div>
 </div>
 @functions{

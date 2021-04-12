@@ -24,11 +24,12 @@
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
     int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
     bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+    bool isOperations = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
 }
 
 @section left
 {
-    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses, isABuyer = isBuyer })
+    @await Component.InvokeAsync("CustomCustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Addresses, isABuyer = isBuyer, isOperations = isOperations })
 }
 
 @{
@@ -125,12 +126,12 @@
                             </div>
                         </div>
                     }
-                <a onclick="location.href='@Url.RouteUrl("CustomerAddressAdd")'" class="address-info" style="background-color:#F5F7FF !important">
-                    <ul>
-                        <img src="~/Themes/@themeName/Content/assets/icn-add.svg" alt="" />
-                        <li class="title">NEW ADDRESS</li>
-                    </ul>
-                </a>
+                    <a onclick="location.href='@Url.RouteUrl("CustomerAddressAdd")'" class="address-info" style="background-color:#F5F7FF !important">
+                        <ul>
+                            <img src="~/Themes/@themeName/Content/assets/icn-add.svg" alt="" />
+                            <li class="title">NEW ADDRESS</li>
+                        </ul>
+                    </a>
                 </div>
             </div>
 

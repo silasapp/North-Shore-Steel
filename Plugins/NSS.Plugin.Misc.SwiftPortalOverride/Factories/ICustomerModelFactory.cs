@@ -33,6 +33,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
 
         NotificationsModel PrepareNotificationsModel(int eRPCompanyId, string error, IDictionary<string, bool> notifications);
 
-        Nop.Web.Models.Customer.CustomerAddressListModel PrepareCustomerAddressListModel();
+        Nop.Web.Models.Customer.CustomerAddressListModel PrepareCustomerAddressListModel(int erpComapanyId);
     }
 }

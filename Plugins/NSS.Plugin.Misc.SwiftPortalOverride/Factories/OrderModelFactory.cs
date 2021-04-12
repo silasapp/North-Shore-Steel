@@ -248,25 +248,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 {
                     foreach (var respShipment in orderShippingDetailsResponse.Shipments)
                     {
-                        var shipments = new OrderShippingDetailsModel.Shipment();
-                        shipments.ShipmentId = respShipment.ShipmentId;
-                        shipments.Status = respShipment.Status;
-                        shipments.ScheduledDate = respShipment.ScheduledDate;
-                        shipments.TotalWeight = respShipment.TotalWeight;
+                        var shipment = new OrderShippingDetailsModel.Shipment
+                        {
+                            ShipmentId = respShipment.ShipmentId,
+                            Status = respShipment.Status,
+                            ScheduledDate = respShipment.ScheduledDate,
+                            TotalWeight = respShipment.TotalWeight
+                        };
+
                         if (respShipment.Items != null)
                         {
-                            foreach (var item in respShipment.Items)
+                            foreach (var shipmentItem in respShipment.Items)
                             {
-                                var items = new OrderShippingDetailsModel.Item
+                                var item = new OrderShippingDetailsModel.Item
                                 {
-                                    Description = item.Description,
-                                    Quantity = item.Quantity,
-                                    Weight = item.Weight
+                                    Description = shipmentItem.Description,
+                                    Quantity = shipmentItem.Quantity,
+                                    Weight = shipmentItem.Weight
                                 };
-                                shipments.Items.Add(items);
+                                shipment.Items.Add(item);
                             }
                         }
-                        model.Shipments.Add(shipments);
+                        model.Shipments.Add(shipment);
                     }
                 }
             }

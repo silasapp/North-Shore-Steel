@@ -70,11 +70,14 @@
                 {
                     @if (urlRecord.Title.ToUpper() == "NOTIFICATIONS" && !urlRecord.IsBuyer && !urlRecord.IsOperations)
                     {
-
+                        continue;
+                    }
+                    else if (urlRecord.Title.ToUpper() == "ADDRESSES" && !urlRecord.IsBuyer)
+                    {
+                        continue;
                     }
                     else
                     {
-
                         <div class="col-md-3 col-sm-6 item">
                             <a href="@urlRecord.Slug" class="text-decoration-none">
                                 <div class="card border-primary mb-3">
