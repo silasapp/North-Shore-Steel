@@ -266,20 +266,20 @@
                                                 <tbody>
                                                     @foreach (var order in Model.OpenOrders)
                                                     {
-                                                    <tr>
-                                                        <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
-                                                        <td>@order.PoNo</td>
-                                                        <td class="text-center">@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
-                                                        <td class="text-center">@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
-                                                        @if (@order.OrderStatusName == "*MULTIPLE*")
-                                                        {
-                                                            <td class="text-center"><a v-on:click="handleMultipleShipmentModal(@order.OrderId, false)" scope="row" class="nss-light-blue">Multiple</a></td>
-                                                        }
-                                                        else
-                                                        {
-                                                            <td class="text-center cursor-pointer">@order.OrderStatusName</td>
-                                                        }
-                                                    </tr>
+                                                        <tr>
+                                                            <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
+                                                            <td>@order.PoNo</td>
+                                                            <td class="text-center">@order.PromiseDate?.ToString("MM/dd/yyyy")</td>
+                                                            <td class="text-center">@order.ScheduledDate?.ToString("MM/dd/yyyy")</td>
+                                                            @if (@order.OrderStatusName == "*MULTIPLE*")
+                                                            {
+                                                                <td class="text-center"><a v-on:click="handleMultipleShipmentModal(@order.OrderId, false)" scope="row" class="nss-light-blue">Multiple</a></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td class="text-center cursor-pointer">@order.OrderStatusName</td>
+                                                            }
+                                                        </tr>
                                                     }
                                                 </tbody>
                                             </table>
@@ -288,11 +288,18 @@
                                         {
                                             <div class="text-center p-t9">
                                                 <div class="action">
-                                                    <a href="/catalog">
-                                                        <button class="swift-color-btn" style="width: 159px;height: 53px;">
+                                                    @if (isBuyer)
+                                                    {
+                                                        <button class="swift-color-btn" style="width: 159px;height: 53px;" onclick="location.href = '/catalog'">
                                                             <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
                                                         </button>
-                                                    </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="swift-color-btn" style="width: 159px;height: 53px;" onclick="location.href = '/orders'">
+                                                            <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> VIEW ORDERS
+                                                        </button>
+                                                    }
                                                 </div>
                                             </div>
                                         }
@@ -368,7 +375,7 @@
                                                             <td><a href="/orders/@order.OrderId" scope="row">@order.OrderId</a></td>
                                                             <td>@order.PoNo</td>
                                                             <td class="text-center">@(order.DeliveryDate?.ToString("MM/dd/yyyy") ?? "N/A")</td>
-                                                           @* <td class="text-center">@order.DeliveryStatus</td>*@
+                                                            @* <td class="text-center">@order.DeliveryStatus</td>*@
                                                             <td class="text-center"><a v-on:click="handleMtrModal(@eRPCompanyId, @order.OrderId)" scope="row" class="nss-light-blue">View</a></td>
                                                             <td class="text-center">
                                                                 @if (order.DeliveryTicketCount > 0)
@@ -449,11 +456,13 @@
                     </div>
 
                 </div>
-                @{ var title = "<span class='dialog-header'>ORDER <span class='order-detail-id'></span> - Multiple Delivery Details</span>"; }
-                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
-                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("850px").Target("body").Render()
-                @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleMobileDialogCreated").Header(title).ContentTemplate(@Content3).ShowCloseIcon(true).Visible(false).Height("100%").Width("100%").Target("body").Render()
-</div>
+            </div>
+
+            @{ var title = "<span class='dialog-header'>ORDER <span class='order-detail-id'></span> - Multiple Delivery Details</span>"; }
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onDialogCreated").Header("<span class='dialog-header'>VIEW MTRS</span>").ContentTemplate(@Content1).ShowCloseIcon(true).Visible(false).Width("700px").Target("body").Render()
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleDialogCreated").Header(title).ContentTemplate(@Content2).ShowCloseIcon(true).Visible(false).Width("850px").Target("body").Render()
+            @Html.EJS().Dialog("dialog").Visible(false).IsModal(true).Created("onMultipleMobileDialogCreated").Header(title).ContentTemplate(@Content3).ShowCloseIcon(true).Visible(false).Height("100%").Width("100%").Target("body").Render()
+
             <a href="/catalog">
                 <div class="discount-block" alt="" style="margin-top: 10px; margin-bottom: 45px;">
                     <img srcset="~/Themes/@(themeName)/Content/assets/discounts-banner@2x.png 2x, /Themes/@(themeName)/Content/assets/discounts-banner.png 1x" src="~/Themes/@(themeName)/Content/assets/discounts-banner.png" alt="discounts-banner">
@@ -485,11 +494,18 @@
                     <div v-if="openOrders.length == 0" style="background:#ffffff; padding: 10px;">
                         <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
                             <div class="action">
-                                <a href="/catalog">
-                                    <button class="swift-color-btn" style="width: 159px;height: 53px;">
+                                @if (isBuyer)
+                                {
+                                    <button class="swift-color-btn" style="width: 159px;height: 53px;" onclick="location.href = '/catalog'">
                                         <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
                                     </button>
-                                </a>
+                                }
+                                else
+                                {
+                                    <button class="swift-color-btn" style="width: 159px;height: 53px;" onclick="location.href = '/orders'">
+                                        <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> VIEW ORDERS
+                                    </button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -549,11 +565,18 @@
                     <div v-if="closedOrders.length == 0" style="background:#ffffff; padding: 10px;">
                         <div class="text-center p-t6" v-bind:class="{'open-orders-bg' : openOrders.length == 0}">
                             <div class="action">
-                                <a href="/catalog">
-                                    <button class="swift-color-btn" style="width: 159px;height: 53px;">
+                                @if (isBuyer)
+                                {
+                                    <button class="swift-color-btn" style="width: 159px;height: 53px;" onclick="location.href = '/catalog'">
                                         <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> SHOP SWIFT&#8482;
                                     </button>
-                                </a>
+                                }
+                                else
+                                {
+                                    <button class="swift-color-btn" style="width: 159px;height: 53px;" onclick="location.href = '/orders'">
+                                        <img src="~/Themes/@themeName/Content/assets/menu.svg" height="20" width="20" alt=""> VIEW ORDERS
+                                    </button>
+                                }
                             </div>
                         </div>
                     </div>

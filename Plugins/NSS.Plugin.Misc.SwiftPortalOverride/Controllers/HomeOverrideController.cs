@@ -103,7 +103,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
         }
 
-        private void SelectCompany(string ERPCompanyId)
+        public void SelectCompany(string ERPCompanyId)
         {
             var currentCustomer = _workContext.CurrentCustomer;
             int customerId = currentCustomer.Id;
