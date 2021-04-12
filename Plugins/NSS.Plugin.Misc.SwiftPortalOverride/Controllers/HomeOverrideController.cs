@@ -93,14 +93,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
             else if (customerCompanies.Count() > 1)
             {
-                CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
-                selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
-                selectAccountModel.loggedInCustomerId = customerId;
+                CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel
+                {
+                    Companies = customerCompanies.Select(cc => cc.Company),
+                    loggedInCustomerId = customerId
+                };
+
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/SelectAccount.cshtml", selectAccountModel);
             }
 
-            // has access to no company
-            return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
+            // has no access to company
+            return RedirectToAction("Index", "Resource");
         }
 
         public void SelectCompany(string ERPCompanyId)
@@ -115,25 +118,32 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             model = new TransactionModel();
 
-            bool canViewDashboard = CanViewDashboard(ERPCId);
+            var (canViewDashboard, isAPUser) = CanViewDashboard(ERPCId);
 
             if (canViewDashboard)
             {
                 model = _customerModelFactory.PrepareCustomerHomeModel(ERPCId);
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
             }
-            
-            return RedirectToAction("CompanyInvoices", "Invoice");
+
+            if (isAPUser)
+            {
+                return RedirectToAction("CompanyInvoices", "Invoice");
+            }
+
+            // no permission
+            return RedirectToAction("Index", "Resource");
         }
 
-        private bool CanViewDashboard(string ERPCId)
+        private (bool, bool) CanViewDashboard(string ERPCId)
         {
             bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.Buyer);
-            bool IsOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.Operations);
+            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.Operations);
+            bool isAPUser = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.AP);
 
-            bool canViewDashboard = (isBuyer || IsOperations);
+            bool canViewDashboard = (isBuyer || isOperations);
 
-            return canViewDashboard;
+            return (canViewDashboard, isAPUser);
         }
 
         private void SaveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
