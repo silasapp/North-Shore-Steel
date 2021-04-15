@@ -154,7 +154,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
 
             Company company = _companyService.GetCompanyEntityByErpEntityId(companyId);
 
-            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(customerId, company.Id);
+            CustomerCompany customerCompany =_customerCompanyService.GetCustomerCompany(customerId, company?.Id ?? 0);
 
             if (customerCompany == null)
             {
