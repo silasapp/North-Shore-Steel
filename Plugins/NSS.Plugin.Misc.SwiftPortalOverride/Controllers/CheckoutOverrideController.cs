@@ -149,82 +149,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         #region Methods
-        public override IActionResult Index()
-        {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
-                return AccessDeniedView();
 
-            //validation
-            if (_orderSettings.CheckoutDisabled)
-                return RedirectToRoute("ShoppingCart");
-
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
-
-            if (!cart.Any())
-                return RedirectToRoute("ShoppingCart");
-
-            var cartProductIds = cart.Select(ci => ci.ProductId).ToArray();
-            var downloadableProductsRequireRegistration =
-                _customerSettings.RequireRegistrationForDownloadableProducts && _productService.HasAnyDownloadableProduct(cartProductIds);
-
-            if (_customerService.IsGuest(_workContext.CurrentCustomer) && (!_orderSettings.AnonymousCheckoutAllowed || downloadableProductsRequireRegistration))
-                return Challenge();
-
-            //if we have only "button" payment methods available (displayed onthe shopping cart page, not during checkout),
-            //then we should allow standard checkout
-            //all payment methods (do not filter by country here as it could be not specified yet)
-            var paymentMethods = _paymentPluginManager
-                .LoadActivePlugins(_workContext.CurrentCustomer, _storeContext.CurrentStore.Id)
-                .Where(pm => !pm.HidePaymentMethod(cart)).ToList();
-            //payment methods displayed during checkout (not with "Button" type)
-            var nonButtonPaymentMethods = paymentMethods
-                .Where(pm => pm.PaymentMethodType != PaymentMethodType.Button)
-                .ToList();
-            //"button" payment methods(*displayed on the shopping cart page)
-            var buttonPaymentMethods = paymentMethods
-                .Where(pm => pm.PaymentMethodType == PaymentMethodType.Button)
-                .ToList();
-            if (!nonButtonPaymentMethods.Any() && buttonPaymentMethods.Any())
-                return RedirectToRoute("ShoppingCart");
-
-            //reset checkout data
-            _customerService.ResetCheckoutData(_workContext.CurrentCustomer, _storeContext.CurrentStore.Id);
-
-            //validation (cart)
-            var checkoutAttributesXml = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer,
-                NopCustomerDefaults.CheckoutAttributes, _storeContext.CurrentStore.Id);
-            var scWarnings = _shoppingCartService.GetShoppingCartWarnings(cart, checkoutAttributesXml, true);
-            if (scWarnings.Any())
-                return RedirectToRoute("ShoppingCart");
-            //validation (each shopping cart item)
-            foreach (var sci in cart)
-            {
-                var product = _productService.GetProductById(sci.ProductId);
-                product.OrderMaximumQuantity = product.OrderMaximumQuantity > 0 ? product.OrderMaximumQuantity : 0;
-
-                var sciWarnings = _shoppingCartService.GetShoppingCartItemWarnings(_workContext.CurrentCustomer,
-                    sci.ShoppingCartType,
-                    product,
-                    sci.StoreId,
-                    sci.AttributesXml,
-                    sci.CustomerEnteredPrice,
-                    sci.RentalStartDateUtc,
-                    sci.RentalEndDateUtc,
-                    sci.Quantity,
-                    false,
-                    sci.Id);
-                if (sciWarnings.Any())
-                    return RedirectToRoute("ShoppingCart");
-            }
-
-            if (_orderSettings.OnePageCheckoutEnabled)
-                return RedirectToRoute("CheckoutOnePage");
-
-            return RedirectToRoute("CheckoutBillingAddress");
-        }
+        #region Page Actions
 
         public override IActionResult OnePageCheckout()
         {
@@ -340,16 +267,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return View();
         }
 
+        #endregion
+
+
+        #region Ajax Actions
 
         [IgnoreAntiforgeryToken]
         public virtual JsonResult CreatePayPalOrder([FromBody] ErpCheckoutModel model)
         {
             try
             {
-                _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"start create paypal order process time stamp - {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}");
-                var sw1 = new Stopwatch();
-                sw1.Start();
-
                 var result = Json(new { });
                 //prepare order GUID
                 var paymentRequest = new ProcessPaymentRequest();
@@ -371,9 +298,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
 
                 HttpContext.Session.Set("OrderPaymentInfo", paymentRequest);
-                sw1.Stop();
-
-                _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"emd create paypal order process time stamp - {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")} | time elapsed - {sw1.ElapsedMilliseconds} ms");
 
                 return result;
             }
@@ -386,10 +310,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [IgnoreAntiforgeryToken]
         public virtual JsonResult PlaceOrder([FromBody] ErpCheckoutModel model)
         {
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"start place order process time stamp - {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")}");
-            var sw1 = new Stopwatch();
-            sw1.Start();
-
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Checkout Model is null");
 
@@ -411,7 +331,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             try
             {
                 // save shipping
-                if(!model.ShippingAddress.IsPickupInStore)
+                if (!model.ShippingAddress.IsPickupInStore)
                     _workContext.CurrentCustomer.ShippingAddressId = model.ShippingAddress.ShippingAddressId;
 
                 // save billing
@@ -419,7 +339,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 {
                     _workContext.CurrentCustomer.BillingAddressId = model.BillingAddress.BillingAddressId;
                 }
-                else if(!model.ShippingAddress.IsPickupInStore)
+                else if (!model.ShippingAddress.IsPickupInStore)
                 {
                     _workContext.CurrentCustomer.BillingAddressId = model.ShippingAddress.ShippingAddressId;
                 }
@@ -428,10 +348,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 // payment
                 var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType, model);
-
-                sw1.Stop();
-
-                _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"place order after paypal took {sw1.ElapsedMilliseconds} ms");
 
                 return result;
 
@@ -453,23 +369,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             bool isExist = true;
             var customer = _workContext.CurrentCustomer;
             //new address
-            AddressModel newAddress = new AddressModel();
+            AddressModel newAddress = new AddressModel
+            {
 
-            // populate fields
-            newAddress.Email = customer.Email;
-            newAddress.FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute);
-            newAddress.LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute);
-            newAddress.PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute);
-            newAddress.Address1 = nAddress.Address1;
-            newAddress.Address2 = nAddress.Address2;
-            newAddress.City = nAddress.City;
-            newAddress.StateProvinceId = nAddress.StateProvinceId;
-            newAddress.ZipPostalCode = nAddress.ZipPostalCode;
-            newAddress.CountryId = 1;
+                // populate fields
+                Email = customer.Email,
+                FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute),
+                LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute),
+                PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute),
+                Address1 = nAddress.Address1,
+                Address2 = nAddress.Address2,
+                City = nAddress.City,
+                StateProvinceId = nAddress.StateProvinceId,
+                ZipPostalCode = nAddress.ZipPostalCode,
+                CountryId = 1
+            };
 
             //custom address attributes
             string customAttributes = null;
-            // REMOVED
 
             //try to find an address with the same values (don't duplicate records)
             var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
@@ -567,6 +484,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
         }
+
+        #endregion
+
+
+        #region Util Methods
 
         private ERPCalculateShippingRequest BuildShippingCostRequest(ErpCheckoutModel model)
         {
@@ -728,12 +650,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 try
                 {
-                    var sw1 = new Stopwatch();
-                    sw1.Start();
                     NSSPlaceOrderRequest(placeOrderResult.PlacedOrder, paymentMethod, deliveryDate?.ToString());
-                    sw1.Stop();
-
-                    _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"Total NSS place order time {sw1.ElapsedMilliseconds} ms");
                 }
                 catch (Exception ex)
                 {
@@ -760,9 +677,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod, string deliveryDate)
         {
-            var sw1 = new Stopwatch();
-            sw1.Start();
-
             var shippingAddress = _addressService.GetAddressById(order.ShippingAddressId ?? 0);
             var pickupAddress = _addressService.GetAddressById(order.PickupAddressId ?? 0);
 
@@ -853,7 +767,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     UnitPrice = Math.Round(item.UnitPriceExclTax, 2),
                     TotalWeight = (decimal.TryParse(genAttrs.FirstOrDefault(x => x.Key == "weight")?.Value, out var weight) ? (int)Math.Round(weight * item.Quantity) : 0),
                     // product attr
-                    Notes =  notes,
+                    Notes = notes,
                     SawOptions = (sawoptions?.ToLower() == "other" || sawoptions?.ToLower() == "none") ? null : sawoptions,
                     SawTolerance = sawoptions?.ToLower() == "none" ? null : workOrderInstructions,
                     Uom = uom
@@ -896,16 +810,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 PoNo = poValues.FirstOrDefault()
             };
 
-            sw1.Stop();
-
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"build order request to call nss api time - {sw1.ElapsedMilliseconds} ms");
-
-            var sw2 = new Stopwatch();
-            sw2.Start();
             // api call
             var resp = _apiService.CreateNSSOrder(erpCompId, request);
-            sw2.Stop();
-            _logger.InsertLog(Nop.Core.Domain.Logging.LogLevel.Debug, $"nss api time elapsed - {sw2.ElapsedMilliseconds} ms");
 
             if (resp.NSSOrderNo > 0)
                 _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo);
@@ -919,34 +825,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int ERPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, erpCompIdCookieKey));
 
-            if (ERPCompanyId > 0) 
+            if (ERPCompanyId > 0)
                 customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, ERPCompanyId);
 
             return (ERPCompanyId, customerCompany);
         }
 
-
         #endregion
 
-        public static string GetJson(object data)
-        {
-            var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
-            return JsonConvert.SerializeObject(data, new JsonSerializerSettings
-            {
-                ContractResolver = contractResolver,
-                Formatting = Formatting.None
-            });
-        }
-    }
 
-    public class PaymentMethodRequest
-    {
-        public string PaymentMethod { get; set; }
-        public CheckoutPaymentMethodModel Model { get; set; }
-    }
-
-    public class ErpMockOrder
-    {
-        public int OrderId { get; set; }
+        #endregion
     }
 }

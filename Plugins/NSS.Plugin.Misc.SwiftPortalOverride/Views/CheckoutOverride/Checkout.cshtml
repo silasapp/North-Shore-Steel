@@ -812,6 +812,9 @@ Content2 =
                             self.shared.billingAddresses.push(address);
                         }
                         self.shippingAddressId = address ? address.id : null;
+
+                        // refresh shipping
+                        self.getShippingRate();
                     },
                     error: function (xhr, _, thrownError) {
                         if (thrownError == "Unauthorized") {
@@ -822,12 +825,12 @@ Content2 =
 
             },
             getShippingRate: function (disableSpinner) {
-
-                if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) { this.showNewShippingAddress = false; return; }
-
+                // reset
                 this.disableSubmit = true;
                 this.deliveryDate = null;
                 this.deliveryDateText = null;
+
+                if (this.isDelivery && !this.shippingAddressId && !this.showNewShippingAddress) { this.showNewShippingAddress = false; return; }
 
                 let address;
                 if (this.isDelivery) {
@@ -889,7 +892,6 @@ Content2 =
                     }
                 });
             },
-
             placeOrder: function () {
                 this.dirty = true;
                 if (this.paymentMethodIndex !== this.shared.constants.PAYMENT_METHOD_LINE_OF_CREDIT
@@ -1202,7 +1204,6 @@ Content2 =
         checkoutvm.dirty = true;
         checkoutvm.showNewShippingAddress = true;
         checkoutvm.saveShippingAddress();
-        checkoutvm.getShippingRate();
 
     });
     $('#use-billing').on('click', function () {
