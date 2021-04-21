@@ -1208,7 +1208,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 SwiftCore.Domain.Customers.Company company;
                 string companyAddress;
-                getERPCompanyIdAndAddressKey(address, out company, out companyAddress);
+                GetERPCompanyIdAndAddressKey(address, out company, out companyAddress);
                 _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
 
                 return RedirectToRoute("CustomerAddresses");
@@ -1244,9 +1244,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //now delete the address record
                 _addressService.DeleteAddress(address);
 
-                SwiftCore.Domain.Customers.Company company;
-                string companyAddress;
-                getERPCompanyIdAndAddressKey(address, out company, out companyAddress);
+                GetERPCompanyIdAndAddressKey(address, out SwiftCore.Domain.Customers.Company company, out string companyAddress);
                 _genericAttributeService.SaveAttribute<string>(company, companyAddress, "");
             }
 
@@ -1257,10 +1255,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             });
         }
 
-        private void getERPCompanyIdAndAddressKey(Address address, out SwiftCore.Domain.Customers.Company company, out string companyAddress)
+        private void GetERPCompanyIdAndAddressKey(Address address, out SwiftCore.Domain.Customers.Company company, out string companyAddress)
         {
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
             int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+
             company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
             companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
         }
