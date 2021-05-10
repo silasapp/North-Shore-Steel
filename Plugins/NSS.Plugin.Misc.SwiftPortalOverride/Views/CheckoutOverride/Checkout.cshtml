@@ -999,6 +999,8 @@ Content2 =
                     data: JSON.stringify(request),
                     success: function (data, textStatus, XMLHttpRequest) {
                         if (data?.error === 1) {
+                            self.hideLoading();
+                            $('#processing_loader').remove();
                             alert(data.message);
                             return;
                         }
