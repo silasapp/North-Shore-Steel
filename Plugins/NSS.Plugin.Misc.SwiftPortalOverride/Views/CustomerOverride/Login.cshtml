@@ -25,6 +25,17 @@
     .user-input-field {
         background: #f6f6f6 !important;
     }
+
+    .register-text li {
+        margin: 0 20px !important;
+        text-align: left;
+        font: normal normal normal 20px/32px "Exo 2";
+        letter-spacing: 0px;
+        color: #242424;
+        opacity: 1;
+        font-weight: bold;
+        list-style: outside !important;
+    }
 </style>
 <div class="page login-page">
     <div class="page-title">
@@ -102,21 +113,11 @@
                 <div class="new-wrapper fieldset register-block" style="padding-top:5rem">
                     <div class="title"><strong style="font-weight: 500;">NEW CUSTOMER</strong></div>
                     <div style="position: relative; bottom: 1rem;">
-                        <div class="text">
-                            <strong>Buy structural steel online</strong>
-                        </div>
-                        <div class="text">
-                            <strong>24/7 MTR's and POD's</strong>
-                        </div>
-                        <div class="text">
-                            <strong>Real time order status</strong>
-                        </div>
-                        <div class="text">
-                            <p>
-                                Register now by clicking the button below.
-                            </p>
-
-                        </div>
+                        <ul class="register-text">
+                            <li>Buy structural steel online</li>
+                            <li>24/7 MTR's and POD's</li>
+                            <li>Real time order status</li>
+                        </ul>
                     </div>
                     <div class="buttons" style="margin-bottom:4rem">
                         <input type="button" class="button-1 register-button" onclick="location.href='@registerUrl'" value="@T("Account.Register")" />
