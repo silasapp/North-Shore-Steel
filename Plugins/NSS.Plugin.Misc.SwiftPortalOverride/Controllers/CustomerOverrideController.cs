@@ -875,8 +875,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return Challenge();
 
             string cellPhone = form["cell-phone"];
-            string pLocationId = form["preferred-location-id"];
-            int preferredLocationId = int.Parse(pLocationId);
+            int.TryParse(form["preferred-location-id"], out int preferredLocationId);
 
             if (string.IsNullOrEmpty(cellPhone) && string.IsNullOrEmpty(model.Phone))
                 ModelState.AddModelError("", "Cell or Work Phone is required.");
@@ -1050,7 +1049,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Phone = model.Phone,
-                        PreferredLocationId = 0,
+                        PreferredLocationId = preferredLocationId,
                         Cell = cellPhone
                     };
 

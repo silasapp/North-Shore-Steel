@@ -92,6 +92,15 @@
     var customer = workContext.CurrentCustomer;
     CustomerCompany customerCompany = GetCustomerCompanyDetails();
     var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
+    int preferredLocationId = genericAttributeService.GetAttribute<int>(customer, Constants.PreferredLocationIdAttribute);
+
+    PreferredLocation preferredLocation = PreferredLocation.Beaumont;
+
+    if (Enum.IsDefined(typeof(PreferredLocation), preferredLocationId))
+    {
+        preferredLocation = (PreferredLocation)preferredLocationId;
+    }
+
 }
 
 @Html.Raw(Model.PaypalScript)
@@ -570,6 +579,7 @@ Content2 =
     var shippingAddresses = @Html.Raw(shippingAddresses);
     var billingAddresses = @Html.Raw(billingAddresses);
     var pickupPoints = @Html.Raw(pickupPoints);
+    var pickupPoint = pickupPoints.length > 0 ? pickupPoints.find(x => x.city.toLowerCase() === '@(preferredLocation.ToString().ToLower())') : null;
     var accountCredit = @Html.Raw(accountCredit);
     var states = @Html.Raw(states);
     var cart = @Html.Raw(cart);
@@ -582,6 +592,7 @@ Content2 =
             shippingAddresses,
             billingAddresses,
             pickupPoints,
+            pickupPoint,
             accountCredit,
             states,
             cart,
@@ -614,7 +625,7 @@ Content2 =
             purchaseOrder,
             isDelivery,
             shippingAddressId: shippingAddresses.length > 0 ? shippingAddresses[0].id : null,
-            pickupPointId: pickupPoints.length > 0 ? pickupPoints[0].id : null,
+            pickupPointId: pickupPoints.length > 0 ? (pickupPoint ? pickupPoint.id : pickupPoints[0].id) : null,
             showNewShippingAddress: false,
             newShippingAddress: {
                 address1: null,

@@ -327,7 +327,7 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             return userDto;
         }
 
-        private void UpdateCustomerGenAttribute(Customer customerToUpdate, string firstname, string lastName, string phone, string cell, int prefferedLocationId)
+        private void UpdateCustomerGenAttribute(Customer customerToUpdate, string firstname, string lastName, string phone, string cell, int preferredLocationId)
         {
             if (!string.IsNullOrEmpty(firstname))
                 _genericAttributeService.SaveAttribute(customerToUpdate, NopCustomerDefaults.FirstNameAttribute, firstname);
@@ -341,8 +341,8 @@ namespace NSS.Plugin.Misc.SwiftApi.Controllers
             if (!string.IsNullOrEmpty(cell))
                 _genericAttributeService.SaveAttribute(customerToUpdate, Constants.CellAttribute, cell);
 
-            if (prefferedLocationId > 0)
-                _genericAttributeService.SaveAttribute(customerToUpdate, Constants.PreferredLocationIdAttribute, prefferedLocationId);
+            if (preferredLocationId > 0)
+                _genericAttributeService.SaveAttribute(customerToUpdate, Constants.PreferredLocationIdAttribute, preferredLocationId);
         }
     }
 }
