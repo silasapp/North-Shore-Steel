@@ -1,0 +1,89 @@
+﻿@using Nop.Services.Customers
+@using Nop.Core
+@using Nop.Core.Infrastructure
+@{
+    // check if user is guest
+    var customer = await EngineContext.Current.Resolve<IWorkContext>().GetCurrentCustomerAsync();
+    var isGuestCustomer = await EngineContext.Current.Resolve<ICustomerService>().IsGuestAsync(customer);
+
+}
+
+@if (!isGuestCustomer)
+{
+    <div id="n-select-account">
+        <div v-if="!isCheckout" class="d-flex flex-row flex-wrap flex-md-nowrap justify-content-between navbar-bg px-0 px-xl-5" v-bind:class="{'mb-4': isMobile}">
+            <div class="header-logo order-0 px-3 px-xl-5 py-3 py-lg-4">
+                @await Component.InvokeAsync("Logo")
+            </div>
+            <div class="header-links-wrapper d-flex flex-row order-2 order-md-3 align-items-center px-3 px-lg-5 py-2">
+                @await Component.InvokeAsync("CustomHeaderLinks")
+            </div>
+            <div v-if="isMobile" id="custom-search-box-container" class="d-flex flex-row flex-grow-1 order-3 order-md-2 align-items-center justify-content-center bg-primary bg-md-transparent py-2">
+                <div class="nav-bar-search">
+                    @await Component.InvokeAsync("CustomSearchBox")
+                </div>
+            </div>
+        </div>
+        <div v-if="isCheckout" class="header-upper nss-nav-bar navbar-bg" style="background-color: transparent!important; border-bottom: none!important;padding-top:2.5rem;padding-bottom:2.5rem;" v-bind:class="{'navbar-bg':isCheckout}">
+            <div class="master-wrapper-content align-items-center">
+                <div class="header-logo header-logo-lg">
+                    @await Component.InvokeAsync("Logo")
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div id="n-select-account" class="header-upper nss-nav-bar" style="background-color: transparent!important; border-bottom: none!important;padding-top:4rem;">
+        <div class="master-wrapper-content align-items-center">
+            <div class="header-logo header-logo-lg">
+                @await Component.InvokeAsync("Logo")
+            </div>
+        </div>
+    </div>
+}
+
+@*display only for select account screen*@
+<div id="select-account" class="header-upper nss-nav-bar" style="background-color: transparent!important; border-bottom: none!important;padding-top:4rem; display:none">
+    <div class="master-wrapper-content align-items-center">
+        <div class="header-logo">
+            @await Component.InvokeAsync("Logo")
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#n-select-account',
+        data: {
+            window: {
+                width: 0,
+                height: 0,
+            },
+            isExportMode: false,
+        },
+        created: function () {
+            window.addEventListener("resize", this.handleResize);
+            this.handleResize();
+        },
+        destroyed: function () {
+            window.removeEventListener("resize", this.handleResize);
+        },
+        computed: {
+            isMobile: function () {
+                return this.window.width <= 767.98;
+            },
+            isCheckout: function () {
+                return (window.location.href.indexOf("onepagecheckout") > -1 || window.location.href.indexOf("Completed") > -1 || window.location.href.indexOf("Rejected") > -1);
+            }
+        },
+        methods: {
+            handleResize: function () {
+                this.window.width = window.innerWidth;
+                this.window.height = window.innerHeight;
+            },
+
+        },
+    });
+</script>

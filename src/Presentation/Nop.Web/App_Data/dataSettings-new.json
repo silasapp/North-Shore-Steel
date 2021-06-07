@@ -1,0 +1,6 @@
+﻿{
+  "DataConnectionString": "Data Source=localhost\\SQLEXPRESS;Initial Catalog=newco-dev-db;Integrated Security=True;Persist Security Info=False",
+  "DataProvider": "sqlserver",
+  "SQLCommandTimeout": null,
+  "RawDataSettings": {}
+}
