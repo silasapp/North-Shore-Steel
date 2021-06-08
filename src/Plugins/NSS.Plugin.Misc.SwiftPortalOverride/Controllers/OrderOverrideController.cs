@@ -18,6 +18,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -81,13 +82,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         //My account / Order details page
         [HttpsRequirement]
-        public override IActionResult Details(int orderId)
+        public override async Task<IActionResult> Details(int orderId)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,(await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+            bool isAp = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.AP);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 
             if (!isBuyer && !isOperations)
                 return AccessDeniedView();
@@ -97,7 +98,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             // call api
             if (eRPCompanyId > 0 && orderId > 0)
-                (_, orderDetailsResponse) = _apiService.GetOrderDetails(eRPCompanyId, orderId);
+                (_, orderDetailsResponse) = await _apiService.GetOrderDetailsAsync(eRPCompanyId, orderId);
 
             if (orderDetailsResponse == null)
                 return Challenge();
@@ -106,13 +107,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
             if (int.TryParse(orderDetailsResponse.MtrCount, out int mtrCount) && mtrCount > 0)
             {
-                (_, orderMTRs) = _apiService.GetOrderMTRs(eRPCompanyId, orderId);
+                (_, orderMTRs) = await _apiService.GetOrderMTRsAsync(eRPCompanyId, orderId);
             }
             
 
-            var model = _orderModelFactory.PrepareOrderDetailsModel(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs);
-            model.CanBuy = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            model.IsAPUser = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
+            var model = await _orderModelFactory.PrepareOrderDetailsModelAsync(eRPCompanyId, orderId, orderDetailsResponse, mtrCount, orderMTRs);
+            model.CanBuy = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            model.IsAPUser = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.AP);
             
             return View(model);
         }
@@ -121,18 +122,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         //My account / Orders
         [HttpsRequirement]
-        public virtual IActionResult CompanyOrders()
+        public virtual async Task<IActionResult> CompanyOrders()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+            bool isAp = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.AP);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync( (await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations =await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 
             if (!isBuyer && !isOperations)
                 return AccessDeniedView();
 
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
                 return Challenge();
 
             var model = new CompanyOrderListModel();
@@ -141,13 +142,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [IgnoreAntiforgeryToken]
-        public PartialViewResult SearchCompanyOrders([FromBody]CompanyOrderListModel.SearchFilter filter)
+        public async Task<PartialViewResult> SearchCompanyOrders([FromBody]CompanyOrderListModel.SearchFilter filter)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,(await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+            bool isAp = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.AP);
+            bool isBuyer =await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 
             if (!isBuyer && !isOperations)
                 return (PartialViewResult)AccessDeniedView();
@@ -155,18 +156,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var model = new CompanyOrderListModel();
 
             if(eRPCompanyId > 0)
-                model = _orderModelFactory.PrepareOrderListModel(eRPCompanyId, filter);
+                model = await _orderModelFactory.PrepareOrderListModelAsync(eRPCompanyId, filter);
             model.IsClosed = filter.IsClosed;
 
             return PartialView("_OrderGrid", model);
         }
 
-        public OrderDetailsModel GetOrderMTRs(int companyId, int orderId)
+        public async Task<OrderDetailsModel> GetOrderMTRs(int companyId, int orderId)
         {
             var model = new OrderDetailsModel();
 
             var orderMTRs = new List<ERPGetOrderMTRResponse>();
-            (_, orderMTRs) = _apiService.GetOrderMTRs(companyId, orderId);
+            (_, orderMTRs) = await _apiService.GetOrderMTRsAsync(companyId, orderId);
 
             var orderedMTRs = orderMTRs?.OrderBy(x => x.LineNo)?.ToList();
 
@@ -188,14 +189,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         //Order Shipments
         [HttpsRequirement]
-        public OrderShippingDetailsModel Shipments(int orderId)
+        public async Task<OrderShippingDetailsModel> Shipments(int orderId)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,(await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            var (_, orderShippingDetails) = _apiService.GetOrderShippingDetails(eRPCompanyId, orderId);
+            var (_, orderShippingDetails) = await _apiService.GetOrderShippingDetailsAsync(eRPCompanyId, orderId);
 
-            var model = _orderModelFactory.PrepareOrderShippingDetailsModel(orderShippingDetails);
+            var model =await _orderModelFactory.PrepareOrderShippingDetailsModelAsync(orderShippingDetails);
             return model;
 
         }
