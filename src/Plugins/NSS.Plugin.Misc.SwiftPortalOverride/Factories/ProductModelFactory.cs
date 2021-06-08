@@ -56,8 +56,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                 throw new ArgumentNullException(nameof(products));
 
             var models = new List<ProductOverviewModel>();
-            var wishlistItems = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.Wishlist,(await _storeContext.GetCurrentStoreAsync()).Id);
-            var cartItems = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart,(await _storeContext.GetCurrentStoreAsync()).Id);
+            var wishlistItems = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.Wishlist, (await _storeContext.GetCurrentStoreAsync()).Id);
+            var cartItems = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
             foreach (var product in products)
             {
@@ -68,9 +68,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     IsCartItem = cartItems.Any(x => x.ProductId == product.Id),
                     CartQuantity = cartItems.FirstOrDefault(x => x.ProductId == product.Id)?.Quantity,
                     Name = await _localizationService.GetLocalizedAsync(product, x => x.Name),
-                    ShortDescription =await _localizationService.GetLocalizedAsync(product, x => x.ShortDescription),
-                    FullDescription =await _localizationService.GetLocalizedAsync(product, x => x.FullDescription),
-                    SeName =await _urlRecordService.GetSeNameAsync(product),
+                    ShortDescription = await _localizationService.GetLocalizedAsync(product, x => x.ShortDescription),
+                    FullDescription = await _localizationService.GetLocalizedAsync(product, x => x.FullDescription),
+                    SeName = await _urlRecordService.GetSeNameAsync(product),
                     Sku = product.Sku,
                     ProductType = product.ProductType,
                     MarkAsNew = product.MarkAsNew &&
@@ -78,9 +78,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         (!product.MarkAsNewEndDateTimeUtc.HasValue || product.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
                 };
 
-               
+
                 // erp
-                var attr =await _genericAttributeService.GetAttributesForEntityAsync(model.Id, nameof(Product));
+                var attr = await _genericAttributeService.GetAttributesForEntityAsync(model.Id, nameof(Product));
 
                 model.ProductCustomAttributes = attr;
 
@@ -101,7 +101,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
 
-            return( await _specificationAttributeService.GetProductSpecificationAttributesAsync(product.Id, 0, null, true))
+            return await (await _specificationAttributeService.GetProductSpecificationAttributesAsync(product.Id, 0, null, true))
                 .SelectAwait(async psa =>
                 {
                     var specAttributeOption =
@@ -126,7 +126,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                         case SpecificationAttributeType.Option:
                             m.ValueRaw =
                                 WebUtility.HtmlEncode(
-                                  await  _localizationService.GetLocalizedAsync(specAttributeOption, x => x.Name));
+                                  await _localizationService.GetLocalizedAsync(specAttributeOption, x => x.Name));
                             break;
                         case SpecificationAttributeType.CustomText:
                             m.ValueRaw =
@@ -143,7 +143,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     }
 
                     return m;
-                }).ToList();
+                }).ToListAsync();
         }
     }
 

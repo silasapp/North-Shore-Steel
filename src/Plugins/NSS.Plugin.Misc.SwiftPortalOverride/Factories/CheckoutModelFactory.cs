@@ -151,10 +151,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                     var pickupPointsResponse =await _shippingService.GetPickupPointsAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0,
                        await _workContext.GetCurrentCustomerAsync(), storeId: (await _storeContext.GetCurrentStoreAsync()).Id);
                     if (pickupPointsResponse.Success)
-                        model.PickupPoints = pickupPointsResponse.PickupPoints.SelectAwait(async point =>
+                        model.PickupPoints = await pickupPointsResponse.PickupPoints.SelectAwait(async point =>
                         {
-                            var country =  _countryService.GetCountryByTwoLetterIsoCodeAsync(point.CountryCode);
-                            var state = _stateProvinceService.GetStateProvinceByAbbreviationAsync(point.StateAbbreviation, country?.Id);
+                            var country =  await _countryService.GetCountryByTwoLetterIsoCodeAsync(point.CountryCode);
+                            var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync(point.StateAbbreviation, country?.Id);
 
                             var pickupPointModel = new CheckoutPickupPointModel
                             {
@@ -190,7 +190,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
                             pickupPointModel.PickupFee = await _priceFormatter.FormatShippingPriceAsync(rate, true);
 
                             return pickupPointModel;
-                        }).ToList();
+                        }).ToListAsync();
                     else
                         foreach (var error in pickupPointsResponse.Errors)
                             model.Warnings.Add(error);
@@ -355,7 +355,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             var model = new OnePageCheckoutModel
             {
                 ShippingRequired = await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart),
-                DisableBillingAddressCheckoutStep =  _orderSettings.DisableBillingAddressCheckoutStep && await _customerService.GetAddressesByCustomerIdAsync((await  _workContext.GetCurrentCustomerAsync()).Id).Any(),
+                DisableBillingAddressCheckoutStep =  _orderSettings.DisableBillingAddressCheckoutStep && (await _customerService.GetAddressesByCustomerIdAsync((await  _workContext.GetCurrentCustomerAsync()).Id)).Any(),
                 BillingAddress = await PrepareBillingAddressModelAsync(cart, prePopulateNewAddressWithCustomerFields: true)
             };
             return model;

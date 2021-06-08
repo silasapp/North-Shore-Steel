@@ -44,6 +44,7 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using RegisterModel = Nop.Web.Models.Customer.RegisterModel;
 using Nop.Web.Extensions;
 using NSS.Plugin.Misc.SwiftCore.DTOs;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -373,9 +374,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [CheckAccessClosedStore(true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public override IActionResult Login(bool? checkoutAsGuest)
+        public override async Task<IActionResult> Login(bool? checkoutAsGuest)
         {
-            var model = _customerModelFactory.PrepareLoginModel(checkoutAsGuest);
+            var model = await _customerModelFactory.PrepareLoginModelAsync(checkoutAsGuest);
             return View(model);
         }
 
