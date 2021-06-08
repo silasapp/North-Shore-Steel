@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NSS.Plugin.Misc.SwiftCore.Configuration;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -49,14 +50,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #region Methods
 
-        public IActionResult Configure()
+        public async Task<IActionResult> Configure()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel))
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.AccessAdminPanel))
                 return AccessDeniedView();
 
             //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
+            var storeScope =await _storeContext.GetActiveStoreScopeConfigurationAsync();
+            var swiftPortalOverrideSettings = await _settingService.LoadSettingAsync<SwiftCoreSettings>(storeScope);
 
             var model = new ConfigurationModel
             {
@@ -78,37 +79,37 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             };
             if (storeScope > 0)
             {
-                model.UseSandBox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.UseSandBox, storeScope);
-                model.TestEmailAddress_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.TestEmailAddress, storeScope);
-                model.ApproverMailBox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.ApproverMailBox, storeScope);
-                model.NSSApiBaseUrl_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, storeScope);
-                model.NSSApiAuthUsername_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, storeScope);
-                model.NSSApiAuthPassword_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, storeScope);
-                model.StorageAccountKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountKey, storeScope);
-                model.StorageAccountName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageAccountName, storeScope);
-                model.StorageContainerName_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.StorageContainerName, storeScope);
-                model.PayPalUseSandbox_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, storeScope);
-                model.PayPalClientId_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalClientId, storeScope);
-                model.PayPalSecretKey_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.PayPalSecretKey, storeScope);
-                model.MarketingVideoUrl_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.MarketingVideoUrl, storeScope);
-                model.ApplyForCreditUrl_OverrideForStore = _settingService.SettingExists(swiftPortalOverrideSettings, x => x.ApplyForCreditUrl, storeScope);
+                model.UseSandBox_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.UseSandBox, storeScope);
+                model.TestEmailAddress_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.TestEmailAddress, storeScope);
+                model.ApproverMailBox_OverrideForStore =await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.ApproverMailBox, storeScope);
+                model.NSSApiBaseUrl_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, storeScope);
+                model.NSSApiAuthUsername_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, storeScope);
+                model.NSSApiAuthPassword_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, storeScope);
+                model.StorageAccountKey_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.StorageAccountKey, storeScope);
+                model.StorageAccountName_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.StorageAccountName, storeScope);
+                model.StorageContainerName_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.StorageContainerName, storeScope);
+                model.PayPalUseSandbox_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, storeScope);
+                model.PayPalClientId_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.PayPalClientId, storeScope);
+                model.PayPalSecretKey_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.PayPalSecretKey, storeScope);
+                model.MarketingVideoUrl_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.MarketingVideoUrl, storeScope);
+                model.ApplyForCreditUrl_OverrideForStore = await _settingService.SettingExistsAsync(swiftPortalOverrideSettings, x => x.ApplyForCreditUrl, storeScope);
             }
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/Configure.cshtml", model);
         }
 
         [HttpPost]
-        public IActionResult Configure(ConfigurationModel model)
+        public async Task<IActionResult> Configure(ConfigurationModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel))
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.AccessAdminPanel))
                 return AccessDeniedView();
 
             if (!ModelState.IsValid)
-                return Configure();
+                return await Configure();
 
             //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var swiftPortalOverrideSettings = _settingService.LoadSetting<SwiftCoreSettings>(storeScope);
+            var storeScope =await _storeContext.GetActiveStoreScopeConfigurationAsync();
+            var swiftPortalOverrideSettings = await _settingService.LoadSettingAsync<SwiftCoreSettings>(storeScope);
 
             //save settings
             swiftPortalOverrideSettings.UseSandBox = model.UseSandBox;
@@ -130,27 +131,27 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
              * This behavior can increase performance because cached settings will not be cleared 
              * and loaded from database after each update */
 
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.UseSandBox, model.UseSandBox_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.TestEmailAddress, model.TestEmailAddress_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.ApproverMailBox, model.ApproverMailBox_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, model.NSSApiBaseUrl_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, model.NSSApiAuthUsername_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, model.NSSApiAuthPassword_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountKey, model.StorageAccountKey_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageAccountName, model.StorageAccountName_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.StorageContainerName, model.StorageContainerName_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, model.PayPalUseSandbox_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalClientId, model.PayPalClientId_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.PayPalSecretKey, model.PayPalSecretKey_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.MarketingVideoUrl, model.MarketingVideoUrl_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(swiftPortalOverrideSettings, x => x.ApplyForCreditUrl, model.ApplyForCreditUrl_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.UseSandBox, model.UseSandBox_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.TestEmailAddress, model.TestEmailAddress_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.ApproverMailBox, model.ApproverMailBox_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.NSSApiBaseUrl, model.NSSApiBaseUrl_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.NSSApiAuthUsername, model.NSSApiAuthUsername_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.NSSApiAuthPassword, model.NSSApiAuthPassword_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.StorageAccountKey, model.StorageAccountKey_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.StorageAccountName, model.StorageAccountName_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.StorageContainerName, model.StorageContainerName_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.PayPalUseSandbox, model.PayPalUseSandbox_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.PayPalClientId, model.PayPalClientId_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.PayPalSecretKey, model.PayPalSecretKey_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.MarketingVideoUrl, model.MarketingVideoUrl_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(swiftPortalOverrideSettings, x => x.ApplyForCreditUrl, model.ApplyForCreditUrl_OverrideForStore, storeScope, false);
 
             //now clear settings cache
-            _settingService.ClearCache();
+            await _settingService.ClearCacheAsync();
 
-            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Plugins.Saved"));
+            _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
-            return Configure();
+            return await Configure();
         }
 
         #endregion
