@@ -7,6 +7,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
+using Nop.Core.Domain.Shipping;
 using Nop.Core.Infrastructure;
 using Nop.Services.Caching;
 using Nop.Services.Catalog;
@@ -35,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -44,7 +46,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         private readonly CaptchaSettings _captchaSettings;
         private readonly CustomerSettings _customerSettings;
-        private readonly ICacheKeyService _cacheKeyService;
         private readonly ICheckoutAttributeParser _checkoutAttributeParser;
         private readonly ICheckoutAttributeService _checkoutAttributeService;
         private readonly ICurrencyService _currencyService;
@@ -79,6 +80,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly ICustomerCompanyProductService _customerCompanyProductService;
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly ICompanyService _companyService;
+        private readonly ShippingSettings _shippingSettings;
 
         #endregion
 
@@ -88,8 +90,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             ICustomerCompanyProductService customerCompanyProductService, 
             ICompanyService companyService, 
             ICustomerCompanyService customerCompanyService, 
-            CustomerSettings customerSettings, 
-            ICacheKeyService cacheKeyService, 
+            CustomerSettings customerSettings,  
             ICheckoutAttributeParser checkoutAttributeParser, 
             ICheckoutAttributeService checkoutAttributeService, 
             ICurrencyService currencyService, 
@@ -119,45 +120,46 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             IWorkContext workContext, 
             IWorkflowMessageService workflowMessageService, 
             MediaSettings mediaSettings, 
-            OrderSettings orderSettings, 
-            ShoppingCartSettings shoppingCartSettings) : base(captchaSettings, 
-                                                              customerSettings, 
-                                                              cacheKeyService, 
-                                                              checkoutAttributeParser, 
-                                                              checkoutAttributeService, 
-                                                              currencyService, 
-                                                              customerActivityService, 
-                                                              customerService, 
-                                                              discountService, 
-                                                              downloadService, 
-                                                              genericAttributeService, 
-                                                              giftCardService, 
-                                                              localizationService, 
-                                                              fileProvider, 
-                                                              notificationService, 
-                                                              permissionService, 
-                                                              pictureService, 
-                                                              priceFormatter, 
-                                                              productAttributeParser, 
-                                                              productAttributeService, 
-                                                              productService, 
-                                                              shippingService, 
-                                                              shoppingCartModelFactory, 
-                                                              shoppingCartService, 
-                                                              staticCacheManager, 
-                                                              storeContext, 
-                                                              taxService, 
-                                                              urlRecordService, 
-                                                              webHelper, 
-                                                              workContext, 
-                                                              workflowMessageService, 
-                                                              mediaSettings, 
-                                                              orderSettings, 
-                                                              shoppingCartSettings)
+            OrderSettings orderSettings,
+             ShippingSettings shippingSettings,
+            ShoppingCartSettings shoppingCartSettings) : base(
+                                             captchaSettings,
+                                            customerSettings,
+                                         checkoutAttributeParser,
+                                        checkoutAttributeService,
+                                        currencyService,
+                                        customerActivityService,
+                                         customerService,
+                                         discountService,
+                                        downloadService,
+                                         genericAttributeService,
+                                        giftCardService,
+                                         localizationService,
+                                         fileProvider,
+                                         notificationService,
+                                         permissionService,
+                                        pictureService,
+                                        priceFormatter,
+                                         productAttributeParser,
+                                         productAttributeService,
+                                         productService,
+                                         shippingService,
+                                         shoppingCartModelFactory,
+                                         shoppingCartService,
+                                         staticCacheManager,
+                                         storeContext,
+                                         taxService,
+                                         urlRecordService,
+                                         webHelper,
+                                        workContext,
+                                         workflowMessageService,
+                                         mediaSettings,
+                                         orderSettings,
+                                         shoppingCartSettings,
+                                         shippingSettings)
         {
             _captchaSettings = captchaSettings;
             _customerSettings = customerSettings;
-            _cacheKeyService = cacheKeyService;
             _checkoutAttributeParser = checkoutAttributeParser;
             _checkoutAttributeService = checkoutAttributeService;
             _currencyService = currencyService;
@@ -196,22 +198,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         #endregion
-
         [HttpsRequirement]
-        public override IActionResult Cart()
+        public override async Task<IActionResult> Cart()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
-            if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.EnableShoppingCart))
                 return RedirectToRoute("Homepage");
 
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
             var model = new ShoppingCartModel();
-            model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart);
+            model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
 
             CheckForUnavailableProductsInCart(cart);
 
@@ -221,19 +222,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         [HttpPost, ActionName("Cart")]
         [FormValueRequired("updatecart")]
-        public override IActionResult UpdateCart(IFormCollection form)
+        public override async Task<IActionResult> UpdateCart(IFormCollection form)
         {
-            var currentCustomer = _workContext.CurrentCustomer;
+            var currentCustomer = await _workContext.GetCurrentCustomerAsync();
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(currentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync(currentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
-            if (!_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart))
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.EnableShoppingCart))
                 return RedirectToRoute("Homepage");
 
-            var cart = _shoppingCartService.GetShoppingCart(currentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(currentCustomer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
             //get identifiers of items to remove
             var itemIdsToRemove = form["removefromcart"]
@@ -241,7 +242,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 .Select(idString => int.TryParse(idString, out var id) ? id : 0)
                 .Distinct().ToList();
 
-            var products = _productService.GetProductsByIds(cart.Select(item => item.ProductId).Distinct().ToArray())
+            var products = (await _productService.GetProductsByIdsAsync(cart.Select(item => item.ProductId).Distinct().ToArray()))
                 .ToDictionary(item => item.Id, item => item);
 
             //get order items with changed quantity
@@ -260,11 +261,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //order cart items
             //first should be items with a reduced quantity and that require other products; or items with an increased quantity and are required for other products
             var orderedCart = itemsWithNewQuantity
-                .OrderByDescending(cartItem =>
+                .OrderByDescending(async cartItem =>
                     (cartItem.NewQuantity < cartItem.Item.Quantity &&
                      (cartItem.Product?.RequireOtherProducts ?? false)) ||
-                    (cartItem.NewQuantity > cartItem.Item.Quantity && cartItem.Product != null && _shoppingCartService
-                         .GetProductsRequiringProduct(cart, cartItem.Product).Any()))
+                    (cartItem.NewQuantity > cartItem.Item.Quantity && cartItem.Product != null && (await _shoppingCartService
+                         .GetProductsRequiringProductAsync(cart, cartItem.Product)).Any()))
                 .ToList();
 
             if (orderedCart.Count == 0)
@@ -277,28 +278,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 foreach (var item in cartItems)
                 {
-                    UpdateShoppingCartItem(item, form, isNewQuantity: false);
+                   await UpdateShoppingCartItem(item, form, isNewQuantity: false);
                 }
             }
 
             //try to update cart items with new quantities and get warnings
-            var warnings = orderedCart.Select(cartItem => new
+            var warnings = await orderedCart.SelectAwait(async cartItem => new
             {
                 ItemId = cartItem.Item.Id,
-                Warnings = UpdateShoppingCartItem(cartItem, form)
-            }).ToList();
+                Warnings = await UpdateShoppingCartItem(cartItem, form)
+            }).ToListAsync();
 
             //updated cart
-            cart = _shoppingCartService.GetShoppingCart(currentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            cart = await _shoppingCartService.GetShoppingCartAsync(currentCustomer, ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
-            CheckForUnavailableProductsInCart(cart);
+           await CheckForUnavailableProductsInCart(cart);
 
             //parse and save checkout attributes
-            ParseAndSaveCheckoutAttributes(cart, form);
+            await ParseAndSaveCheckoutAttributesAsync(cart, form);
 
             //prepare model
             var model = new ShoppingCartModel();
-            model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart);
+            model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
 
             //update current warnings
             foreach (var warningItem in warnings.Where(warningItem => warningItem.Warnings.Any()))
@@ -312,11 +313,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var checkoutError = model.Items.FirstOrDefault(it => it.Warnings.Count > 0);
             if (checkoutError != null)
             {
-                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CartError, true);
+                await _genericAttributeService.SaveAttributeAsync(currentCustomer, SwiftPortalOverrideDefaults.CartError, true);
             }
             else
             {
-                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CartError, "");
+                await _genericAttributeService.SaveAttributeAsync(currentCustomer, SwiftPortalOverrideDefaults.CartError, "");
             }
 
             return View(model);
@@ -327,18 +328,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         //currently we use this method on catalog pages (category/manufacturer/etc)
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public IActionResult CustomAddProductToCart_Catalog(int productId, int shoppingCartTypeId,
+        public async Task<IActionResult> CustomAddProductToCart_Catalog(int productId, int shoppingCartTypeId,
             int quantity, bool forceredirection = false)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
             var cartType = (ShoppingCartType)shoppingCartTypeId;
 
-            var product = _productService.GetProductById(productId);
+            var product = await _productService.GetProductByIdAsync(productId);
 
             if (quantity == 0)
                 //we can only add when quantity is more than zero
@@ -361,7 +362,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
                 });
             }
 
@@ -372,7 +373,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //it can confuse customers. That's why we redirect customers to the product details page
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
                 });
             }
 
@@ -381,7 +382,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //cannot be added to the cart (requires a customer to enter price)
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
                 });
             }
 
@@ -390,7 +391,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //rental products require start/end dates to be entered
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
                 });
             }
 
@@ -400,25 +401,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 //cannot be added to the cart (requires a customer to select a quantity from dropdownlist)
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
                 });
             }
 
             //allow a product to be added to the cart when all attributes are with "read-only checkboxes" type
-            var productAttributes = _productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+            var productAttributes = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
             if (productAttributes.Count > 0 && productAttributes.Any(p => p.IsRequired))
             {
                 //product has some attributes. let a customer see them
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("Product", new { SeName = _urlRecordService.GetSeName(product) })
+                    redirect = Url.RouteUrl("Product", new { SeName = await _urlRecordService.GetSeNameAsync(product) })
                 });
             }
 
             //creating XML for "read-only checkboxes" attributes
             var attXml = productAttributes.Aggregate(string.Empty, (attributesXml, attribute) =>
             {
-                var attributeValues = _productAttributeService.GetProductAttributeValues(attribute.Id);
+                var attributeValues = _productAttributeService.GetProductAttributeValuesAsync(attribute.Id).Result;
                 foreach (var selectedAttributeId in attributeValues
                     .Where(v => v.IsPreSelected)
                     .Select(v => v.Id)
@@ -430,19 +431,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 return attributesXml;
             });
-
             //get standard warnings without attribute validations
             //first, try to find existing shopping cart item
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, cartType, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), cartType,( await _storeContext.GetCurrentStoreAsync()).Id);
             var shoppingCartItem = cart.FirstOrDefault(x => x.ProductId == product.Id);
 
             //if we already have the same product in the cart, then use the total quantity to validate
             var quantityToValidate = quantity;
             product.OrderMaximumQuantity = product.OrderMaximumQuantity > 0 ? product.OrderMaximumQuantity : 0;
 
-            var addToCartWarnings = _shoppingCartService
-                .GetShoppingCartItemWarnings(_workContext.CurrentCustomer, cartType,
-                product, _storeContext.CurrentStore.Id, string.Empty,
+            var addToCartWarnings = await _shoppingCartService
+                .GetShoppingCartItemWarningsAsync(await _workContext.GetCurrentCustomerAsync(), cartType,
+                product, (await _storeContext.GetCurrentStoreAsync()).Id, string.Empty,
                 decimal.Zero, null, null, quantityToValidate, false, shoppingCartItem?.Id ?? 0, true, false, false, false);
             if (cartType == ShoppingCartType.ShoppingCart && addToCartWarnings.Any())
             {
@@ -458,10 +458,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //now let's try adding product to the cart (now including product attribute validation, etc)
             // if we already have the same product as a wishlist, then don't add again
             if (shoppingCartItem == null || (shoppingCartItem != null && cartType != ShoppingCartType.Wishlist)) {
-                addToCartWarnings = _shoppingCartService.AddToCart(customer: _workContext.CurrentCustomer,
+                addToCartWarnings = await _shoppingCartService.AddToCartAsync(customer: await _workContext.GetCurrentCustomerAsync(),
                     product: product,
                     shoppingCartType: cartType,
-                    storeId: _storeContext.CurrentStore.Id,
+                    storeId: (await _storeContext.GetCurrentStoreAsync()).Id,
                     attributesXml: shoppingCartItem?.AttributesXml ?? attXml,
                     quantity: quantity);
             }
@@ -483,8 +483,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 case ShoppingCartType.Wishlist:
                     {
                         //activity log
-                        _customerActivityService.InsertActivity("PublicStore.AddToWishlist",
-                            string.Format(_localizationService.GetResource("ActivityLog.PublicStore.AddToWishlist"), product.Name), product);
+                       await  _customerActivityService.InsertActivityAsync("PublicStore.AddToWishlist",
+                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.PublicStore.AddToWishlist"), product.Name), product);
 
                         if (_shoppingCartSettings.DisplayWishlistAfterAddingProduct || forceredirection)
                         {
@@ -496,16 +496,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         }
 
                         //display notification message and update appropriate blocks
-                        var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+                        var shoppingCarts = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.Wishlist,(await _storeContext.GetCurrentStoreAsync()).Id);
 
-                        var updatetopwishlistsectionhtml = string.Format(_localizationService.GetResource("Wishlist.HeaderQuantity"),
+                        var updatetopwishlistsectionhtml = string.Format(await _localizationService.GetResourceAsync("Wishlist.HeaderQuantity"),
                             shoppingCarts.Count);
                         updatetopwishlistsectionhtml = Regex.Replace(updatetopwishlistsectionhtml, @"[()]+", "");
 
                         return Json(new
                         {
                             success = true,
-                            message = string.Format(_localizationService.GetResource("Products.ProductHasBeenAddedToTheWishlist.Link"), Url.RouteUrl("Wishlist")),
+                            message = string.Format(await _localizationService.GetResourceAsync("Products.ProductHasBeenAddedToTheWishlist.Link"), Url.RouteUrl("Wishlist")),
                             updatetopwishlistsectionhtml
                         });
                     }
@@ -514,8 +514,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 default:
                     {
                         //activity log
-                        _customerActivityService.InsertActivity("PublicStore.AddToShoppingCart",
-                            string.Format(_localizationService.GetResource("ActivityLog.PublicStore.AddToShoppingCart"), product.Name), product);
+                       await _customerActivityService.InsertActivityAsync("PublicStore.AddToShoppingCart",
+                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.PublicStore.AddToShoppingCart"), product.Name), product);
 
                         if (_shoppingCartSettings.DisplayCartAfterAddingProduct || forceredirection)
                         {
@@ -527,21 +527,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         }
 
                         //display notification message and update appropriate blocks
-                        var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+                        var shoppingCarts = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart,(await _storeContext.GetCurrentStoreAsync()).Id);
 
-                        var updatetopcartsectionhtml = string.Format(_localizationService.GetResource("ShoppingCart.HeaderQuantity"),
+                        var updatetopcartsectionhtml = string.Format(await _localizationService.GetResourceAsync("ShoppingCart.HeaderQuantity"),
                             shoppingCarts.Count);
 
 
                         updatetopcartsectionhtml = Regex.Replace(updatetopcartsectionhtml, @"[()]+", "");
-                        var updateflyoutcartsectionhtml = _shoppingCartSettings.MiniShoppingCartEnabled
-                            ? RenderViewComponentToString("FlyoutShoppingCart")
+                        var updateflyoutcartsectionhtml =  _shoppingCartSettings.MiniShoppingCartEnabled
+                            ? await RenderViewComponentToStringAsync("FlyoutShoppingCart")
                             : string.Empty;
 
                         return Json(new
                         {
                             success = true,
-                            message = string.Format(_localizationService.GetResource("Products.ProductHasBeenAddedToTheCart.Link"), Url.RouteUrl("ShoppingCart")),
+                            message = string.Format(await _localizationService.GetResourceAsync("Products.ProductHasBeenAddedToTheCart.Link"), Url.RouteUrl("ShoppingCart")),
                             updatetopcartsectionhtml,
                             updateflyoutcartsectionhtml
                         });
@@ -549,7 +549,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
-        protected override IActionResult GetProductToCartDetails(List<string> addToCartWarnings, ShoppingCartType cartType, Product product)
+        protected override async Task<IActionResult> GetProductToCartDetailsAsync(List<string> addToCartWarnings, ShoppingCartType cartType, Product product)
         {
             if (addToCartWarnings.Any())
             {
@@ -568,8 +568,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 case ShoppingCartType.Wishlist:
                     {
                         //activity log
-                        _customerActivityService.InsertActivity("PublicStore.AddToWishlist",
-                            string.Format(_localizationService.GetResource("ActivityLog.PublicStore.AddToWishlist"), product.Name), product);
+                        await _customerActivityService.InsertActivityAsync("PublicStore.AddToWishlist",
+                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.PublicStore.AddToWishlist"), product.Name), product);
 
                         if (_shoppingCartSettings.DisplayWishlistAfterAddingProduct)
                         {
@@ -581,10 +581,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         }
 
                         //display notification message and update appropriate blocks
-                        var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+                        var shoppingCarts = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.Wishlist,(await _storeContext.GetCurrentStoreAsync()).Id);
 
                         var updatetopwishlistsectionhtml = string.Format(
-                            _localizationService.GetResource("Wishlist.HeaderQuantity"),
+                            await _localizationService.GetResourceAsync("Wishlist.HeaderQuantity"),
                             shoppingCarts.Count);
 
                         updatetopwishlistsectionhtml = Regex.Replace(updatetopwishlistsectionhtml, @"[()]+", "");
@@ -593,7 +593,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         {
                             success = true,
                             message = string.Format(
-                                _localizationService.GetResource("Products.ProductHasBeenAddedToTheWishlist.Link"),
+                               await _localizationService.GetResourceAsync("Products.ProductHasBeenAddedToTheWishlist.Link"),
                                 Url.RouteUrl("Wishlist")),
                             updatetopwishlistsectionhtml
                         });
@@ -603,8 +603,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 default:
                     {
                         //activity log
-                        _customerActivityService.InsertActivity("PublicStore.AddToShoppingCart",
-                            string.Format(_localizationService.GetResource("ActivityLog.PublicStore.AddToShoppingCart"), product.Name), product);
+                        await _customerActivityService.InsertActivityAsync("PublicStore.AddToShoppingCart",
+                            string.Format(await _localizationService.GetResourceAsync("ActivityLog.PublicStore.AddToShoppingCart"), product.Name), product);
 
                         if (_shoppingCartSettings.DisplayCartAfterAddingProduct)
                         {
@@ -616,22 +616,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         }
 
                         //display notification message and update appropriate blocks
-                        var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+                        var shoppingCarts = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart,(await _storeContext.GetCurrentStoreAsync()).Id);
 
                         var updatetopcartsectionhtml = string.Format(
-                            _localizationService.GetResource("ShoppingCart.HeaderQuantity"),
+                           await _localizationService.GetResourceAsync("ShoppingCart.HeaderQuantity"),
                             shoppingCarts.Count);
 
                         updatetopcartsectionhtml = Regex.Replace(updatetopcartsectionhtml, @"[()]+", "");
 
                         var updateflyoutcartsectionhtml = _shoppingCartSettings.MiniShoppingCartEnabled
-                            ? RenderViewComponentToString("FlyoutShoppingCart")
+                            ? await RenderViewComponentToStringAsync("FlyoutShoppingCart")
                             : string.Empty;
 
                         return Json(new
                         {
                             success = true,
-                            message = string.Format(_localizationService.GetResource("Products.ProductHasBeenAddedToTheCart.Link"),
+                            message = string.Format(await _localizationService.GetResourceAsync("Products.ProductHasBeenAddedToTheCart.Link"),
                                 Url.RouteUrl("ShoppingCart")),
                             updatetopcartsectionhtml,
                             updateflyoutcartsectionhtml
@@ -640,56 +640,56 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
-        public override IActionResult StartCheckout(IFormCollection form)
+        public override async Task<IActionResult> StartCheckout(IFormCollection form)
         {
-            var currentCustomer = _workContext.CurrentCustomer;
+            var currentCustomer = await _workContext.GetCurrentCustomerAsync();
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(currentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync(currentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
             //update cart
             UpdateCart(form);
-            bool checkoutError = _genericAttributeService.GetAttribute<bool>(currentCustomer, SwiftPortalOverrideDefaults.CartError);
+            bool checkoutError = await _genericAttributeService.GetAttributeAsync<bool>(currentCustomer, SwiftPortalOverrideDefaults.CartError);
             if (checkoutError)
             {
-                _genericAttributeService.SaveAttribute(currentCustomer, SwiftPortalOverrideDefaults.CartError, "");
+              await  _genericAttributeService.SaveAttributeAsync(currentCustomer, SwiftPortalOverrideDefaults.CartError, "");
                 return View();
             }
 
-            return base.StartCheckout(form);
+            return await base.StartCheckout(form);
         }
 
         [HttpsRequirement]
-        public override IActionResult Wishlist(Guid? customerGuid)
+        public override async Task<IActionResult> Wishlist(Guid? customerGuid)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,(await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
-            if (!_permissionService.Authorize(StandardPermissionProvider.EnableWishlist))
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.EnableWishlist))
                 return RedirectToRoute("Homepage");
 
             var customer = customerGuid.HasValue ?
-                _customerService.GetCustomerByGuid(customerGuid.Value)
-                : _workContext.CurrentCustomer;
+               await _customerService.GetCustomerByGuidAsync(customerGuid.Value)
+                : await _workContext.GetCurrentCustomerAsync();
             if (customer == null)
                 return RedirectToRoute("Homepage");
 
-            var cart = _shoppingCartService.GetShoppingCart(customer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist,(await _storeContext.GetCurrentStoreAsync()).Id);
 
             var model = new WishlistModel();
-            model = _shoppingCartModelFactory.PrepareWishlistModel(model, cart, !customerGuid.HasValue);
+            model = await _shoppingCartModelFactory.PrepareWishlistModelAsync(model, cart, !customerGuid.HasValue);
             return View(model);
         }
 
-        private void CheckForUnavailableProductsInCart(IList<ShoppingCartItem> cart)
+        private async Task CheckForUnavailableProductsInCart(IList<ShoppingCartItem> cart)
         {
             var productIds = cart.Select(item => item.ProductId).Distinct().ToArray();
-            var products = _productService.GetProductsByIds(productIds);
+            var products = await _productService.GetProductsByIdsAsync(productIds);
 
             if (products.Any(p => !p.Published))
             {
@@ -697,9 +697,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
-        private IList<string> UpdateShoppingCartItem(dynamic cartItem, IFormCollection form, bool isNewQuantity = true)
+        private async Task<IList<string>> UpdateShoppingCartItem(dynamic cartItem, IFormCollection form, bool isNewQuantity = true)
         {
-            var attrsMapping = _productAttributeService.GetProductAttributeMappingsByProductId((int)cartItem.Product.Id);
+            var attrsMapping =await _productAttributeService.GetProductAttributeMappingsByProductIdAsync((int)cartItem.Product.Id);
 
             foreach (var map in attrsMapping)
             {
@@ -711,31 +711,31 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
             }
 
-            var warnings = _shoppingCartService.UpdateShoppingCartItem(_workContext.CurrentCustomer,
+            var warnings = await _shoppingCartService.UpdateShoppingCartItemAsync(await _workContext.GetCurrentCustomerAsync(),
                                 cartItem.Item.Id, cartItem.Item.AttributesXml, cartItem.Item.CustomerEnteredPrice,
                                 cartItem.Item.RentalStartDateUtc, cartItem.Item.RentalEndDateUtc, isNewQuantity ? cartItem.NewQuantity : cartItem.Item.Quantity, true);
 
             // update cust part No
-            CustomerCompany customerCompany = GetCustomerCompanyDetails();
+            CustomerCompany customerCompany = await GetCustomerCompanyDetails();
 
             if (customerCompany != null)
             {
                 var controlId = $"customerpartNo{cartItem.Product.Id}";
                 if (form.TryGetValue(controlId, out var value) && !string.IsNullOrEmpty(value.FirstOrDefault()))
-                    _customerCompanyProductService.UpdateCustomerCompanyProduct(new CustomerCompanyProduct { CustomerCompanyId = customerCompany.Id, ProductId = cartItem.Product.Id, CustomerPartNo = value.FirstOrDefault() });
+                  await  _customerCompanyProductService.UpdateCustomerCompanyProduct(new CustomerCompanyProduct { CustomerCompanyId = customerCompany.Id, ProductId = cartItem.Product.Id, CustomerPartNo = value.FirstOrDefault() });
             }
 
             return warnings;
         }
 
-        private CustomerCompany GetCustomerCompanyDetails()
+        private async Task<CustomerCompany> GetCustomerCompanyDetails()
         {
             CustomerCompany customerCompany = new CustomerCompany();
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,(await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
             if (eRPCompanyId > 0)
-                customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
+                customerCompany = await _customerCompanyService.GetCustomerCompanyByErpCompIdAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId);
 
             return customerCompany;
         }
