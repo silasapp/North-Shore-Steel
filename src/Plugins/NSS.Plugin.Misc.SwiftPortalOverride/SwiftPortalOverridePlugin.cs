@@ -155,7 +155,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             await dataProvider.ExecuteNonQueryAsync(sql);
 
             // email template
-            ConfigureMessageTemplates();
+            await ConfigureMessageTemplatesAsync();
 
             await base.InstallAsync();
         }
@@ -174,7 +174,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             //// email template
             var changePasswordTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName))?.FirstOrDefault();
             if (changePasswordTemplate != null)
-                _messageTemplateService.DeleteMessageTemplateAsync(changePasswordTemplate);
+                await _messageTemplateService.DeleteMessageTemplateAsync(changePasswordTemplate);
 
             var pendingApprovalTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName))?.FirstOrDefault();
             if (pendingApprovalTemplate != null)
@@ -187,7 +187,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             await base.UninstallAsync();
         }
 
-        async void ConfigureMessageTemplates()
+        async Task ConfigureMessageTemplatesAsync()
         {
             // change password email
             var changePasswordTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName))?.FirstOrDefault();
