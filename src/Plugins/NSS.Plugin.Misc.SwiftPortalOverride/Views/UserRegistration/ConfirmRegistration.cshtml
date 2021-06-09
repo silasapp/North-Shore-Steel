@@ -16,8 +16,8 @@
 
 }
 @{
-    var currentCustomer = _workContext.CurrentCustomer;
-    var isAdmin = _customerService.IsAdmin(currentCustomer);
+    var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+    var isAdmin = await _customerService.IsAdminAsync(currentCustomer);
 
 }
 

@@ -13,7 +13,7 @@
     Html.AppendPageCssClassParts("html-order-details-page");
 }
 @{
-    var themeName = themeContext.WorkingThemeName;
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
     string CLOSED_ORDER_STATUS_NAME = "Invoiced";
 }
 
