@@ -187,10 +187,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             await base.UninstallAsync();
         }
 
-        void ConfigureMessageTemplates()
+        async void ConfigureMessageTemplates()
         {
             // change password email
-            var changePasswordTemplate = await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName)?.FirstOrDefault();
+            var changePasswordTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName))?.FirstOrDefault();
             if (changePasswordTemplate == null)
             {
                 changePasswordTemplate = new MessageTemplate
@@ -202,12 +202,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                     IsActive = true,
                 };
 
-                _messageTemplateService.InsertMessageTemplate(changePasswordTemplate);
+                await _messageTemplateService.InsertMessageTemplateAsync(changePasswordTemplate);
             }
 
 
             // pennding aproval email
-            var pendingApprovalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName)?.FirstOrDefault();
+            var pendingApprovalTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName))?.FirstOrDefault();
             if (pendingApprovalTemplate == null)
             {
                 pendingApprovalTemplate = new MessageTemplate
@@ -219,11 +219,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                     IsActive = true,
                 };
 
-                _messageTemplateService.InsertMessageTemplate(pendingApprovalTemplate);
+                await _messageTemplateService.InsertMessageTemplateAsync(pendingApprovalTemplate);
             }
 
             // reject email
-            var denialTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName)?.FirstOrDefault();
+            var denialTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName))?.FirstOrDefault();
             if (denialTemplate == null)
             {
                 denialTemplate = new MessageTemplate
@@ -235,7 +235,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
                     IsActive = true,
                 };
 
-                _messageTemplateService.InsertMessageTemplate(denialTemplate);
+                await _messageTemplateService.InsertMessageTemplateAsync(denialTemplate);
             }
         }
 
