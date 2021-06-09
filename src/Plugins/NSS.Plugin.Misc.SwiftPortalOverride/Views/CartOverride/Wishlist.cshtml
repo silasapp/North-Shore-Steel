@@ -30,10 +30,10 @@
 }
 
 @{
-    var themeName = themeContext.WorkingThemeName;
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
-    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    var eRPCompanyId = genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey);
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await workContext.GetCurrentCustomerAsync()).Id);
+    var eRPCompanyId = await genericAttributeService.GetAttributeAsync<string>(await workContext.GetCurrentCustomerAsync(), compIdCookieKey);
     var eRPCompanyIdExist = false;
     eRPCompanyIdExist = !string.IsNullOrEmpty(eRPCompanyId) && true;
 }
@@ -96,12 +96,12 @@
                                     <tbody>
                                         @foreach (var item in Model.Items)
                                         {
-                                            var product = productService.GetProductById(item.ProductId);
-                                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                                            var product = await productService.GetProductByIdAsync(item.ProductId);
+                                            var attr = await genericAttributeService.GetAttributesForEntityAsync(item.ProductId, nameof(Product));
                                             var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
                                             if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
                                             {
-                                                var shape = shapeService.GetShapeById(shapeId);
+                                                var shape = shapeService.GetShapeByIdAsync(shapeId);
                                             }
                                             var itemId = item.Id;
                                             string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
@@ -203,12 +203,12 @@
                         <div v-if="isMobile">
                             @foreach (var item in Model.Items)
                             {
-                                var product = productService.GetProductById(item.ProductId);
-                                var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                                var product = await productService.GetProductByIdAsync(item.ProductId);
+                                var attr = await genericAttributeService.GetAttributesForEntityAsync(item.ProductId, nameof(Product));
                                 var mtr = attr.FirstOrDefault(x => x.Key == "mtr")?.Value;
                                 if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
                                 {
-                                    var shape = shapeService.GetShapeById(shapeId);
+                                    var shape = await shapeService.GetShapeByIdAsync(shapeId);
                                 }
                                 var itemId = item.Id;
                                 string isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;

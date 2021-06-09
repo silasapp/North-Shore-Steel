@@ -196,7 +196,7 @@
 @{
     //prepare "Add to cart" AJAX link
     @Html.Hidden("selectedProductId", 0);
-    var currentCustomer = workContext.CurrentCustomer;
+    var currentCustomer = await workContext.GetCurrentCustomerAsync();
     var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
     var wishListShoppingCartId = (int)ShoppingCartType.Wishlist;
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
@@ -242,10 +242,10 @@
     @foreach (var item in Model.Products)
     {
         var productRowData = new Dictionary<string, object>();
-        var attr = genericAttributeService.GetAttributesForEntity(item.Id, nameof(Product));
+        var attr = await genericAttributeService.GetAttributesForEntityAsync(item.Id, nameof(Product));
         string _isSerialized = attr.FirstOrDefault(x => x.Key == "serialized")?.Value;
         var cartQuantity = item.CartQuantity == null ? 0 : item.CartQuantity;
-        var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.Id);
+        var mappings = await productAttributeService.GetProductAttributeMappingsByProductIdAsync(item.Id);
 
         var mappingIds = mappings.Select(x => x.Id).ToArray();
 

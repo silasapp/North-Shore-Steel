@@ -9,7 +9,7 @@
     //title
     Html.AddTitleParts("Resources");
 }
-@{ var themeName = themeContext.WorkingThemeName; }
+@{ var themeName = await themeContext.GetWorkingThemeNameAsync(); }
 
 
 

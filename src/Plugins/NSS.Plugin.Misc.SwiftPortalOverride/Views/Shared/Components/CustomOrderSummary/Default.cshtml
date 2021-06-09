@@ -53,13 +53,13 @@
 </style>
 @{
 
-    var themeName = themeContext.WorkingThemeName;
-    var customer = workContext.CurrentCustomer;
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
+    var customer = await workContext.GetCurrentCustomerAsync();
 
     // get cust company
-    CustomerCompany customerCompany = GetCustomerCompanyDetails();
+    CustomerCompany customerCompany = await GetCustomerCompanyDetails();
 
-    var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
+    var cartItems = await shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart);
 
     var purchasechkattr = Model.CheckoutAttributes.FirstOrDefault(x => x.Name == Constants.CheckoutPONoAttribute);
 
@@ -71,18 +71,18 @@
 
 
 
-        var product = productService.GetProductById(item.ProductId);
-        var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
-        var mappings = productAttributeService.GetProductAttributeMappingsByProductId(item.ProductId);
+        var product = await productService.GetProductByIdAsync(item.ProductId);
+        var attr = await genericAttributeService.GetAttributesForEntityAsync(item.ProductId, nameof(Product));
+        var mappings = await productAttributeService.GetProductAttributeMappingsByProductIdAsync(item.ProductId);
 
         var mappingIds = mappings.Select(x => x.Id).ToArray();
 
         var attrIds = mappings.Select(x => x.ProductAttributeId)?.ToArray();
-        var attrs = productAttributeService.GetProductAttributeByIds(attrIds);
+        var attrs = await productAttributeService.GetProductAttributeByIdsAsync(attrIds);
         var hasSawOption = false;
         if (int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId))
         {
-            var shape = shapeService.GetShapeById(shapeId);
+            var shape = await shapeService.GetShapeByIdAsync(shapeId);
             hasSawOption = shape != null ? shape.SawOption : false;
         }
 
@@ -90,7 +90,7 @@
         foreach (var it in attrs)
         {
             var xMapping = mappings.FirstOrDefault(x => x.ProductAttributeId == it.Id);
-            var xValues = productAttributeService.GetProductAttributeValues(xMapping.Id);
+            var xValues = await productAttributeService.GetProductAttributeValuesAsync(xMapping.Id);
             var obj = new SawOptionsAttribute
             {
                 Name = it.Name,
@@ -118,7 +118,7 @@
         // get attribute
 
         var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
-        var attributes = PrepareProductAttributeModels(product, cartItem);
+        var attributes = await PrepareProductAttributeModels(product, cartItem);
 
         var custPartNoAttr = attributes.FirstOrDefault(x => x.Name == Constants.CustomerPartNoAttribute);
         var purchaseUnitAttr = attributes.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
@@ -428,11 +428,11 @@ Content2 =
 
                         @if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
                         {
-                            var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+                            var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
                             //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
                             //of course, you can modify appropriate locales to include VAT info there
                             <div class="tax-shipping-info">
-                                @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                                @T(inclTax ? "ShoppingCart.TaxShipping.InclTax" : "ShoppingCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = await Html.GetTopicSeNameAsync("shippinginfo") }))
                             </div>
                         }
                         <div class="cart-footer row mt-0 mt-md-2">
@@ -557,43 +557,43 @@ Content2 =
         return s;
     }
 
-    CustomerCompany GetCustomerCompanyDetails()
+    async Task<CustomerCompany> GetCustomerCompanyDetails()
     {
         CustomerCompany customerCompany = new CustomerCompany();
-        var currentCustomer = workContext.CurrentCustomer;
+        var currentCustomer = await workContext.GetCurrentCustomerAsync();
         var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-        int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+        int eRPCompanyId = Convert.ToInt32(await genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey));
 
         if (eRPCompanyId > 0)
-            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(currentCustomer.Id, eRPCompanyId);
+            customerCompany = await customerCompanyService.GetCustomerCompanyByErpCompIdAsync(currentCustomer.Id, eRPCompanyId);
 
         return customerCompany;
     }
 
     #region PrepareProductAttributeModels
-    IList<ProductDetailsModel.ProductAttributeModel> PrepareProductAttributeModels(Product product, ShoppingCartItem updatecartitem)
+    async Task<IList<ProductDetailsModel.ProductAttributeModel>> PrepareProductAttributeModels(Product product, ShoppingCartItem updatecartitem)
     {
         if (product == null)
             throw new ArgumentNullException(nameof(product));
 
         var model = new List<ProductDetailsModel.ProductAttributeModel>();
 
-        var productAttributeMapping = productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+        var productAttributeMapping = await productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
         foreach (var attribute in productAttributeMapping)
         {
-            var productAttrubute = productAttributeService.GetProductAttributeById(attribute.ProductAttributeId);
+            var productAttrubute = await productAttributeService.GetProductAttributeByIdAsync(attribute.ProductAttributeId);
 
             var attributeModel = new ProductDetailsModel.ProductAttributeModel
             {
                 Id = attribute.Id,
                 ProductId = product.Id,
                 ProductAttributeId = attribute.ProductAttributeId,
-                Name = localizationService.GetLocalized(productAttrubute, x => x.Name),
-                Description = localizationService.GetLocalized(productAttrubute, x => x.Description),
-                TextPrompt = localizationService.GetLocalized(attribute, x => x.TextPrompt),
+                Name = await localizationService.GetLocalizedAsync(productAttrubute, x => x.Name),
+                Description = await localizationService.GetLocalizedAsync(productAttrubute, x => x.Description),
+                TextPrompt = await localizationService.GetLocalizedAsync(attribute, x => x.TextPrompt),
                 IsRequired = attribute.IsRequired,
                 AttributeControlType = attribute.AttributeControlType,
-                DefaultValue = updatecartitem != null ? null : localizationService.GetLocalized(attribute, x => x.DefaultValue),
+                DefaultValue = updatecartitem != null ? null : await localizationService.GetLocalizedAsync(attribute, x => x.DefaultValue),
                 HasCondition = !string.IsNullOrEmpty(attribute.ConditionAttributeXml)
             };
 
@@ -601,13 +601,13 @@ Content2 =
             if (attribute.ShouldHaveValues())
             {
                 //values
-                var attributeValues = productAttributeService.GetProductAttributeValues(attribute.Id);
+                var attributeValues = await productAttributeService.GetProductAttributeValuesAsync(attribute.Id);
                 foreach (var attributeValue in attributeValues)
                 {
                     var valueModel = new ProductDetailsModel.ProductAttributeValueModel
                     {
                         Id = attributeValue.Id,
-                        Name = localizationService.GetLocalized(attributeValue, x => x.Name),
+                        Name = await localizationService.GetLocalizedAsync(attributeValue, x => x.Name),
                         ColorSquaresRgb = attributeValue.ColorSquaresRgb, //used with "Color squares" attribute type
                         IsPreSelected = attributeValue.IsPreSelected,
                         CustomerEntersQty = attributeValue.CustomerEntersQty,
@@ -635,7 +635,7 @@ Content2 =
                                     item.IsPreSelected = false;
 
                                 //select new values
-                                var selectedValues = productAttributeParser.ParseProductAttributeValues(updatecartitem.AttributesXml);
+                                var selectedValues = await productAttributeParser.ParseProductAttributeValuesAsync(updatecartitem.AttributesXml);
                                 foreach (var attributeValue in selectedValues)
                                     foreach (var item in attributeModel.Values)
                                         if (attributeValue.Id == item.Id)
@@ -657,7 +657,7 @@ Content2 =
                             //set customer entered quantity
                             if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
                             {
-                                foreach (var attributeValue in productAttributeParser.ParseProductAttributeValues(updatecartitem.AttributesXml)
+                                foreach (var attributeValue in (await productAttributeParser.ParseProductAttributeValuesAsync(updatecartitem.AttributesXml))
                                     .Where(value => value.CustomerEntersQty))
                                 {
                                     var item = attributeModel.Values.FirstOrDefault(value => value.Id == attributeValue.Id);

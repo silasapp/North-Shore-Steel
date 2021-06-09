@@ -12,12 +12,12 @@
 @model TopMenuModel
 
 @{
-    var currentCustomer = workContext.CurrentCustomer;
+    var currentCustomer = await workContext.GetCurrentCustomerAsync();
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-    string eRPCompanyId = genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
-    bool isAP = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.AP);
-    bool isOperations = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Operations);
-    bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
+    string eRPCompanyId = await genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey);
+    bool isAP = await customerCompanyService.AuthorizeAsync(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.AP);
+    bool isOperations = await customerCompanyService.AuthorizeAsync(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Operations);
+    bool isBuyer = await customerCompanyService.AuthorizeAsync(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
 }
 <style>
     .active-tab {
