@@ -10,6 +10,7 @@ using NSS.Plugin.Misc.SwiftCore.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -50,15 +51,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         [HttpsRequirement]
         [IgnoreAntiforgeryToken]
-        public virtual IActionResult Index()
+        public virtual async Task<IActionResult> Index()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 
-            var allTopics = _topicService.GetAllTopics(_storeContext.CurrentStore.Id);
+            var allTopics = await _topicService.GetAllTopicsAsync((await _storeContext.GetCurrentStoreAsync()).Id);
             List<UrlRecordData> urlRecordData = new List<UrlRecordData>();
 
             foreach (var item in allTopics)
@@ -67,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 {
                     var urlRecord = new UrlRecordData
                     {
-                        Slug = _urlRecordService.GetSeName(item.Id, "Topic"),
+                        Slug = await _urlRecordService.GetSeNameAsync(item.Id, "Topic"),
                         Title = item.Title,
                         IsBuyer = isBuyer,
                         IsOperations = isOperations

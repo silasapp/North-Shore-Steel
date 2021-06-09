@@ -7,6 +7,7 @@ using Nop.Web.Controllers;
 using Nop.Web.Factories;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc.Filters;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -49,16 +50,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public override IActionResult TopicDetailsPopup(string systemName)
+        public override async Task<IActionResult> TopicDetailsPopup(string systemName)
         {
-            var model = _topicModelFactory.PrepareTopicModelBySystemName(systemName);
+            var model = await _topicModelFactory.PrepareTopicModelBySystemNameAsync(systemName);
             if (model == null)
                 return InvokeHttp404();
 
             ViewBag.IsPopup = true;
 
             //template
-            var templateViewPath = _topicModelFactory.PrepareTemplateViewPath(model.TopicTemplateId);
+            var templateViewPath = await _topicModelFactory.PrepareTemplateViewPathAsync(model.TopicTemplateId);
             return PartialView(templateViewPath, model);
         }
 

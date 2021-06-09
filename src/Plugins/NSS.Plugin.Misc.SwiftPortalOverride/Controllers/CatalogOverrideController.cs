@@ -63,28 +63,30 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #endregion
 
         [HttpsRequirement]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            // _workContext.CurrentCustomer changed to _workContext.GetCurrentCustomerAsync()
+            // _workContext.CurrentStore changed to _workContext.GetCurrentStoreAsync()
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.GetCurrentCustomerAsync().Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!(await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer)))
                 return AccessDeniedView();
 
             //'Continue shopping' URL
-            _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+            await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(),
                 NopCustomerDefaults.LastContinueShoppingPageAttribute,
                 _webHelper.GetThisPageUrl(false),
-                _storeContext.CurrentStore.Id);
+                (await _storeContext.GetCurrentStoreAsync()).Id);
 
-            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(new List<int>(), new List<int>(), isPageLoad: true);
+            CatalogModel = await _catalogModelFactory.PrepareSwiftCatalogModelAsync(new List<int>(), new List<int>(), isPageLoad: true);
 
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/CustomCatalogIndex.cshtml", CatalogModel);
         }
 
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public JsonResult FilteredProductsResult([FromBody] FilterParams filterParams)
+        public async Task<JsonResult> FilteredProductsResult([FromBody] FilterParams filterParams)
         {
             Stopwatch filterTimer = new Stopwatch();
             filterTimer.Start();
@@ -99,7 +101,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var catalogTimer = new Stopwatch();
             catalogTimer.Start();
-            CatalogModel = _catalogModelFactory.PrepareSwiftCatalogModel(shapeIds, specIds, searchKeyword);
+            CatalogModel = await _catalogModelFactory.PrepareSwiftCatalogModelAsync(shapeIds, specIds, searchKeyword);
             CatalogModel.FilterParams = filterParams;
             catalogTimer.Stop();
             Debug.Print("catalogTimer", catalogTimer.Elapsed.TotalMilliseconds);
@@ -110,7 +112,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             return Json(
                 new {
-                    partialView = RenderPartialViewToString("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel),
+                    partialView = await RenderPartialViewToStringAsync("~/Plugins/Misc.SwiftPortalOverride/Views/CustomCatalog/_FilteredPartialView.cshtml", CatalogModel),
                     shapes = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.ShapeFilter.FilterItems),
                     specs = JavaScriptConvert.ToString(CatalogModel.PagingFilteringContext.SpecificationFilter.FilterItems),
                 }
@@ -118,10 +120,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [IgnoreAntiforgeryToken]
-        public JsonResult RemoveFromFavorites([FromBody] int itemId)
+        public async Task<JsonResult> RemoveFromFavorites([FromBody] int itemId)
         {
 
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.Wishlist, (await _storeContext.GetCurrentStoreAsync()).Id);
 
             var innerWarnings = new Dictionary<int, IList<string>>();
             foreach (var sci in cart)
@@ -129,10 +131,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 var remove = itemId == sci.ProductId;
                 if (remove)
                 {
-                    _shoppingCartService.DeleteShoppingCartItem(sci);
-                    var shoppingCarts = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.Wishlist, _storeContext.CurrentStore.Id);
+                    await _shoppingCartService.DeleteShoppingCartItemAsync(sci);
+                    var shoppingCarts = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.Wishlist, (await _storeContext.GetCurrentStoreAsync()).Id);
 
-                    var updatetopwishlistsectionhtml = string.Format(_localizationService.GetResource("Wishlist.HeaderQuantity"),
+                    var updatetopwishlistsectionhtml = string.Format(await _localizationService.GetResourceAsync("Wishlist.HeaderQuantity"),
                           shoppingCarts.Count);
                     updatetopwishlistsectionhtml = Regex.Replace(updatetopwishlistsectionhtml, @"[()]+", "");
 
