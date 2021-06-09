@@ -68,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         /// <summary>
         /// Install the plugin
         /// </summary>
-        public override async void InstallAsync()
+        public override async Task InstallAsync()
         {
             //settings
             await _settingService.SaveSettingAsync(
@@ -80,7 +80,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             );
 
             //locales
-            _localizationService.AddPluginLocaleResource(new Dictionary<string, string>
+            /* _localizationService.AddPluginLocaleResource() changed to _localizationService.AddLocaleResourceAsync() */
+            await _localizationService.AddLocaleResourceAsync(new Dictionary<string, string>
             {
                 // config fields
                 ["Plugins.Misc.SwiftPortalOverride.Fields.UseSandBox"] = "Use SandBox",
@@ -142,7 +143,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
             var settings = DataSettingsManager.LoadSettings();
             var dataProvider = DataProviderManager.GetDataProvider(settings.DataProvider);
 
-            dataProvider.ExecuteNonQuery(@"IF EXISTS (
+            await dataProvider.ExecuteNonQueryAsync(@"IF EXISTS (
                 SELECT type_desc, type
                 FROM sys.procedures WITH(NOLOCK)
                 WHERE NAME = 'ProductLoadAllPagedSwiftPortal'
@@ -151,45 +152,45 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
              DROP PROCEDURE dbo.ProductLoadAllPagedSwiftPortal");
 
             var sql = GetSQL("ProductLoadAllPagedSwiftPortal");
-            dataProvider.ExecuteNonQuery(sql);
+            await dataProvider.ExecuteNonQueryAsync(sql);
 
             // email template
             ConfigureMessageTemplates();
 
-            base.Install();
+            await base.InstallAsync();
         }
 
         /// <summary>
         /// Uninstall the plugin
         /// </summary>
-        public override void Uninstall()
+        public override async Task UninstallAsync()
         {
             //settings
-            _settingService.DeleteSetting<SwiftCoreSettings>();
+            await _settingService.DeleteSettingAsync<SwiftCoreSettings>();
 
             //locales
-            _localizationService.DeletePluginLocaleResources("Plugins.Misc.SwiftPortalOverride");
+            await _localizationService.DeleteLocaleResourcesAsync("Plugins.Misc.SwiftPortalOverride");
 
             //// email template
-            var changePasswordTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName)?.FirstOrDefault();
+            var changePasswordTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName))?.FirstOrDefault();
             if (changePasswordTemplate != null)
-                _messageTemplateService.DeleteMessageTemplate(changePasswordTemplate);
+                _messageTemplateService.DeleteMessageTemplateAsync(changePasswordTemplate);
 
-            var pendingApprovalTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName)?.FirstOrDefault();
+            var pendingApprovalTemplate = (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.NewCustomerPendingApprovalMessageTemplateName))?.FirstOrDefault();
             if (pendingApprovalTemplate != null)
-                _messageTemplateService.DeleteMessageTemplate(changePasswordTemplate);
+                await _messageTemplateService.DeleteMessageTemplateAsync(changePasswordTemplate);
 
-            var denialTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName)?.FirstOrDefault();
+            var denialTemplate =  (await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.NewCustomerRejectionMessageTemplateName))?.FirstOrDefault();
             if (denialTemplate != null)
-                _messageTemplateService.DeleteMessageTemplate(changePasswordTemplate);
+                await _messageTemplateService.DeleteMessageTemplateAsync(changePasswordTemplate);
 
-            base.Uninstall();
+            await base.UninstallAsync();
         }
 
         void ConfigureMessageTemplates()
         {
             // change password email
-            var changePasswordTemplate = _messageTemplateService.GetMessageTemplatesByName(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName)?.FirstOrDefault();
+            var changePasswordTemplate = await _messageTemplateService.GetMessageTemplatesByNameAsync(SwiftPortalOverrideDefaults.ChangePasswordMessageTemplateName)?.FirstOrDefault();
             if (changePasswordTemplate == null)
             {
                 changePasswordTemplate = new MessageTemplate

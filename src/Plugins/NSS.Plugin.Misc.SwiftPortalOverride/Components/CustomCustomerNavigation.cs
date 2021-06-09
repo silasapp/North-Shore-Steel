@@ -14,7 +14,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Components
             _customerModelFactory = customerModelFactory;
         }
 
-        public async Task<IViewComponentResult> Invoke(bool isABuyer, bool isOperations, int selectedTabId = 0)
+        public async Task<IViewComponentResult> InvokeAsync(bool isABuyer, bool isOperations, int selectedTabId = 0)
         {
             var model = await _customerModelFactory.PrepareCustomerNavigationModelAsync(isABuyer, isOperations,selectedTabId);
             return View(model);
