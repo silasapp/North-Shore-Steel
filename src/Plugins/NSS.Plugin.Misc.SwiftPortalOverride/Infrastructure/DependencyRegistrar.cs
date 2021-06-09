@@ -9,42 +9,42 @@ using Nop.Services.Catalog;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using Nop.Services.Orders;
 using Nop.Services.Customers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Infrastructure
 {
     public class DependencyRegistrar : IDependencyRegistrar
     {
-        public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
+        public void Register(IServiceCollection services, ITypeFinder typeFinder, AppSettings appSettings)
         {
-            // self
-            builder.RegisterType<WorkFlowMessageServiceOverride>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<PayPalServiceManager>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<PayPalProcessor>().AsSelf().InstancePerLifetimeScope();
+            //Self
+            services.AddSingleton<WorkFlowMessageServiceOverride>();
+            services.AddSingleton<PayPalServiceManager>();
+            services.AddSingleton<PayPalProcessor>();
 
-            // core
-            builder.RegisterType<CustomerCompanyService>().As<ICustomerCompanyService>().InstancePerLifetimeScope();
-            builder.RegisterType<ShapeService>().As<IShapeService>().InstancePerLifetimeScope();
-            builder.RegisterType<AzureStorageService>().As<IStorageService>().InstancePerLifetimeScope();
-            builder.RegisterType<CustomerCompanyProductService>().As<ICustomerCompanyProductService>().InstancePerLifetimeScope();
-            builder.RegisterType<NSSApiService>().As<IApiService>().InstancePerLifetimeScope();
+            //Core
+            services.AddScoped<ICustomerCompanyService, CustomerCompanyService>();
+            services.AddScoped<IShapeService, ShapeService>();
+            services.AddScoped<IStorageService, AzureStorageService>();
+            services.AddScoped<ICustomerCompanyProductService, CustomerCompanyProductService>();
+            services.AddScoped<IApiService, NSSApiService>();
 
-            // overrides
-            builder.RegisterType<QueuedEmailServiceOverride>().As<IQueuedEmailService>().InstancePerLifetimeScope();
-            builder.RegisterType<WorkFlowMessageServiceOverride>().As<IWorkflowMessageService>().InstancePerLifetimeScope();
-            builder.RegisterType<ProductServiceOverride>().As<IProductService>().InstancePerLifetimeScope();
-            builder.RegisterType<CustomShoppingCartService>().As<IShoppingCartService>().InstancePerLifetimeScope();
-            builder.RegisterType<CustomCustomerService>().As<ICustomerService>().InstancePerLifetimeScope();
-            builder.RegisterType<CustomOrderProcessingService>().As<IOrderProcessingService>().InstancePerLifetimeScope();
+            // Override
+            services.AddScoped<IQueuedEmailService, QueuedEmailServiceOverride>();
+            services.AddScoped<IWorkflowMessageService, WorkFlowMessageServiceOverride>();
+            services.AddScoped<IProductService, ProductServiceOverride>();
+            services.AddScoped<IShoppingCartService, CustomShoppingCartService>();
+            services.AddScoped<ICustomerService, CustomCustomerService>();
+            services.AddScoped<IOrderProcessingService, CustomOrderProcessingService>();
 
             //  factories
-            builder.RegisterType<CatalogModelFactory>().As<ICatalogModelFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<CheckoutModelFactory>().As<ICheckoutModelFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ProductModelFactory>().As<IProductModelFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<OrderModelFactory>().As<IOrderModelFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<InvoiceModelFactory>().As<IInvoiceModelFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<CustomerModelFactory>().As<ICustomerModelFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<CustomCommonModelFactory>().As<Nop.Web.Factories.ICommonModelFactory>().InstancePerLifetimeScope();
-
+            services.AddScoped<ICatalogModelFactory, CatalogModelFactory>();
+            services.AddScoped<ICheckoutModelFactory, CheckoutModelFactory>();
+            services.AddScoped<IProductModelFactory, ProductModelFactory>();
+            services.AddScoped<IOrderModelFactory, OrderModelFactory>();
+            services.AddScoped<IInvoiceModelFactory, InvoiceModelFactory>();
+            services.AddScoped<ICustomerModelFactory, CustomerModelFactory>();
+            services.AddScoped<Nop.Web.Factories.ICommonModelFactory, CustomCommonModelFactory>();
         }
 
         public int Order => 10;
