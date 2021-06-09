@@ -16,6 +16,8 @@ using NSS.Plugin.Misc.SwiftPortalOverride.Models;
 using System;
 using System.Collections.Generic;
 using ICustomerModelFactory = NSS.Plugin.Misc.SwiftPortalOverride.Factories.ICustomerModelFactory;
+using System.Threading.Tasks;
+using Nop.Core.Events;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -78,10 +80,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpsRequirement]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public virtual IActionResult Register()
+        public virtual async Task<IActionResult> Register()
         {
             var model = new RegisterModel();
-            model = _customerModelFactory.PrepareRegisterModel(model, false, setDefaultValues: true);
+            model = await _customerModelFactory.PrepareRegisterModelAsync(model, false, setDefaultValues: true);
             return View(model);
         }
 
@@ -90,25 +92,26 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [ValidateHoneypot]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public virtual IActionResult Register(RegisterModel model, string returnUrl)
+        public virtual async Task<IActionResult> Register(RegisterModel model, string returnUrl)
         {
             //check whether registration is allowed
             if (_customerSettings.UserRegistrationType == UserRegistrationType.Disabled)
                 return RedirectToRoute("RegisterResult", new { resultId = (int)UserRegistrationType.Disabled });
 
-            if (_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             {
                 //Already registered customer. 
-                _authenticationService.SignOut();
+                await _authenticationService.SignOutAsync();
 
                 //raise logged out event       
-                _eventPublisher.Publish(new CustomerLoggedOutEvent(_workContext.CurrentCustomer));
+                await _eventPublisher.PublishAsync(new CustomerLoggedOutEvent(await _workContext.GetCurrentCustomerAsync()));
 
                 //Save a new record
-                _workContext.CurrentCustomer = _customerService.InsertGuestCustomer();
+                /***** _workContext.CurrentCustomer changed to _workContext.SetCurrentCustomerAsync() *****/
+                await _workContext.SetCurrentCustomerAsync(await _customerService.InsertGuestCustomerAsync());
             }
-            var customer = _workContext.CurrentCustomer;
-            customer.RegisteredInStoreId = _storeContext.CurrentStore.Id;
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            customer.RegisteredInStoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
 
             var warnings = new List<string>();
             if(!string.IsNullOrEmpty(model.Email) && !string.IsNullOrEmpty(model.ConfirmEmail))
@@ -159,7 +162,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 userRegistrationRequest.BuyerRole = model.IsExistingCustomer ? model.BuyerRole : true;
 
 
-                var registrationResult = _userRegistrationService.InsertUser(userRegistrationRequest);
+                var registrationResult = await _userRegistrationService.InsertUserAsync(userRegistrationRequest);
                 if (registrationResult.Item1.Success)
                 {
                     // prepare request for create api create user registration call
@@ -185,14 +188,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     request.Buyer = res.IsExistingCustomer ? res.BuyerRole : (bool?)null;
                     request.Operations = res.IsExistingCustomer ? res.OperationsRole : (bool?)null;
 
-                    var response = _apiService.CreateUserRegistration(request);
+                    var response = await _apiService.CreateUserRegistrationAsync(request);
                     // check if error in response
                     // return error to screen
 
 
                     // registration successful
-                    _workflowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessage(res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
-                    _workflowMessageService.SendNSSCustomerRegisteredNotificationMessage(res.Id, res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, _storeContext.CurrentStore.DefaultLanguageId);
+                    await _workflowMessageService.SendNewCustomerPendingApprovalEmailNotificationMessageAsync(res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, (await _storeContext.GetCurrentStoreAsync()).DefaultLanguageId);
+                    await _workflowMessageService.SendNSSCustomerRegisteredNotificationMessageAsync(res.Id, res.WorkEmail, $"{res.FirstName} {res.LastName}", res.IsExistingCustomer, (await _storeContext.GetCurrentStoreAsync()).DefaultLanguageId);
 
                     // redirect to confirmation page
                     model.MarketingVideoUrl = _swiftCoreSettings.MarketingVideoUrl;
@@ -205,20 +208,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             //If we got this far, something failed, redisplay form
-            model = _customerModelFactory.PrepareRegisterModel(model, true, setDefaultValues: true);
+            model = await _customerModelFactory.PrepareRegisterModelAsync(model, true, setDefaultValues: true);
             return View(model);
         }
 
 
-        public virtual IActionResult ConfirmRegistration(int regId)
+        public virtual async Task<IActionResult> ConfirmRegistration(int regId)
         {
-            UserRegistration model = GetRegisteredUser(regId);
+            UserRegistration model = await GetRegisteredUser(regId);
             return View(model);
         }
 
-        public virtual IActionResult Approve(int regId)
+        public virtual async Task<IActionResult> Approve(int regId)
         {
-            UserRegistration userRegistration = GetRegisteredUser(regId);
+            UserRegistration userRegistration = await GetRegisteredUser(regId);
             if(userRegistration.StatusId != 0)
             {
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
@@ -240,7 +243,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             //validate unique user
-            if (_customerService.GetCustomerByEmail(userRegistration.WorkEmail) != null)
+            if (await _customerService.GetCustomerByEmailAsync(userRegistration.WorkEmail) != null)
             {
                 warnings.Add("Email Already Exists");
                 //return;
@@ -254,7 +257,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (ModelState.IsValid)
             {
                 // approve user from nss
-                var (response, error) = _apiService.ApproveUserRegistration(regId);
+                var (response, error) = await _apiService.ApproveUserRegistrationAsync(regId);
 
                 if (!string.IsNullOrEmpty(error))
                 {
@@ -266,38 +269,38 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
             // update user state and modified state 
-            _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Approved);
+            await _userRegistrationService.UpdateRegisteredUserAsync(regId, (int)UserRegistrationStatus.Approved);
 
-            userRegistration = GetRegisteredUser(regId);
+            userRegistration = await GetRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
 
         }
 
-        public virtual IActionResult Reject(int regId)
+        public virtual async Task<IActionResult> Reject(int regId)
         {
 
-            var userRegistration = GetRegisteredUser(regId);
+            var userRegistration = await GetRegisteredUser(regId);
             if (userRegistration.StatusId != 0)
             {
                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
             }
 
-            var response = _apiService.RejectUserRegistration(regId);
+            var response = await _apiService.RejectUserRegistrationAsync(regId);
             // update user state and modified state 
-            _userRegistrationService.UpdateRegisteredUser(regId, (int)UserRegistrationStatus.Rejected);
+            await _userRegistrationService.UpdateRegisteredUserAsync(regId, (int)UserRegistrationStatus.Rejected);
 
             // send reject email
-            _workflowMessageService.SendNewCustomerRejectionEmailNotificationMessage(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", _storeContext.CurrentStore.DefaultLanguageId);
+            await _workflowMessageService.SendNewCustomerRejectionEmailNotificationMessageAsync(userRegistration.WorkEmail, $"{userRegistration.FirstName} {userRegistration.LastName}", (await _storeContext.GetCurrentStoreAsync()).DefaultLanguageId);
 
-            userRegistration = GetRegisteredUser(regId);
+            userRegistration = await GetRegisteredUser(regId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/UserRegistration/ConfirmRegistration.cshtml", userRegistration);
         }
 
         #endregion
 
-        private UserRegistration GetRegisteredUser(int regId)
+        private async Task<UserRegistration> GetRegisteredUser(int regId)
         {
-            UserRegistration model = _userRegistrationService.GetById(regId);
+            UserRegistration model = await _userRegistrationService.GetByIdAsync(regId);
             return model;
         }
 

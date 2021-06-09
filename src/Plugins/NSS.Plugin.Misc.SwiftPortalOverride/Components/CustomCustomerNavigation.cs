@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using Nop.Web.Framework.Components;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Components
 {
@@ -13,9 +14,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Components
             _customerModelFactory = customerModelFactory;
         }
 
-        public IViewComponentResult Invoke(bool isABuyer, bool isOperations, int selectedTabId = 0)
+        public async Task<IViewComponentResult> Invoke(bool isABuyer, bool isOperations, int selectedTabId = 0)
         {
-            var model = _customerModelFactory.PrepareCustomerNavigationModel(isABuyer, isOperations,selectedTabId);
+            var model = await _customerModelFactory.PrepareCustomerNavigationModelAsync(isABuyer, isOperations,selectedTabId);
             return View(model);
         }
     }

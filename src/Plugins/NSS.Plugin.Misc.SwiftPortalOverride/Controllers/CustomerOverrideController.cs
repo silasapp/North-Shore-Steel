@@ -45,6 +45,8 @@ using RegisterModel = Nop.Web.Models.Customer.RegisterModel;
 using Nop.Web.Extensions;
 using NSS.Plugin.Misc.SwiftCore.DTOs;
 using System.Threading.Tasks;
+using Nop.Core.Events;
+using Nop.Services.Authentication.MultiFactor;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -74,6 +76,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILocalizationService _localizationService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
+        private readonly INotificationService _notificationService;
         private readonly IStoreContext _storeContext;
         private readonly ITaxService _taxService;
         private readonly IWebHelper _webHelper;
@@ -89,11 +92,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         private readonly IAddressAttributeParser _addressAttributeParser;
         private readonly IApiService _apiService;
 
-        #endregion
 
         #region Constructor
-
-        public CustomerOverrideController(IApiService apiService, ICompanyService companyService, Factories.ICustomerModelFactory overrideCustomerModelFactory, ICustomerCompanyService customerCompanyService, AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IAuthenticationService authenticationService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, INewsLetterSubscriptionService newsLetterSubscriptionService, IOrderService orderService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IShoppingCartService shoppingCartService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, newsLetterSubscriptionService, orderService, pictureService, priceFormatter, productService, shoppingCartService, stateProvinceService, storeContext, taxService, webHelper, workContext, workflowMessageService, localizationSettings, mediaSettings, storeInformationSettings, taxSettings)
+        public CustomerOverrideController(AddressSettings addressSettings, CaptchaSettings captchaSettings, CustomerSettings customerSettings, DateTimeSettings dateTimeSettings, IDownloadService downloadService, ForumSettings forumSettings, GdprSettings gdprSettings, Factories.ICustomerModelFactory overrideCustomerModelFactory,  IAddressAttributeParser addressAttributeParser, IAddressModelFactory addressModelFactory, IAddressService addressService, IApiService apiService, IAuthenticationService authenticationService, ICompanyService companyService, ICustomerCompanyService customerCompanyService, ICountryService countryService, ICurrencyService currencyService, ICustomerActivityService customerActivityService, ICustomerAttributeParser customerAttributeParser, ICustomerAttributeService customerAttributeService, ICustomerModelFactory customerModelFactory, ICustomerRegistrationService customerRegistrationService, ICustomerService customerService, IEventPublisher eventPublisher, IExportManager exportManager, IExternalAuthenticationService externalAuthenticationService, IGdprService gdprService, IGenericAttributeService genericAttributeService, IGiftCardService giftCardService, ILocalizationService localizationService, ILogger logger, IMultiFactorAuthenticationPluginManager multiFactorAuthenticationPluginManager, INewsLetterSubscriptionService newsLetterSubscriptionService, INotificationService notificationService, IOrderService orderService, IShoppingCartService shoppingCartService, IPictureService pictureService, IPriceFormatter priceFormatter, IProductService productService, IStateProvinceService stateProvinceService, IStoreContext storeContext, ITaxService taxService, IWebHelper webHelper, IWorkContext workContext, IWorkflowMessageService workflowMessageService, LocalizationSettings localizationSettings, MediaSettings mediaSettings, MultiFactorAuthenticationSettings multiFactorAuthenticationSettings, StoreInformationSettings storeInformationSettings, TaxSettings taxSettings, WorkFlowMessageServiceOverride workFlowMessageServiceOverride) : base(addressSettings, captchaSettings, customerSettings, dateTimeSettings, downloadService, forumSettings, gdprSettings, addressAttributeParser, addressModelFactory, addressService, authenticationService, countryService, currencyService, customerActivityService, customerAttributeParser, customerAttributeService, customerModelFactory, customerRegistrationService, customerService, eventPublisher, exportManager, externalAuthenticationService, gdprService, genericAttributeService, giftCardService, localizationService, logger, multiFactorAuthenticationPluginManager, newsLetterSubscriptionService, notificationService, orderService, pictureService, priceFormatter, productService, stateProvinceService, storeContext, taxService, workContext, workflowMessageService, localizationSettings, mediaSettings, multiFactorAuthenticationSettings, storeInformationSettings, taxSettings)
         {
             _customerSettings = customerSettings;
             _customerModelFactory = customerModelFactory;
@@ -116,6 +117,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
             _newsLetterSubscriptionService = newsLetterSubscriptionService;
+            _notificationService = notificationService;
             _storeContext = storeContext;
             _taxService = taxService;
             _webHelper = webHelper;
@@ -135,13 +137,20 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #endregion
 
+        
+
+        #endregion
+
 
         #region Utilities
 
-        private int GetERPCompanyId()
+        /* _workContext.CurrentCustomer changed to _workContext.GetCurrentCustomerAsync() */
+        /* _workContext.CurrentStore changed to _workContext.GetCurrentStoreAsync() */
+        /* _workContext.WorkingLanguage changed to _workContext.GetWorkingLanguageAsync() */
+        private async Task<int> GetERPCompanyId()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
             return eRPCompanyId;
         }
 
@@ -158,13 +167,13 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
         }
 
-        protected override string ParseCustomCustomerAttributes(IFormCollection form)
+        protected override async Task<string> ParseCustomCustomerAttributesAsync(IFormCollection form)
         {
             if (form == null)
                 throw new ArgumentNullException(nameof(form));
 
             var attributesXml = "";
-            var attributes = _customerAttributeService.GetAllCustomerAttributes();
+            var attributes = await _customerAttributeService.GetAllCustomerAttributesAsync();
             foreach (var attribute in attributes)
             {
                 var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
@@ -201,7 +210,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     case AttributeControlType.ReadonlyCheckboxes:
                         {
                             //load read-only (already server-side selected) values
-                            var attributeValues = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
+                            var attributeValues = await _customerAttributeService.GetCustomerAttributeValuesAsync(attribute.Id);
                             foreach (var selectedAttributeId in attributeValues
                                 .Where(v => v.IsPreSelected)
                                 .Select(v => v.Id)
@@ -238,7 +247,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
 
-        protected void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
+        protected async void RegisterNSSUser(RegisterModel model, IFormCollection form, Customer customer)
         {
             try
             {
@@ -256,21 +265,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 };
 
                 #region BuildCustomAttributes
-                var attributes = _customerAttributeService.GetAllCustomerAttributes();
+                var attributes = await _customerAttributeService.GetAllCustomerAttributesAsync();
                 buildCustomAttributes(form, request, attributes);
 
                 #endregion
 
-                var response = _apiService.CreateNSSUser(request);
+                var response = await _apiService.CreateNSSUserAsync(request);
 
                 if (response != null && response.WitnrixId != null)
                 {
                     // save wintrix id
-                    _genericAttributeService.SaveAttribute(customer, Constants.ErpKeyAttribute, response.WitnrixId);
+                    await _genericAttributeService.SaveAttributeAsync(customer, Constants.ErpKeyAttribute, response.WitnrixId);
                 }
 
                 // send nss an email
-                _workFlowMessageServiceOverride.SendNSSCustomerRegisteredNotificationMessage(customer, _workContext.WorkingLanguage.Id, response?.WitnrixId);
+                await _workFlowMessageServiceOverride.SendNSSCustomerRegisteredNotificationMessageAsync(customer, (await _workContext.GetWorkingLanguageAsync()).Id, response?.WitnrixId);
             }
             catch (Exception)
             {
@@ -280,7 +289,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         }
 
-        protected void buildCustomAttributes(IFormCollection form, ERPCreateUserRequest request, IList<CustomerAttribute> attributes)
+        protected async void buildCustomAttributes(IFormCollection form, ERPCreateUserRequest request, IList<CustomerAttribute> attributes)
         {
             foreach (var attribute in attributes)
             {
@@ -297,7 +306,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                 if (selectedAttributeId > 0)
                                 {
                                     //var val = attribute.Values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
-                                    var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
+                                    var values = await _customerAttributeService.GetCustomerAttributeValuesAsync(attribute.Id);
                                     var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
                                     if (val != null)
                                     {
@@ -386,12 +395,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [CheckAccessClosedStore(true)]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public override IActionResult Login(LoginModel model, string returnUrl, bool captchaValid)
+        public override async Task<IActionResult> Login(LoginModel model, string returnUrl, bool captchaValid)
         {
             //validate CAPTCHA
             if (_captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage && !captchaValid)
             {
-                ModelState.AddModelError("", _localizationService.GetResource("Common.WrongCaptchaMessage"));
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Common.WrongCaptchaMessage"));
             }
 
             if (ModelState.IsValid)
@@ -400,36 +409,36 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 {
                     model.Username = model.Username.Trim();
                 }
-                var loginResult = _customerRegistrationService.ValidateCustomer(_customerSettings.UsernamesEnabled ? model.Username : model.Email, model.Password);
+                var loginResult = await _customerRegistrationService.ValidateCustomerAsync(_customerSettings.UsernamesEnabled ? model.Username : model.Email, model.Password);
                 switch (loginResult)
                 {
                     case CustomerLoginResults.Successful:
                         {
                             var customer = _customerSettings.UsernamesEnabled
-                                ? _customerService.GetCustomerByUsername(model.Username)
-                                : _customerService.GetCustomerByEmail(model.Email);
+                                ? await _customerService.GetCustomerByUsernameAsync(model.Username)
+                                : await _customerService.GetCustomerByEmailAsync(model.Email);
 
-                            bool isPassWordChanged = _genericAttributeService.GetAttribute<bool>(customer, "IsPasswordChanged");
+                            bool isPassWordChanged = await _genericAttributeService.GetAttributeAsync<bool>(customer, "IsPasswordChanged");
                             if (!isPassWordChanged)
                             {
-                                var changePasswordModel = _customerModelFactory.PrepareChangePasswordModel();
+                                var changePasswordModel = await _customerModelFactory.PrepareChangePasswordModelAsync();
                                 Response.Cookies.Append(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange, model.Email);
-                                _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.OldPassword, model.Password);
+                                await _genericAttributeService.SaveAttributeAsync(customer, SwiftPortalOverrideDefaults.OldPassword, model.Password);
                                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/ChangePasswordFirstTimeLogin.cshtml", changePasswordModel);
                             }
 
                             //migrate shopping cart
-                            _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer, true);
+                            await _shoppingCartService.MigrateShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), customer, true);
 
                             //sign in new customer
-                            _authenticationService.SignIn(customer, model.RememberMe);
+                            await _authenticationService.SignInAsync(customer, model.RememberMe);
 
                             //raise event       
-                            _eventPublisher.Publish(new CustomerLoggedinEvent(customer));
+                            await _eventPublisher.PublishAsync(new CustomerLoggedinEvent(customer));
 
                             //activity log
-                            _customerActivityService.InsertActivity(customer, "PublicStore.Login",
-                                _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+                            await _customerActivityService.InsertActivityAsync(customer, "PublicStore.Login",
+                               await _localizationService.GetResourceAsync("ActivityLog.PublicStore.Login"), customer);
 
 
                             if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
@@ -444,7 +453,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             //If we got this far, something failed, redisplay form
-            model = _customerModelFactory.PrepareLoginModel(model.CheckoutAsGuest);
+            model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
             return View(model);
         }
 
@@ -456,14 +465,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpsRequirement]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public override IActionResult Register()
+        public override async Task<IActionResult> Register(string returnUrl)
         {
             //check whether registration is allowed
             if (_customerSettings.UserRegistrationType == UserRegistrationType.Disabled)
                 return RedirectToRoute("RegisterResult", new { resultId = (int)UserRegistrationType.Disabled });
 
             var model = new RegisterModel();
-            model = _customerModelFactory.PrepareRegisterModel(model, false, setDefaultValues: true);
+            model = await _customerModelFactory.PrepareRegisterModelAsync(model, false, setDefaultValues: true);
 
             //For view give full path of your published plugin
             return View(model);
@@ -475,29 +484,30 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [ValidateHoneypot]
         //available even when navigation is not allowed
         [CheckAccessPublicStore(true)]
-        public override IActionResult Register(RegisterModel model, string returnUrl, bool captchaValid, IFormCollection form)
+        public override async Task<IActionResult> Register(RegisterModel model, string returnUrl, bool captchaValid, IFormCollection form)
         {
             //check whether registration is allowed
             if (_customerSettings.UserRegistrationType == UserRegistrationType.Disabled)
                 return RedirectToRoute("RegisterResult", new { resultId = (int)UserRegistrationType.Disabled });
 
-            if (_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             {
                 //Already registered customer. 
-                _authenticationService.SignOut();
+                await _authenticationService.SignOutAsync();
 
                 //raise logged out event       
-                _eventPublisher.Publish(new CustomerLoggedOutEvent(_workContext.CurrentCustomer));
+                await _eventPublisher.PublishAsync(new CustomerLoggedOutEvent(await _workContext.GetCurrentCustomerAsync()));
 
                 //Save a new record
-                _workContext.CurrentCustomer = _customerService.InsertGuestCustomer();
+                /* await _workContext.CurrentCustomer = await _customerService.InsertGuestCustomer(); */
+                await _workContext.SetCurrentCustomerAsync(await _customerService.InsertGuestCustomerAsync());
             }
-            var customer = _workContext.CurrentCustomer;
-            customer.RegisteredInStoreId = _storeContext.CurrentStore.Id;
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            customer.RegisteredInStoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
 
             //custom customer attributes
-            var customerAttributesXml = ParseCustomCustomerAttributes(form);
-            var customerAttributeWarnings = _customerAttributeParser.GetAttributeWarnings(customerAttributesXml);
+            var customerAttributesXml = await ParseCustomCustomerAttributesAsync(form);
+            var customerAttributeWarnings = await _customerAttributeParser.GetAttributeWarningsAsync(customerAttributesXml);
             foreach (var error in customerAttributeWarnings)
             {
                 ModelState.AddModelError("", error);
@@ -506,14 +516,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             //validate CAPTCHA
             if (_captchaSettings.Enabled && _captchaSettings.ShowOnRegistrationPage && !captchaValid)
             {
-                ModelState.AddModelError("", _localizationService.GetResource("Common.WrongCaptchaMessage"));
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Common.WrongCaptchaMessage"));
             }
 
             //GDPR
             if (_gdprSettings.GdprEnabled)
             {
-                var consents = _gdprService
-                    .GetAllConsents().Where(consent => consent.DisplayDuringRegistration && consent.IsRequired).ToList();
+                var consents = (await _gdprService
+                    .GetAllConsentsAsync()).Where(consent => consent.DisplayDuringRegistration && consent.IsRequired).ToList();
 
                 ValidateRequiredConsents(consents, form);
             }
@@ -531,78 +541,79 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     _customerSettings.UsernamesEnabled ? model.Username : model.Email,
                     model.Password,
                     _customerSettings.DefaultPasswordFormat,
-                    _storeContext.CurrentStore.Id,
+                    (await _storeContext.GetCurrentStoreAsync()).Id,
                     isApproved);
-                var registrationResult = _customerRegistrationService.RegisterCustomer(registrationRequest);
+                var registrationResult = await _customerRegistrationService.RegisterCustomerAsync(registrationRequest);
                 if (registrationResult.Success)
                 {
                     //properties
                     if (_dateTimeSettings.AllowCustomersToSetTimeZone)
                     {
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.TimeZoneIdAttribute, model.TimeZoneId);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.TimeZoneIdAttribute, model.TimeZoneId);
                     }
                     //VAT number
                     if (_taxSettings.EuVatEnabled)
                     {
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberAttribute, model.VatNumber);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.VatNumberAttribute, model.VatNumber);
 
-                        var vatNumberStatus = _taxService.GetVatNumberStatus(model.VatNumber, out _, out var vatAddress);
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberStatusIdAttribute, (int)vatNumberStatus);
+                        //var vatNumberStatus = await _taxService.GetVatNumberStatusAsync(model.VatNumber, out _, out var vatAddress);
+                        var (vatNumberStatus, _, vatAddress) = await _taxService.GetVatNumberStatusAsync(model.VatNumber);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.VatNumberStatusIdAttribute, (int)vatNumberStatus);
                         //send VAT number admin notification
                         if (!string.IsNullOrEmpty(model.VatNumber) && _taxSettings.EuVatEmailAdminWhenNewVatSubmitted)
-                            _workflowMessageService.SendNewVatSubmittedStoreOwnerNotification(customer, model.VatNumber, vatAddress, _localizationSettings.DefaultAdminLanguageId);
+                            await _workflowMessageService.SendNewVatSubmittedStoreOwnerNotificationAsync(customer, model.VatNumber, vatAddress, _localizationSettings.DefaultAdminLanguageId);
                     }
 
                     //form fields
                     if (_customerSettings.GenderEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.GenderAttribute, model.Gender);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.GenderAttribute, model.Gender);
                     if (_customerSettings.FirstNameEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FirstNameAttribute, model.FirstName);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.FirstNameAttribute, model.FirstName);
                     if (_customerSettings.LastNameEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.LastNameAttribute, model.LastName);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.LastNameAttribute, model.LastName);
                     if (_customerSettings.DateOfBirthEnabled)
                     {
                         var dateOfBirth = model.ParseDateOfBirth();
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.DateOfBirthAttribute, dateOfBirth);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.DateOfBirthAttribute, dateOfBirth);
                     }
                     if (_customerSettings.CompanyEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CompanyAttribute, model.Company);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CompanyAttribute, model.Company);
                     if (_customerSettings.StreetAddressEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StreetAddressAttribute, model.StreetAddress);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.StreetAddressAttribute, model.StreetAddress);
                     if (_customerSettings.StreetAddress2Enabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StreetAddress2Attribute, model.StreetAddress2);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.StreetAddress2Attribute, model.StreetAddress2);
                     if (_customerSettings.ZipPostalCodeEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.ZipPostalCodeAttribute, model.ZipPostalCode);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ZipPostalCodeAttribute, model.ZipPostalCode);
                     if (_customerSettings.CityEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CityAttribute, model.City);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CityAttribute, model.City);
                     if (_customerSettings.CountyEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CountyAttribute, model.County);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CountyAttribute, model.County);
                     if (_customerSettings.CountryEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CountryIdAttribute, model.CountryId);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CountryIdAttribute, model.CountryId);
                     if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StateProvinceIdAttribute,
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.StateProvinceIdAttribute,
                             model.StateProvinceId);
                     if (_customerSettings.PhoneEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.PhoneAttribute, model.Phone);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.PhoneAttribute, model.Phone);
                     if (_customerSettings.FaxEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FaxAttribute, model.Fax);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.FaxAttribute, model.Fax);
 
                     //newsletter
                     if (_customerSettings.NewsletterEnabled)
                     {
                         //save newsletter value
-                        var newsletter = _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreId(model.Email, _storeContext.CurrentStore.Id);
+                        var newsletter = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreIdAsync(model.Email, (await _storeContext.GetCurrentStoreAsync()).Id);
                         if (newsletter != null)
                         {
                             if (model.Newsletter)
                             {
                                 newsletter.Active = true;
-                                _newsLetterSubscriptionService.UpdateNewsLetterSubscription(newsletter);
+                                await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(newsletter);
 
                                 //GDPR
                                 if (_gdprSettings.GdprEnabled && _gdprSettings.LogNewsletterConsent)
                                 {
-                                    _gdprService.InsertLog(customer, 0, GdprRequestType.ConsentAgree, _localizationService.GetResource("Gdpr.Consent.Newsletter"));
+                                    await _gdprService.InsertLogAsync(customer, 0, GdprRequestType.ConsentAgree, await _localizationService.GetResourceAsync("Gdpr.Consent.Newsletter"));
                                 }
                             }
                             //else
@@ -615,19 +626,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         {
                             if (model.Newsletter)
                             {
-                                _newsLetterSubscriptionService.InsertNewsLetterSubscription(new NewsLetterSubscription
+                                await _newsLetterSubscriptionService.InsertNewsLetterSubscriptionAsync(new NewsLetterSubscription
                                 {
                                     NewsLetterSubscriptionGuid = Guid.NewGuid(),
                                     Email = model.Email,
                                     Active = true,
-                                    StoreId = _storeContext.CurrentStore.Id,
+                                    StoreId = (await _storeContext.GetCurrentStoreAsync()).Id,
                                     CreatedOnUtc = DateTime.UtcNow
                                 });
 
                                 //GDPR
                                 if (_gdprSettings.GdprEnabled && _gdprSettings.LogNewsletterConsent)
                                 {
-                                    _gdprService.InsertLog(customer, 0, GdprRequestType.ConsentAgree, _localizationService.GetResource("Gdpr.Consent.Newsletter"));
+                                    await _gdprService.InsertLogAsync(customer, 0, GdprRequestType.ConsentAgree, await _localizationService.GetResourceAsync("Gdpr.Consent.Newsletter"));
                                 }
                             }
                         }
@@ -639,14 +650,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         //GDPR
                         if (_gdprSettings.GdprEnabled && _gdprSettings.LogPrivacyPolicyConsent)
                         {
-                            _gdprService.InsertLog(customer, 0, GdprRequestType.ConsentAgree, _localizationService.GetResource("Gdpr.Consent.PrivacyPolicy"));
+                            await _gdprService.InsertLogAsync(customer, 0, GdprRequestType.ConsentAgree, await _localizationService.GetResourceAsync("Gdpr.Consent.PrivacyPolicy"));
                         }
                     }
 
                     //GDPR
                     if (_gdprSettings.GdprEnabled)
                     {
-                        var consents = _gdprService.GetAllConsents().Where(consent => consent.DisplayDuringRegistration).ToList();
+                        var consents = (await _gdprService.GetAllConsentsAsync()).Where(consent => consent.DisplayDuringRegistration).ToList();
                         foreach (var consent in consents)
                         {
                             var controlId = $"consent{consent.Id}";
@@ -654,46 +665,46 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                             if (!StringValues.IsNullOrEmpty(cbConsent) && cbConsent.ToString().Equals("on"))
                             {
                                 //agree
-                                _gdprService.InsertLog(customer, consent.Id, GdprRequestType.ConsentAgree, consent.Message);
+                                await _gdprService.InsertLogAsync(customer, consent.Id, GdprRequestType.ConsentAgree, consent.Message);
                             }
                             else
                             {
                                 //disagree
-                                _gdprService.InsertLog(customer, consent.Id, GdprRequestType.ConsentDisagree, consent.Message);
+                                await _gdprService.InsertLogAsync(customer, consent.Id, GdprRequestType.ConsentDisagree, consent.Message);
                             }
                         }
                     }
 
                     //save customer attributes
-                    _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CustomCustomerAttributes, customerAttributesXml);
+                    await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CustomCustomerAttributes, customerAttributesXml);
 
                     //login customer now
                     if (isApproved)
-                        _authenticationService.SignIn(customer, true);
+                        await _authenticationService.SignInAsync(customer, true);
 
                     //insert default address (if possible)
                     var defaultAddress = new Address
                     {
-                        FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute),
-                        LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute),
+                        FirstName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.FirstNameAttribute),
+                        LastName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastNameAttribute),
                         Email = customer.Email,
-                        Company = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.CompanyAttribute),
-                        CountryId = _genericAttributeService.GetAttribute<int>(customer, NopCustomerDefaults.CountryIdAttribute) > 0
-                            ? (int?)_genericAttributeService.GetAttribute<int>(customer, NopCustomerDefaults.CountryIdAttribute)
+                        Company = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.CompanyAttribute),
+                        CountryId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.CountryIdAttribute) > 0
+                            ? (int?) await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.CountryIdAttribute)
                             : null,
-                        StateProvinceId = _genericAttributeService.GetAttribute<int>(customer, NopCustomerDefaults.StateProvinceIdAttribute) > 0
-                            ? (int?)_genericAttributeService.GetAttribute<int>(customer, NopCustomerDefaults.StateProvinceIdAttribute)
+                        StateProvinceId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.StateProvinceIdAttribute) > 0
+                            ? (int?) await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.StateProvinceIdAttribute)
                             : null,
-                        County = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.CountyAttribute),
-                        City = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.CityAttribute),
-                        Address1 = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.StreetAddressAttribute),
-                        Address2 = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.StreetAddress2Attribute),
-                        ZipPostalCode = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.ZipPostalCodeAttribute),
-                        PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute),
-                        FaxNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FaxAttribute),
+                        County = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.CountyAttribute),
+                        City = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.CityAttribute),
+                        Address1 = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.StreetAddressAttribute),
+                        Address2 = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.StreetAddress2Attribute),
+                        ZipPostalCode = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.ZipPostalCodeAttribute),
+                        PhoneNumber = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.PhoneAttribute),
+                        FaxNumber = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.FaxAttribute),
                         CreatedOnUtc = customer.CreatedOnUtc
                     };
-                    if (_addressService.IsAddressValid(defaultAddress))
+                    if (await _addressService.IsAddressValidAsync(defaultAddress))
                     {
                         //some validation
                         if (defaultAddress.CountryId == 0)
@@ -703,34 +714,34 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         //set default address
                         //customer.Addresses.Add(defaultAddress);
 
-                        _addressService.InsertAddress(defaultAddress);
+                        await _addressService.InsertAddressAsync(defaultAddress);
 
-                        _customerService.InsertCustomerAddress(customer, defaultAddress);
+                        await _customerService.InsertCustomerAddressAsync(customer, defaultAddress);
 
                         customer.BillingAddressId = defaultAddress.Id;
                         customer.ShippingAddressId = defaultAddress.Id;
 
-                        _customerService.UpdateCustomer(customer);
+                        await _customerService.UpdateCustomerAsync(customer);
                     }
 
                     //notifications
                     if (_customerSettings.NotifyNewCustomerRegistration)
-                        _workflowMessageService.SendCustomerRegisteredNotificationMessage(customer,
+                        await _workflowMessageService.SendCustomerRegisteredNotificationMessageAsync(customer,
                             _localizationSettings.DefaultAdminLanguageId);
 
                     //NSS User Registeration
                     RegisterNSSUser(model, form, customer);
 
                     //raise event       
-                    _eventPublisher.Publish(new CustomerRegisteredEvent(customer));
+                    await _eventPublisher.PublishAsync(new CustomerRegisteredEvent(customer));
 
                     switch (_customerSettings.UserRegistrationType)
                     {
                         case UserRegistrationType.EmailValidation:
                             {
                                 //email validation message
-                                _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.AccountActivationTokenAttribute, Guid.NewGuid().ToString());
-                                _workflowMessageService.SendCustomerEmailValidationMessage(customer, _workContext.WorkingLanguage.Id);
+                                await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.AccountActivationTokenAttribute, Guid.NewGuid().ToString());
+                                await _workflowMessageService.SendCustomerEmailValidationMessageAsync(customer, (await _workContext.GetWorkingLanguageAsync()).Id);
 
                                 //result
                                 return RedirectToRoute("RegisterResult",
@@ -744,10 +755,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         case UserRegistrationType.Standard:
                             {
                                 //send customer welcome message
-                                _workflowMessageService.SendCustomerWelcomeMessage(customer, _workContext.WorkingLanguage.Id);
+                                await _workflowMessageService.SendCustomerWelcomeMessageAsync(customer, (await _workContext.GetWorkingLanguageAsync()).Id);
 
                                 //raise event       
-                                _eventPublisher.Publish(new CustomerActivatedEvent(customer));
+                                await _eventPublisher.PublishAsync(new CustomerActivatedEvent(customer));
 
                                 return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Confirmation.cshtml");
                                 //var redirectUrl = Url.RouteUrl("RegisterResult",
@@ -767,7 +778,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             //If we got this far, something failed, redisplay form
-            model = _customerModelFactory.PrepareRegisterModel(model, true, customerAttributesXml);
+            model = await _customerModelFactory.PrepareRegisterModelAsync(model, true, customerAttributesXml);
             return View(model);
         }
 
@@ -776,23 +787,23 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #region My account / Change password
 
-        public override IActionResult ChangePassword(ChangePasswordModel model)
+        public override async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!(await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync())))
                 return Challenge();
 
-            var customer = _workContext.CurrentCustomer;
+            var customer = await _workContext.GetCurrentCustomerAsync();
 
             if (ModelState.IsValid)
             {
                 var changePasswordRequest = new ChangePasswordRequest(customer.Email,
                     true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
-                var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
+                var changePasswordResult = await _customerRegistrationService.ChangePasswordAsync(changePasswordRequest);
                 if (changePasswordResult.Success)
                 {
                     // send change password email
-                    _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
-                    model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
+                    await _workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessageAsync(await _workContext.GetCurrentCustomerAsync(), (await _storeContext.GetCurrentStoreAsync()).DefaultLanguageId);
+                    _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Account.ChangePassword.Success"));
                     return View(model);
                 }
 
@@ -807,41 +818,41 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
 
         [CheckAccessPublicStore(true)]
-        public virtual IActionResult NewCustomerChangePassword(ChangePasswordModel model)
+        public virtual async Task<IActionResult> NewCustomerChangePassword(ChangePasswordModel model)
         {
             var newUserEmail = Request.Cookies[SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange];
             Customer customer = new Customer();
             if(!string.IsNullOrEmpty(newUserEmail))
-                customer = _customerService.GetCustomerByEmail(newUserEmail);
+                customer = await _customerService.GetCustomerByEmailAsync(newUserEmail);
 
             if (ModelState.IsValid)
             {
-                var oldPassword = _genericAttributeService.GetAttribute<string>(customer, SwiftPortalOverrideDefaults.OldPassword);
+                var oldPassword = await _genericAttributeService.GetAttributeAsync<string>(customer, SwiftPortalOverrideDefaults.OldPassword);
                 var changePasswordRequest = new ChangePasswordRequest(customer.Email,
                     true, _customerSettings.DefaultPasswordFormat, model.NewPassword, oldPassword);
-                var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
+                var changePasswordResult = await _customerRegistrationService.ChangePasswordAsync(changePasswordRequest);
                 if (changePasswordResult.Success)
                 {
                     // send change password email
                     //_workFlowMessageServiceOverride.SendChangePasswordEmailNotificationMessage(_workContext.CurrentCustomer, _storeContext.CurrentStore.DefaultLanguageId);
-                    _genericAttributeService.SaveAttribute(customer, "IsPasswordChanged", true);
-                    model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
+                    await _genericAttributeService.SaveAttributeAsync(customer, "IsPasswordChanged", true);
                     Response.Cookies.Delete(SwiftPortalOverrideDefaults.NewUserEmailForPasswordChange);
 
                     //migrate shopping cart
-                    _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer, true);
+                    await _shoppingCartService.MigrateShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), customer, true);
 
                     //sign in new customer
-                    _authenticationService.SignIn(customer, true);
+                    await _authenticationService.SignInAsync(customer, true);
 
                     //raise event       
-                    _eventPublisher.Publish(new CustomerLoggedinEvent(customer));
+                    await _eventPublisher.PublishAsync(new CustomerLoggedinEvent(customer));
 
                     //activity log
-                    _customerActivityService.InsertActivity(customer, "PublicStore.Login",
-                        _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+                    await _customerActivityService.InsertActivityAsync(customer, "PublicStore.Login",
+                        await _localizationService.GetResourceAsync("ActivityLog.PublicStore.Login"), customer);
 
-                    _genericAttributeService.SaveAttribute(customer, SwiftPortalOverrideDefaults.OldPassword, "");
+                    await _genericAttributeService.SaveAttributeAsync(customer, SwiftPortalOverrideDefaults.OldPassword, "");
+                    _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Account.ChangePassword.Success"));
                     return RedirectToRoute("Homepage");
                 }
 
@@ -858,21 +869,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #region My account / Info
         [HttpsRequirement]
-        public override IActionResult Info()
+        public override async Task<IActionResult> Info()
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (! await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
                 return Challenge();
 
             var model = new CustomerInfoModel();
-            model = _customerModelFactory.PrepareCustomerInfoModel(model, _workContext.CurrentCustomer, false);
+            model = await _customerModelFactory.PrepareCustomerInfoModelAsync(model, await _workContext.GetCurrentCustomerAsync(), false);
 
             return View(model);
         }
 
         [HttpPost]
-        public override IActionResult Info(CustomerInfoModel model, IFormCollection form)
+        public override async Task<IActionResult> Info(CustomerInfoModel model, IFormCollection form)
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!(await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync())))
                 return Challenge();
 
             string cellPhone = form["cell-phone"];
@@ -883,22 +894,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var oldCustomerModel = new CustomerInfoModel();
 
-            var customer = _workContext.CurrentCustomer;
+            var customer = await _workContext.GetCurrentCustomerAsync();
 
             //get customer info model before changes for gdpr log
             if (_gdprSettings.GdprEnabled & _gdprSettings.LogUserProfileChanges)
-                oldCustomerModel = _customerModelFactory.PrepareCustomerInfoModel(oldCustomerModel, customer, false);
+                oldCustomerModel = await _customerModelFactory.PrepareCustomerInfoModelAsync(oldCustomerModel, customer, false);
 
             //custom customer attributes
-            var customerAttributesXml = ParseCustomCustomerAttributes(form);
-            var customerAttributeWarnings = _customerAttributeParser.GetAttributeWarnings(customerAttributesXml);
+            var customerAttributesXml = await ParseCustomCustomerAttributesAsync(form);
+            var customerAttributeWarnings = await _customerAttributeParser.GetAttributeWarningsAsync(customerAttributesXml);
 
 
             //GDPR
             if (_gdprSettings.GdprEnabled)
             {
-                var consents = _gdprService
-                    .GetAllConsents().Where(consent => consent.DisplayOnCustomerInfoPage && consent.IsRequired).ToList();
+                var consents = (await _gdprService
+                    .GetAllConsentsAsync()).Where(consent => consent.DisplayOnCustomerInfoPage && consent.IsRequired).ToList();
 
                 ValidateRequiredConsents(consents, form);
             }
@@ -907,7 +918,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    int ErpId = _genericAttributeService.GetAttribute<int>(customer, Constants.ErpKeyAttribute);
+                    int ErpId = await _genericAttributeService.GetAttributeAsync<int>(customer, Constants.ErpKeyAttribute);
 
                     //username 
                     if (_customerSettings.UsernamesEnabled && _customerSettings.AllowUsersToChangeUsernames)
@@ -915,12 +926,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         if (!customer.Username.Equals(model.Username.Trim(), StringComparison.InvariantCultureIgnoreCase))
                         {
                             //change username
-                            _customerRegistrationService.SetUsername(customer, model.Username.Trim());
+                            await _customerRegistrationService.SetUsernameAsync(customer, model.Username.Trim());
 
                             //re-authenticate
                             //do not authenticate users in impersonation mode
                             if (_workContext.OriginalCustomerIfImpersonated == null)
-                                _authenticationService.SignIn(customer, true);
+                                await _authenticationService.SignInAsync(customer, true);
                         }
                     }
                     //email
@@ -928,102 +939,102 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     {
                         //change email
                         var requireValidation = _customerSettings.UserRegistrationType == UserRegistrationType.EmailValidation;
-                        _customerRegistrationService.SetEmail(customer, model.Email.Trim(), requireValidation);
+                        await _customerRegistrationService.SetEmailAsync(customer, model.Email.Trim(), requireValidation);
 
                         //do not authenticate users in impersonation mode
                         if (_workContext.OriginalCustomerIfImpersonated == null)
                         {
                             //re-authenticate (if usernames are disabled)
                             if (!_customerSettings.UsernamesEnabled && !requireValidation)
-                                _authenticationService.SignIn(customer, true);
+                                await _authenticationService.SignInAsync(customer, true);
                         }
                     }
 
                     //properties
                     if (_dateTimeSettings.AllowCustomersToSetTimeZone)
                     {
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.TimeZoneIdAttribute,
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.TimeZoneIdAttribute,
                             model.TimeZoneId);
                     }
                     //VAT number
                     if (_taxSettings.EuVatEnabled)
                     {
-                        var prevVatNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.VatNumberAttribute);
+                        var prevVatNumber = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.VatNumberAttribute);
 
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberAttribute,
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.VatNumberAttribute,
                             model.VatNumber);
                         if (prevVatNumber != model.VatNumber)
                         {
-                            var vatNumberStatus = _taxService.GetVatNumberStatus(model.VatNumber, out _, out var vatAddress);
-                            _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.VatNumberStatusIdAttribute, (int)vatNumberStatus);
+                            var (vatNumberStatus, _, vatAddress) = await _taxService.GetVatNumberStatusAsync(model.VatNumber);
+                            await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.VatNumberStatusIdAttribute, (int)vatNumberStatus);
                             //send VAT number admin notification
                             if (!string.IsNullOrEmpty(model.VatNumber) && _taxSettings.EuVatEmailAdminWhenNewVatSubmitted)
-                                _workflowMessageService.SendNewVatSubmittedStoreOwnerNotification(customer,
+                                await _workflowMessageService.SendNewVatSubmittedStoreOwnerNotificationAsync(customer,
                                     model.VatNumber, vatAddress, _localizationSettings.DefaultAdminLanguageId);
                         }
                     }
 
                     //form fields
                     if (_customerSettings.GenderEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.GenderAttribute, model.Gender);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.GenderAttribute, model.Gender);
                     if (_customerSettings.FirstNameEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FirstNameAttribute, model.FirstName);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.FirstNameAttribute, model.FirstName);
                     if (_customerSettings.LastNameEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.LastNameAttribute, model.LastName);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.LastNameAttribute, model.LastName);
                     if (_customerSettings.DateOfBirthEnabled)
                     {
                         var dateOfBirth = model.ParseDateOfBirth();
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.DateOfBirthAttribute, dateOfBirth);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.DateOfBirthAttribute, dateOfBirth);
                     }
                     if (_customerSettings.CompanyEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CompanyAttribute, model.Company);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CompanyAttribute, model.Company);
                     if (_customerSettings.StreetAddressEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StreetAddressAttribute, model.StreetAddress);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.StreetAddressAttribute, model.StreetAddress);
                     if (_customerSettings.StreetAddress2Enabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StreetAddress2Attribute, model.StreetAddress2);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.StreetAddress2Attribute, model.StreetAddress2);
                     if (_customerSettings.ZipPostalCodeEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.ZipPostalCodeAttribute, model.ZipPostalCode);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ZipPostalCodeAttribute, model.ZipPostalCode);
                     if (_customerSettings.CityEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CityAttribute, model.City);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CityAttribute, model.City);
                     if (_customerSettings.CountyEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CountyAttribute, model.County);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CountyAttribute, model.County);
                     if (_customerSettings.CountryEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.CountryIdAttribute, model.CountryId);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CountryIdAttribute, model.CountryId);
                     if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.StateProvinceIdAttribute, model.StateProvinceId);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.StateProvinceIdAttribute, model.StateProvinceId);
                     if (_customerSettings.PhoneEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.PhoneAttribute, model.Phone);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.PhoneAttribute, model.Phone);
                     if (_customerSettings.FaxEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.FaxAttribute, model.Fax);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.FaxAttribute, model.Fax);
 
                     //newsletter
                     if (_customerSettings.NewsletterEnabled)
                     {
                         //save newsletter value
-                        var newsletter = _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, _storeContext.CurrentStore.Id);
+                        var newsletter = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreIdAsync(customer.Email, (await _storeContext.GetCurrentStoreAsync()).Id);
                         if (newsletter != null)
                         {
                             if (model.Newsletter)
                             {
                                 var wasActive = newsletter.Active;
                                 newsletter.Active = true;
-                                _newsLetterSubscriptionService.UpdateNewsLetterSubscription(newsletter);
+                                await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(newsletter);
                             }
                             else
                             {
-                                _newsLetterSubscriptionService.DeleteNewsLetterSubscription(newsletter);
+                                await _newsLetterSubscriptionService.DeleteNewsLetterSubscriptionAsync(newsletter);
                             }
                         }
                         else
                         {
                             if (model.Newsletter)
                             {
-                                _newsLetterSubscriptionService.InsertNewsLetterSubscription(new NewsLetterSubscription
+                                await _newsLetterSubscriptionService.InsertNewsLetterSubscriptionAsync(new NewsLetterSubscription
                                 {
                                     NewsLetterSubscriptionGuid = Guid.NewGuid(),
                                     Email = customer.Email,
                                     Active = true,
-                                    StoreId = _storeContext.CurrentStore.Id,
+                                    StoreId = (await _storeContext.GetCurrentStoreAsync()).Id,
                                     CreatedOnUtc = DateTime.UtcNow
                                 });
                             }
@@ -1031,18 +1042,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     }
 
                     if (_forumSettings.ForumsEnabled && _forumSettings.SignaturesEnabled)
-                        _genericAttributeService.SaveAttribute(customer, NopCustomerDefaults.SignatureAttribute, model.Signature);
+                        await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.SignatureAttribute, model.Signature);
 
                     //save customer attributes
-                    _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+                    await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(),
                         NopCustomerDefaults.CustomCustomerAttributes, customerAttributesXml);
 
                     //GDPR
                     if (_gdprSettings.GdprEnabled)
-                        LogGdpr(customer, oldCustomerModel, model, form);
+                        await LogGdprAsync(customer, oldCustomerModel, model, form);
 
-                    _genericAttributeService.SaveAttribute(customer, Constants.CellAttribute, cellPhone);
-                    _genericAttributeService.SaveAttribute(customer, Constants.PreferredLocationIdAttribute, preferredLocationId);
+                    await _genericAttributeService.SaveAttributeAsync(customer, Constants.CellAttribute, cellPhone);
+                    await _genericAttributeService.SaveAttributeAsync(customer, Constants.PreferredLocationIdAttribute, preferredLocationId);
 
                     var request = new ERPUpdateUserRequest
                     {
@@ -1055,7 +1066,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     };
 
                     #region BuildCustomAttributes
-                    var attributes = _customerAttributeService.GetAllCustomerAttributes();
+                    var attributes = await _customerAttributeService.GetAllCustomerAttributesAsync();
                     foreach (var attribute in attributes)
                     {
                         var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
@@ -1070,7 +1081,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                                         var selectedAttributeId = int.Parse(ctrlAttributes);
                                         if (selectedAttributeId > 0)
                                         {
-                                            var values = _customerAttributeService.GetCustomerAttributeValues(attribute.Id);
+                                            var values = await _customerAttributeService.GetCustomerAttributeValuesAsync(attribute.Id);
                                             var val = values.Where(x => x.Id == selectedAttributeId).FirstOrDefault();
                                             if (val != null)
                                             {
@@ -1100,7 +1111,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     #endregion
 
-                    _apiService.UpdateNSSUser(ErpId, request);
+                    await _apiService.UpdateNSSUserAsync(ErpId, request);
 
 
                     return RedirectToRoute("CustomerInfo");
@@ -1112,7 +1123,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             //If we got this far, something failed, redisplay form
-            model = _customerModelFactory.PrepareCustomerInfoModel(model, customer, true, customerAttributesXml);
+            model = await _customerModelFactory.PrepareCustomerInfoModelAsync(model, customer, true, customerAttributesXml);
             return View(model);
         }
 
@@ -1121,70 +1132,70 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region My account / Address
 
         [HttpsRequirement]
-        public override IActionResult Addresses()
+        public override async Task<IActionResult> Addresses()
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!(await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync())))
                 return Challenge();
-            int eRPCompanyId = GetERPCompanyId();
+            int eRPCompanyId = await GetERPCompanyId();
 
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
 
             if (!isBuyer)
                 return AccessDeniedView();
 
-            var model = _overrideCustomerModelFactory.PrepareCustomerAddressListModel(eRPCompanyId);
+            var model = await _overrideCustomerModelFactory.PrepareCustomerAddressListModelAsync(eRPCompanyId);
             return View(model);
         }
 
         [HttpsRequirement]
-        public override IActionResult AddressEdit(int addressId)
+        public override async Task<IActionResult> AddressEdit(int addressId)
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!(await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync())))
                 return Challenge();
 
-            var customer = _workContext.CurrentCustomer;
+            var customer = await _workContext.GetCurrentCustomerAsync();
             //find address (ensure that it belongs to the current customer)
-            var address = _customerService.GetCustomerAddress(customer.Id, addressId);
+            var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
             if (address == null)
                 //address is not found
                 return RedirectToRoute("CustomerAddresses");
 
             var model = new CustomerAddressEditModel();
-            _addressModelFactory.PrepareAddressModel(model.Address,
+            await _addressModelFactory.PrepareAddressModelAsync(model.Address,
                 address: address,
                 excludeProperties: false,
                 addressSettings: _addressSettings,
-                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+                loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id));
 
             return View(model);
         }
 
         [HttpsRequirement]
-        public override IActionResult AddressAdd()
+        public override async Task<IActionResult> AddressAdd()
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
                 return Challenge();
 
             var model = new CustomerAddressEditModel();
             model.Address.CountryId = 1;
-            _addressModelFactory.PrepareAddressModel(model.Address,
+            await _addressModelFactory.PrepareAddressModelAsync(model.Address,
                 address: null,
                 excludeProperties: false,
                 addressSettings: _addressSettings,
-                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
+                loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id));
 
             return View(model);
         }
 
         [HttpPost]
-        public override IActionResult AddressAdd(CustomerAddressEditModel model, IFormCollection form)
+        public override async Task<IActionResult> AddressAdd(CustomerAddressEditModel model, IFormCollection form)
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!(await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync())))
                 return Challenge();
 
             //custom address attributes
-            var customAttributes = _addressAttributeParser.ParseCustomAddressAttributes(form);
-            var customAttributeWarnings = _addressAttributeParser.GetAttributeWarnings(customAttributes);
+            var customAttributes = await _addressAttributeParser.ParseCustomAddressAttributesAsync(form);
+            var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
             foreach (var error in customAttributeWarnings)
             {
                 ModelState.AddModelError("", error);
@@ -1202,24 +1213,24 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     address.StateProvinceId = null;
 
 
-                _addressService.InsertAddress(address);
-                _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+                await _addressService.InsertAddressAsync(address);
+                await _customerService.InsertCustomerAddressAsync(await _workContext.GetCurrentCustomerAsync(), address);
 
 
                 SwiftCore.Domain.Customers.Company company;
                 string companyAddress;
-                GetERPCompanyIdAndAddressKey(address, out company, out companyAddress);
-                _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
+                (company, companyAddress) = await GetERPCompanyIdAndAddressKeyAsync(address);
+                await _genericAttributeService.SaveAttributeAsync<int>(company, companyAddress, address.Id);
 
                 return RedirectToRoute("CustomerAddresses");
             }
 
             //If we got this far, something failed, redisplay form
-            _addressModelFactory.PrepareAddressModel(model.Address,
+            await _addressModelFactory.PrepareAddressModelAsync(model.Address,
                 address: null,
                 excludeProperties: true,
                 addressSettings: _addressSettings,
-                loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id),
+                loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id),
                 overrideAttributesXml: customAttributes);
 
             return View(model);
@@ -1227,25 +1238,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         [HttpPost]
         [HttpsRequirement]
-        public override IActionResult AddressDelete(int addressId)
+        public override async Task<IActionResult> AddressDelete(int addressId)
         {
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!(await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync())))
                 return Challenge();
 
             
-            var customer = _workContext.CurrentCustomer;
+            var customer = await _workContext.GetCurrentCustomerAsync();
 
             //find address (ensure that it belongs to the current customer)
-            var address = _customerService.GetCustomerAddress(customer.Id, addressId);
+            var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
             if (address != null)
             {
-                _customerService.RemoveCustomerAddress(customer, address);
-                _customerService.UpdateCustomer(customer);
+                await _customerService.RemoveCustomerAddressAsync(customer, address);
+                await _customerService.UpdateCustomerAsync(customer);
                 //now delete the address record
-                _addressService.DeleteAddress(address);
+                await _addressService.DeleteAddressAsync(address);
 
-                GetERPCompanyIdAndAddressKey(address, out SwiftCore.Domain.Customers.Company company, out string companyAddress);
-                _genericAttributeService.SaveAttribute<string>(company, companyAddress, "");
+                var (company, companyAddress) = await GetERPCompanyIdAndAddressKeyAsync(address);
+                await _genericAttributeService.SaveAttributeAsync<string>(company, companyAddress, "");
             }
 
             //redirect to the address list page
@@ -1255,13 +1266,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             });
         }
 
-        private void GetERPCompanyIdAndAddressKey(Address address, out SwiftCore.Domain.Customers.Company company, out string companyAddress)
+        private async Task<(SwiftCore.Domain.Customers.Company, string)> GetERPCompanyIdAndAddressKeyAsync(Address address)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
-            companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+            var company = await _companyService.GetCompanyEntityByErpEntityIdAsync(eRPCompanyId);
+            var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
+
+            return (company, companyAddress);
         }
 
         #endregion
@@ -1269,12 +1282,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region My account / Notification
 
         [HttpsRequirement]
-        public IActionResult Notifications()
+        public async Task<IActionResult> Notifications()
         {
-            int eRPCompanyId = GetERPCompanyId();
+            int eRPCompanyId = await GetERPCompanyId();
 
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 
             if (!isOperations && !isBuyer)
                 return AccessDeniedView();
@@ -1284,22 +1297,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [HttpsRequirement]
-        public IActionResult GetNotifications()
+        public async Task<IActionResult> GetNotifications()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 
             if (!isOperations && !isBuyer)
                 return AccessDeniedView();
 
             // call api
-            var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
-            var (result, error) = _apiService.GetCompanyNotificationPreferences(custNo, eRPCompanyId);
+            var custNo = await _genericAttributeService.GetAttributeAsync<int>(await _workContext.GetCurrentCustomerAsync(), Constants.ErpKeyAttribute);
+            var (result, error) = await _apiService.GetCompanyNotificationPreferencesAsync(custNo, eRPCompanyId);
 
-            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(eRPCompanyId, error, result);
+            var model = await _overrideCustomerModelFactory.PrepareNotificationsModelAsync(eRPCompanyId, error, result);
 
             return Json(new { model });
         }
@@ -1308,21 +1321,21 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         [HttpsRequirement]
         [IgnoreAntiforgeryToken]
-        public IActionResult UpdateNotifications([FromBody] NotificationsModel.NotificationUpdateModel notificationRequest)
+        public async Task<IActionResult> UpdateNotifications([FromBody] NotificationsModel.NotificationUpdateModel notificationRequest)
         {
             if (notificationRequest == null)
                 throw new ArgumentNullException(nameof(notificationRequest));
 
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+            bool isOperations = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 
             if (!isOperations && !isBuyer)
                 return AccessDeniedView();
 
             // call api
-            var custNo = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, Constants.ErpKeyAttribute);
+            var custNo = await _genericAttributeService.GetAttributeAsync<int>(await _workContext.GetCurrentCustomerAsync(), Constants.ErpKeyAttribute);
             var preferences = new Dictionary<string, bool>();
 
             if (notificationRequest.Preferences != null)
@@ -1333,9 +1346,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
             }
 
-            var (result, error) = _apiService.UpdateCompanyNotificationPreferences(custNo, eRPCompanyId, preferences);
+            var (result, error) = await _apiService.UpdateCompanyNotificationPreferencesAsync(custNo, eRPCompanyId, preferences);
 
-            var model = _overrideCustomerModelFactory.PrepareNotificationsModel(eRPCompanyId, error, result);
+            var model = await _overrideCustomerModelFactory.PrepareNotificationsModelAsync(eRPCompanyId, error, result);
 
             //return View("~/Plugins/Misc.SwiftPortalOverride/Views/CustomerOverride/Notifications.cshtml", model);
 

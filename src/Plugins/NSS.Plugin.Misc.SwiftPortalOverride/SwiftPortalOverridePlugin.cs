@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride
 {
@@ -67,10 +68,10 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride
         /// <summary>
         /// Install the plugin
         /// </summary>
-        public override void Install()
+        public override async void InstallAsync()
         {
             //settings
-            _settingService.SaveSetting(
+            await _settingService.SaveSettingAsync(
                 new SwiftCoreSettings
                 {
                     StorageContainerName = "swiftportal-container",

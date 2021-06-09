@@ -6,6 +6,7 @@ using Nop.Services.Orders;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
 using Nop.Web.Models.ShoppingCart;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Components
 {
@@ -28,17 +29,17 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Components
             _workContext = workContext;
         }
 
-        public IViewComponentResult Invoke(bool? prepareAndDisplayOrderReviewData, ShoppingCartModel overriddenModel)
+        public async Task<IViewComponentResult> Invoke(bool? prepareAndDisplayOrderReviewData, ShoppingCartModel overriddenModel)
         {
             //use already prepared (shared) model
             if (overriddenModel != null)
                 return View(overriddenModel);
 
             //if not passed, then create a new model
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
             var model = new ShoppingCartModel();
-            model = _shoppingCartModelFactory.PrepareShoppingCartModel(model, cart,
+            model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart,
                 isEditable: false,
                 prepareAndDisplayOrderReviewData: prepareAndDisplayOrderReviewData.GetValueOrDefault());
             return View(model);

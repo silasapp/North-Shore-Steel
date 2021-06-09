@@ -2,6 +2,7 @@
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
 using Nop.Web.Models.Common;
+using System.Threading.Tasks;
 
 namespace Nop.Web.Components
 {
@@ -12,9 +13,9 @@ namespace Nop.Web.Components
         {
             _commonModelFactory = commonModelFactory;
         }
-        public IViewComponentResult Invoke()
+        public async Task<IViewComponentResult> Invoke()
         {
-            var model = _commonModelFactory.PrepareHeaderLinksModel();
+            var model = await _commonModelFactory.PrepareHeaderLinksModelAsync();
             return View(model);
         }
     }

@@ -11,6 +11,7 @@ using NSS.Plugin.Misc.SwiftCore.Configuration;
 using NSS.Plugin.Misc.SwiftPortalOverride.Services;
 using System;
 using Nop.Services.Common;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -46,22 +47,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region Methods
 
         [HttpsRequirement]
-        public IActionResult CompanyInvoices()
+        public async Task<IActionResult> CompanyInvoices()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
-            bool isAp = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.AP);
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+            bool isAp = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.AP);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
 
             if (!isAp)
                 return AccessDeniedView();
 
-            if (!_customerService.IsRegistered(_workContext.CurrentCustomer))
+            if (!(await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync())))
                 return Challenge();
 
             // get company info
-            var customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, eRPCompanyId);
-            var company = _apiService.GetCompanyInfo(eRPCompanyId.ToString());
+            var customerCompany = await _customerCompanyService.GetCustomerCompanyByErpCompIdAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId);
+            var company = await _apiService.GetCompanyInfoAsync(eRPCompanyId.ToString());
 
             // build credit summary
             var creditSummary = new CompanyInvoiceListModel.CreditSummaryModel
@@ -73,7 +74,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             if ( creditSummary.CompanyHasCreditTerms && (isAp))
             {
-                var creditResposne = _apiService.GetCompanyCreditBalance(eRPCompanyId);
+                var creditResposne = await _apiService.GetCompanyCreditBalanceAsync(eRPCompanyId);
 
                 creditSummary.CreditAmount = creditResposne?.CreditAmount ?? decimal.Zero;
                 creditSummary.CreditLimit = creditResposne?.CreditLimit ?? decimal.Zero;
@@ -98,15 +99,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
       
         [IgnoreAntiforgeryToken]
-        public PartialViewResult SearchCompanyInvoices([FromBody]CompanyInvoiceListModel.SearchFilter filter)
+        public async Task<PartialViewResult> SearchCompanyInvoices([FromBody]CompanyInvoiceListModel.SearchFilter filter)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
             var model = new CompanyInvoiceListModel();
 
             if (eRPCompanyId > 0)
-                model = _invoiceModelFactory.PrepareInvoiceListModel(eRPCompanyId, filter);
+                model = await _invoiceModelFactory.PrepareInvoiceListModelAsync(eRPCompanyId, filter);
             model.IsClosed = filter.IsClosed;
             return PartialView("_InvoiceGrid", model);
         }
