@@ -38,6 +38,7 @@ using NSS.Plugin.Misc.SwiftCore.Helpers;
 using NSS.Plugin.Misc.SwiftCore;
 using System.Diagnostics;
 using NSS.Plugin.Misc.SwiftCore.DTOs;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -153,19 +154,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #region Page Actions
 
-        public override IActionResult OnePageCheckout()
+        public override async Task<IActionResult> OnePageCheckout()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,(await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
             //validation
             if (_orderSettings.CheckoutDisabled)
                 return RedirectToRoute("ShoppingCart");
 
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
             if (!cart.Any())
                 return RedirectToRoute("ShoppingCart");
@@ -173,95 +174,96 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_orderSettings.OnePageCheckoutEnabled)
                 return RedirectToRoute("Checkout");
 
-            if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
+            if (await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync()) && !_orderSettings.AnonymousCheckoutAllowed)
                 return Challenge();
 
             var shoppingCartModel = new ShoppingCartModel();
 
             CheckoutCompleteOverrideModel model = new CheckoutCompleteOverrideModel
             {
-                BillingAddressModel = _overrideCheckoutModelFactory.PrepareOnePageCheckoutModel(cart),
-                ShippingAddressModel = _overrideCheckoutModelFactory.PrepareShippingAddressModel(cart, prePopulateNewAddressWithCustomerFields: true),
-                ShippingMethodModel = _checkoutModelFactory.PrepareShippingMethodModel(cart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer)),
-                ConfirmModel = _checkoutModelFactory.PrepareConfirmOrderModel(cart),
-                ShoppingCartModel = _shoppingCartModelFactory.PrepareShoppingCartModel(shoppingCartModel, cart),
-                OrderTotals = _shoppingCartModelFactory.PrepareOrderTotalsModel(cart, false)
+                BillingAddressModel = await _overrideCheckoutModelFactory.PrepareOnePageCheckoutModelAsync(cart),
+                ShippingAddressModel = await _overrideCheckoutModelFactory.PrepareShippingAddressModelAsync(cart, prePopulateNewAddressWithCustomerFields: true),
+                ShippingMethodModel = await _checkoutModelFactory.PrepareShippingMethodModelAsync(cart, await _customerService.GetCustomerShippingAddressAsync(await _workContext.GetCurrentCustomerAsync())),
+                ConfirmModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart),
+                ShoppingCartModel = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(shoppingCartModel, cart),
+                OrderTotals = await _shoppingCartModelFactory.PrepareOrderTotalsModelAsync(cart, false)
             };
 
             //filter by country
             var filterByCountryId = 0;
             if (_addressSettings.CountryEnabled)
             {
-                filterByCountryId = _customerService.GetCustomerBillingAddress(_workContext.CurrentCustomer)?.CountryId ?? 0;
+                filterByCountryId = (await _customerService.GetCustomerBillingAddressAsync(await _workContext.GetCurrentCustomerAsync()))?.CountryId ?? 0;
             }
 
             var usaCountryId = "1";
-            model.StateProvinces = _countryModelFactory.GetStatesByCountryId(usaCountryId, false);
+            model.StateProvinces = await _countryModelFactory.GetStatesByCountryIdAsync(usaCountryId, false);
 
             // account credit
             var creditModel = new AccountCreditModel();
-            var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
-            var companyInfo = _apiService.GetCompanyInfo(eRPCompanyId.ToString());
+            var (erpCompId, customerCompany) = await GetCustomerCompanyDetails();
+            var companyInfo = await _apiService.GetCompanyInfoAsync(eRPCompanyId.ToString());
 
             if (customerCompany != null && companyInfo != null && companyInfo.HasCredit && customerCompany.CanCredit)
             {
-                var creditResult = _apiService.GetCompanyCreditBalance(erpCompId);
+                var creditResult = await _apiService.GetCompanyCreditBalanceAsync(erpCompId);
                 creditModel = new AccountCreditModel { CanCredit = true, CreditAmount = creditResult?.CreditAmount ?? decimal.Zero };
 
                 // save credit bal, cached purposes
-                _genericAttributeService.SaveAttribute<decimal?>(_workContext.CurrentCustomer, PaypalDefaults.CreditBalanceKey, creditModel.CreditAmount, _storeContext.CurrentStore.Id);
+                await _genericAttributeService.SaveAttributeAsync<decimal?>(await _workContext.GetCurrentCustomerAsync(), PaypalDefaults.CreditBalanceKey, creditModel.CreditAmount,(await _storeContext.GetCurrentStoreAsync()).Id);
             }
 
             model.AccountCreditModel = creditModel;
 
-            (model.PaypalScript, _) = _payPalServiceManager.GetScript(_settings);
+            (model.PaypalScript, _) = await _payPalServiceManager.GetScriptAsync(_settings);
 
             //model
-            model.PaymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
+            model.PaymentMethodModel = await _checkoutModelFactory.PreparePaymentMethodModelAsync(cart, filterByCountryId);
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Checkout.cshtml", model);
         }
 
-        public override IActionResult Completed(int? orderId)
+        public override async Task<IActionResult> Completed(int? orderId)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
             //validation
-            if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
+            if (await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync()) && !_orderSettings.AnonymousCheckoutAllowed)
                 return Challenge();
 
             Nop.Core.Domain.Orders.Order order = null;
             if (orderId.HasValue)
             {
                 //load order by identifier (if provided)
-                order = _orderService.GetOrderById(orderId.Value);
+                order = await _orderService.GetOrderByIdAsync(orderId.Value);
             }
             if (order == null)
             {
-                order = _orderService.SearchOrders(storeId: _storeContext.CurrentStore.Id,
-                customerId: _workContext.CurrentCustomer.Id, pageSize: 1)
+                
+                order = (await _orderService.SearchOrdersAsync(storeId: (await _storeContext.GetCurrentStoreAsync()).Id,
+                customerId: (await _workContext.GetCurrentCustomerAsync()).Id, pageSize: 1))
                     .FirstOrDefault();
             }
-            if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
+            if (order == null || order.Deleted ||( await _workContext.GetCurrentCustomerAsync()).Id != order.CustomerId)
             {
                 return RedirectToRoute("Homepage");
             }
 
-            var model = _checkoutModelFactory.PrepareCheckoutCompletedModel(order);
+            var model = await _checkoutModelFactory.PrepareCheckoutCompletedModelAsync(order);
             //add erp order no
-            model.CustomProperties.TryAdd(SwiftCore.Helpers.Constants.ErpOrderNoAttribute, _genericAttributeService.GetAttribute<long?>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute));
+            model.CustomProperties.TryAdd(SwiftCore.Helpers.Constants.ErpOrderNoAttribute,await _genericAttributeService.GetAttributeAsync<long?>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute));
             return View("~/Plugins/Misc.SwiftPortalOverride/Views/CheckoutOverride/Completed.cshtml", model);
         }
 
-        public virtual IActionResult Rejected()
+        public virtual async Task<IActionResult> Rejected()
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
-            if (!_customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer))
+            if (!await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer))
                 return AccessDeniedView();
 
             return View();
@@ -273,7 +275,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         #region Ajax Actions
 
         [IgnoreAntiforgeryToken]
-        public virtual JsonResult CreatePayPalOrder([FromBody] ErpCheckoutModel model)
+        public virtual async Task<JsonResult> CreatePayPalOrder([FromBody] ErpCheckoutModel model)
         {
             try
             {
@@ -283,7 +285,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 _paymentService.GenerateOrderGuid(paymentRequest);
 
                 //try to create an order
-                var (order, errorMessage) = _payPalServiceManager.CreateOrder(_settings, paymentRequest.OrderGuid, model);
+                var (order, errorMessage) = await _payPalServiceManager.CreateOrderAsync(_settings, paymentRequest.OrderGuid, model);
                 if (order != null)
                 {
                     //save order details for future using
@@ -308,16 +310,16 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [IgnoreAntiforgeryToken]
-        public virtual JsonResult PlaceOrder([FromBody] ErpCheckoutModel model)
+        public virtual async Task<JsonResult> PlaceOrder([FromBody] ErpCheckoutModel model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Checkout Model is null");
 
             //validation
             if (_orderSettings.CheckoutDisabled)
-                throw new Exception(_localizationService.GetResource("Checkout.Disabled"));
+                throw new Exception(await _localizationService.GetResourceAsync("Checkout.Disabled"));
 
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
             if (!cart.Any())
                 throw new Exception("Your cart is empty");
@@ -325,29 +327,29 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (!_orderSettings.OnePageCheckoutEnabled)
                 throw new Exception("One page checkout is disabled");
 
-            if (_customerService.IsGuest(_workContext.CurrentCustomer) && !_orderSettings.AnonymousCheckoutAllowed)
+            if (await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync()) && !_orderSettings.AnonymousCheckoutAllowed)
                 throw new Exception("Anonymous checkout is not allowed");
 
             try
             {
                 // save shipping
                 if (!model.ShippingAddress.IsPickupInStore)
-                    _workContext.CurrentCustomer.ShippingAddressId = model.ShippingAddress.ShippingAddressId;
+                   ( await _workContext.GetCurrentCustomerAsync()).ShippingAddressId = model.ShippingAddress.ShippingAddressId;
 
                 // save billing
                 if (model.BillingAddress.BillingAddressId > 0)
                 {
-                    _workContext.CurrentCustomer.BillingAddressId = model.BillingAddress.BillingAddressId;
+                  ( await _workContext.GetCurrentCustomerAsync()).BillingAddressId = model.BillingAddress.BillingAddressId;
                 }
                 else if (!model.ShippingAddress.IsPickupInStore)
                 {
-                    _workContext.CurrentCustomer.BillingAddressId = model.ShippingAddress.ShippingAddressId;
+                  (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = model.ShippingAddress.ShippingAddressId;
                 }
 
-                _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+               await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
 
                 // payment
-                var result = ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType, model);
+                var result = await ProcessPayment(model.PaymentMethodModel.CheckoutPaymentMethodType, model);
 
                 return result;
 
@@ -355,28 +357,28 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
             catch (Exception exc)
             {
-                _logger.Error(exc.Message, exc, _workContext.CurrentCustomer);
+               await _logger.ErrorAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
                 return Json(new { error = 1, message = exc.Message });
             }
         }
 
 
         [IgnoreAntiforgeryToken]
-        public JsonResult SaveNewAddress([FromBody] NewAddress nAddress)
+        public async Task<JsonResult> SaveNewAddress([FromBody] NewAddress nAddress)
         {
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int eRPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, compIdCookieKey));
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,(await _workContext.GetCurrentCustomerAsync()).Id);
+            int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
             bool isExist = true;
-            var customer = _workContext.CurrentCustomer;
+            var customer = await _workContext.GetCurrentCustomerAsync();
             //new address
             AddressModel newAddress = new AddressModel
             {
 
                 // populate fields
                 Email = customer.Email,
-                FirstName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.FirstNameAttribute),
-                LastName = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastNameAttribute),
-                PhoneNumber = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.PhoneAttribute),
+                FirstName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.FirstNameAttribute),
+                LastName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastNameAttribute),
+                PhoneNumber = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.PhoneAttribute),
                 Address1 = nAddress.Address1,
                 Address2 = nAddress.Address2,
                 City = nAddress.City,
@@ -389,7 +391,8 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             string customAttributes = null;
 
             //try to find an address with the same values (don't duplicate records)
-            var address = _addressService.FindAddress(_customerService.GetAddressesByCustomerId(_workContext.CurrentCustomer.Id).ToList(),
+            var address = await _addressService.FindAddress(await _customerService.GetAddressesByCustomerIdAsync((await _workContext.GetCurrentCustomerAsync()).Id)
+                .ToList(),
                 newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
                 newAddress.Email, newAddress.FaxNumber, newAddress.Company,
                 newAddress.Address1, newAddress.Address2, newAddress.City,
@@ -403,18 +406,18 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 address.CustomAttributes = customAttributes;
                 address.CreatedOnUtc = DateTime.UtcNow;
 
-                _addressService.InsertAddress(address);
-                _customerService.InsertCustomerAddress(_workContext.CurrentCustomer, address);
+               await  _addressService.InsertAddressAsync(address);
+                await _customerService.InsertCustomerAddressAsync(await _workContext.GetCurrentCustomerAsync(), address);
 
-                var company = _companyService.GetCompanyEntityByErpEntityId(eRPCompanyId);
+                var company = await _companyService.GetCompanyEntityByErpEntityIdAsync(eRPCompanyId);
                 var companyAddress = string.Format(SwiftPortalOverrideDefaults.CompanyAddressKey, address.Id);
-                _genericAttributeService.SaveAttribute<int>(company, companyAddress, address.Id);
+               await _genericAttributeService.SaveAttributeAsync<int>(company, companyAddress, address.Id);
             }
 
 
-            var _ = nAddress.AddressType == "billing" ? _workContext.CurrentCustomer.BillingAddressId = address.Id : _workContext.CurrentCustomer.ShippingAddressId = address.Id;
+            var _ = nAddress.AddressType == "billing" ? (await _workContext.GetCurrentCustomerAsync()).BillingAddressId = address.Id : (await _workContext.GetCurrentCustomerAsync()).ShippingAddressId = address.Id;
 
-            _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+            await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
 
             var contractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             var savedAddress = JsonConvert.SerializeObject(address, new JsonSerializerSettings
@@ -427,48 +430,48 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         }
 
         [IgnoreAntiforgeryToken]
-        public JsonResult GetShippingRate([FromBody] ShippingCostRequest address)
+        public async Task<JsonResult> GetShippingRate([FromBody] ShippingCostRequest address)
         {
             try
             {
-                ERPCalculateShippingResponse response = GetShippingCost(address);
+                ERPCalculateShippingResponse response = await GetShippingCost(address);
 
                 if (!response.Allowed)
                     response.ShippingCost = decimal.Zero;
 
-                var shoppingCart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+                var shoppingCart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, (await _storeContext.GetCurrentStoreAsync()).Id);
 
                 //if pickup
                 if (address.IsPickup)
                 {
-                    var pickupPoints = _shippingService.GetPickupPoints(_workContext.CurrentCustomer.BillingAddressId ?? 0, _workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id).PickupPoints.ToList();
+                    var pickupPoints = (await _shippingService.GetPickupPointsAsync((await _workContext.GetCurrentCustomerAsync()).BillingAddressId ?? 0, await _workContext.GetCurrentCustomerAsync(), storeId:(await _storeContext.GetCurrentStoreAsync()).Id)).PickupPoints.ToList();
                     var pickupPoint = string.IsNullOrEmpty(address.PickupPointId) ? pickupPoints.FirstOrDefault() : pickupPoints.FirstOrDefault(x => x.Id == address.PickupPointId);
 
-                    SavePickupOption(pickupPoint);
+                   await SavePickupOptionAsync(pickupPoint);
                 }
                 else
                 {
                     // update shipping address
                     if (address.ExistingAddressId.HasValue && address.ExistingAddressId.Value > 0)
                     {
-                        _workContext.CurrentCustomer.ShippingAddressId = address.ExistingAddressId;
-                        _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                       (await _workContext.GetCurrentCustomerAsync()).ShippingAddressId = address.ExistingAddressId;
+                       await _customerService.UpdateCustomerAsync(await _workContext.GetCurrentCustomerAsync());
                     }
 
                     //Get shipping
-                    var shippingOptions = _shippingService.GetShippingOptions(shoppingCart, _customerService.GetCustomerShippingAddress(_workContext.CurrentCustomer),
-                        _workContext.CurrentCustomer, "Shipping.NSS", _storeContext.CurrentStore.Id).ShippingOptions.ToList();
+                    var shippingOptions = (await _shippingService.GetShippingOptionsAsync(shoppingCart, await _customerService.GetCustomerShippingAddressAsync(await _workContext.GetCurrentCustomerAsync()),
+                       await _workContext.GetCurrentCustomerAsync(), "Shipping.NSS",(await _storeContext.GetCurrentStoreAsync()).Id)).ShippingOptions.ToList();
 
                     var shippingOption = shippingOptions.FirstOrDefault();
 
                     //save
                     if (shippingOption != null)
-                        _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption, _storeContext.CurrentStore.Id);
+                       await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption,(await _storeContext.GetCurrentStoreAsync()).Id);
 
-                    _genericAttributeService.SaveAttribute<PickupPoint>(_workContext.CurrentCustomer, NopCustomerDefaults.SelectedPickupPointAttribute, null, _storeContext.CurrentStore.Id);
+                    await _genericAttributeService.SaveAttributeAsync<PickupPoint>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.SelectedPickupPointAttribute, null, (await _storeContext.GetCurrentStoreAsync()).Id);
                 }
 
-                var orderTotals = _shoppingCartModelFactory.PrepareOrderTotalsModel(shoppingCart, false);
+                var orderTotals = await _shoppingCartModelFactory.PrepareOrderTotalsModelAsync(shoppingCart, false);
 
                 return Json(new
                 {
@@ -490,19 +493,19 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
         #region Util Methods
 
-        private ERPCalculateShippingRequest BuildShippingCostRequest(ErpCheckoutModel model)
+        private async Task<ERPCalculateShippingRequest> BuildShippingCostRequest(ErpCheckoutModel model)
         {
-            var shippingAddress = _addressService.GetAddressById(model.ShippingAddress.ShippingAddressId);
+            var shippingAddress = await _addressService.GetAddressByIdAsync(model.ShippingAddress.ShippingAddressId);
             var shippingAddressNew = model.ShippingAddress.ShippingNewAddress;
 
-            var shipStateProvince = shippingAddress != null ? _stateProvinceService.GetStateProvinceByAddress(shippingAddress) : _stateProvinceService.GetStateProvinceById(shippingAddressNew.StateProvinceId ?? 0);
+            var shipStateProvince = shippingAddress != null ? await _stateProvinceService.GetStateProvinceByAddressAsync(shippingAddress) : await _stateProvinceService.GetStateProvinceByIdAsync(shippingAddressNew.StateProvinceId ?? 0);
 
             var shippingAddress1 = shippingAddress != null ? shippingAddress.Address1 : shippingAddressNew.Address1;
             var shippingAddress2 = shippingAddress != null ? shippingAddress.Address2 : shippingAddressNew.Address2;
             var shippingCity = shippingAddress != null ? shippingAddress.City : shippingAddressNew.City;
             var shippingCountryId = shippingAddress != null ? shippingAddress.CountryId : shippingAddressNew.CountryId;
             var shippingZipPostalCode = shippingAddress != null ? shippingAddress.ZipPostalCode : shippingAddressNew.ZipPostalCode;
-            var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute);
+            var shippingPhoneNumber = shippingAddress != null ? shippingAddress.PhoneNumber : await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.PhoneAttribute);
 
             var request = new ERPCalculateShippingRequest
             {
@@ -517,7 +520,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return request;
         }
 
-        private ERPCalculateShippingResponse GetShippingCost(ShippingCostRequest address = null, ERPCalculateShippingRequest requestOverride = null)
+        private async Task<ERPCalculateShippingResponse> GetShippingCost(ShippingCostRequest address = null, ERPCalculateShippingRequest requestOverride = null)
         {
             if (address == null && requestOverride == null)
                 throw new ArgumentNullException(nameof(address));
@@ -532,7 +535,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                     DeliveryMethod = address.IsPickup ? "Pickup" : "Shipping",
                     DestinationAddressLine1 = address.Address1,
                     DestinationAddressLine2 = address.Address2,
-                    State = _stateProvinceService.GetStateProvinceById(address.StateProvinceId ?? 0)?.Abbreviation,
+                    State = (await _stateProvinceService.GetStateProvinceByIdAsync(address.StateProvinceId ?? 0))?.Abbreviation,
                     City = address.City,
                     PostalCode = address.ZipPostalCode,
                     PickupLocationId = address.IsPickup ? (address?.City?.ToLower() == "houston" ? 2 : (address?.City?.ToLower() == "beaumont" ? 1 : 0)) : 0
@@ -541,11 +544,11 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var orderItems = new List<Item>();
             request.OrderWeight = 0;
 
-            var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart,(await _storeContext.GetCurrentStoreAsync()).Id);
 
             foreach (var item in cart)
             {
-                var attr = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                var attr =await _genericAttributeService.GetAttributesForEntityAsync(item.ProductId, nameof(Product));
 
                 bool isNum = decimal.TryParse(attr.FirstOrDefault(x => x.Key == "weight")?.Value, out decimal weight);
                 isNum = int.TryParse(attr.FirstOrDefault(x => x.Key == "shapeId")?.Value, out int shapeId);
@@ -557,7 +560,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (length > request.MaxLength)
                     request.MaxLength = (int)Math.Round(length);
 
-                var shape = _shapeService.GetShapeByIdAsync(shapeId);
+                var shape = await _shapeService.GetShapeByIdAsync(shapeId);
 
                 orderItems.Add(new Item
                 {
@@ -569,15 +572,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             request.Items = JsonConvert.SerializeObject(orderItems.ToArray());
 
-            var (_, response) = _apiService.GetShippingRate(request);
+            var (_, response) = await _apiService.GetShippingRateAsync(request);
             return response;
         }
 
-        private JsonResult ProcessPayment(int paymentMethodtype, ErpCheckoutModel model)
+        private async Task<JsonResult> ProcessPayment(int paymentMethodtype, ErpCheckoutModel model)
         {
             //prevent 2 orders being placed within an X seconds time frame
-            if (!IsMinimumOrderPlacementIntervalValid(_workContext.CurrentCustomer))
-                throw new Exception(_localizationService.GetResource("Checkout.MinOrderPlacementInterval"));
+            if (!await IsMinimumOrderPlacementIntervalValidAsync(await _workContext.GetCurrentCustomerAsync()))
+                throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
             //place order
             var processPaymentRequest = HttpContext.Session.Get<ProcessPaymentRequest>("OrderPaymentInfo");
@@ -609,30 +612,30 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             _paymentService.GenerateOrderGuid(processPaymentRequest);
-            processPaymentRequest.StoreId = _storeContext.CurrentStore.Id;
-            processPaymentRequest.CustomerId = _workContext.CurrentCustomer.Id;
+            processPaymentRequest.StoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
+            processPaymentRequest.CustomerId = (await _workContext.GetCurrentCustomerAsync()).Id;
             processPaymentRequest.PaymentMethodSystemName = paymentMethod;
             HttpContext.Session.Set<ProcessPaymentRequest>("OrderPaymentInfo", processPaymentRequest);
 
-            var result = ProcessPaymentType(processPaymentRequest, paymentMethod);
+            var result = await ProcessPaymentType(processPaymentRequest, paymentMethod);
 
             return result;
         }
 
-        private JsonResult ProcessPaymentType(ProcessPaymentRequest processPaymentRequest, string paymentMethod)
+        private async Task<JsonResult> ProcessPaymentType(ProcessPaymentRequest processPaymentRequest, string paymentMethod)
         {
             //add custom values
             processPaymentRequest.CustomValues.Add(PaypalDefaults.PaymentMethodTypeKey, paymentMethod);
             if (paymentMethod == "CREDIT")
             {
                 //nss get credit amount
-                var (erpCompId, _) = GetCustomerCompanyDetails();
+                var (erpCompId, _) = await GetCustomerCompanyDetails();
                 // get credit balance from cache
-                var creditAmount = _genericAttributeService.GetAttribute<decimal>(_workContext.CurrentCustomer, PaypalDefaults.CreditBalanceKey, _storeContext.CurrentStore.Id, decimal.Zero);
+                var creditAmount = await _genericAttributeService.GetAttributeAsync<decimal>(await _workContext.GetCurrentCustomerAsync(), PaypalDefaults.CreditBalanceKey, (await _storeContext.GetCurrentStoreAsync()).Id, decimal.Zero);
                 processPaymentRequest.CustomValues.Add(PaypalDefaults.CreditBalanceKey, creditAmount);
             }
 
-            var placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest);
+            var placeOrderResult = await _orderProcessingService.PlaceOrderAsync(processPaymentRequest);
 
             if (placeOrderResult.Success)
             {
@@ -643,7 +646,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 };
 
                 // reset credit balance
-                _genericAttributeService.SaveAttribute<decimal?>(_workContext.CurrentCustomer, PaypalDefaults.CreditBalanceKey, null, _storeContext.CurrentStore.Id);
+                await _genericAttributeService.SaveAttributeAsync<decimal?>(await _workContext.GetCurrentCustomerAsync(), PaypalDefaults.CreditBalanceKey, null, (await _storeContext.GetCurrentStoreAsync()).Id);
 
                 // call nss place Order
                 processPaymentRequest.CustomValues.TryGetValue(PaypalDefaults.ShippingDeliveryDateKey, out var deliveryDate);
@@ -654,7 +657,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex.Message, ex, _workContext.CurrentCustomer);
+                    await _logger.ErrorAsync(ex.Message, ex, await _workContext.GetCurrentCustomerAsync());
 
                     return Json(new { error = 3, message = "Order was not placed successfully" });
                 }
@@ -663,9 +666,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 if (paymentMethod == "CREDIT")
                 {
                     placeOrderResult.PlacedOrder.PaymentStatus = PaymentStatus.Paid;
-                    _orderService.UpdateOrder(placeOrderResult.PlacedOrder);
+                    await _orderService.UpdateOrderAsync(placeOrderResult.PlacedOrder);
 
-                    _orderProcessingService.CheckOrderStatus(placeOrderResult.PlacedOrder);
+                    await _orderProcessingService.CheckOrderStatusAsync(placeOrderResult.PlacedOrder);
                 }
 
                 //success
@@ -675,23 +678,23 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return Json(new { error = 1, message = "Order was not placed successfully" });
         }
 
-        private void NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod, string deliveryDate)
+        private async Task NSSPlaceOrderRequest(Nop.Core.Domain.Orders.Order order, string paymentMethod, string deliveryDate)
         {
-            var shippingAddress = _addressService.GetAddressById(order.ShippingAddressId ?? 0);
-            var pickupAddress = _addressService.GetAddressById(order.PickupAddressId ?? 0);
+            var shippingAddress = await _addressService.GetAddressByIdAsync(order.ShippingAddressId ?? 0);
+            var pickupAddress = await _addressService.GetAddressByIdAsync(order.PickupAddressId ?? 0);
 
-            var chkAttr = _checkoutAttributeParser.ParseCheckoutAttributes(order.CheckoutAttributesXml);
+            var chkAttr = await _checkoutAttributeParser.ParseCheckoutAttributesAsync(order.CheckoutAttributesXml);
             var poAttr = chkAttr.FirstOrDefault(x => x.Name == SwiftCore.Helpers.Constants.CheckoutPONoAttribute);
             var poValues = poAttr != null ? _checkoutAttributeParser.ParseValues(order.CheckoutAttributesXml, poAttr.Id) : new List<string>();
 
-            var (erpCompId, customerCompany) = GetCustomerCompanyDetails();
+            var (erpCompId, customerCompany) = await GetCustomerCompanyDetails();
 
             // discounts
             var discounts = new List<Discount>();
-            var discounUsagetList = _discountService.GetAllDiscountUsageHistory(orderId: order.Id);
+            var discounUsagetList = await _discountService.GetAllDiscountUsageHistoryAsync(orderId: order.Id);
             foreach (var item in discounUsagetList)
             {
-                var discount = _discountService.GetDiscountById(item.DiscountId);
+                var discount = await _discountService.GetDiscountByIdAsync(item.DiscountId);
                 if (discount != null)
                 {
                     decimal amount = decimal.Zero;
@@ -716,14 +719,14 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             }
 
             // order items
-            var orderItemList = _orderService.GetOrderItems(order.Id);
+            var orderItemList = await _orderService.GetOrderItemsAsync(order.Id);
             var orderItems = new List<SwiftCore.DTOs.OrderItem>();
             foreach (var item in orderItemList)
             {
-                var genAttrs = _genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                var genAttrs = await _genericAttributeService.GetAttributesForEntityAsync(item.ProductId, nameof(Product));
 
-                var mappings = _productAttributeParser.ParseProductAttributeMappings(item.AttributesXml);
-                var attrs = _productAttributeService.GetAllProductAttributes();
+                var mappings = await _productAttributeParser.ParseProductAttributeMappingsAsync(item.AttributesXml);
+                var attrs = await _productAttributeService.GetAllProductAttributesAsync();
 
                 string uom = null, notes = null, sawoptions = null, sawTolerance = null, workOrderInstructions = null;
 
@@ -744,7 +747,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         }
                         else if (mapping.ProductAttributeId == sawOptionAttr?.Id)
                         {
-                            sawoptions = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name;
+                            sawoptions = (await _productAttributeParser.ParseProductAttributeValuesAsync(item.AttributesXml, mapping.Id))?.FirstOrDefault()?.Name;
                         }
                         else if (mapping.ProductAttributeId == workOrderAttr?.Id)
                         {
@@ -752,7 +755,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                         }
                         else if (mapping.ProductAttributeId == uomAttr?.Id)
                         {
-                            uom = _productAttributeParser.ParseProductAttributeValues(item.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? Constants.UnitPerPieceField;
+                            uom = (await _productAttributeParser.ParseProductAttributeValuesAsync(item.AttributesXml, mapping.Id))?.FirstOrDefault()?.Name ?? Constants.UnitPerPieceField;
                         }
                     }
                 }
@@ -776,15 +779,15 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
             var request = new ERPCreateOrderRequest()
             {
-                ContactEmail = _workContext.CurrentCustomer.Email,
-                ContactFirstName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.FirstNameAttribute),
-                ContactLastName = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.LastNameAttribute),
-                ContactPhone = _genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, NopCustomerDefaults.PhoneAttribute),
-                UserId = _genericAttributeService.GetAttribute<int>(_workContext.CurrentCustomer, SwiftCore.Helpers.Constants.ErpKeyAttribute),
+                ContactEmail = (await _workContext.GetCurrentCustomerAsync()).Email,
+                ContactFirstName = await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.FirstNameAttribute),
+                ContactLastName = await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.LastNameAttribute),
+                ContactPhone = await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.PhoneAttribute),
+                UserId = await _genericAttributeService.GetAttributeAsync<int>(await _workContext.GetCurrentCustomerAsync(), SwiftCore.Helpers.Constants.ErpKeyAttribute),
 
                 ShippingAddressLine1 = shippingAddress?.Address1,
                 ShippingAddressLine2 = shippingAddress?.Address2,
-                ShippingAddressState = _stateProvinceService.GetStateProvinceById(shippingAddress?.StateProvinceId ?? 0)?.Abbreviation,
+                ShippingAddressState = (await _stateProvinceService.GetStateProvinceByIdAsync(shippingAddress?.StateProvinceId ?? 0))?.Abbreviation,
                 ShippingAddressCity = shippingAddress?.City,
                 ShippingAddressPostalCode = shippingAddress?.ZipPostalCode,
                 PickupInStore = order.PickupInStore,
@@ -811,22 +814,22 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             };
 
             // api call
-            var resp = _apiService.CreateNSSOrder(erpCompId, request);
+            var resp = await _apiService.CreateNSSOrderAsync(erpCompId, request);
 
             if (resp.NSSOrderNo > 0)
-                _genericAttributeService.SaveAttribute<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo);
+                await _genericAttributeService.SaveAttributeAsync<long>(order, SwiftCore.Helpers.Constants.ErpOrderNoAttribute, resp.NSSOrderNo);
 
         }
 
-        private (int companyId, CustomerCompany customerCompany) GetCustomerCompanyDetails()
+        private async Task<(int companyId, CustomerCompany customerCompany)> GetCustomerCompanyDetails()
         {
             CustomerCompany customerCompany = null;
 
-            string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.CurrentCustomer.Id);
-            int ERPCompanyId = Convert.ToInt32(_genericAttributeService.GetAttribute<string>(_workContext.CurrentCustomer, erpCompIdCookieKey));
+            string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,( await _workContext.GetCurrentCustomerAsync()).Id);
+            int ERPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), erpCompIdCookieKey));
 
             if (ERPCompanyId > 0)
-                customerCompany = _customerCompanyService.GetCustomerCompanyByErpCompId(_workContext.CurrentCustomer.Id, ERPCompanyId);
+                customerCompany = await _customerCompanyService.GetCustomerCompanyByErpCompIdAsync((await _workContext.GetCurrentCustomerAsync()).Id, ERPCompanyId);
 
             return (ERPCompanyId, customerCompany);
         }
