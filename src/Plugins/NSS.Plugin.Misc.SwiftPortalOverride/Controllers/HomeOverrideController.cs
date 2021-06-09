@@ -14,6 +14,7 @@ using Nop.Core.Domain.Customers;
 using NSS.Plugin.Misc.SwiftPortalOverride.Factories;
 using NSS.Plugin.Misc.SwiftCore.DTOs;
 using NSS.Plugin.Misc.SwiftCore.Helpers;
+using System.Threading.Tasks;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 {
@@ -59,7 +60,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         public override IActionResult Index()
         {
             string ERPCId = string.Empty;
-            var currentCustomer = _workContext.CurrentCustomer;
+            var currentCustomer =  _workContext.GetCurrentCustomerAsync().Result;
             int customerId = currentCustomer.Id;
             Company company = new Company();
 
@@ -67,9 +68,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             TransactionModel model = new TransactionModel();
 
             // get all companies assigned to customer
-            IEnumerable<CustomerCompany> customerCompanies = _customerCompanyService.GetCustomerCompaniesAsync(customerId);
+            IEnumerable<CustomerCompany> customerCompanies = _customerCompanyService.GetCustomerCompaniesAsync(customerId).Result;
 
-            ERPCId = _genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
+            ERPCId =  _genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey).Result;
 
             if (ERPCId != null)
             {
@@ -77,7 +78,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 IEnumerable<CustomerCompany> cc = customerCompanies.Where(x => x.Company.ErpCompanyId.ToString() == ERPCId);
                 if (cc.Count() > 0)
                 {
-                    return NavigateToPermittedHomeScreen(ERPCId, out model);
+                 var (result, updatedModel) = NavigateToPermittedHomeScreen(ERPCId).Result;
+                    model = updatedModel;
+                    return result;
                 }
 
                 // remove cookie
@@ -89,7 +92,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
                 SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCId);
 
-                return NavigateToPermittedHomeScreen(ERPCId, out model);
+                var (result, updatedModel) = NavigateToPermittedHomeScreen(ERPCId).Result;
+                model = updatedModel;
+                return result;
             }
             else if (customerCompanies.Count() > 1)
             {
@@ -106,49 +111,49 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             return RedirectToAction("Index", "Resource");
         }
 
-        public void SelectCompany(string ERPCompanyId)
+        public async Task SelectCompany(string ERPCompanyId)
         {
-            var currentCustomer = _workContext.CurrentCustomer;
+            var currentCustomer = await _workContext.GetCurrentCustomerAsync();
             int customerId = currentCustomer.Id;
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, customerId);
-            SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
+           await SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
         }
 
-        private IActionResult NavigateToPermittedHomeScreen(string ERPCId, out TransactionModel model)
+        private async Task<(IActionResult, TransactionModel model)> NavigateToPermittedHomeScreen(string ERPCId)
         {
-            model = new TransactionModel();
+           var model = new TransactionModel();
 
-            var (canViewDashboard, isAPUser) = CanViewDashboard(ERPCId);
+            var (canViewDashboard, isAPUser) = await CanViewDashboard(ERPCId);
 
             if (canViewDashboard)
             {
-                model = _customerModelFactory.PrepareCustomerHomeModel(ERPCId);
-                return View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model);
+                model = await _customerModelFactory.PrepareCustomerHomeModelAsync(ERPCId);
+                return (View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml"),model);
             }
 
             if (isAPUser)
             {
-                return RedirectToAction("CompanyInvoices", "Invoice");
+                return (RedirectToAction("CompanyInvoices", "Invoice"),model);
             }
 
             // no permission
-            return RedirectToAction("Index", "Resource");
+            return (RedirectToAction("Index", "Resource"),model);
         }
 
-        private (bool, bool) CanViewDashboard(string ERPCId)
+        private async Task<(bool, bool)> CanViewDashboard(string ERPCId)
         {
-            bool isBuyer = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.Buyer);
-            bool isOperations = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.Operations);
-            bool isAPUser = _customerCompanyService.Authorize(_workContext.CurrentCustomer.Id, Convert.ToInt32(ERPCId), ERPRole.AP);
+            bool isBuyer = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, Convert.ToInt32(ERPCId), ERPRole.Buyer);
+            bool isOperations = await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, Convert.ToInt32(ERPCId), ERPRole.Operations);
+            bool isAPUser =await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, Convert.ToInt32(ERPCId), ERPRole.AP);
 
             bool canViewDashboard = (isBuyer || isOperations);
 
             return (canViewDashboard, isAPUser);
         }
 
-        private void SaveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
+        private async Task SaveAttributeERPCompanyId(Nop.Core.Domain.Customers.Customer currentCustomer, string compIdCookieKey, string ERPCompanyId)
         {
-            _genericAttributeService.SaveAttribute(currentCustomer, compIdCookieKey, ERPCompanyId);
+           await _genericAttributeService.SaveAttributeAsync(currentCustomer, compIdCookieKey, ERPCompanyId);
         }
     }
 }
