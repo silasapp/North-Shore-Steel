@@ -101,7 +101,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Factories
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
 
-            return await (await _specificationAttributeService.GetProductSpecificationAttributesAsync(product.Id, 0, null, true))
+            return await (await _pecificationAttributeService.GetProductSpecificationAttributesAsync(product.Id, 0, null, true))
                 .SelectAwait(async psa =>
                 {
                     var specAttributeOption =
