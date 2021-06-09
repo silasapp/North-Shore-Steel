@@ -25,7 +25,7 @@
 @model CheckoutCompleteOverrideModel
 @{
     Layout = "_ColumnsOne";
-    var themeName = themeContext.WorkingThemeName;
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
 
     //title
     Html.AddTitleParts("Checkout");
@@ -89,10 +89,10 @@
 }
 
 @{
-    var customer = workContext.CurrentCustomer;
+    var customer = await workContext.GetCurrentCustomerAsync();
     CustomerCompany customerCompany = GetCustomerCompanyDetails();
-    var cartItems = shoppingCartService.GetShoppingCart(customer, ShoppingCartType.ShoppingCart);
-    int preferredLocationId = genericAttributeService.GetAttribute<int>(customer, Constants.PreferredLocationIdAttribute);
+    var cartItems = await shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart);
+    int preferredLocationId = await genericAttributeService.GetAttributeAsync<int>(customer, Constants.PreferredLocationIdAttribute);
 
     PreferredLocation preferredLocation = PreferredLocation.Beaumont;
 
@@ -432,15 +432,15 @@ Content2 =
                                 {
                                     var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
 
-                                    var product = productService.GetProductById(item.ProductId);
-                                    var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                                    var product = await productService.GetProductByIdAsync(item.ProductId);
+                                    var attr = await genericAttributeService.GetAttributesForEntityAsync(item.ProductId, nameof(Product));
 
-                                    var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
-                                    var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
+                                    var attribute = (await productAttributeService.GetAllProductAttributesAsync())?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                                    var mappings = await productAttributeParser.ParseProductAttributeMappingsAsync(cartItem.AttributesXml);
                                     var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
                                     var uom = "EA";
                                     if (mapping != null)
-                                        uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
+                                        uom = (await productAttributeParser.ParseProductAttributeValuesAsync(cartItem.AttributesXml, mapping.Id))?.FirstOrDefault()?.Name ?? "EA";
 
                                     var customerPathNo = "";
                                     if (customerCompany != null)
@@ -472,15 +472,15 @@ Content2 =
                         {
                             var cartItem = cartItems.FirstOrDefault(x => x.Id == item.Id);
 
-                            var product = productService.GetProductById(item.ProductId);
-                            var attr = genericAttributeService.GetAttributesForEntity(item.ProductId, nameof(Product));
+                            var product = await productService.GetProductByIdAsync(item.ProductId);
+                            var attr = await genericAttributeService.GetAttributesForEntityAsync(item.ProductId, nameof(Product));
 
-                            var attribute = productAttributeService.GetAllProductAttributes()?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
-                            var mappings = productAttributeParser.ParseProductAttributeMappings(cartItem.AttributesXml);
+                            var attribute = (await productAttributeService.GetAllProductAttributesAsync())?.FirstOrDefault(x => x.Name == Constants.PurchaseUnitAttribute);
+                            var mappings = await productAttributeParser.ParseProductAttributeMappingsAsync(cartItem.AttributesXml);
                             var mapping = mappings.FirstOrDefault(x => x.ProductAttributeId == attribute?.Id);
                             var uom = "EA";
                             if (mapping != null)
-                                uom = productAttributeParser.ParseProductAttributeValues(cartItem.AttributesXml, mapping.Id)?.FirstOrDefault()?.Name ?? "EA";
+                                uom = (await productAttributeParser.ParseProductAttributeValuesAsync(cartItem.AttributesXml, mapping.Id))?.FirstOrDefault()?.Name ?? "EA";
 
                             var customerPathNo = "";
                             if (customerCompany != null)
@@ -562,17 +562,17 @@ Content2 =
         return s;
     }
 
-    CustomerCompany GetCustomerCompanyDetails()
+   async  CustomerCompany  GetCustomerCompanyDetails()
     {
         CustomerCompany customerCompany = new CustomerCompany();
-        var currentCustomer = workContext.CurrentCustomer;
+        var currentCustomer = await workContext.GetCurrentCustomerAsync();
         var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-        int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+        int eRPCompanyId = Convert.ToInt32(await genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey));
 
         if (eRPCompanyId > 0)
-            customerCompany = customerCompanyService.GetCustomerCompanyByErpCompId(currentCustomer.Id, eRPCompanyId);
+            customerCompany = await customerCompanyService.GetCustomerCompanyByErpCompIdAsync(currentCustomer.Id, eRPCompanyId);
 
-        return customerCompany;
+        return  customerCompany;
     }
 }
 <script>
