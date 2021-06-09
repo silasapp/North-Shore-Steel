@@ -391,8 +391,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             string customAttributes = null;
 
             //try to find an address with the same values (don't duplicate records)
-            var address = await _addressService.FindAddress(await _customerService.GetAddressesByCustomerIdAsync((await _workContext.GetCurrentCustomerAsync()).Id)
-                .ToList(),
+            var address = _addressService.FindAddress((await _customerService.GetAddressesByCustomerIdAsync((await _workContext.GetCurrentCustomerAsync()).Id)).ToList(),
                 newAddress.FirstName, newAddress.LastName, newAddress.PhoneNumber,
                 newAddress.Email, newAddress.FaxNumber, newAddress.Company,
                 newAddress.Address1, newAddress.Address2, newAddress.City,
