@@ -109,7 +109,7 @@ namespace NSS.Plugin.Shipping.NSS.Services
                 if (length > request.MaxLength)
                     request.MaxLength = (int)Math.Round(length);
 
-                var shape = _shapeService.GetShapeByIdAsync(shapeId);
+                var shape = await _shapeService.GetShapeByIdAsync(shapeId);
 
                 orderItems.Add(new Item
                 {
