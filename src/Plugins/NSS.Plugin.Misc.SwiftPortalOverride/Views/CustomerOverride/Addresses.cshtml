@@ -21,10 +21,10 @@
 }
 
 @{
-    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
-    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-    bool isOperations = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await workContext.GetCurrentCustomerAsync()).Id);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttributeAsync<string>(await workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+    bool isBuyer = await customerCompanyService.AuthorizeAsync((await workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+    bool isOperations = await customerCompanyService.AuthorizeAsync((await workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 }
 
 @section left
@@ -33,7 +33,7 @@
 }
 
 @{
-    var themeName = themeContext.WorkingThemeName;
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
 }
 
 <style>
