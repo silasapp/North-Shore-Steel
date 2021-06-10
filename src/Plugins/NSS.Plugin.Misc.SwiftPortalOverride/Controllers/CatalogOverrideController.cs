@@ -67,7 +67,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         {
             // _workContext.CurrentCustomer changed to _workContext.GetCurrentCustomerAsync()
             // _workContext.CurrentStore changed to _workContext.GetCurrentStoreAsync()
-            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, _workContext.GetCurrentCustomerAsync().Id);
+            var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
             int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
             if (!(await _customerCompanyService.AuthorizeAsync((await _workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer)))
