@@ -11,7 +11,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public IEnumerable<IGrouping<string, SpecificationFilter>> ProductsGroupedBySpecTitle { get; set; }
 
         public List<SpecificationFilter> SpecificationFilters { get; set; }
-        public string rr { get; set; }
 
     }
 

@@ -50,7 +50,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public bool PayPalClientId_OverrideForStore { get; set; }
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.PayPalSecretKey")]
         [DataType(DataType.Password)]
-        [NoTrim]
         public string PayPalSecretKey { get; set; }
         public bool PayPalSecretKey_OverrideForStore { get; set; }
 
