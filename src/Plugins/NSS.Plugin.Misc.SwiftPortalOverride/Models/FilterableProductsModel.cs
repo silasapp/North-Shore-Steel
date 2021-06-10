@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class FilterableProductsModel : BaseNopModel
+    public record FilterableProductsModel : BaseNopModel
     {
         public IEnumerable<IGrouping<string, SpecificationFilter>> ProductsGroupedBySpecTitle { get; set; }
 

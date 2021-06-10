@@ -7,7 +7,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class ConfigurationModel : BaseNopModel
+    public record ConfigurationModel : BaseNopModel
     {
         public int ActiveStoreScopeConfiguration {get;set;}
         [NopResourceDisplayName("Plugins.Misc.SwiftPortalOverride.Fields.UseSandBox")]

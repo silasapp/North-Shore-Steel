@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class RecentOrderModel : BaseNopModel
+    public record RecentOrderModel : BaseNopModel
     {
         public int OrderId { get; set; }
         public double Weight { get; set; }

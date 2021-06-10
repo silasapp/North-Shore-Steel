@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class CustomerHomeModel : BaseNopModel
+    public record CustomerHomeModel : BaseNopModel
     {
         
     }

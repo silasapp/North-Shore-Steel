@@ -5,28 +5,28 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class CustomerAccountModel : BaseNopModel
+    public record CustomerAccountModel : BaseNopModel
     {
         public Notification Notification { get; set; }
 
     }
     public class Notification
     {
-        public bool isMyOrderConfirmedEmail { get; set; }
-        public bool isMyOrderConfirmedSms { get; set; }
-        public bool isMyOrderScheduledDateEmail { get; set; }
-        public bool isMyOrderScheduledDateSms { get; set; }
-        public bool isMyOrderPromiseDateEmail { get; set; }
-        public bool isMyOrderPromiseDateSms { get; set; }
-        public bool isMyOrderReadyEmail { get; set; }
-        public bool isMyOrderReadySms { get; set; }
-        public bool isMyOrderLoadingEmail { get; set; }
-        public bool isMyOrderLoadingSms { get; set; }
-        public bool isMyOrderShippedEmail { get; set; }
-        public bool isMyOrderShippedSms { get; set; }
-        public bool isAnyOrderConfirmedEmail { get; set; }
-        public bool isAnyOrderConfirmedSms { get; set; }
-        public bool isAnyOrderShippedEmail { get; set; }
-        public bool isAnyOrderShippedSms { get; set; }
+        public bool IsMyOrderConfirmedEmail { get; set; }
+        public bool IsMyOrderConfirmedSms { get; set; }
+        public bool IsMyOrderScheduledDateEmail { get; set; }
+        public bool IsMyOrderScheduledDateSms { get; set; }
+        public bool IsMyOrderPromiseDateEmail { get; set; }
+        public bool IsMyOrderPromiseDateSms { get; set; }
+        public bool IsMyOrderReadyEmail { get; set; }
+        public bool IsMyOrderReadySms { get; set; }
+        public bool IsMyOrderLoadingEmail { get; set; }
+        public bool IsMyOrderLoadingSms { get; set; }
+        public bool IsMyOrderShippedEmail { get; set; }
+        public bool IsMyOrderShippedSms { get; set; }
+        public bool IsAnyOrderConfirmedEmail { get; set; }
+        public bool IsAnyOrderConfirmedSms { get; set; }
+        public bool IsAnyOrderShippedEmail { get; set; }
+        public bool IsAnyOrderShippedSms { get; set; }
     }
 }

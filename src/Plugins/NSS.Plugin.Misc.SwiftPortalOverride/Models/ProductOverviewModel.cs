@@ -10,7 +10,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public partial class ProductOverviewModel : BaseNopEntityModel
+    public partial record ProductOverviewModel : BaseNopEntityModel
     {
         public ProductOverviewModel()
         {
@@ -53,7 +53,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
         #region Nested Classes
 
-        public partial class ProductPriceModel : BaseNopModel
+        public partial record ProductPriceModel : BaseNopModel
         {
             public string OldPrice { get; set; }
             public string Price { get; set; }
@@ -83,7 +83,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         /// <summary>
         /// Specification attribute model
         /// </summary>
-        public partial class ProductSpecificationModel : BaseNopModel
+        public partial record ProductSpecificationModel : BaseNopModel
         {
             /// <summary>
             /// Specificartion attribute ID
