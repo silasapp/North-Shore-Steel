@@ -24,13 +24,13 @@
 }
 
 @{
-    var themeName = themeContext.WorkingThemeName;
-    var currentCustomer = workContext.CurrentCustomer;
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
+    var currentCustomer = await workContext.GetCurrentCustomerAsync();
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-    string eRPCompanyId  = string.IsNullOrEmpty(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey)) ? "0000" : genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
-    bool isAP = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.AP);
-    bool isOperations = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Operations);
-    bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
+    string eRPCompanyId  = string.IsNullOrEmpty(await genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey)) ? "0000" : await genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey);
+    bool isAP = await customerCompanyService.AuthorizeAsync(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.AP);
+    bool isOperations = await customerCompanyService.AuthorizeAsync(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Operations);
+    bool isBuyer = await customerCompanyService.AuthorizeAsync(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
 }
 
 
