@@ -11,10 +11,10 @@
 @inject IWorkContext workContext
 
 @{
-    var currentCustomer = workContext.CurrentCustomer;
+    var currentCustomer = await workContext.GetCurrentCustomerAsync();
     var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, currentCustomer.Id);
-    string eRPCompanyId = genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey);
-    bool isBuyer = customerCompanyService.Authorize(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
+    string eRPCompanyId = await genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey);
+    bool isBuyer = await customerCompanyService.AuthorizeAsync(currentCustomer.Id, Convert.ToInt32(eRPCompanyId), ERPRole.Buyer);
 }
 
 @if (isBuyer)
