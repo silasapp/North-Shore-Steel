@@ -14,16 +14,16 @@
 @using Nop.Web.Framework.Themes
 
 @{
-    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
-    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,( await workContext.GetCurrentCustomerAsync()).Id);
+    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttributeAsync<string>(await workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+    bool isBuyer = await customerCompanyService.AuthorizeAsync((await workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
 }
 
 <div id="header-links" class="header-links">
 
     <div class="overlay" id="menu-overlay" onclick="closeDrawer()"></div>
     <ul class="mb-0">
-        @{ var themeName = themeContext.WorkingThemeName; }
+        @{ var themeName = await themeContext.GetWorkingThemeNameAsync(); }
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksBefore })
         @if (Model.IsAuthenticated)
         {
