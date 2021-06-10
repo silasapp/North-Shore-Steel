@@ -78,7 +78,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 IEnumerable<CustomerCompany> cc = customerCompanies.Where(x => x.Company.ErpCompanyId.ToString() == ERPCId);
                 if (cc.Count() > 0)
                 {
-                 var (result, updatedModel) = NavigateToPermittedHomeScreen(ERPCId).Result;
+                 var (result, updatedModel) = NavigateToPermittedHomeScreen(ERPCId, model).Result;
                     model = updatedModel;
                     return result;
                 }
@@ -92,7 +92,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 ERPCId = customerCompanies.First().Company.ErpCompanyId.ToString();
                 SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCId);
 
-                var (result, updatedModel) = NavigateToPermittedHomeScreen(ERPCId).Result;
+                var (result, updatedModel) = NavigateToPermittedHomeScreen(ERPCId, model).Result;
                 model = updatedModel;
                 return result;
             }
@@ -119,25 +119,25 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
            await SaveAttributeERPCompanyId(currentCustomer, compIdCookieKey, ERPCompanyId);
         }
 
-        private async Task<(IActionResult, TransactionModel model)> NavigateToPermittedHomeScreen(string ERPCId)
+        private async Task<(IActionResult, TransactionModel)> NavigateToPermittedHomeScreen(string eRPCId, TransactionModel model)
         {
-           var model = new TransactionModel();
+            model = new TransactionModel();
 
-            var (canViewDashboard, isAPUser) = await CanViewDashboard(ERPCId);
+            var (canViewDashboard, isAPUser) = await CanViewDashboard(eRPCId);
 
             if (canViewDashboard)
             {
-                model = await _customerModelFactory.PrepareCustomerHomeModelAsync(ERPCId);
-                return (View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml"),model);
+                model = await _customerModelFactory.PrepareCustomerHomeModelAsync(eRPCId);
+                return (View("~/Plugins/Misc.SwiftPortalOverride/Views/HomeIndex.cshtml", model), model);
             }
 
             if (isAPUser)
             {
-                return (RedirectToAction("CompanyInvoices", "Invoice"),model);
+                return (RedirectToAction("CompanyInvoices", "Invoice", model), model);
             }
 
             // no permission
-            return (RedirectToAction("Index", "Resource"),model);
+            return (RedirectToAction("Index", "Resource", model), model);
         }
 
         private async Task<(bool, bool)> CanViewDashboard(string ERPCId)
