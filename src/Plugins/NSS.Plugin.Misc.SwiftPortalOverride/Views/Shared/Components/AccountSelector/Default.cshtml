@@ -10,21 +10,21 @@
 @inject ICustomerCompanyService customerCompanyService
 @inject IGenericAttributeService genericAttributeService
 @{
-    var currentCustomer = workContext.CurrentCustomer;
+    var currentCustomer = await workContext.GetCurrentCustomerAsync();
     int customerId = currentCustomer.Id;
     // get all companies assigned to customer
-    IEnumerable<CustomerCompany> customerCompanies = customerCompanyService.GetCustomerCompanies(customerId);
+    IEnumerable<CustomerCompany> customerCompanies = await customerCompanyService.GetCustomerCompaniesAsync(customerId);
 
     CustomerSelectAccountModel selectAccountModel = new CustomerSelectAccountModel();
     selectAccountModel.Companies = customerCompanies.Select(cc => cc.Company);
-    selectAccountModel.loggedInCustomerId = customerId;
+    selectAccountModel.LoggedInCustomerId = customerId;
     selectAccountModel.Count = customerCompanies.Count();
 }
 
 @{
     // get cust company
-    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(currentCustomer, compIdCookieKey));
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await workContext.GetCurrentCustomerAsync()).Id);
+    int eRPCompanyId = Convert.ToInt32(await genericAttributeService.GetAttributeAsync<string>(currentCustomer, compIdCookieKey));
 }
 
 
