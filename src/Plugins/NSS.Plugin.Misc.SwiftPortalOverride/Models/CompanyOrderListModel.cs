@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public partial class CompanyOrderListModel : BaseNopModel
+    public partial record CompanyOrderListModel : BaseNopModel
     {
         public CompanyOrderListModel()
         {
@@ -19,7 +19,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
 
         #region Nested Classes
-        public partial class OrderDetailsModel : BaseNopEntityModel
+        public partial record OrderDetailsModel : BaseNopEntityModel
         {
             public int OrderId { get; set; }
             public decimal Weight { get; set; }

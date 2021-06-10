@@ -3,7 +3,7 @@ using Nop.Web.Framework.Models;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public partial class CustomerNavigationModel : BaseNopModel
+    public partial record CustomerNavigationModel : BaseNopModel
     {
         public CustomerNavigationModel()
         {
@@ -17,7 +17,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public CustomerNavigationEnum SelectedTab { get; set; }
     }
 
-    public class CustomerNavigationItemModel : BaseNopModel
+    public record CustomerNavigationItemModel : BaseNopModel
     {
         public string RouteName { get; set; }
         public string Title { get; set; }
@@ -26,7 +26,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         public string ItemLogo { get; set; }
     }
 
-    public class CompanyNavigationItemModel : BaseNopModel
+    public record CompanyNavigationItemModel : BaseNopModel
     {
         public string RouteName { get; set; }
         public string Title { get; set; }

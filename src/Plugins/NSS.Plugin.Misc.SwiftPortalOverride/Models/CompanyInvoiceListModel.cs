@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public partial class CompanyInvoiceListModel : BaseNopModel
+    public partial record CompanyInvoiceListModel : BaseNopModel
     {
         public CompanyInvoiceListModel()
         {
@@ -41,7 +41,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
             public bool IsBuyer { get; set; }
             public bool IsOperations { get; set; }
         }
-        public partial class InvoiceDetailsModel : BaseNopEntityModel
+        public partial record InvoiceDetailsModel : BaseNopEntityModel
         {
             public int InvoiceId { get; set; }
             public int OrderNo { get; set; }

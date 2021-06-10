@@ -7,7 +7,7 @@ using static NSS.Plugin.Misc.SwiftPortalOverride.Models.CompanyInvoiceListModel;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class TransactionModel : BaseNopModel
+    public record TransactionModel : BaseNopModel
     {
         public TransactionModel()
         {

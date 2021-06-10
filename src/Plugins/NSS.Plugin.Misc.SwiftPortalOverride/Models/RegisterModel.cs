@@ -8,7 +8,7 @@ using NSS.Plugin.Misc.SwiftCore.Helpers;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public partial class RegisterModel : BaseNopModel
+    public partial record RegisterModel : BaseNopModel
     {
         
         

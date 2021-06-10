@@ -6,11 +6,11 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public class CustomerSelectAccountModel : BaseNopModel
+    public record CustomerSelectAccountModel : BaseNopModel
     {
         public IEnumerable<Company> Companies { get; set; }
 
-        public int loggedInCustomerId { get; set; }
+        public int LoggedInCustomerId { get; set; }
         public int Count { get; set; }
     }
 }

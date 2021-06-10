@@ -13,7 +13,7 @@ using System.Text;
 
 namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 {
-    public partial class CheckoutCompleteOverrideModel : BaseNopEntityModel
+    public partial record CheckoutCompleteOverrideModel : BaseNopEntityModel
     {
         public OnePageCheckoutModel BillingAddressModel { get; set; }
         public CheckoutShippingAddressModel ShippingAddressModel { get; set; }

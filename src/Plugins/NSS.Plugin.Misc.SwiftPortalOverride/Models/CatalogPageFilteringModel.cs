@@ -20,7 +20,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
     /// <summary>
     /// Filtering and paging model for catalog
     /// </summary>
-    public partial class CatalogPagingFilteringModel : BasePageableModel
+    public partial record CatalogPagingFilteringModel : BasePageableModel
     {
         #region Ctor
 
@@ -73,7 +73,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         /// <summary>
         /// Specification filter model
         /// </summary>
-        public partial class SpecificationFilterModel : BaseNopModel
+        public partial record SpecificationFilterModel : BaseNopModel
         {
             #region Const
 
@@ -117,106 +117,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
 
             #region Methods
 
-            /// <summary>
-            /// Get IDs of already filtered specification options
-            /// </summary>
-            /// <param name="webHelper">Web helper</param>
-            /// <returns>IDs</returns>
-            public virtual List<int> GetAlreadyFilteredSpecOptionIds(IWebHelper webHelper)
-            {
-                var result = new List<int>();
-
-                var alreadyFilteredSpecsStr = webHelper.QueryString<string>(QUERYSTRINGPARAM);
-                if (string.IsNullOrWhiteSpace(alreadyFilteredSpecsStr))
-                    return result;
-
-                foreach (var spec in alreadyFilteredSpecsStr.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    int.TryParse(spec.Trim(), out var specId);
-                    if (!result.Contains(specId))
-                        result.Add(specId);
-                }
-                return result;
-            }
-
-            /// <summary>
-            /// Prepare model
-            /// </summary>
-            /// <param name="alreadyFilteredSpecOptionIds">IDs of already filtered specification options</param>
-            /// <param name="filterableSpecificationAttributeOptionIds">IDs of filterable specification options</param>
-            /// <param name="specificationAttributeService"></param>
-            /// <param name="localizationService">Localization service</param>
-            /// <param name="webHelper">Web helper</param>
-            /// <param name="workContext">Work context</param>
-            /// <param name="staticCacheManager">Cache manager</param>
-            public virtual void PrepareSpecsFilters(IList<int> alreadyFilteredSpecOptionIds,
-                int[] filterableSpecificationAttributeOptionIds,
-                ICacheKeyService cacheKeyService,
-                ISpecificationAttributeService specificationAttributeService, ILocalizationService localizationService,
-                IWebHelper webHelper, IWorkContext workContext, IStaticCacheManager staticCacheManager)
-            {
-                Enabled = false;
-                var cacheKey = cacheKeyService.PrepareKeyForDefaultCache(NopModelCacheDefaults.SpecsFilterModelKey, filterableSpecificationAttributeOptionIds, workContext.WorkingLanguage);
-
-                var allOptions = specificationAttributeService.GetSpecificationAttributeOptionsByIds(filterableSpecificationAttributeOptionIds);
-                var allFilters = staticCacheManager.Get(cacheKey, () => allOptions.Select(sao =>
-                {
-                    var specAttribute = specificationAttributeService.GetSpecificationAttributeById(sao.SpecificationAttributeId);
-
-                    return new SpecificationAttributeOptionFilter
-                    {
-                        SpecificationAttributeId = specAttribute.Id,
-                        SpecificationAttributeName = localizationService.GetLocalized(specAttribute, x => x.Name, workContext.WorkingLanguage.Id),
-                        SpecificationAttributeDisplayOrder = specAttribute.DisplayOrder,
-                        SpecificationAttributeOptionId = sao.Id,
-                        SpecificationAttributeOptionName = localizationService.GetLocalized(sao, x => x.Name, workContext.WorkingLanguage.Id),
-                        SpecificationAttributeOptionColorRgb = sao.ColorSquaresRgb,
-                        SpecificationAttributeOptionDisplayOrder = sao.DisplayOrder
-                    };
-                }).ToList());
-
-                if (!allFilters.Any())
-                    return;
-
-                //sort loaded options
-                allFilters = allFilters.OrderBy(saof => saof.SpecificationAttributeDisplayOrder)
-                    .ThenBy(saof => saof.SpecificationAttributeName)
-                    .ThenBy(saof => saof.SpecificationAttributeOptionDisplayOrder)
-                    .ThenBy(saof => saof.SpecificationAttributeOptionName).ToList();
-
-                //prepare the model properties
-                Enabled = true;
-                var removeFilterUrl = webHelper.RemoveQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM);
-                RemoveFilterUrl = ExcludeQueryStringParams(removeFilterUrl, webHelper);
-
-                //get already filtered specification options
-                var alreadyFilteredOptions = allFilters.Where(x => alreadyFilteredSpecOptionIds.Contains(x.SpecificationAttributeOptionId));
-                AlreadyFilteredItems = alreadyFilteredOptions.Select(x =>
-                    new SpecificationFilterItem
-                    {
-                        SpecificationAttributeName = x.SpecificationAttributeName,
-                        SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
-                        //SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb
-                    }).ToList();
-
-                //get not filtered specification options
-                NotFilteredItems = allFilters.Except(alreadyFilteredOptions).Select(x =>
-                {
-                    //filter URL
-                    var alreadyFiltered = alreadyFilteredSpecOptionIds.Concat(new List<int> { x.SpecificationAttributeOptionId });
-                    var filterUrl = webHelper.ModifyQueryString(webHelper.GetThisPageUrl(true), QUERYSTRINGPARAM,
-                        alreadyFiltered.OrderBy(id => id).Select(id => id.ToString()).ToArray());
-
-                    return new SpecificationFilterItem()
-                    {
-                        SpecificationAttributeOptionId = x.SpecificationAttributeOptionId,
-                        SpecificationAttributeName = x.SpecificationAttributeName,
-                        SpecificationAttributeOptionName = x.SpecificationAttributeOptionName,
-                        //SpecificationAttributeOptionColorRgb = x.SpecificationAttributeOptionColorRgb,
-                        //FilterUrl = ExcludeQueryStringParams(filterUrl, webHelper)
-                    };
-                }).ToList();
-            }
 
             #endregion
 
@@ -246,7 +146,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         /// <summary>
         /// Specification filter item
         /// </summary>
-        public partial class SpecificationFilterItem : BaseNopModel
+        public partial record SpecificationFilterItem : BaseNopModel
         {
             /// <summary>
             /// Specification attribute id
@@ -268,7 +168,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         /// <summary>
         /// Shape filter model
         /// </summary>
-        public partial class ShapeFilterModel : BaseNopModel
+        public partial record ShapeFilterModel : BaseNopModel
         {
             #region Const
 
@@ -316,7 +216,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Models
         /// <summary>
         /// Specification filter item
         /// </summary>
-        public partial class ShapeFilterItem : BaseNopModel
+        public partial record ShapeFilterItem : BaseNopModel
         {
             public ShapeFilterItem()
             {
