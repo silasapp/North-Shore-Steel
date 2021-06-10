@@ -21,10 +21,10 @@
 }
 
 @{
-    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, workContext.CurrentCustomer.Id);
-    int eRPCompanyId = Convert.ToInt32(genericAttributeService.GetAttribute<string>(workContext.CurrentCustomer, compIdCookieKey));
-    bool isBuyer = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Buyer);
-    bool isOperations = customerCompanyService.Authorize(workContext.CurrentCustomer.Id, eRPCompanyId, ERPRole.Operations);
+    var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await workContext.GetCurrentCustomerAsync()).Id);
+    int eRPCompanyId = Convert.ToInt32(await genericAttributeService.GetAttributeAsync<string>(await workContext.GetCurrentCustomerAsync(), compIdCookieKey));
+    bool isBuyer = await customerCompanyService.AuthorizeAsync((await workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Buyer);
+    bool isOperations = await customerCompanyService.AuthorizeAsync((await workContext.GetCurrentCustomerAsync()).Id, eRPCompanyId, ERPRole.Operations);
 }
 
 @section left
@@ -33,9 +33,9 @@
 }
 
 @{
-    var customer = workContext.CurrentCustomer;
-    string CellPhone = genericAttributeService.GetAttribute<string>(customer, Constants.CellAttribute);
-    int preferredLocationId = genericAttributeService.GetAttribute<int>(customer, Constants.PreferredLocationIdAttribute);
+    var customer = await workContext.GetCurrentCustomerAsync();
+    string CellPhone = await genericAttributeService.GetAttributeAsync<string>(customer, Constants.CellAttribute);
+    int preferredLocationId = await genericAttributeService.GetAttributeAsync<int>(customer, Constants.PreferredLocationIdAttribute);
 }
 <style>
     .grey-bg {
