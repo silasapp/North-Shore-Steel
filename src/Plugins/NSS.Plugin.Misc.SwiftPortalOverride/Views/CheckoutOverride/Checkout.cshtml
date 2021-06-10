@@ -90,7 +90,7 @@
 
 @{
     var customer = await workContext.GetCurrentCustomerAsync();
-    CustomerCompany customerCompany = GetCustomerCompanyDetails();
+    CustomerCompany customerCompany = await GetCustomerCompanyDetailsAsync();
     var cartItems = await shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart);
     int preferredLocationId = await genericAttributeService.GetAttributeAsync<int>(customer, Constants.PreferredLocationIdAttribute);
 
@@ -562,7 +562,7 @@ Content2 =
         return s;
     }
 
-   async  CustomerCompany  GetCustomerCompanyDetails()
+    async  Task<CustomerCompany>  GetCustomerCompanyDetailsAsync()
     {
         CustomerCompany customerCompany = new CustomerCompany();
         var currentCustomer = await workContext.GetCurrentCustomerAsync();
