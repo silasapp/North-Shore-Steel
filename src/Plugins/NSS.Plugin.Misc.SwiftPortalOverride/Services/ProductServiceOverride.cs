@@ -68,7 +68,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
         public override async Task<IPagedList<Product>> SearchProductsAsync(
             int pageIndex = 0,
             int pageSize = int.MaxValue,
-            IList<int> categoryIds = null,
+            IList<int> shapeIds = null,
             IList<int> manufacturerIds = null,
             int storeId = 0,
             int vendorId = 0,
@@ -90,192 +90,135 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Services
             bool showHidden = false,
             bool? overridePublished = null)
         {
+            var filterableSpecificationAttributeOptionIds = new List<int>();
+
+            //search by keyword
+            var searchLocalizedValue = false;
+            if (languageId > 0)
+            {
+                if (showHidden)
+                {
+                    searchLocalizedValue = true;
+                }
+                else
+                {
+                    //ensure that we have at least two published languages
+                    var totalPublishedLanguages = _languageService.GetAllLanguagesAsync().Result.Count();
+                    searchLocalizedValue = totalPublishedLanguages >= 2;
+                }
+            }
+
+            //validate "shapeIds" parameter
+            if (shapeIds != null && shapeIds.Contains(0))
+                shapeIds.Remove(0);
+
+            //Access control list. Allowed customer roles
+            var allowedCustomerRolesIds = await _customerService.GetCustomerRoleIdsAsync(await _workContext.GetCurrentCustomerAsync());
+
+            //pass category identifiers as comma-delimited string
+            var commaSeparatedShapeIds = shapeIds == null ? string.Empty : string.Join(",", shapeIds);
+
+            //pass customer role identifiers as comma-delimited string
+            var commaSeparatedAllowedCustomerRoleIds = string.Join(",", allowedCustomerRolesIds);
+
+            //pass specification identifiers as comma-delimited string
+            var commaSeparatedSpecIds = string.Empty;
+            if (filteredSpecOptions != null)
+            {
+                ((List<int>)filteredSpecOptions).Sort();
+                commaSeparatedSpecIds = string.Join(",", filteredSpecOptions);
+            }
+
             //some databases don't support int.MaxValue
             if (pageSize == int.MaxValue)
                 pageSize = int.MaxValue - 1;
 
-            var productsQuery = _productRepository.Table;
+            //prepare input parameters
+            var pCategoryIds = SqlParameterHelper.GetStringParameter("ShapeIds", commaSeparatedShapeIds);
+            var pManufacturerId = SqlParameterHelper.GetInt32Parameter("ManufacturerId", 0);
+            var pStoreId = SqlParameterHelper.GetInt32Parameter("StoreId", !_catalogSettings.IgnoreStoreLimitations ? storeId : 0);
+            var pVendorId = SqlParameterHelper.GetInt32Parameter("VendorId", vendorId);
+            var pWarehouseId = SqlParameterHelper.GetInt32Parameter("WarehouseId", warehouseId);
+            var pProductTypeId = SqlParameterHelper.GetInt32Parameter("ProductTypeId", (int?)productType);
+            var pVisibleIndividuallyOnly = SqlParameterHelper.GetBooleanParameter("VisibleIndividuallyOnly", visibleIndividuallyOnly);
+            var pMarkedAsNewOnly = SqlParameterHelper.GetBooleanParameter("MarkedAsNewOnly", false);
+            var pProductTagId = SqlParameterHelper.GetInt32Parameter("ProductTagId", productTagId);
+            var pFeaturedProducts = SqlParameterHelper.GetBooleanParameter("FeaturedProducts", null);
+            var pPriceMin = SqlParameterHelper.GetDecimalParameter("PriceMin", priceMin);
+            var pPriceMax = SqlParameterHelper.GetDecimalParameter("PriceMax", priceMax);
+            var pKeywords = SqlParameterHelper.GetStringParameter("Keywords", keywords);
+            var pSearchDescriptions = SqlParameterHelper.GetBooleanParameter("SearchDescriptions", searchDescriptions);
+            var pSearchManufacturerPartNumber = SqlParameterHelper.GetBooleanParameter("SearchManufacturerPartNumber", searchManufacturerPartNumber);
+            var pSearchSku = SqlParameterHelper.GetBooleanParameter("SearchSku", searchSku);
+            var pSearchProductTags = SqlParameterHelper.GetBooleanParameter("SearchProductTags", searchProductTags);
+            var pUseFullTextSearch = SqlParameterHelper.GetBooleanParameter("UseFullTextSearch", false);
+            var pFullTextMode = SqlParameterHelper.GetInt32Parameter("FullTextMode", 0);
+            var pFilteredSpecs = SqlParameterHelper.GetStringParameter("FilteredSpecs", commaSeparatedSpecIds);
+            var pLanguageId = SqlParameterHelper.GetInt32Parameter("LanguageId", searchLocalizedValue ? languageId : 0);
+            var pOrderBy = SqlParameterHelper.GetInt32Parameter("OrderBy", (int)orderBy);
+            var pAllowedCustomerRoleIds = SqlParameterHelper.GetStringParameter("AllowedCustomerRoleIds", !_catalogSettings.IgnoreAcl ? commaSeparatedAllowedCustomerRoleIds : string.Empty);
+            var pPageIndex = SqlParameterHelper.GetInt32Parameter("PageIndex", pageIndex);
+            var pPageSize = SqlParameterHelper.GetInt32Parameter("PageSize", pageSize);
+            var pShowHidden = SqlParameterHelper.GetBooleanParameter("ShowHidden", showHidden);
+            var pOverridePublished = SqlParameterHelper.GetBooleanParameter("OverridePublished", overridePublished);
+            var pLoadFilterableSpecificationAttributeOptionIds = SqlParameterHelper.GetBooleanParameter("LoadFilterableSpecificationAttributeOptionIds", false);
 
-            if (!showHidden)
-                productsQuery = productsQuery.Where(p => p.Published);
-            else if (overridePublished.HasValue)
-                productsQuery = productsQuery.Where(p => p.Published == overridePublished.Value);
+            //prepare output parameters
+            var pFilterableSpecificationAttributeOptionIds = SqlParameterHelper.GetOutputStringParameter("FilterableSpecificationAttributeOptionIds");
+            pFilterableSpecificationAttributeOptionIds.Size = int.MaxValue - 1;
+            var pTotalRecords = SqlParameterHelper.GetOutputInt32Parameter("TotalRecords");
 
-            //apply store mapping constraints
-            productsQuery = await _storeMappingService.ApplyStoreMapping(productsQuery, storeId);
+            //invoke stored procedure
+            var products = (await _productRepository.EntityFromSqlAsync("ProductLoadAllPagedSwiftPortal",
+                pCategoryIds,
+                pManufacturerId,
+                pStoreId,
+                pVendorId,
+                pWarehouseId,
+                pProductTypeId,
+                pVisibleIndividuallyOnly,
+                pMarkedAsNewOnly,
+                pProductTagId,
+                pFeaturedProducts,
+                pPriceMin,
+                pPriceMax,
+                pKeywords,
+                pSearchDescriptions,
+                pSearchManufacturerPartNumber,
+                pSearchSku,
+                pSearchProductTags,
+                pUseFullTextSearch,
+                pFullTextMode,
+                pFilteredSpecs,
+                pLanguageId,
+                pOrderBy,
+                pAllowedCustomerRoleIds,
+                pPageIndex,
+                pPageSize,
+                pShowHidden,
+                pOverridePublished,
+                pLoadFilterableSpecificationAttributeOptionIds,
+                pFilterableSpecificationAttributeOptionIds,
+                pTotalRecords)).ToList();
 
-            //apply ACL constraints
-            if (!showHidden)
+            //get filterable specification attribute option identifier
+            var filterableSpecificationAttributeOptionIdsStr =
+                pFilterableSpecificationAttributeOptionIds.Value != DBNull.Value
+                    ? (string)pFilterableSpecificationAttributeOptionIds.Value
+                    : string.Empty;
+
+            if (false &&
+                !string.IsNullOrWhiteSpace(filterableSpecificationAttributeOptionIdsStr))
             {
-                var customer = await _workContext.GetCurrentCustomerAsync();
-                productsQuery = await _aclService.ApplyAcl(productsQuery, customer);
+                filterableSpecificationAttributeOptionIds = filterableSpecificationAttributeOptionIdsStr
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => Convert.ToInt32(x.Trim()))
+                    .ToList();
             }
+            //return products
+            var totalRecords = pTotalRecords.Value != DBNull.Value ? Convert.ToInt32(pTotalRecords.Value) : 0;
 
-            productsQuery =
-                from p in productsQuery
-                where !p.Deleted &&
-                    (vendorId == 0 || p.VendorId == vendorId) &&
-                    (
-                        warehouseId == 0 ||
-                        (
-                            !p.UseMultipleWarehouses ? p.WarehouseId == warehouseId :
-                                _productWarehouseInventoryRepository.Table.Any(pwi => pwi.Id == warehouseId && pwi.ProductId == p.Id)
-                        )
-                    ) &&
-                    (productType == null || p.ProductTypeId == (int)productType) &&
-                    (showHidden == false || LinqToDB.Sql.Between(DateTime.UtcNow, p.AvailableStartDateTimeUtc ?? DateTime.MinValue, p.AvailableEndDateTimeUtc ?? DateTime.MaxValue)) &&
-                    (priceMin == null || p.Price >= priceMin) &&
-                    (priceMax == null || p.Price <= priceMax)
-                select p;
-
-            if (!string.IsNullOrEmpty(keywords))
-            {
-                var langs = await _languageService.GetAllLanguagesAsync(showHidden: true);
-
-                //Set a flag which will to points need to search in localized properties. If showHidden doesn't set to true should be at least two published languages.
-                var searchLocalizedValue = languageId > 0 && langs.Count() >= 2 && (showHidden || langs.Count(l => l.Published) >= 2);
-
-                IQueryable<int> productsByKeywords;
-
-                productsByKeywords =
-                        from p in _productRepository.Table
-                        where p.Name.Contains(keywords) ||
-                            (searchDescriptions &&
-                                (p.ShortDescription.Contains(keywords) || p.FullDescription.Contains(keywords))) ||
-                            (searchManufacturerPartNumber && p.ManufacturerPartNumber == keywords) ||
-                            (searchSku && p.Sku == keywords)
-                        select p.Id;
-
-                //search by SKU for ProductAttributeCombination
-                if (searchSku)
-                {
-                    productsByKeywords = productsByKeywords.Union(
-                        from pac in _productAttributeCombinationRepository.Table
-                        where pac.Sku == keywords
-                        select pac.ProductId);
-                }
-
-                if (searchProductTags)
-                {
-                    productsByKeywords = productsByKeywords.Union(
-                        from pptm in _productTagMappingRepository.Table
-                        join pt in _productTagRepository.Table on pptm.ProductTagId equals pt.Id
-                        where pt.Name == keywords
-                        select pptm.ProductId
-                    );
-
-                    if (searchLocalizedValue)
-                    {
-                        productsByKeywords = productsByKeywords.Union(
-                        from pptm in _productTagMappingRepository.Table
-                        join lp in _localizedPropertyRepository.Table on pptm.ProductTagId equals lp.EntityId
-                        where lp.LocaleKeyGroup == nameof(ProductTag) &&
-                              lp.LocaleKey == nameof(ProductTag.Name) &&
-                              lp.LocaleValue.Contains(keywords)
-                        select lp.EntityId);
-                    }
-                }
-
-                if (searchLocalizedValue)
-                {
-                    productsByKeywords = productsByKeywords.Union(
-                                from lp in _localizedPropertyRepository.Table
-                                let checkName = lp.LocaleKey == nameof(Product.Name) &&
-                                                lp.LocaleValue.Contains(keywords)
-                                let checkShortDesc = searchDescriptions &&
-                                                lp.LocaleKey == nameof(Product.ShortDescription) &&
-                                                lp.LocaleValue.Contains(keywords)
-                                let checkProductTags = searchProductTags &&
-                                                lp.LocaleKeyGroup == nameof(ProductTag) &&
-                                                lp.LocaleKey == nameof(ProductTag.Name) &&
-                                                lp.LocaleValue.Contains(keywords)
-                                where
-                                    (lp.LocaleKeyGroup == nameof(Product) && lp.LanguageId == languageId) && (checkName || checkShortDesc) ||
-                                    checkProductTags
-
-                                select lp.EntityId);
-                }
-
-                productsQuery =
-                    from p in productsQuery
-                    from pbk in LinqToDB.LinqExtensions.InnerJoin(productsByKeywords, pbk => pbk == p.Id)
-                    select p;
-            }
-
-            if (categoryIds is not null)
-            {
-                if (categoryIds.Contains(0))
-                    categoryIds.Remove(0);
-
-                if (categoryIds.Any())
-                {
-                    var productCategoryQuery =
-                        from pc in _productCategoryRepository.Table
-                        where (!excludeFeaturedProducts || !pc.IsFeaturedProduct) &&
-                            categoryIds.Contains(pc.CategoryId)
-                        select pc;
-
-                    productsQuery =
-                        from p in productsQuery
-                        where productCategoryQuery.Any(pc => pc.ProductId == p.Id)
-                        select p;
-                }
-            }
-
-            if (manufacturerIds is not null)
-            {
-                if (manufacturerIds.Contains(0))
-                    manufacturerIds.Remove(0);
-
-                if (manufacturerIds.Any())
-                {
-                    var productManufacturerQuery =
-                        from pm in _productManufacturerRepository.Table
-                        where (!excludeFeaturedProducts || !pm.IsFeaturedProduct) &&
-                            manufacturerIds.Contains(pm.ManufacturerId)
-                        select pm;
-
-                    productsQuery =
-                        from p in productsQuery
-                        where productManufacturerQuery.Any(pm => pm.ProductId == p.Id)
-                        select p;
-                }
-            }
-
-            if (productTagId > 0)
-            {
-                productsQuery =
-                    from p in productsQuery
-                    join ptm in _productTagMappingRepository.Table on p.Id equals ptm.ProductId
-                    where ptm.ProductTagId == productTagId
-                    select p;
-            }
-
-            if (filteredSpecOptions?.Count > 0)
-            {
-                var specificationAttributeIds = filteredSpecOptions
-                    .Select(sao => sao.SpecificationAttributeId)
-                    .Distinct();
-
-                foreach (var specificationAttributeId in specificationAttributeIds)
-                {
-                    var optionIdsBySpecificationAttribute = filteredSpecOptions
-                        .Where(o => o.SpecificationAttributeId == specificationAttributeId)
-                        .Select(o => o.Id);
-
-                    var productSpecificationQuery =
-                        from psa in _productSpecificationAttributeRepository.Table
-                        where psa.AllowFiltering && optionIdsBySpecificationAttribute.Contains(psa.SpecificationAttributeOptionId)
-                        select psa;
-
-                    productsQuery =
-                        from p in productsQuery
-                        where productSpecificationQuery.Any(pc => pc.ProductId == p.Id)
-                        select p;
-                }
-            }
-
-            return await productsQuery.OrderBy(orderBy).ToPagedListAsync(pageIndex, pageSize);
+            return (new PagedList<Product>(products, pageIndex, pageSize, totalRecords));
         }
 
     }

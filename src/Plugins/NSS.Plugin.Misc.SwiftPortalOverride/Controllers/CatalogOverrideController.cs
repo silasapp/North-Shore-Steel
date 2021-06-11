@@ -65,8 +65,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [HttpsRequirement]
         public async Task<IActionResult> Index()
         {
-            // _workContext.CurrentCustomer changed to _workContext.GetCurrentCustomerAsync()
-            // _workContext.CurrentStore changed to _workContext.GetCurrentStoreAsync()
             var compIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey, (await _workContext.GetCurrentCustomerAsync()).Id);
             int eRPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), compIdCookieKey));
 
@@ -88,9 +86,6 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
         [IgnoreAntiforgeryToken]
         public async Task<JsonResult> FilteredProductsResult([FromBody] FilterParams filterParams)
         {
-            Stopwatch filterTimer = new Stopwatch();
-            filterTimer.Start();
-
             var shapeIds = filterParams?.ShapeIds;
             var specIds = filterParams?.SpecIds;
             var searchKeyword = filterParams?.SearchKeyword;
@@ -99,15 +94,9 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             if (specIds == null)
                 specIds = new List<int>();
 
-            var catalogTimer = new Stopwatch();
-            catalogTimer.Start();
             CatalogModel = await _catalogModelFactory.PrepareSwiftCatalogModelAsync(shapeIds, specIds, searchKeyword);
             CatalogModel.FilterParams = filterParams;
-            catalogTimer.Stop();
-            Debug.Print("catalogTimer", catalogTimer.Elapsed.TotalMilliseconds);
 
-            filterTimer.Stop();
-            Debug.Print("filterTimer", filterTimer.Elapsed.TotalMilliseconds);
             CatalogModel.ActiveShapeAttributes = filterParams?.ActiveShapeAttributes?.ToList();
 
             return Json(
