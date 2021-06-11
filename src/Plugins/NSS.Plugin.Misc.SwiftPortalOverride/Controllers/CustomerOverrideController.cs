@@ -918,7 +918,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    int ErpId = await _genericAttributeService.GetAttributeAsync<int>(customer, Constants.ErpKeyAttribute);
+                    int erpId = await _genericAttributeService.GetAttributeAsync<int>(customer, Constants.ErpKeyAttribute);
 
                     //username 
                     if (_customerSettings.UsernamesEnabled && _customerSettings.AllowUsersToChangeUsernames)
@@ -1111,7 +1111,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                     #endregion
 
-                    await _apiService.UpdateNSSUserAsync(ErpId, request);
+                    await _apiService.UpdateNSSUserAsync(erpId, request);
 
 
                     return RedirectToRoute("CustomerInfo");

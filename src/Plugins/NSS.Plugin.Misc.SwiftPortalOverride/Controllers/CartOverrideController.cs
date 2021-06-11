@@ -214,7 +214,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             var model = new ShoppingCartModel();
             model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
 
-            CheckForUnavailableProductsInCart(cart);
+           await CheckForUnavailableProductsInCart(cart);
 
             return View(model);
         }
@@ -650,7 +650,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
                 return AccessDeniedView();
 
             //update cart
-            UpdateCart(form);
+           await UpdateCart(form);
             bool checkoutError = await _genericAttributeService.GetAttributeAsync<bool>(currentCustomer, SwiftPortalOverrideDefaults.CartError);
             if (checkoutError)
             {

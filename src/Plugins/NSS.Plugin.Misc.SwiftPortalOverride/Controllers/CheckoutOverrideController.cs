@@ -652,7 +652,7 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
 
                 try
                 {
-                    NSSPlaceOrderRequest(placeOrderResult.PlacedOrder, paymentMethod, deliveryDate?.ToString());
+                  await  NSSPlaceOrderRequest(placeOrderResult.PlacedOrder, paymentMethod, deliveryDate?.ToString());
                 }
                 catch (Exception ex)
                 {
@@ -825,12 +825,12 @@ namespace NSS.Plugin.Misc.SwiftPortalOverride.Controllers
             CustomerCompany customerCompany = null;
 
             string erpCompIdCookieKey = string.Format(SwiftPortalOverrideDefaults.ERPCompanyCookieKey,( await _workContext.GetCurrentCustomerAsync()).Id);
-            int ERPCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), erpCompIdCookieKey));
+            int erpCompanyId = Convert.ToInt32(await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), erpCompIdCookieKey));
 
-            if (ERPCompanyId > 0)
-                customerCompany = await _customerCompanyService.GetCustomerCompanyByErpCompIdAsync((await _workContext.GetCurrentCustomerAsync()).Id, ERPCompanyId);
+            if (erpCompanyId > 0)
+                customerCompany = await _customerCompanyService.GetCustomerCompanyByErpCompIdAsync((await _workContext.GetCurrentCustomerAsync()).Id, erpCompanyId);
 
-            return (ERPCompanyId, customerCompany);
+            return (erpCompanyId, customerCompany);
         }
 
         #endregion
